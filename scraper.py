@@ -3,17 +3,24 @@ import time
 import re
 import os
 from datetime import datetime, timedelta, timezone
-import cloudscraper
 from bs4 import BeautifulSoup
+import requests as std_requests
+
+try:
+    from curl_cffi import requests as cffi_requests
+    USE_CFFI = True
+except ImportError:
+    import cloudscraper
+    USE_CFFI = False
 
 URLS = [
-    {"url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-sale/new-cairo/", "deal": "بيع", "category": "شقق"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-rent/new-cairo/", "deal": "إيجار", "category": "شقق"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/rooms-for-rent/new-cairo/", "deal": "إيجار", "category": "شقق"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/villas-for-sale/new-cairo/", "deal": "بيع", "category": "فيلا"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/villas-for-rent/new-cairo/", "deal": "إيجار", "category": "فيلا"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-sale/new-cairo/", "deal": "بيع", "category": "تجاري وإداري"},
-    {"url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-rent/new-cairo/", "deal": "إيجار", "category": "تجاري وإداري"}
+    {"url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/", "deal": "بيع", "category": "شقق"},
+    {"url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/", "deal": "إيجار", "category": "شقق"},
+    {"url": "https://www.dubizzle.com.eg/properties/rooms-for-rent/new-cairo/", "deal": "إيجار", "category": "شقق"},
+    {"url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/", "deal": "بيع", "category": "فيلا"},
+    {"url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/", "deal": "إيجار", "category": "فيلا"},
+    {"url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/", "deal": "بيع", "category": "تجاري وإداري"},
+    {"url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/", "deal": "إيجار", "category": "تجاري وإداري"}
 ]
 
 BROKER_KEYWORDS = [
@@ -23,12 +30,30 @@ BROKER_KEYWORDS = [
 
 SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
 
-def create_scraper():
-    scraper = cloudscraper.create_scraper(
-        browser={"browser": "chrome", "platform": "windows", "mobile": False}
-    )
-    scraper.headers.update({"Accept-Language": "ar,en-US;q=0.9,en;q=0.8"})
-    return scraper
+def fetch_page(session, url):
+    headers = {
+        "Accept-Language": "ar,en-US;q=0.9,en;q=0.8",
+        "Referer": "https://www.dubizzle.com.eg/"
+    }
+    try:
+        if USE_CFFI:
+            res = session.get(url, headers=headers, impersonate="chrome120", timeout=25)
+        else:
+            res = session.get(url, headers=headers, timeout=25)
+        if res.status_code == 200 and ("/ad/" in res.text or "dubizzle" in res.text):
+            return res.text
+    except Exception:
+        pass
+
+    try:
+        jina_url = "https://r.jina.ai/" + url
+        jina_headers = {"X-Return-Format": "html", "Accept-Language": "ar"}
+        res2 = std_requests.get(jina_url, headers=jina_headers, timeout=30)
+        if res2.status_code == 200:
+            return res2.text
+    except Exception:
+        pass
+    return ""
 
 def detect_subtype(title, description, category):
     if category != "شقق":
@@ -46,33 +71,33 @@ def detect_subtype(title, description, category):
         return "غرفة"
     return "شقة"
 
-def get_user_ads_count(scraper, profile_url):
+def get_user_ads_count(session, profile_url):
     if not profile_url:
         return 1
     try:
-        time.sleep(1.2)
-        res = scraper.get(profile_url, timeout=15)
-        if res.status_code != 200:
+        time.sleep(1.0)
+        html = fetch_page(session, profile_url)
+        if not html:
             return 1
-        soup = BeautifulSoup(res.text, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text(" ", strip=True)
         match = re.search(r"(\d+)\s*(?:إعلان|إعلانات|اعلان|Ads|ad)", text, re.IGNORECASE)
         if match:
             return int(match.group(1))
-        articles = soup.find_all("article")
-        if articles:
-            return len(articles)
+        ad_links = {a["href"] for a in soup.find_all("a", href=True) if "/ad/" in a["href"]}
+        if ad_links:
+            return len(ad_links)
         return 1
     except Exception:
         return 1
 
-def parse_ad_details(scraper, ad_url, blocked_users):
+def parse_ad_details(session, ad_url, blocked_users):
     try:
-        time.sleep(1.4)
-        res = scraper.get(ad_url, timeout=15)
-        if res.status_code != 200:
+        time.sleep(1.0)
+        html = fetch_page(session, ad_url)
+        if not html:
             return None
-        soup = BeautifulSoup(res.text, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
 
         seller_name = "مالك"
         profile_url = None
@@ -85,28 +110,52 @@ def parse_ad_details(scraper, ad_url, blocked_users):
         if profile_url and profile_url in blocked_users:
             return None
 
+        for a in soup.find_all("a", href=True):
+            if "/companies/" in a["href"] or "/agencies/" in a["href"]:
+                if profile_url:
+                    blocked_users.add(profile_url)
+                return None
+
         description = ""
         desc_el = soup.find("div", {"aria-label": "Description"}) or soup.find("div", class_=re.compile(r"description", re.I))
         if desc_el:
             description = desc_el.get_text("\n", strip=True)
-        else:
-            for script in soup.find_all("script", {"type": "application/ld+json"}):
-                try:
-                    data = json.loads(script.string or "{}")
-                    if isinstance(data, dict) and "description" in data:
-                        description = data["description"]
-                        break
-                except Exception:
-                    pass
+        if not description:
+            meta_desc = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
+            if meta_desc and meta_desc.get("content"):
+                description = meta_desc["content"].strip()
 
-        combined_check = (seller_name + " " + description[:180]).lower()
+        title = ""
+        h1 = soup.find("h1")
+        if h1:
+            title = h1.get_text(strip=True)
+        if not title:
+            meta_title = soup.find("meta", {"property": "og:title"})
+            if meta_title and meta_title.get("content"):
+                title = meta_title["content"].strip()
+
+        price_text = "غير محدد"
+        price_num = 0
+        price_el = soup.find("span", {"aria-label": "Price"}) or soup.find(string=re.compile(r"ج\.م|EGP"))
+        if price_el:
+            price_text = price_el.strip() if isinstance(price_el, str) else price_el.get_text(strip=True)
+            nums = re.findall(r"\d+", price_text.replace(",", ""))
+            if nums:
+                price_num = int(nums[0])
+
+        page_text = soup.get_text(" ", strip=True)
+        area_match = re.search(r"(\d+)\s*(?:م²|متر|sqm|m²)", page_text, re.I)
+        beds_match = re.search(r"(\d+)\s*(?:غرف|غرفة|beds|bed)", page_text, re.I)
+        baths_match = re.search(r"(\d+)\s*(?:حمام|حمامات|baths|bath)", page_text, re.I)
+
+        combined_check = (seller_name + " " + title + " " + description[:200]).lower()
         for kw in BROKER_KEYWORDS:
             if kw in combined_check:
                 if profile_url:
                     blocked_users.add(profile_url)
                 return None
 
-        ads_count = get_user_ads_count(scraper, profile_url)
+        ads_count = get_user_ads_count(session, profile_url)
         if ads_count > 7:
             if profile_url:
                 blocked_users.add(profile_url)
@@ -116,7 +165,13 @@ def parse_ad_details(scraper, ad_url, blocked_users):
             return None
 
         return {
-            "description": description if description else "اضغط على الزر بالأسفل لفتح الإعلان وقراءة التفاصيل على دوبيزل.",
+            "title": title or "عقار بالقاهرة الجديدة",
+            "price_text": price_text,
+            "price_num": price_num,
+            "area": area_match.group(1) + " م²" if area_match else "غير محدد",
+            "beds": beds_match.group(1) + " غرف" if beds_match else "",
+            "baths": baths_match.group(1) + " حمام" if baths_match else "",
+            "description": description if description else "اضغط على فتح الإعلان لقراءة كافة التفاصيل على دوبيزل.",
             "seller_name": seller_name,
             "seller_profile": profile_url or "",
             "seller_ads_count": ads_count
@@ -125,7 +180,7 @@ def parse_ad_details(scraper, ad_url, blocked_users):
         return None
 
 def scrape_all():
-    scraper = create_scraper()
+    session = cffi_requests.Session() if USE_CFFI else cloudscraper.create_scraper()
     now_ts = int(time.time())
     cairo_tz = timezone(timedelta(hours=2))
     now_cairo = datetime.now(cairo_tz).strftime("%Y/%m/%d، %I:%M %p")
@@ -154,57 +209,38 @@ def scrape_all():
 
     for cat in URLS:
         try:
-            res = scraper.get(cat["url"], timeout=20)
-            if res.status_code != 200:
+            html = fetch_page(session, cat["url"])
+            if not html:
                 continue
-            soup = BeautifulSoup(res.text, "html.parser")
-            articles = soup.find_all("article")[:15]
+            soup = BeautifulSoup(html, "html.parser")
 
-            for art in articles:
-                link_el = art.find("a", href=True)
-                if not link_el:
-                    continue
-                href = link_el["href"]
-                ad_url = "https://www.dubizzle.com.eg" + href if href.startswith("/") else href
-                if ad_url in seen_urls or "/ad/" not in ad_url:
-                    continue
+            ad_urls = []
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                if "/ad/" in href and "-ID" in href:
+                    full_url = "https://www.dubizzle.com.eg" + href if href.startswith("/") else href
+                    if full_url not in seen_urls and full_url not in ad_urls:
+                        ad_urls.append(full_url)
 
-                title_el = art.find("h2") or link_el
-                title = title_el.get_text(strip=True) if title_el else "عقار بالقاهرة الجديدة"
-
-                price_text = "غير محدد"
-                price_num = 0
-                price_el = art.find("span", {"aria-label": "Price"}) or art.find(string=re.compile(r"ج\.م|EGP"))
-                if price_el:
-                    price_text = price_el.strip() if isinstance(price_el, str) else price_el.get_text(strip=True)
-                    nums = re.findall(r"\d+", price_text.replace(",", ""))
-                    if nums:
-                        price_num = int(nums[0])
-
-                card_text = art.get_text(" ", strip=True)
-                area_match = re.search(r"(\d+)\s*(?:م²|متر|sqm|m²)", card_text, re.I)
-                beds_match = re.search(r"(\d+)\s*(?:غرف|غرفة|beds|bed)", card_text, re.I)
-                baths_match = re.search(r"(\d+)\s*(?:حمام|حمامات|baths|bath)", card_text, re.I)
-
-                details = parse_ad_details(scraper, ad_url, blocked_users)
+            for ad_url in ad_urls[:10]:
                 seen_urls.add(ad_url)
+                details = parse_ad_details(session, ad_url, blocked_users)
                 if not details:
                     continue
 
-                subtype = detect_subtype(title, details["description"], cat["category"])
-
+                subtype = detect_subtype(details["title"], details["description"], cat["category"])
                 new_ads.append({
-                    "title": title,
+                    "title": details["title"],
                     "url": ad_url,
-                    "price_text": price_text,
-                    "price_num": price_num,
+                    "price_text": details["price_text"],
+                    "price_num": details["price_num"],
                     "deal": cat["deal"],
                     "category": cat["category"],
                     "subtype": subtype,
                     "location": "القاهرة الجديدة",
-                    "area": area_match.group(1) + " م²" if area_match else "غير محدد",
-                    "beds": beds_match.group(1) + " غرف" if beds_match else "",
-                    "baths": baths_match.group(1) + " حمام" if baths_match else "",
+                    "area": details["area"],
+                    "beds": details["beds"],
+                    "baths": details["baths"],
                     "description": details["description"],
                     "seller_name": details["seller_name"],
                     "seller_profile": details["seller_profile"],
