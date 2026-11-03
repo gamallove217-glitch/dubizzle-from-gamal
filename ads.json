@@ -1,51 +1,8 @@
 {
-  "last_scrape": "2026/11/03، 09:05 AM",
-  "total": 2,
-  "owners_count": 2,
+  "last_scrape": "2026/11/03، 09:27 AM",
+  "total": 0,
+  "owners_count": 0,
   "blocked_count": 0,
   "blocked_users": [],
-  "ads": [
-    {
-      "schema_version": 8,
-      "ad_id": 503258437,
-      "title": "شقة لقطه 63 متر للبيع مدينة العبور-الحى الثامن-الاسكان",
-      "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%82%D8%B7%D9%87-63-%D9%85%D8%AA%D8%B1-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%85%D8%AF%D9%8A%D9%86%D8%A9-%D8%A7%D9%84%D8%B9%D8%A8%D9%88%D8%B1-%D8%A7%D9%84%D8%AD%D9%89-%D8%A7%D9%84%D8%AB%D8%A7%D9%85%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%83%D8%A7%D9%86-ID503258437.html",
-      "price_text": "1,350,000 ج.م",
-      "price_num": 1350000,
-      "deal": "بيع",
-      "category": "شقق",
-      "subtype": "شقة",
-      "location": "القاهرة الجديدة",
-      "area": "63 م²",
-      "beds": "",
-      "baths": "",
-      "description": "الإعلانات النشطة4. رقم الإعلان 503258437. الإبلاغ عن هذا الإعلان. الاتجاهات ... شقة لقطه 65 متر للبيع مجاورات التجمع الأول. 9. 1,350,000 ج.م. شقة لقطه 65 متر ...",
-      "seller_name": "مالك مباشر",
-      "seller_profile": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%82%D8%B7%D9%87-63-%D9%85%D8%AA%D8%B1-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%85%D8%AF%D9%8A%D9%86%D8%A9-%D8%A7%D9%84%D8%B9%D8%A8%D9%88%D8%B1-%D8%A7%D9%84%D8%AD%D9%89-%D8%A7%D9%84%D8%AB%D8%A7%D9%85%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%83%D8%A7%D9%86-ID503258437.html",
-      "seller_ads_count": 4,
-      "scraped_timestamp": 1793689556,
-      "scraped_date": "2026/11/03، 09:05 AM"
-    },
-    {
-      "schema_version": 8,
-      "ad_id": 503073103,
-      "title": "شقة للبيع 220 م لوران ( ش عبد المنعم الدليل )",
-      "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-220-%D9%85-%D9%84%D9%88%D8%B1%D8%A7%D9%86-%D8%B4-%D8%B9%D8%A8%D8%AF-%D8%A7%D9%84%D9%85%D9%86%D8%B9%D9%85-%D8%A7%D9%84%D8%AF%D9%84%D9%8A%D9%84-ID503073103.html",
-      "price_text": "25,000 ج.م",
-      "price_num": 25000,
-      "deal": "إيجار",
-      "category": "شقق",
-      "subtype": "شقة",
-      "location": "القاهرة الجديدة",
-      "area": "220 م²",
-      "beds": "",
-      "baths": "",
-      "description": "الإعلانات النشطة4. رقم الإعلان 503073103. الإبلاغ عن هذا الإعلان. الاتجاهات ... شقة للإيجار 180م سموحة (ش ذكى رجب). 13. 25,000 ج.مشهرياً. شقة للإيجار 180م ...",
-      "seller_name": "مالك مباشر",
-      "seller_profile": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-220-%D9%85-%D9%84%D9%88%D8%B1%D8%A7%D9%86-%D8%B4-%D8%B9%D8%A8%D8%AF-%D8%A7%D9%84%D9%85%D9%86%D8%B9%D9%85-%D8%A7%D9%84%D8%AF%D9%84%D9%8A%D9%84-ID503073103.html",
-      "seller_ads_count": 4,
-      "scraped_timestamp": 1793689556,
-      "scraped_date": "2026/11/03، 09:05 AM"
-    }
-  ]
+  "ads": []
 }
