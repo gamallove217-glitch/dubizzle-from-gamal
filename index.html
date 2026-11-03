@@ -21,8 +21,7 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .logo-wrap { display: flex; align-items: center; gap: 12px; }
     .logo-box { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-    .logo-title { font-size: 19px; font-weight: 800; line-height: 1.2; }
-    .logo-sub { font-size: 12px; color: var(--accent); }
+    .logo-title { font-size: 20px; font-weight: 800; }
     .status-badge { background: var(--surface); border: 1px solid var(--border); padding: 8px 14px; border-radius: 99px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
     .pulse { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -46,7 +45,9 @@
     .tag-deal { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
     .tag-sub { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
     .ad-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.5; color: #fff; }
-    .ad-price { font-size: 21px; font-weight: 800; color: var(--primary); margin-bottom: 12px; }
+    .price-box { background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); padding: 8px 12px; border-radius: 10px; display: inline-block; margin-bottom: 12px; }
+    .price-lbl { font-size: 12px; color: var(--muted); margin-left: 6px; }
+    .ad-price { font-size: 20px; font-weight: 800; color: var(--primary); }
     .specs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .spec-item { background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 12px; color: #cbd5e1; }
     .desc-container { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; color: #e2e8f0; line-height: 1.7; margin-bottom: 14px; white-space: pre-line; max-height: 160px; overflow-y: auto; }
@@ -67,10 +68,7 @@
   <div class="top-bar">
     <div class="logo-wrap">
       <div class="logo-box">م</div>
-      <div>
-        <div class="logo-title">رادار ملاك القاهرة الجديدة</div>
-        <div class="logo-sub">فلترة تلقائية (من 1 إلى 4 إعلانات) وحذف بعد 7 أيام</div>
-      </div>
+      <div class="logo-title">رادار ملاك القاهرة الجديدة</div>
     </div>
     <div class="status-badge">
       <span class="pulse"></span>
@@ -84,8 +82,8 @@
       <div class="stat-lbl">إعلانات ملاك متاحة</div>
     </div>
     <div class="stat-card">
-      <div class="stat-val" id="blockedBrokersCount">0</div>
-      <div class="stat-lbl">سماسرة تم حظرهم</div>
+      <div class="stat-val" id="uniqueOwnersCount">0</div>
+      <div class="stat-lbl">عدد الملاك تم الحصول عليهم</div>
     </div>
     <div class="stat-card">
       <div class="stat-val">7 أيام</div>
@@ -160,7 +158,8 @@
         allAds = data.ads || [];
         document.getElementById("lastUpdateText").textContent = "آخر تحديث: " + (data.last_scrape || "الآن");
         document.getElementById("totalOwnersCount").textContent = allAds.length;
-        document.getElementById("blockedBrokersCount").textContent = data.blocked_count || 0;
+        const uniqueOwners = new Set(allAds.map(a => a.seller_profile || a.seller_name || a.url)).size;
+        document.getElementById("uniqueOwnersCount").textContent = data.owners_count || uniqueOwners;
         applyFilters();
       } catch (e) {
         document.getElementById("lastUpdateText").textContent = "جاري تحديث البيانات...";
@@ -227,7 +226,10 @@
             <span class="tag tag-sub">${ad.subtype || ad.category}</span>
           </div>
           <div class="ad-title">${ad.title}</div>
-          <div class="ad-price">${ad.price_text}</div>
+          <div class="price-box">
+            <span class="price-lbl">سعر الوحدة:</span>
+            <span class="ad-price">${ad.price_text}</span>
+          </div>
           <div class="specs-row">
             <span class="spec-item">المساحة: ${ad.area}</span>
             ${ad.beds ? `<span class="spec-item">${ad.beds}</span>` : ""}
@@ -236,8 +238,8 @@
           </div>
           <div class="desc-container">${ad.description}</div>
           <div class="card-actions">
-            <a href="${ad.url}" target="_blank" class="btn-open">فتح الإعلان على دوبيزل</a>
-            <button class="btn-copy" onclick="copyText(this, \`${ad.title.replace(/`/g, '')}\n\n${ad.description.replace(/`/g, '')}\n\n${ad.url}\`)">نسخ الوصف</button>
+            <a href="${ad.url}" target="_blank" rel="noopener noreferrer" class="btn-open">فتح الإعلان على دوبيزل</a>
+            <button class="btn-copy" onclick="copyText(this, \`${ad.title.replace(/`/g, '')}\nالسعر: ${ad.price_text}\n\n${ad.description.replace(/`/g, '')}\n\n${ad.url}\`)">نسخ الوصف</button>
           </div>
         </div>
       `).join("");
