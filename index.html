@@ -9,7 +9,6 @@
     :root {
       --bg: #070b14;
       --surface: #111827;
-      --surface-hover: #1e293b;
       --border: #1f2937;
       --primary: #f97316;
       --accent: #38bdf8;
@@ -21,7 +20,7 @@
     body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 680px; margin: 0 auto; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .logo-wrap { display: flex; align-items: center; gap: 12px; }
-    .logo-box { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.35); }
+    .logo-box { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #2563eb); color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
     .logo-title { font-size: 19px; font-weight: 800; line-height: 1.2; }
     .logo-sub { font-size: 12px; color: var(--accent); }
     .status-badge { background: var(--surface); border: 1px solid var(--border); padding: 8px 14px; border-radius: 99px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
@@ -32,17 +31,15 @@
     .stat-lbl { font-size: 11px; color: var(--muted); }
     .search-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
     .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 12px 16px; border-radius: 12px; font-size: 14px; margin-bottom: 12px; outline: none; }
-    .search-input:focus { border-color: var(--accent); }
     .chips-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; scrollbar-width: none; }
-    .chip { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .chip { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .chip.active { background: var(--primary); color: #070b14; border-color: var(--primary); font-weight: 700; }
     .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
     .btn-tool, .select-tool { flex: 1; background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .section-title { font-size: 17px; font-weight: 800; }
     .section-count { font-size: 12px; color: var(--accent); font-weight: 600; }
-    .ad-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 16px; transition: transform 0.2s, border-color 0.2s; }
-    .ad-card:hover { border-color: #334155; }
+    .ad-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 16px; }
     .badges-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
     .tag { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; }
     .tag-owner { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
@@ -157,7 +154,8 @@
 
     async function fetchAds() {
       try {
-        const res = await fetch("ads.json?v=" + Date.now());
+        const rawUrl = "https://raw.githubusercontent.com/gamallove217-glitch/dubizzle-from-gamal/main/ads.json?t=" + Date.now();
+        const res = await fetch(rawUrl, { cache: "no-store" });
         const data = await res.json();
         allAds = data.ads || [];
         document.getElementById("lastUpdateText").textContent = "آخر تحديث: " + (data.last_scrape || "الآن");
@@ -165,7 +163,7 @@
         document.getElementById("blockedBrokersCount").textContent = data.blocked_count || 0;
         applyFilters();
       } catch (e) {
-        document.getElementById("lastUpdateText").textContent = "بانتظار التشغيل الأول من Actions";
+        document.getElementById("lastUpdateText").textContent = "جاري تحديث البيانات...";
       }
     }
 
@@ -248,4 +246,4 @@
     fetchAds();
   </script>
 </body>
-          </html>
+</html>
