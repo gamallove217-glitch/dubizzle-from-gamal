@@ -1,89 +1,32 @@
-"""Dubizzle Egypt New Cairo owner ads scraper.
-
-Flow: listing pages (discovery) -> full live ad page (truth) -> strict owner filter.
-All pages are fetched through ScraperAPI with a tier ladder (plain, render, premium)
-and a hard credit budget. A run_report is written inside ads.json for diagnostics.
-"""
 import json
-import os
-import re
-import threading
 import time
-import traceback
-from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
+import re
+import os
 from datetime import datetime, timedelta, timezone
-from html import unescape
-from html.parser import HTMLParser
-from urllib.parse import quote
-
 import requests
 
-# Prefer a GitHub secret named SCRAPERAPI_KEY. The fallback keeps the old behavior.
-API_KEY = os.environ.get("SCRAPERAPI_KEY") or "1fbcb4ca0bad271b0780c0a848e8c05b"
-SCHEMA_VERSION = 11
+API_KEY = "1fbcb4ca0bad271b0780c0a848e8c05b"
+SCHEMA_VERSION = 14
 SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
 
-SITE = "https://www.dubizzle.com.eg"
-SCRAPER_ENDPOINT = "https://api.scraperapi.com/"
-ACCOUNT_ENDPOINT = "https://api.scraperapi.com/account"
-SEARCH_ENDPOINT = "https://api.scraperapi.com/structured/google/search"
-
-CREDIT_BUDGET = int(os.environ.get("CREDIT_BUDGET", "300"))
-CREDIT_RESERVE = int(os.environ.get("CREDIT_RESERVE", "30"))
-LISTING_SHARE = float(os.environ.get("LISTING_SHARE", "0.35"))
-MIN_HOURS_BETWEEN_SCHEDULED = float(os.environ.get("MIN_HOURS", "20"))
-MAX_RUNTIME_SEC = int(os.environ.get("MAX_RUNTIME_SEC", "1500"))
-TARGET_NEW_ADS = int(os.environ.get("TARGET_NEW_ADS", "45"))
-PAGES_PER_SOURCE = int(os.environ.get("PAGES_PER_SOURCE", "2"))
-GOOGLE_FALLBACK_QUERIES = int(os.environ.get("GOOGLE_FALLBACK_QUERIES", "3"))
-MIN_CANDIDATES = int(os.environ.get("MIN_CANDIDATES", "30"))
-SKIP_VERIFIED_BUSINESS = os.environ.get("SKIP_VERIFIED_BUSINESS", "1") == "1"
-MAX_WORKERS = 5
-
-MAX_OWNER_ADS = 4
-BLOCK_ABOVE = 7
-
-# (credits per request on ScraperAPI) plain=1, render=10, premium=10, premium+render=25
-TIERS = [
-    {"name": "plain", "extra": {}, "cost": 1},
-    {"name": "render", "extra": {"render": "true"}, "cost": 10},
-    {"name": "premium", "extra": {"premium": "true"}, "cost": 10},
-    {"name": "premium_render", "extra": {"premium": "true", "render": "true"}, "cost": 25},
-]
-
-# Slugs verified from public search results: apartments-duplex-for-rent/5th-settlement
-# and the q-<keyword> pages. The other slugs are assumed; run_report shows which worked.
-RENT, SALE = "apartments-duplex-for-rent", "apartments-duplex-for-sale"
-LISTING_SOURCES = [
-    (f"{RENT}/5th-settlement/", "إيجار", "شقق"),
-    (f"{SALE}/5th-settlement/", "بيع", "شقق"),
-    ("villas-for-sale/5th-settlement/", "بيع", "فيلا"),
-    ("villas-for-rent/5th-settlement/", "إيجار", "فيلا"),
-    ("commercial-for-rent/5th-settlement/", "إيجار", "تجاري وإداري"),
-    ("commercial-for-sale/5th-settlement/", "بيع", "تجاري وإداري"),
-    (f"{RENT}/new-cairo/", "إيجار", "شقق"),
-    (f"{SALE}/new-cairo/", "بيع", "شقق"),
-    (f"{RENT}/q-الرحاب/", "إيجار", "شقق"),
-    (f"{SALE}/q-الرحاب/", "بيع", "شقق"),
-    (f"{RENT}/q-مدينتي/", "إيجار", "شقق"),
-    (f"{SALE}/q-مدينتي/", "بيع", "شقق"),
-]
-for _kw in ("المالك", "دوبلكس", "بنتهاوس", "استوديو", "روف"):
-    LISTING_SOURCES.append((f"{RENT}/5th-settlement/q-{_kw}/", "إيجار", "شقق"))
-    LISTING_SOURCES.append((f"{SALE}/5th-settlement/q-{_kw}/", "بيع", "شقق"))
-
-# Used only as a fallback feeder when listing discovery returns too few ads (25 credits each).
 SEARCH_QUERIES = [
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار التجمع الخامس ج.م", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للبيع التجمع الخامس ج.م", "deal": "بيع", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ فيلا للبيع التجمع الخامس ج.م", "deal": "بيع", "category": "فيلا"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار القاهرة الجديدة ج.م", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للبيع القاهرة الجديدة ج.م", "deal": "بيع", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ فيلا للايجار التجمع الخامس ج.م", "deal": "إيجار", "category": "فيلا"},
-    {"q": "site:dubizzle.com.eg/ad/ مكتب اداري للايجار التجمع الخامس ج.م", "deal": "إيجار", "category": "تجاري وإداري"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار الرحاب ج.م", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار مدينتي ج.م", "deal": "إيجار", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ التجمع "الإعلانات النشطة 1" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ "القاهرة الجديدة" "الإعلانات النشطة 1" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ الرحاب "الإعلانات النشطة 1" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ مدينتي "الإعلانات النشطة 1" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ التجمع "الإعلانات النشطة 2" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ التجمع "الإعلانات النشطة 3" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ التجمع "الإعلانات النشطة 4" "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ "القاهرة الجديدة" ("الإعلانات النشطة 2" OR "الإعلانات النشطة 3" OR "الإعلانات النشطة 4") "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ (الرحاب OR مدينتي) ("الإعلانات النشطة 2" OR "الإعلانات النشطة 3" OR "الإعلانات النشطة 4") "المساحة"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ شقة للايجار التجمع الخامس "من المالك"', "deal": "إيجار", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ شقة للايجار القاهرة الجديدة "من المالك"', "deal": "إيجار", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ شقة للبيع التجمع الخامس "من المالك"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ شقة للايجار الرحاب OR مدينتي "من المالك"', "deal": "إيجار", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ شقة للبيع الرحاب OR مدينتي "من المالك"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ (دوبلكس OR بنتهاوس OR استوديو) التجمع "من المالك"', "deal": "بيع", "category": "شقق"},
+    {"q": 'site:dubizzle.com.eg/ad/ (فيلا OR تاون هاوس) التجمع "من المالك"', "deal": "بيع", "category": "فيلا"},
+    {"q": 'site:dubizzle.com.eg/ad/ (مكتب OR محل OR عيادة) التجمع OR مدينتي "من المالك"', "deal": "إيجار", "category": "تجاري وإداري"}
 ]
 
 NEW_CAIRO_PLACES = [
@@ -91,422 +34,350 @@ NEW_CAIRO_PLACES = [
     "النرجس", "اللوتس", "الياسمين", "البنفسج", "الشويفات", "الأندلس", "الاندلس",
     "بيت الوطن", "الأكاديمية", "الاكاديمية", "المستثمرين", "القطامية", "ميفيدا",
     "هايد بارك", "ماونتن فيو", "بالم هيلز", "سراي", "التسعين", "القرنفل",
-    "تاج سيتي", "ابو الهول", "جاردينيا", "دار مصر", "سكن مصر", "جنة", "الباتيو",
-    "new cairo", "5th settlement", "rehab", "madinaty", "mivida", "hyde park"
+    "تاج سيتي", "ابو الهول", "جاردينيا", "جاردنيا", "دار مصر", "سكن مصر", "جنة",
+    "الباتيو", "المراسم", "فيفث سكوير", "ستون ريزيدنس", "بيلاجيو", "لاڤي",
+    "new cairo", "5th settlement", "rehab", "madinaty", "mivida", "hyde park", "marasem"
 ]
 
 EXCLUDED_CITIES = [
     "العبور", "لوران", "سموحة", "سموحه", "الإسكندرية", "الاسكندرية", "اسكندرية",
     "أكتوبر", "اكتوبر", "زايد", "الشيخ زايد", "الشروق", "بدر", "المعادي", "المعادى",
-    "مدينة نصر", "مدينه نصر", "مصر الجديدة", "مصر الجديده", "المقطم", "الهرم",
-    "فيصل", "الدقي", "المهندسين", "حلوان", "شبرا", "عين شمس", "الساحل", "السخنة",
-    "الغردقة", "ميامي", "سيدي بشر", "المنتزه", "العجمي", "طنطا", "المنصورة", "الزقازيق"
+    "زهراء المعادي", "زهراء المعادى", "مدينة المعراج", "مدينة نصر", "مدينه نصر",
+    "مصر الجديدة", "مصر الجديده", "النزهة", "النزهه", "شيراتون", "العباسية",
+    "السيدة زينب", "المقطم", "الهرم", "فيصل", "الدقي", "المهندسين", "حلوان",
+    "شبرا", "عين شمس", "المطرية", "البساتين", "الساحل", "راس الحكمة", "السخنة",
+    "الغردقة", "ميامي", "سيدي بشر", "المنتزه", "العجمي", "طنطا", "المنصورة",
+    "الزقازيق", "العاصمة الإدارية", "العاصمه الاداريه"
 ]
 
-# Checked only against visible text (scripts removed first), never against raw HTML.
+NON_REAL_ESTATE_WORDS = [
+    "سائق", "سواق", "محاسب", "كاشير", "سكرتيرة", "سكرتيره", "جليسة", "جليسه",
+    "وظائف", "وظيفة", "تعيين", "مطلوب للعمل", "برخصة", "سيارات للبيع", "كيلومترات",
+    "ناقل الحركة", "فني دش", "نجار", "دهانات", "صيانة", "حفلات", "مناسبات", "روبوت"
+]
+
+COMPANY_SELLER_WORDS = [
+    "real estate", "realestate", "properties", "property", "investment",
+    "developments", "development", "consultancy", "agency", "broker", "group",
+    "homes", "home", "aqar", "للتسويق", "للاستثمار", "للتنمية", "للتطوير",
+    "شركة", "الوكيل", "el rabeh", "go homes", "quality square", "بانوراما"
+]
+
 DELETED_PHRASES = [
-    "لم يتم العثور على تطابقات", "قد تم بيعه أو إزالته", "تم بيعه أو إزالته",
-    "حاول البحث عن إعلانات مشابهة", "we couldn't find any matches", "no longer available",
+    "لم يتم العثور على تطابقات",
+    "قد تم بيعه أو إزالته",
+    "تم بيعه أو إزالته",
+    "حاول البحث عن إعلانات مشابهة",
+    "هذا الإعلان غير متاح",
+    "we couldn't find any matches",
+    "no longer available"
 ]
 
-BLOCK_MARKERS = (
-    "just a moment", "attention required", "enable javascript and cookies",
-    "checking your browser", "verify you are human", "error 1020",
-    "access denied", "you have been blocked",
-)
-CUT_MARKERS = (
-    "إعلانات مشابهة", "اعلانات مشابهة", "الإعلانات المشابهة", "الاعلانات المشابهة",
-    "إعلانات ذات صلة", "اتجاهات الأسعار", "الاتجاهات والمؤشرات",
-    "similar ads", "related ads", "price trends",
-)
-SELLER_LABELS = ("تم النشر بواسطة", "نشر بواسطة", "نُشر بواسطة", "posted by", "published by")
-BIZ_RE = re.compile(r"صاحب عمل موثق|verified business", re.I)
+def is_strictly_new_cairo(title, main_text):
+    t_low = title.lower()
+    m_low = main_text.lower()
 
-# ---------------------------------------------------------------- run state
-T0 = time.time()
-LOCK = threading.Lock()
-STOP = threading.Event()
-STATS = Counter()
-EXAMPLES = {"blocked": [], "no_count": [], "no_price": [], "invalid": [], "listing_empty": []}
-TIER_STATE = {}
-BUDGET = None
+    if any(nw in (t_low + " " + m_low) for nw in NON_REAL_ESTATE_WORDS):
+        return False
 
+    loc_match = re.search(r"الموقع\.\s*([^\.]+?)\.\s*Map placeholder", main_text)
+    loc_str = loc_match.group(1).lower() if loc_match else ""
 
-class BudgetStop(Exception):
-    pass
+    if any(ex in t_low for ex in EXCLUDED_CITIES):
+        return False
+    if loc_str and any(ex in loc_str for ex in EXCLUDED_CITIES):
+        return False
 
+    if any(nc in t_low for nc in NEW_CAIRO_PLACES):
+        return True
+    if loc_str and any(nc in loc_str for nc in NEW_CAIRO_PLACES):
+        return True
+    if any(nc in m_low for nc in NEW_CAIRO_PLACES) and not any(ex in m_low for ex in EXCLUDED_CITIES):
+        return True
 
-class Budget:
-    def __init__(self, limit):
-        self.limit = limit
-        self.phase_limit = limit
-        self.used = 0
-        self.lock = threading.Lock()
+    return False
 
-    def spend(self, n):
-        with self.lock:
-            if self.used + n > self.phase_limit:
-                raise BudgetStop("credits")
-            self.used += n
+def detect_category_and_subtype(title, main_text, default_cat):
+    t_low = title.lower()
+    m_low = main_text.lower()
+    for src in [t_low, m_low]:
+        if any(w in src for w in ["مكتب", "محل", "عيادة", "عياده", "إداري", "اداري", "تجاري", "مول", "مقر", "مخزن", "office", "clinic", "retail"]):
+            return "تجاري وإداري", "تجاري وإداري"
+        if any(w in src for w in ["بنتهاوس", "بنت هاوس", "penthouse"]):
+            return "شقق", "بنتهاوس"
+        if any(w in src for w in ["دوبلكس", "دوبليكس", "duplex"]):
+            return "شقق", "دوبلكس"
+        if any(w in src for w in ["استوديو", "ستوديو", "studio"]):
+            return "شقق", "استوديو"
+        if any(w in src for w in ["روف", "رووف", "roof"]):
+            return "شقق", "روف"
+        if any(w in src for w in ["غرفة", "غرفه", "room"]):
+            return "شقق", "غرفة"
+        if any(w in src for w in ["شقة", "شقه", "apartment", "flat"]):
+            return "شقق", "شقة"
+        if any(w in src for w in ["فيلا", "تاون هاوس", "توين هاوس", "ستاند الون", "town house", "villa", "townhouse", "twinhouse", "standalone"]):
+            return "فيلا", "فيلا"
+    return default_cat, ("شقة" if default_cat == "شقق" else default_cat)
 
-
-def bump(key, n=1):
-    with LOCK:
-        STATS[key] += n
-
-
-def add_example(kind, url, tier, lines, extra=""):
-    with LOCK:
-        if len(EXAMPLES[kind]) >= 3:
-            return
-        EXAMPLES[kind].append({
-            "url": url, "tier": tier, "extra": extra,
-            "head": " | ".join(lines[:12])[:500],
-            "seller_window": seller_window_text(lines),
-        })
-
-
-# ---------------------------------------------------------------- text helpers
-DIGITS = {**{0x660 + i: 48 + i for i in range(10)}, **{0x6F0 + i: 48 + i for i in range(10)}}
-AR = "\u0621-\u064A"
-
-
-def norm(text):
-    text = text.translate(DIGITS)
-    text = text.replace("\u066c", ",").replace("\u066b", ".").replace("\u00a0", " ")
-    return re.sub(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]", "", text)
-
-
-class _TextExtractor(HTMLParser):
-    SKIP = {"script", "style", "noscript", "template", "svg", "head"}
-    BLOCK = {"p", "div", "br", "li", "ul", "ol", "h1", "h2", "h3", "h4", "h5", "h6",
-             "tr", "table", "section", "article", "header", "footer", "main", "nav",
-             "aside", "form", "dl", "dt", "dd", "hr"}
-
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.parts = []
-        self.skip = 0
-
-    def handle_starttag(self, tag, attrs):
-        if tag in self.SKIP:
-            self.skip += 1
-        elif not self.skip:
-            self.parts.append("\n" if tag in self.BLOCK else " ")
-
-    def handle_endtag(self, tag):
-        if tag in self.SKIP:
-            self.skip = max(0, self.skip - 1)
-        elif not self.skip:
-            self.parts.append("\n" if tag in self.BLOCK else " ")
-
-    def handle_data(self, data):
-        if not self.skip:
-            self.parts.append(data)
-
-
-def html_to_lines(html):
-    p = _TextExtractor()
-    try:
-        p.feed(html)
-        p.close()
-    except Exception:
-        pass
-    lines = []
-    for ln in norm("".join(p.parts)).split("\n"):
-        ln = re.sub(r"\s+", " ", ln).strip()
-        if ln:
-            lines.append(ln)
-    return lines
-
-
-def to_int(s):
-    s = s.replace(",", "").strip()
-    return int(s) if s.isdigit() else 0
-
-
-def extract_title(html):
-    t = ""
-    m = (re.search(r'<meta[^>]+property=["\']og:title["\'][^>]+content=["\']([^"\']*)["\']', html, re.I)
-         or re.search(r'<meta[^>]+content=["\']([^"\']*)["\'][^>]+property=["\']og:title["\']', html, re.I))
-    if m:
-        t = m.group(1)
-    if not t.strip():
-        m = re.search(r"<h1\b[^>]*>(.*?)</h1>", html, re.S | re.I)
-        if m:
-            t = re.sub(r"<[^>]+>", " ", m.group(1))
-    if not t.strip():
-        m = re.search(r"<title[^>]*>(.*?)</title>", html, re.S | re.I)
-        t = m.group(1) if m else ""
-    t = re.sub(r"\s+", " ", norm(unescape(t))).strip()
-    return re.sub(r"\s*[-|]\s*(?:دوبيزل|dubizzle).*$", "", t, flags=re.I).strip()
-
-
-def main_segment(lines):
-    out = []
-    for ln in lines:
-        low = ln.lower()
-        if len(out) >= 8 and any(m in low for m in CUT_MARKERS):
-            break
-        out.append(ln)
-    return out
-
-
-def field_value(lines, labels):
-    for i, ln in enumerate(lines):
-        low = ln.lower()
-        for lab in labels:
-            if low.startswith(lab):
-                rest = ln[len(lab):].strip(" :：")
-                if rest:
-                    return rest[:40]
-                if i + 1 < len(lines):
-                    return lines[i + 1][:40]
-    return ""
-
-
-CUR = r"(?:EGP|(?<![" + AR + r"])ج\.?\s?م\.?(?![" + AR + r"])|جنيه|جنية)"
-NUM = r"(\d{1,3}(?:,\d{3})+|\d{4,12})"
-PRICE_RES = [re.compile(CUR + r"\s*" + NUM, re.I), re.compile(NUM + r"\s*" + CUR, re.I)]
-UNIT = r"(?:\(\s*(?:م\s?[²2]?|m\s?[²2]?|sqm|متر(?:\s*مربع)?)\s*\))?"
-AREA_RE = re.compile(r"(?:المساحة|Area)\s*" + UNIT + r"\s*[:：]?\s*(\d{2,5})", re.I)
-AREA_FALLBACK_RE = re.compile(r"(?<![\d,])(\d{2,4})\s*(?:م²|م2|متر(?:\s*مربع)?|sqm|m²|m2)", re.I)
-BEDS_RE = re.compile(r"(?:غرف(?:ة)?\s*(?:ال)?نوم|Bedrooms?|Beds?)\s*[:：]?\s*(\d{1,2})", re.I)
-BEDS2_RE = re.compile(r"(?<![\d,])(\d{1,2})\s*(?:غرف نوم|غرف|غرفة|bedrooms?|beds?)", re.I)
-BATHS_RE = re.compile(r"(?:(?:ال)?حمامات|حمام|Bathrooms?|Baths?)\s*[:：]?\s*(\d{1,2})", re.I)
-BATHS2_RE = re.compile(r"(?<![\d,])(\d{1,2})\s*(?:حمامات|حمام|bathrooms?|baths?)", re.I)
-PERIOD_RE = re.compile(r"(شهري[اً]?|سنوي[اً]?|يومي[اً]?|monthly|yearly|daily)", re.I)
-
-ACT = r"(?:ال)?[إأآا]علان(?:ات)?\s*(?:ال)?نشط(?:ة|ه|ين)?"
-ACTIVE_PATS = [
-    re.compile(r"(?<![\d,.])(\d{1,3})(?![\d,])\s*" + ACT),
-    re.compile(ACT + r"\s*[:：]?\s*(?<![\d,.])(\d{1,3})(?![\d,])"),
-    re.compile(r"(?<![\d,.])(\d{1,3})(?![\d,])\s*active\s*(?:ads?|listings?)", re.I),
-    re.compile(r"active\s*(?:ads?|listings?)\s*[:：]?\s*(\d{1,3})(?![\d,])", re.I),
-]
-NAME_CUT_RE = re.compile(
-    r"\s+(?:عضو منذ|member since)|\s+\d{1,3}\s+(?:ال)?[إأآا]علان|\s+(?:ال)?[إأآا]علان|\s+\d{1,3}\s+active",
-    re.I)
-
-
-def first_price(text):
-    best = None
-    for rx in PRICE_RES:
-        for m in rx.finditer(text):
-            val = to_int(m.group(1))
-            if val >= 1000 and (best is None or m.start() < best[0]):
-                best = (m.start(), val)
-                break
-    return best[1] if best else 0
-
-
-def seller_index(lines):
-    for i, ln in enumerate(lines):
-        low = ln.lower()
-        for lab in SELLER_LABELS:
-            if lab in low:
-                return i, lab
-    return None, None
-
-
-def seller_window_text(lines):
-    idx, _ = seller_index(lines)
-    if idx is None:
-        return "no seller label found"
-    return " | ".join(lines[idx: idx + 10])[:400]
-
-
-def extract_seller(lines):
-    idx, lab = seller_index(lines)
-    name, window, biz = None, "", False
-    if idx is not None:
-        ln = lines[idx]
-        after = ln[ln.lower().index(lab) + len(lab):].strip(" :：-")
-        if not after and idx + 1 < len(lines):
-            after = lines[idx + 1]
-        cand = NAME_CUT_RE.split(after)[0].strip()
-        if 2 <= len(cand) <= 40:
-            name = cand
-        window = " ".join(lines[idx: idx + 12])
-        biz = bool(BIZ_RE.search(window))
-    count, src = None, ""
-    for scope, label in ((window, "seller_box"), ("\n".join(lines), "page_text")):
-        if not scope:
-            continue
-        for rx in ACTIVE_PATS:
-            m = rx.search(scope)
-            if m:
-                count, src = int(m.group(1)), label
-                break
-        if count is not None:
-            break
-    return name, count, src, biz
-
-
-def parse_ad_page(html):
-    """Return (result, complete). complete=True means no need to escalate to a stronger tier."""
-    lines = html_to_lines(html)
-    out = {"state": "invalid"}
-    head = " ".join(lines[:15]).lower()
-    if len(lines) < 80 and any(m in head for m in BLOCK_MARKERS):
-        out["state"] = "blocked"
-        out["lines"] = lines
-        return out, False
-    low_full = "\n".join(lines).lower()
-    if any(dp in low_full for dp in DELETED_PHRASES):
-        return {"state": "gone"}, True
-    title = extract_title(html)
-    main = main_segment(lines)
-    main_text = "\n".join(main)
-    price_lines = [ln for ln in main[:30] if not (title and ln.startswith(title[:25]))]
-    price = first_price("\n".join(price_lines[:25])) or first_price("\n".join(price_lines))
-    if not price:
-        m = re.search(r'"price"\s*:\s*"?(\d[\d.]*)', html)
-        if m and m.group(1).replace(".", "").isdigit() and float(m.group(1)) >= 1000:
-            price = int(float(m.group(1)))
-    if not title and not price:
-        out["lines"] = lines
-        return out, False
-    period = ""
-    for ln in main[:25]:
-        if str(price) in ln.replace(",", "") or f"{price:,}" in ln:
-            pm = PERIOD_RE.search(" ".join(main[max(0, main.index(ln) - 1): main.index(ln) + 3]))
-            period = pm.group(1) if pm else ""
-            break
-    m_area = AREA_RE.search(main_text) or AREA_FALLBACK_RE.search(title + "\n" + main_text)
-    m_beds = BEDS_RE.search(main_text) or BEDS2_RE.search(title + "\n" + main_text)
-    m_baths = BATHS_RE.search(main_text) or BATHS2_RE.search(title + "\n" + main_text)
-    loc_line = ""
-    for ln in main[:30]:
-        if len(ln) < 90 and re.search(r"[،,]", ln) and (
-                any(p in ln.lower() for p in NEW_CAIRO_PLACES + EXCLUDED_CITIES)
-                or "القاهرة" in ln or "cairo" in ln.lower()):
-            loc_line = ln
-            break
-    start = 0
-    for i, ln in enumerate(main):
-        if ln.lower().strip(": ") in ("التفاصيل", "الوصف", "details", "description"):
-            start = i + 1
-            break
-    else:
-        for i, ln in enumerate(main):
-            if title and ln.startswith(title[:25]):
-                start = i + 1
-                break
-    desc_parts = []
-    for ln in main[start:]:
-        low = ln.lower()
-        if any(low.startswith(s) for s in ("الموقع", "location", "سلامتك", "your safety", "تم النشر", "posted by")):
-            break
-        if len(ln) >= 30:
-            desc_parts.append(ln)
-    name, count, count_src, biz = extract_seller(lines)
-    if count is None:
-        mj = re.search(r'"(?:activeAdsCount|active_ads_count|activeAds|active_ads)"\s*:\s*(\d{1,4})', html)
-        if mj:
-            count, count_src = int(mj.group(1)), "embedded_json"
-    out.update({
-        "state": "ok", "title": title, "price_num": price, "price_period": period,
-        "area": (m_area.group(1) + " م²") if m_area else "مدرج بالإعلان",
-        "beds": (m_beds.group(1) + " غرف") if m_beds else "",
-        "baths": (m_baths.group(1) + " حمام") if m_baths else "",
-        "loc_line": loc_line,
-        "type_field": field_value(main, ("النوع", "type")),
-        "purpose": field_value(main, ("الغرض", "purpose")),
-        "description": "\n".join(desc_parts)[:1500],
-        "seller_name": name, "count": count, "count_src": count_src, "biz": biz,
-        "lines": lines,
-    })
-    return out, count is not None
-
-
-# ---------------------------------------------------------------- classification
-def detect_category_and_subtype(title, type_field, default_cat):
-    t = title.lower()
-    tf = type_field.lower()
-    both = t + " " + tf
-    if any(w in tf for w in ["فيلا", "تاون", "توين", "villa", "townhouse", "twin"]):
-        cat = "فيلا"
-    elif any(w in tf for w in ["مكتب", "محل", "عيادة", "عياده", "تجاري", "اداري", "إداري", "commercial", "office", "shop", "clinic", "retail"]):
-        cat = "تجاري وإداري"
-    elif any(w in tf for w in ["شقة", "شقه", "apartment", "duplex", "دوبلكس", "penthouse", "بنتهاوس", "studio", "استوديو", "غرفة", "room", "roof", "روف"]):
-        cat = "شقق"
-    elif any(w in t for w in ["مكتب", "محل", "عيادة", "عياده", "office", "clinic", "retail"]):
-        cat = "تجاري وإداري"
-    elif any(w in t for w in ["فيلا", "تاون هاوس", "توين هاوس", "ستاند الون", "villa", "townhouse", "twinhouse", "standalone"]):
-        cat = "فيلا"
-    else:
-        cat = default_cat
-    if cat == "فيلا":
-        return cat, "فيلا"
-    if cat == "تجاري وإداري":
-        return cat, "تجاري وإداري"
-    if any(w in both for w in ["بنتهاوس", "بنت هاوس", "penthouse"]):
-        return "شقق", "بنتهاوس"
-    if any(w in both for w in ["دوبلكس", "دوبليكس", "duplex"]):
-        return "شقق", "دوبلكس"
-    if any(w in both for w in ["استوديو", "ستوديو", "studio"]):
-        return "شقق", "استوديو"
-    if re.match(r"^\s*(?:روف|رووف|roof)", t) or any(w in tf for w in ["روف", "roof"]):
-        return "شقق", "روف"
-    if re.match(r"^\s*(?:غرفة|غرفه|room)", t) or any(w in tf for w in ["غرفة", "room"]):
-        return "شقق", "غرفة"
-    return cat, ("شقة" if cat == "شقق" else cat)
-
-
-def detect_deal(purpose, default_deal):
-    p = purpose.lower()
-    if any(w in p for w in ["ايجار", "إيجار", "rent"]):
+def detect_deal(title, main_text, default_deal):
+    t_low = title.lower()
+    m_low = main_text.lower()
+    if "غرض العقارللإيجار" in m_low or any(w in t_low for w in ["للايجار", "للإيجار", "ايجار", "إيجار", "for rent", "rent", "مفروش", "مفروشة"]):
         return "إيجار"
-    if any(w in p for w in ["بيع", "sale"]):
+    if "غرض العقارللبيع" in m_low or any(w in t_low for w in ["للبيع", "بيع", "for sale", "sale", "تمليك"]):
+        return "بيع"
+    if any(w in m_low for w in ["للايجار", "للإيجار", "شهرياً", "شهريا", "سنوياً"]):
+        return "إيجار"
+    if any(w in m_low for w in ["للبيع", "تمليك"]):
         return "بيع"
     return default_deal
 
+def extract_main_part(raw_snippet):
+    main_part = raw_snippet.split("الإبلاغ عن هذا الإعلان")[0].split("قم بالإبلاغ عن هذا الإعلان")[0]
+    main_part = main_part.replace("المواصفات البارزة التفاصيل الوصف الكماليات تم النشر بواسطة الاتجاهات والمؤشرات الإعلانات ذات الصلة.", "")
+    main_part = main_part.replace("التفاصيل الوصف الكماليات تم النشر بواسطة الاتجاهات والمؤشرات الإعلانات ذات الصلة.", "")
+    if main_part.count(";") >= 2 and "ج.م" in main_part:
+        parts = [p.strip() for p in main_part.split(";") if "ج.م" not in p]
+        main_part = " ".join(parts)
+    return main_part.strip()
 
-def in_new_cairo(title, loc_line, from_nc_source):
-    loc = loc_line.lower()
-    if loc:
-        if any(ex in loc for ex in EXCLUDED_CITIES):
-            return False
-        if any(nc in loc for nc in NEW_CAIRO_PLACES):
-            return True
-    t = title.lower()
-    if any(ex in t for ex in EXCLUDED_CITIES):
-        return False
-    if any(nc in t for nc in NEW_CAIRO_PLACES):
-        return True
-    return from_nc_source
+def extract_ad_id_and_seller(title, main_part, ad_url):
+    ad_id = 0
+    m_id = (
+        re.search(r"رقم الإعلان\s*(\d+)", main_part)
+        or re.search(r"-ID(\d+)", ad_url, re.I)
+        or re.search(r"\b(20\d{7}|50\d{7})\b", title + " " + main_part)
+    )
+    if m_id and m_id.group(1).isdigit():
+        ad_id = int(m_id.group(1))
 
+    ads_count = None
+    m_count = (
+        re.search(r"(?:ال)?[إأآا]علانات\s*(?:ال)?نشط[ةه]\s*[:：]?\s*(\d+)", main_part)
+        or re.search(r"(\d+)\s*(?:ال)?[إأآا]علانات\s*(?:ال)?نشط[ةه]", main_part)
+    )
+    if m_count:
+        ads_count = int(m_count.group(1))
 
-def extract_ad_id(ad_url):
-    m = re.search(r"-ID(\d+)", ad_url, re.I)
-    return int(m.group(1)) if m and m.group(1).isdigit() else 0
+    seller_name = "مالك مباشر"
+    m_name = re.search(r"تم النشر بواسطة\s*([^\.\|\n]+?)(?:\.\s*عضو منذ|\s+عضو منذ|\.\s*الإعلانات|$)", main_part)
+    if m_name:
+        cand = m_name.group(1).strip()
+        if 1 < len(cand) <= 35:
+            seller_name = cand
 
+    return ad_id, ads_count, seller_name
 
-def normalize_ad_url(href):
-    href = unescape(href).split("?")[0].split("#")[0]
-    if href.startswith("//"):
-        href = "https:" + href
-    if href.startswith("/"):
-        href = SITE + href
-    href = re.sub(r"^(https?://[^/]+)/(?:en|ar)/ad/", r"\1/ad/", href)
-    return quote(href, safe=":/%-._~")
+def extract_specs_and_desc(title, main_part):
+    full = f"{title} . {main_part}"
+    price_text = "موضح داخل الإعلان"
+    price_num = 1
 
+    patterns = [
+        r"([\d,]{4,12})\s*(?:ج\.م|جنيه|جنية|EGP)",
+        r"(?:ج\.م|ج\.م\.|EGP)\s*([\d,]{4,12})",
+        r"(?:السعر|بسعر|مطلوب|الايجار|الإيجار|إجمالي السعر)\s*[:：]?\s*([\d,]{4,12})"
+    ]
+    for pat in patterns:
+        m = re.search(pat, full, re.I)
+        if m:
+            raw_p = m.group(1).replace(",", "")
+            if raw_p.isdigit() and int(raw_p) >= 2000:
+                price_num = int(raw_p)
+                price_text = f"{price_num:,} ج.م"
+                break
 
-# ---------------------------------------------------------------- fetching
-def scraper_get(url, tier):
-    BUDGET.spend(tier["cost"])
-    params = {"api_key": API_KEY, "url": url}
-    params.update(tier["extra"])
-    for attempt in range(3):
-        if time.time() - T0 > MAX_RUNTIME_SEC:
-            raise BudgetStop("time")
+    if price_num == 1:
+        m_mil = re.search(r"(\d+(?:\.\d+)?)\s*(?:مليون|ملايين|million)", full, re.I)
+        if m_mil:
+            price_num = int(float(m_mil.group(1)) * 1000000)
+            price_text = f"{price_num:,} ج.م"
+        else:
+            m_k = re.search(r"(\d{1,3})\s*(?:الف|ألف|آلاف)\b", full, re.I)
+            if m_k and int(m_k.group(1)) >= 3:
+                price_num = int(m_k.group(1)) * 1000
+                price_text = f"{price_num:,} ج.م"
+
+    area_match = (
+        re.search(r"المساحة\s*\(?م[٢2²]?\)?\s*[:：]?\s*(\d{2,4})", full, re.I)
+        or re.search(r"(\d{2,4})\s*(?:م²|متر|sqm|m²|م٢|م\b)", full, re.I)
+    )
+    beds_match = (
+        re.search(r"(?:غرف نوم|غرف|غرفة)\s*[:：]?\s*(\d+)", full, re.I)
+        or re.search(r"(\d+)\s*(?:غرف|غرفة|نوم|bedroom|bedrooms|beds)", full, re.I)
+    )
+    baths_match = (
+        re.search(r"(?:الحمامات|حمامات|حمام)\s*[:：]?\s*(\d+)", full, re.I)
+        or re.search(r"(\d+)\s*(?:حمام|حمامات|bathroom|bathrooms|toilets)", full, re.I)
+    )
+
+    area = area_match.group(1) + " م²" if area_match else "مدرج بالإعلان"
+    beds = beds_match.group(1) + " غرف" if beds_match else ""
+    baths = baths_match.group(1) + " حمام" if baths_match else ""
+
+    clean_desc = main_part.split("تم النشر بواسطة")[0].strip()
+    if len(clean_desc) < 15:
+        clean_desc = title
+
+    return price_text, price_num, area, beds, baths, clean_desc
+
+def scrape_all():
+    now_ts = int(time.time())
+    cairo_tz = timezone(timedelta(hours=2))
+    now_cairo = datetime.now(cairo_tz).strftime("%Y/%m/%d، %I:%M %p")
+
+    existing_ads = []
+    blocked_users = set()
+
+    if os.path.exists("ads.json"):
         try:
-            r = requests.get(SCRAPER_ENDPOINT, params=params, timeout=80)
-        except requests.RequestException:
+            with open("ads.json", "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                existing_ads = old_data.get("ads", [])
+                blocked_users = set(old_data.get("blocked_users", []))
+        except Exception:
+            pass
+
+    valid_existing_ads = []
+    seller_counts = {}
+
+    for ad in existing_ads:
+        if ad.get("schema_version") != SCHEMA_VERSION:
+            continue
+        if (now_ts - ad.get("scraped_timestamp", now_ts)) >= SEVEN_DAYS_SECONDS:
+            continue
+        if ad.get("ad_id", 0) >= 500000000:
+            continue
+        sk = ad.get("seller_profile", "")
+        if sk and sk in blocked_users:
+            continue
+        if ad.get("seller_ads_count", 1) > 4:
+            continue
+        valid_existing_ads.append(ad)
+        if sk:
+            seller_counts[sk] = max(seller_counts.get(sk, 0), ad.get("seller_ads_count", 1))
+
+    seen_urls = {ad.get("url") for ad in valid_existing_ads if ad.get("url")}
+    seen_ids = {ad.get("ad_id") for ad in valid_existing_ads if ad.get("ad_id")}
+    new_ads = []
+
+    for idx, item in enumerate(SEARCH_QUERIES):
+        if idx > 0:
             time.sleep(3)
-            continue
-        if r.status_code == 429:
-            time.sleep(6 * (attempt + 1))
-            continue
-        return
+
+        try:
+            params = {
+                "api_key": API_KEY,
+                "query": item["q"],
+                "hl": "ar",
+                "gl": "eg"
+            }
+            res = requests.get("https://api.scraperapi.com/structured/google/search", params=params, timeout=30)
+            print(f"[{idx+1}/{len(SEARCH_QUERIES)}] Status {res.status_code} | {item['q']}")
+            if res.status_code != 200:
+                continue
+
+            results = res.json().get("organic_results", [])
+            for r in results:
+                ad_url = r.get("link", "").split("?")[0]
+                if "dubizzle.com.eg" not in ad_url or "/ad/" not in ad_url or ad_url in seen_urls:
+                    continue
+
+                raw_title = r.get("title", "")
+                raw_snippet = r.get("snippet", "")
+
+                if any(dp in (raw_title + " " + raw_snippet).lower() for dp in DELETED_PHRASES):
+                    continue
+
+                if "شاهد المزيد من إعلانات" in raw_snippet or "**" in raw_snippet:
+                    continue
+
+                main_part = extract_main_part(raw_snippet)
+                ad_id, ads_count, seller_name = extract_ad_id_and_seller(raw_title, main_part, ad_url)
+
+                if ad_id >= 500000000:
+                    blocked_users.add(seller_name if seller_name != "مالك مباشر" else ad_url)
+                    continue
+
+                if ad_id > 0 and ad_id in seen_ids:
+                    continue
+
+                if any(cw in seller_name.lower() for cw in COMPANY_SELLER_WORDS):
+                    blocked_users.add(seller_name)
+                    continue
+
+                if ads_count is not None:
+                    if ads_count > 7:
+                        blocked_users.add(seller_name if seller_name != "مالك مباشر" else ad_url)
+                        continue
+                    if ads_count < 1 or ads_count > 4:
+                        continue
+
+                clean_title = re.sub(r"\s*[-|]\s*(?:شقق|فلل|عقار|مبانى).*$", "", raw_title, flags=re.I)
+                clean_title = re.sub(r"\s*[-|]\s*(?:دوبيزل|dubizzle).*$", "", clean_title, flags=re.I).strip()
+
+                if not is_strictly_new_cairo(clean_title, main_part):
+                    continue
+
+                seller_key = seller_name if seller_name != "مالك مباشر" else ad_url
+                if seller_key in blocked_users:
+                    continue
+
+                final_count = ads_count if ads_count is not None else (seller_counts.get(seller_key, 0) + 1)
+                seller_counts[seller_key] = final_count
+                if final_count > 4:
+                    if final_count > 7:
+                        blocked_users.add(seller_key)
+                    continue
+
+                price_text, price_num, area, beds, baths, clean_desc = extract_specs_and_desc(clean_title, main_part)
+                cat_name, subtype = detect_category_and_subtype(clean_title, main_part, item["category"])
+                deal_name = detect_deal(clean_title, main_part, item["deal"])
+
+                seen_urls.add(ad_url)
+                if ad_id > 0:
+                    seen_ids.add(ad_id)
+
+                new_ads.append({
+                    "schema_version": SCHEMA_VERSION,
+                    "ad_id": ad_id if ad_id > 0 else int(time.time()),
+                    "title": clean_title,
+                    "url": ad_url,
+                    "price_text": price_text,
+                    "price_num": price_num,
+                    "deal": deal_name,
+                    "category": cat_name,
+                    "subtype": subtype,
+                    "location": "القاهرة الجديدة",
+                    "area": area,
+                    "beds": beds,
+                    "baths": baths,
+                    "description": clean_desc,
+                    "seller_name": seller_name,
+                    "seller_profile": seller_key,
+                    "seller_ads_count": final_count,
+                    "scraped_timestamp": now_ts,
+                    "scraped_date": now_cairo
+                })
+        except Exception as e:
+            print(f"Error: {e}")
+
+    final_ads = new_ads + valid_existing_ads
+    final_ads.sort(key=lambda x: x.get("ad_id", 0), reverse=True)
+    unique_owners = len({ad.get("seller_profile") or ad.get("url") for ad in final_ads})
+
+    payload = {
+        "last_scrape": now_cairo,
+        "total": len(final_ads),
+        "owners_count": unique_owners,
+        "blocked_count": len(blocked_users),
+        "blocked_users": list(blocked_users),
+        "ads": final_ads
+    }
+
+    with open("ads.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"Saved {len(final_ads)} verified private owner ads.")
+
+if __name__ == "__main__":
+    scrape_all()
