@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مصيدة الملاك | القاهرة الجديدة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131b2e;
+      --card-border: #1f2a44;
+      --accent: #f97316;
+      --green: #10b981;
+      --blue: #2563eb;
+      --purple: #8b5cf6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 14px; max-width: 650px; margin: 0 auto; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .title-wrap h1 { font-size: 1.45rem; font-weight: 900; color: #fff; }
+    .title-wrap p { font-size: 0.78rem; color: var(--muted); }
+    .logo-badge { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; }
+    .update-pill { display: inline-flex; align-items: center; gap: 8px; background: #111827; border: 1px solid var(--card-border); padding: 5px 12px; border-radius: 999px; font-size: 0.76rem; color: var(--muted); margin-bottom: 14px; }
+    .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; display: inline-block; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-box { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s; }
+    .stat-box:active, .stat-box.active-stat { border-color: var(--accent); background: rgba(249, 115, 22, 0.12); }
+    .stat-num { font-size: 1.25rem; font-weight: 900; color: #fff; line-height: 1.2; }
+    .stat-num.rent-c { color: #38bdf8; }
+    .stat-num.sale-c { color: #fb923c; }
+    .stat-num.block-c { color: #f43f5e; }
+    .stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .filter-panel { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; margin-bottom: 14px; }
+    .search-input { width: 100%; background: #090d16; border: 1px solid var(--card-border); color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 10px; outline: none; }
+    .search-input:focus { border-color: var(--accent); }
+    .pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px; scrollbar-width: none; }
+    .pills-row::-webkit-scrollbar { display: none; }
+    .pill { background: #090d16; border: 1px solid var(--card-border); color: var(--text); padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+    .pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pill.crm-pill.active { background: var(--green); border-color: var(--green); }
+    .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+    .select-box { background: #090d16; border: 1px solid var(--card-border); color: #fff; padding: 8px 10px; border-radius: 10px; font-size: 0.82rem; outline: none; width: 100%; }
+    .results-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.82rem; color: var(--muted); }
+    .ad-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; margin-bottom: 12px; position: relative; transition: 0.2s; }
+    .ad-card.contacted-card { border-color: rgba(16, 185, 129, 0.45); opacity: 0.85; }
+    .ad-card.saved-card { border-color: var(--accent); }
+    .badges-top { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; align-items: center; }
+    .badge { padding: 3px 9px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
+    .b-owner { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .b-deal-rent { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .b-deal-sale { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+    .b-sub { background: rgba(37, 99, 235, 0.18); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.35); }
+    .b-ppm { background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.35); }
+    .ad-title { font-size: 1.02rem; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.45; }
+    .price-box { background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .price-label { font-size: 0.78rem; color: var(--muted); }
+    .price-val { font-size: 1.18rem; font-weight: 900; color: var(--accent); }
+    .specs-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .spec-chip { background: #090d16; border: 1px solid var(--card-border); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; color: #cbd5e1; }
+    .desc-box { background: #090d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 10px; font-size: 0.83rem; color: #e2e8f0; line-height: 1.6; margin-bottom: 10px; max-height: 130px; overflow-y: auto; }
+    .crm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .btn-crm { background: #090d16; border: 1px solid var(--card-border); color: var(--muted); padding: 7px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; cursor: pointer; text-align: center; }
+    .btn-crm.done { background: rgba(16, 185, 129, 0.18); border-color: var(--green); color: #34d399; }
+    .btn-crm.starred { background: rgba(249, 115, 22, 0.18); border-color: var(--accent); color: #fb923c; }
+    .actions-row { display: grid; grid-template-columns: 1.3fr 1fr 0.9fr; gap: 6px; }
+    .btn { padding: 9px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; text-align: center; text-decoration: none; cursor: pointer; border: none; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-wa { background: #059669; color: #fff; }
+    .btn-sec { background: #1e293b; color: #e2e8f0; border: 1px solid var(--card-border); }
+    .empty-box { text-align: center; padding: 35px 15px; color: var(--muted); background: var(--card); border-radius: 14px; border: 1px solid var(--card-border); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="title-wrap">
+      <h1>مصيدة الملاك</h1>
+      <p>القاهرة الجديدة • ملاك مباشر بدون وسطاء</p>
+    </div>
+    <div class="logo-badge">م</div>
+  </div>
+
+  <div class="update-pill">
+    <span class="dot"></span>
+    <span id="lastUpdate">جاري التحميل...</span>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box" onclick="quickDeal('الكل')">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">إجمالي الفرص</div>
+    </div>
+    <div class="stat-box" onclick="quickDeal('إيجار')">
+      <div class="stat-num rent-c" id="statRent">0</div>
+      <div class="stat-label">عروض إيجار</div>
+    </div>
+    <div class="stat-box" onclick="quickDeal('بيع')">
+      <div class="stat-num sale-c" id="statSale">0</div>
+      <div class="stat-label">عروض بيع</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num block-c" id="statBlocked">0</div>
+      <div class="stat-label">سماسرة محظورين</div>
+    </div>
+  </div>
+
+  <div class="filter-panel">
+    <input type="text" id="searchInput" class="search-input" placeholder="ابحث بالمنطقة أو الوصف (مثال: الرحاب، مدينتي، النرجس، لاروزا)..." oninput="renderAds()" />
+
+    <div class="pills-row" id="dealPills">
+      <button class="pill active" onclick="setDeal('الكل', this)">الكل (بيع وإيجار)</button>
+      <button class="pill" onclick="setDeal('إيجار', this)">إيجار فقط</button>
+      <button class="pill" onclick="setDeal('بيع', this)">بيع فقط</button>
+    </div>
+
+    <div class="pills-row" id="subPills">
+      <button class="pill active" onclick="setSub('الكل', this)">كل العقارات</button>
+      <button class="pill" onclick="setSub('شقة', this)">شقق</button>
+      <button class="pill" onclick="setSub('دوبلكس', this)">دوبلكس</button>
+      <button class="pill" onclick="setSub('بنتهاوس', this)">بنتهاوس</button>
+      <button class="pill" onclick="setSub('استوديو', this)">استوديو</button>
+      <button class="pill" onclick="setSub('فيلا', this)">فيلات وتاون هاوس</button>
+      <button class="pill" onclick="setSub('تجاري وإداري', this)">مكاتب وتجاري</button>
+    </div>
+
+    <div class="pills-row" id="crmPills">
+      <button class="pill crm-pill active" onclick="setCrm('الكل', this)">كل الحالات</button>
+      <button class="pill crm-pill" onclick="setCrm('uncontacted', this)">لم يتم التواصل</button>
+      <button class="pill crm-pill" onclick="setCrm('saved', this)">اللقطات المحفوظة</button>
+      <button class="pill crm-pill" onclick="setCrm('contacted', this)">تم التواصل معهم</button>
+    </div>
+
+    <div class="controls-row">
+      <select id="sortSelect" class="select-box" onchange="renderAds()">
+        <option value="newest">الأحدث أولا</option>
+        <option value="price_asc">السعر: الأقل أولا</option>
+        <option value="price_desc">السعر: الأعلى أولا</option>
+        <option value="ppm_asc">سعر المتر: الأقل أولا</option>
+      </select>
+      <input type="number" id="maxPriceInput" class="select-box" placeholder="أقصى سعر (ج.م)" oninput="renderAds()" />
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <span>النتائج المصفاة</span>
+    <span id="resultsCount">عرض 0 إعلان</span>
+  </div>
+
+  <div id="adsContainer"></div>
+
+  <script>
+    let allAds = [];
+    let filterDeal = 'الكل';
+    let filterSub = 'الكل';
+    let filterCrm = 'الكل';
+
+    let contactedIds = JSON.parse(localStorage.getItem('gamal_contacted') || '[]');
+    let savedIds = JSON.parse(localStorage.getItem('gamal_saved') || '[]');
+
+    function toggleContacted(id) {
+      if (contactedIds.includes(id)) {
+        contactedIds = contactedIds.filter(x => x !== id);
+      } else {
+        contactedIds.push(id);
+      }
+      localStorage.setItem('gamal_contacted', JSON.stringify(contactedIds));
+      renderAds();
+    }
+
+    function toggleSaved(id) {
+      if (savedIds.includes(id)) {
+        savedIds = savedIds.filter(x => x !== id);
+      } else {
+        savedIds.push(id);
+      }
+      localStorage.setItem('gamal_saved', JSON.stringify(savedIds));
+      renderAds();
+    }
+
+    function quickDeal(d) {
+      filterDeal = d;
+      const btns = document.querySelectorAll('#dealPills .pill');
+      btns.forEach(b => {
+        b.classList.remove('active');
+        if ((d === 'الكل' && b.textContent.includes('الكل')) || b.textContent.includes(d)) {
+          b.classList.add('active');
+        }
+      });
+      renderAds();
+    }
+
+    function setDeal(d, btn) {
+      filterDeal = d;
+      document.querySelectorAll('#dealPills .pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAds();
+    }
+
+    function setSub(s, btn) {
+      filterSub = s;
+      document.querySelectorAll('#subPills .pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAds();
+    }
+
+    function setCrm(c, btn) {
+      filterCrm = c;
+      document.querySelectorAll('#crmPills .pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAds();
+    }
+
+    function calcPpm(ad) {
+      if (ad.deal !== 'بيع' || !ad.price_num || ad.price_num < 500000) return 0;
+      const m = (ad.area || '').match(/(\d{2,4})/);
+      if (!m) return 0;
+      const sqm = parseInt(m[1], 10);
+      if (sqm < 30) return 0;
+      return Math.round(ad.price_num / sqm);
+    }
+
+    function shareWhatsApp(idx) {
+      const ad = window.currentFiltered[idx];
+      if (!ad) return;
+      const lines = [
+        `عرض عقاري بالقاهرة الجديدة (${ad.deal} - ${ad.subtype || ad.category})`,
+        `العنوان: ${ad.title}`,
+        `السعر: ${ad.price_text}`,
+        `المساحة: ${ad.area}${ad.beds ? ' | ' + ad.beds : ''}${ad.baths ? ' | ' + ad.baths : ''}`,
+        `التفاصيل: ${ad.description}`
+      ];
+      const url = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+      window.open(url, '_blank');
+    }
+
+    function copyText(idx, btn) {
+      const ad = window.currentFiltered[idx];
+      if (!ad) return;
+      navigator.clipboard.writeText(`${ad.title}\nالسعر: ${ad.price_text}\nالمساحة: ${ad.area}\n${ad.description}`);
+      const old = btn.textContent;
+      btn.textContent = 'تم النسخ';
+      setTimeout(() => btn.textContent = old, 1200);
+    }
+
+    function renderAds() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const maxP = parseFloat(document.getElementById('maxPriceInput').value) || 0;
+      const sortBy = document.getElementById('sortSelect').value;
+
+      let list = allAds.filter(ad => {
+        if (filterDeal !== 'الكل' && ad.deal !== filterDeal) return false;
+        if (filterSub !== 'الكل' && ad.subtype !== filterSub && ad.category !== filterSub) return false;
+        if (filterCrm === 'uncontacted' && contactedIds.includes(ad.ad_id)) return false;
+        if (filterCrm === 'contacted' && !contactedIds.includes(ad.ad_id)) return false;
+        if (filterCrm === 'saved' && !savedIds.includes(ad.ad_id)) return false;
+        if (maxP > 0 && ad.price_num > maxP) return false;
+        if (q) {
+          const hay = `${ad.title} ${ad.description} ${ad.seller_name} ${ad.area}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (sortBy === 'price_asc') return (a.price_num || 999999999) - (b.price_num || 999999999);
+        if (sortBy === 'price_desc') return (b.price_num || 0) - (a.price_num || 0);
+        if (sortBy === 'ppm_asc') return (calcPpm(a) || 999999999) - (calcPpm(b) || 999999999);
+        return (b.ad_id || 0) - (a.ad_id || 0);
+      });
+
+      window.currentFiltered = list;
+      document.getElementById('resultsCount').textContent = `عرض ${list.length} من ${allAds.length} إعلان`;
+
+      const container = document.getElementById('adsContainer');
+      if (!list.length) {
+        container.innerHTML = `<div class="empty-box">لا توجد إعلانات مطابقة للفلتر الحالي</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map((ad, idx) => {
+        const isContacted = contactedIds.includes(ad.ad_id);
+        const isSaved = savedIds.includes(ad.ad_id);
+        const ppm = calcPpm(ad);
+        const dealClass = ad.deal === 'إيجار' ? 'b-deal-rent' : 'b-deal-sale';
+
+        return `
+          <div class="ad-card ${isContacted ? 'contacted-card' : ''} ${isSaved ? 'saved-card' : ''}">
+            <div class="badges-top">
+              <span class="badge b-owner">مالك (${ad.seller_ads_count || 1} إعلان فقط)</span>
+              <span class="badge ${dealClass}">${ad.deal}</span>
+              <span class="badge b-sub">${ad.subtype || ad.category}</span>
+              ${ppm > 0 ? `<span class="badge b-ppm">سعر المتر: ${ppm.toLocaleString()} ج.م</span>` : ''}
+            </div>
+
+            <div class="ad-title">${ad.title}</div>
+
+            <div class="price-box">
+              <span class="price-label">سعر الوحدة:</span>
+              <span class="price-val">${ad.price_text}</span>
+            </div>
+
+            <div class="specs-row">
+              <span class="spec-chip">المساحة: ${ad.area}</span>
+              ${ad.beds ? `<span class="spec-chip">${ad.beds}</span>` : ''}
+              ${ad.baths ? `<span class="spec-chip">${ad.baths}</span>` : ''}
+              <span class="spec-chip">المعلن: ${ad.seller_name}</span>
+            </div>
+
+            <div class="desc-box">${ad.description}</div>
+
+            <div class="crm-row">
+              <button class="btn-crm ${isContacted ? 'done' : ''}" onclick="toggleContacted(${ad.ad_id})">
+                ${isContacted ? 'تم التواصل مع المالك' : 'تحديد كـ تم التواصل'}
+              </button>
+              <button class="btn-crm ${isSaved ? 'starred' : ''}" onclick="toggleSaved(${ad.ad_id})">
+                ${isSaved ? 'محفوظ في اللقطات' : 'حفظ في اللقطات'}
+              </button>
+            </div>
+
+            <div class="actions-row">
+              <a class="btn btn-primary" href="${ad.url}" target="_blank" rel="noopener">فتح على دوبيزل</a>
+              <button class="btn btn-wa" onclick="shareWhatsApp(${idx})">إرسال لعميل</button>
+              <button class="btn btn-sec" onclick="copyText(${idx}, this)">نسخ الوصف</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch('ads.json?t=' + Date.now());
+        const data = await res.json();
+        allAds = data.ads || [];
+        document.getElementById('lastUpdate').textContent = 'آخر تحديث: ' + (data.last_scrape || '');
+        document.getElementById('statTotal').textContent = allAds.length;
+        document.getElementById('statRent').textContent = allAds.filter(a => a.deal === 'إيجار').length;
+        document.getElementById('statSale').textContent = allAds.filter(a => a.deal === 'بيع').length;
+        document.getElementById('statBlocked').textContent = data.blocked_count || 0;
+        renderAds();
+      } catch (e) {
+        document.getElementById('lastUpdate').textContent = 'تعذر تحميل البيانات';
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
