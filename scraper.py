@@ -20,24 +20,22 @@ URLS = [
 
 BROKER_KEYWORDS = [
     "شركة", "للعقارات", "التسويق العقاري", "بروكر", "سمسار", "عمولة", "مكتب عقارات",
-    "real estate", "property", "properties", "agency", "broker", "consultancy", "investment", "group"
+    "real estate", "property", "properties", "agency", "broker", "consultancy", "investment",
+    "verified business", "featured business"
 ]
 
 SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
 
 def fetch_via_api(target_url):
-    modes = [
-        {"api_key": API_KEY, "url": target_url},
-        {"api_key": API_KEY, "url": target_url, "premium": "true"},
-        {"api_key": API_KEY, "url": target_url, "render": "true"}
-    ]
-    for params in modes:
+    for extra in [{"render": "false"}, {"premium": "true"}, {"render": "true"}]:
         try:
-            res = requests.get("http://api.scraperapi.com", params=params, timeout=60)
-            if res.status_code == 200 and ("/ad/" in res.text or "<article" in res.text or "h1" in res.text):
+            params = {"api_key": API_KEY, "url": target_url}
+            params.update(extra)
+            res = requests.get("http://api.scraperapi.com", params=params, timeout=35)
+            if res.status_code == 200 and ("/ad/" in res.text or "<article" in res.text):
                 return res.text
         except Exception as e:
-            print(f"Attempt error: {e}")
+            print(f"Fetch error: {e}")
     return ""
 
 def detect_subtype(title, description, category):
@@ -59,105 +57,6 @@ def detect_subtype(title, description, category):
 def is_broker_text(text):
     low = text.lower()
     return any(kw in low for kw in BROKER_KEYWORDS)
-
-def get_user_ads_count(profile_url):
-    if not profile_url:
-        return 1
-    try:
-        html = fetch_via_api(profile_url)
-        if not html:
-            return 1
-        soup = BeautifulSoup(html, "html.parser")
-        text = soup.get_text(" ", strip=True)
-        match = re.search(r"(\d+)\s*(?:إعلان|إعلانات|اعلان|Ads|ad)", text, re.IGNORECASE)
-        if match:
-            return int(match.group(1))
-        ad_links = {a["href"] for a in soup.find_all("a", href=True) if "/ad/" in a["href"]}
-        if ad_links:
-            return len(ad_links)
-        return 1
-    except Exception:
-        return 1
-
-def enrich_ad_details(ad_url, fallback_title, fallback_price_text, fallback_price_num, fallback_area, fallback_beds, fallback_baths, fallback_desc, blocked_users):
-    try:
-        html = fetch_via_api(ad_url)
-        if not html:
-            return {
-                "title": fallback_title,
-                "price_text": fallback_price_text,
-                "price_num": fallback_price_num,
-                "area": fallback_area,
-                "beds": fallback_beds,
-                "baths": fallback_baths,
-                "description": fallback_desc,
-                "seller_name": "مالك",
-                "seller_profile": "",
-                "seller_ads_count": 1
-            }
-
-        soup = BeautifulSoup(html, "html.parser")
-
-        for a in soup.find_all("a", href=True):
-            if "/companies/" in a["href"] or "/agencies/" in a["href"]:
-                blocked_users.add(a["href"])
-                return None
-
-        seller_name = "مالك"
-        profile_url = ""
-        for a in soup.find_all("a", href=True):
-            if "/profile/" in a["href"]:
-                profile_url = "https://www.dubizzle.com.eg" + a["href"] if a["href"].startswith("/") else a["href"]
-                seller_name = a.get_text(strip=True) or "مالك"
-                break
-
-        if profile_url and profile_url in blocked_users:
-            return None
-
-        description = ""
-        desc_el = soup.find("div", {"aria-label": "Description"}) or soup.find("div", class_=re.compile(r"description", re.I))
-        if desc_el:
-            description = desc_el.get_text("\n", strip=True)
-        if not description:
-            meta_desc = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
-            if meta_desc and meta_desc.get("content"):
-                description = meta_desc["content"].strip()
-        if not description:
-            description = fallback_desc
-
-        title = fallback_title
-        h1 = soup.find("h1")
-        if h1 and h1.get_text(strip=True):
-            title = h1.get_text(strip=True)
-
-        if is_broker_text(seller_name + " " + title + " " + description[:200]):
-            if profile_url:
-                blocked_users.add(profile_url)
-            return None
-
-        ads_count = 1
-        if profile_url:
-            ads_count = get_user_ads_count(profile_url)
-            if ads_count > 7:
-                blocked_users.add(profile_url)
-                return None
-            if ads_count > 4:
-                return None
-
-        return {
-            "title": title,
-            "price_text": fallback_price_text,
-            "price_num": fallback_price_num,
-            "area": fallback_area,
-            "beds": fallback_beds,
-            "baths": fallback_baths,
-            "description": description,
-            "seller_name": seller_name,
-            "seller_profile": profile_url,
-            "seller_ads_count": ads_count
-        }
-    except Exception:
-        return None
 
 def scrape_all():
     now_ts = int(time.time())
@@ -184,13 +83,13 @@ def scrape_all():
             valid_existing_ads.append(ad)
 
     seen_urls = {ad.get("url") for ad in valid_existing_ads if ad.get("url")}
-    new_ads = []
+    candidate_ads = []
+    seller_ad_counts = {}
 
     for cat in URLS:
-        print(f"Fetching category: {cat['url']}")
+        print(f"Scraping: {cat['url']}")
         html = fetch_via_api(cat["url"])
         if not html:
-            print("Failed to fetch category html")
             continue
 
         soup = BeautifulSoup(html, "html.parser")
@@ -198,18 +97,12 @@ def scrape_all():
         if not cards:
             cards = [a.find_parent("div") or a for a in soup.find_all("a", href=re.compile(r"/ad/"))]
 
-        print(f"Found {len(cards)} cards in category")
-        checked_in_cat = 0
-
         for card in cards:
-            if checked_in_cat >= 5:
-                break
-
             card_html = str(card)
             if "/companies/" in card_html or "/agencies/" in card_html:
-                comp_links = [a["href"] for a in card.find_all("a", href=True) if "/companies/" in a["href"] or "/agencies/" in a["href"]]
-                for cl in comp_links:
-                    blocked_users.add(cl)
+                for a in card.find_all("a", href=True):
+                    if "/companies/" in a["href"] or "/agencies/" in a["href"]:
+                        blocked_users.add(a["href"])
                 continue
 
             link_el = card.find("a", href=re.compile(r"/ad/")) if card.name != "a" else card
@@ -226,63 +119,75 @@ def scrape_all():
                 blocked_users.add(ad_url)
                 continue
 
+            seller_name = "مالك"
+            seller_key = ad_url
+            for a in card.find_all("a", href=True):
+                if "/profile/" in a["href"]:
+                    seller_key = a["href"]
+                    seller_name = a.get_text(strip=True) or "مالك"
+                    break
+
+            if seller_key in blocked_users:
+                continue
+
+            seller_ad_counts[seller_key] = seller_ad_counts.get(seller_key, 0) + 1
+            if seller_ad_counts[seller_key] > 7:
+                blocked_users.add(seller_key)
+                continue
+
             title_el = card.find("h2") or link_el
-            fallback_title = title_el.get_text(strip=True) if title_el else "عقار بالقاهرة الجديدة"
-            if len(fallback_title) < 5:
-                fallback_title = card_text.split("|")[0].strip() or "عقار بالقاهرة الجديدة"
+            title = title_el.get_text(strip=True) if title_el else ""
+            if len(title) < 5:
+                parts = [p.strip() for p in card_text.split("|") if len(p.strip()) > 10]
+                title = parts[0] if parts else "عقار من المالك بالقاهرة الجديدة"
 
             price_text = "غير محدد"
             price_num = 0
-            price_match = re.search(r"([\d,]+)\s*(?:ج\.م|جنيه|EGP)", card_text)
+            price_match = re.search(r"([\d,]+)\s*(?:ج\.م|جنيه|EGP)", card_text) or re.search(r"(?:ج\.م|EGP)\s*([\d,]+)", card_text)
             if price_match:
-                price_text = price_match.group(1) + " ج.م"
                 price_num = int(price_match.group(1).replace(",", ""))
+                price_text = f"{price_num:,} ج.م"
 
-            area_match = re.search(r"(\d+)\s*(?:م²|متر|sqm|m²)", card_text, re.I)
+            area_match = re.search(r"(\d+)\s*(?:م²|متر|sqm|m²|م٢)", card_text, re.I)
             beds_match = re.search(r"(\d+)\s*(?:غرف|غرفة|beds|bed)", card_text, re.I)
             baths_match = re.search(r"(\d+)\s*(?:حمام|حمامات|baths|bath)", card_text, re.I)
 
-            fallback_area = area_match.group(1) + " م²" if area_match else "غير محدد"
-            fallback_beds = beds_match.group(1) + " غرف" if beds_match else ""
-            fallback_baths = baths_match.group(1) + " حمام" if baths_match else ""
+            area = area_match.group(1) + " م²" if area_match else "غير محدد"
+            beds = beds_match.group(1) + " غرف" if beds_match else ""
+            baths = baths_match.group(1) + " حمام" if baths_match else ""
+
+            clean_desc = "\n".join([p.strip() for p in card_text.split("|") if len(p.strip()) > 3])
+            subtype = detect_subtype(title, clean_desc, cat["category"])
 
             seen_urls.add(ad_url)
-            checked_in_cat += 1
-
-            details = enrich_ad_details(
-                ad_url,
-                fallback_title,
-                price_text,
-                price_num,
-                fallback_area,
-                fallback_beds,
-                fallback_baths,
-                card_text,
-                blocked_users
-            )
-            if not details:
-                continue
-
-            subtype = detect_subtype(details["title"], details["description"], cat["category"])
-            new_ads.append({
-                "title": details["title"],
+            candidate_ads.append({
+                "title": title,
                 "url": ad_url,
-                "price_text": details["price_text"],
-                "price_num": details["price_num"],
+                "price_text": price_text,
+                "price_num": price_num,
                 "deal": cat["deal"],
                 "category": cat["category"],
                 "subtype": subtype,
                 "location": "القاهرة الجديدة",
-                "area": details["area"],
-                "beds": details["beds"],
-                "baths": details["baths"],
-                "description": details["description"],
-                "seller_name": details["seller_name"],
-                "seller_profile": details["seller_profile"],
-                "seller_ads_count": details["seller_ads_count"],
+                "area": area,
+                "beds": beds,
+                "baths": baths,
+                "description": clean_desc,
+                "seller_name": seller_name,
+                "seller_profile": seller_key,
+                "seller_ads_count": 1,
                 "scraped_timestamp": now_ts,
                 "scraped_date": now_cairo
             })
+
+    new_ads = []
+    for ad in candidate_ads:
+        sk = ad["seller_profile"]
+        count = seller_ad_counts.get(sk, 1)
+        if sk in blocked_users or count > 4:
+            continue
+        ad["seller_ads_count"] = count
+        new_ads.append(ad)
 
     final_ads = new_ads + valid_existing_ads
 
@@ -296,7 +201,7 @@ def scrape_all():
 
     with open("ads.json", "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
-    print(f"Saved {len(final_ads)} owner ads and {len(blocked_users)} blocked brokers.")
+    print(f"Done. Saved {len(final_ads)} owner ads, blocked {len(blocked_users)} brokers.")
 
 if __name__ == "__main__":
     scrape_all()
