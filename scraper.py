@@ -6,29 +6,31 @@ from datetime import datetime, timedelta, timezone
 import requests
 
 API_KEY = "1fbcb4ca0bad271b0780c0a848e8c05b"
-SCHEMA_VERSION = 6
-BASE_MIN_AD_ID = 204800000
+SCHEMA_VERSION = 7
+MIN_ACTIVE_AD_ID = 204600000
 SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
 
 SEARCH_QUERIES = [
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار التجمع الخامس القاهرة الجديدة", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار القاهرة الجديدة التجمع الاول او الثالث", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للبيع التجمع الخامس القاهرة الجديدة", "deal": "بيع", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار او للبيع الرحاب مدينتي القاهرة الجديدة", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ دوبلكس او بنتهاوس للايجار او للبيع التجمع القاهرة الجديدة", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ استوديو او روف او غرفة للايجار التجمع القاهرة الجديدة", "deal": "إيجار", "category": "شقق"},
-    {"q": "site:dubizzle.com.eg/ad/ فيلا او تاون هاوس او توين هاوس للايجار التجمع القاهرة الجديدة", "deal": "إيجار", "category": "فيلا"},
-    {"q": "site:dubizzle.com.eg/ad/ فيلا او تاون هاوس او توين هاوس للبيع التجمع القاهرة الجديدة", "deal": "بيع", "category": "فيلا"},
-    {"q": "site:dubizzle.com.eg/ad/ مكتب اداري او مقر للايجار التجمع الخامس القاهرة الجديدة", "deal": "إيجار", "category": "تجاري وإداري"},
-    {"q": "site:dubizzle.com.eg/ad/ محل تجاري او عيادة او مكتب للبيع التجمع القاهرة الجديدة", "deal": "بيع", "category": "تجاري وإداري"},
-    {"q": 'site:dubizzle.com.eg/en/ad/ "New Cairo" Apartment OR Duplex OR Studio Rent EGP', "deal": "إيجار", "category": "شقق"},
-    {"q": 'site:dubizzle.com.eg/en/ad/ "New Cairo" Villa OR Townhouse OR Office Sale OR Rent EGP', "deal": "بيع", "category": "فيلا"}
+    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار التجمع", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ شقة للبيع التجمع", "deal": "بيع", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ شقة للايجار القاهرة الجديدة", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ شقة للبيع القاهرة الجديدة", "deal": "بيع", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ دوبلكس التجمع", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ بنتهاوس التجمع", "deal": "بيع", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ استوديو التجمع", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ شقة الرحاب", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ شقة مدينتي", "deal": "إيجار", "category": "شقق"},
+    {"q": "site:dubizzle.com.eg/ad/ فيلا التجمع", "deal": "بيع", "category": "فيلا"},
+    {"q": "site:dubizzle.com.eg/ad/ تاون هاوس التجمع", "deal": "بيع", "category": "فيلا"},
+    {"q": "site:dubizzle.com.eg/ad/ مكتب للايجار التجمع", "deal": "إيجار", "category": "تجاري وإداري"},
+    {"q": "site:dubizzle.com.eg/ad/ محل التجمع", "deal": "إيجار", "category": "تجاري وإداري"}
 ]
 
 DELETED_PHRASES = [
     "لم يتم العثور على تطابقات",
     "قد تم بيعه أو إزالته",
     "تم بيعه أو إزالته",
+    "حاول البحث عن إعلانات مشابهة",
     "we couldn't find any matches",
     "no longer available"
 ]
@@ -116,29 +118,6 @@ def extract_seller_key(title, snippet, ad_url):
         return " ".join(words[:4])
     return ad_url
 
-def query_search_results(query_str):
-    for tbs_opt in ["qdr:w", ""]:
-        try:
-            params = {
-                "api_key": API_KEY,
-                "query": query_str,
-                "hl": "ar",
-                "gl": "eg",
-                "num": "25"
-            }
-            if tbs_opt:
-                params["tbs"] = tbs_opt
-            res = requests.get("https://api.scraperapi.com/structured/google/search", params=params, timeout=45)
-            if res.status_code == 200:
-                data = res.json()
-                organic = data.get("organic_results", [])
-                if organic:
-                    return organic
-        except Exception as e:
-            print(f"Search request warning: {e}")
-        time.sleep(2)
-    return []
-
 def scrape_all():
     now_ts = int(time.time())
     cairo_tz = timezone(timedelta(hours=2))
@@ -173,93 +152,87 @@ def scrape_all():
             seller_counts[sk] = seller_counts.get(sk, 0) + 1
 
     seen_urls = {ad.get("url") for ad in valid_existing_ads if ad.get("url")}
-    raw_items = []
-    highest_id = BASE_MIN_AD_ID
+    candidates = []
 
     for idx, item in enumerate(SEARCH_QUERIES):
         if idx > 0:
-            time.sleep(22)
+            time.sleep(24)
 
-        print(f"[{idx+1}/{len(SEARCH_QUERIES)}] Fetching: {item['q']}")
-        results = query_search_results(item["q"])
-        print(f"Found {len(results)} results")
-
-        for r in results:
-            ad_url = r.get("link", "").split("?")[0]
-            if "dubizzle.com.eg" not in ad_url or "/ad/" not in ad_url:
-                continue
-            if "/companies/" in ad_url or "/agencies/" in ad_url:
-                blocked_users.add(ad_url)
-                continue
-            if ad_url in seen_urls:
-                continue
-
-            ad_id = extract_ad_id(ad_url)
-            if ad_id > highest_id:
-                highest_id = ad_id
-
-            title = re.sub(r"\s*[-|]\s*(?:دوبيزل|dubizzle).*$", "", r.get("title", ""), flags=re.I).strip()
-            snippet = r.get("snippet", "").strip()
-            full_text = f"{title} | {snippet}"
-
-            if any(dp in full_text.lower() for dp in DELETED_PHRASES):
+        try:
+            params = {
+                "api_key": API_KEY,
+                "query": item["q"],
+                "hl": "ar",
+                "gl": "eg",
+                "num": "20"
+            }
+            res = requests.get("https://api.scraperapi.com/structured/google/search", params=params, timeout=45)
+            print(f"[{idx+1}/{len(SEARCH_QUERIES)}] {item['q']} -> Status {res.status_code}")
+            if res.status_code != 200:
                 continue
 
-            seen_urls.add(ad_url)
-            raw_items.append({
-                "ad_id": ad_id,
-                "title": title or "عقار بالقاهرة الجديدة",
-                "snippet": snippet,
-                "full_text": full_text,
-                "url": ad_url,
-                "default_deal": item["deal"],
-                "default_cat": item["category"]
-            })
+            data = res.json()
+            results = data.get("organic_results", [])
+            print(f"Results found: {len(results)}")
 
-    dynamic_min_id = max(BASE_MIN_AD_ID, highest_id - 200000)
-    candidates = []
+            for r in results:
+                ad_url = r.get("link", "").split("?")[0]
+                if "dubizzle.com.eg" not in ad_url or "/ad/" not in ad_url:
+                    continue
+                if "/companies/" in ad_url or "/agencies/" in ad_url:
+                    blocked_users.add(ad_url)
+                    continue
+                if ad_url in seen_urls:
+                    continue
 
-    for raw in raw_items:
-        if raw["ad_id"] > 0 and raw["ad_id"] < dynamic_min_id:
-            continue
+                ad_id = extract_ad_id(ad_url)
+                if ad_id > 0 and ad_id < MIN_ACTIVE_AD_ID:
+                    continue
 
-        title = raw["title"]
-        snippet = raw["snippet"]
-        ad_url = raw["url"]
+                title = re.sub(r"\s*[-|]\s*(?:دوبيزل|dubizzle).*$", "", r.get("title", ""), flags=re.I).strip()
+                snippet = r.get("snippet", "").strip()
+                full_text = f"{title} | {snippet}"
 
-        seller_key = extract_seller_key(title, snippet, ad_url)
-        if seller_key in blocked_users:
-            continue
+                if any(dp in full_text.lower() for dp in DELETED_PHRASES):
+                    continue
 
-        seller_counts[seller_key] = seller_counts.get(seller_key, 0) + 1
-        if seller_counts[seller_key] > 7:
-            blocked_users.add(seller_key)
-            continue
+                seller_key = extract_seller_key(title, snippet, ad_url)
+                if seller_key in blocked_users:
+                    continue
 
-        price_text, price_num, area, beds, baths = extract_specs(raw["full_text"])
-        cat_name, subtype = detect_category_and_subtype(title, snippet, raw["default_cat"])
-        deal_name = detect_deal(title, snippet, raw["default_deal"])
+                seller_counts[seller_key] = seller_counts.get(seller_key, 0) + 1
+                if seller_counts[seller_key] > 7:
+                    blocked_users.add(seller_key)
+                    continue
 
-        candidates.append({
-            "schema_version": SCHEMA_VERSION,
-            "title": title,
-            "url": ad_url,
-            "price_text": price_text,
-            "price_num": price_num,
-            "deal": deal_name,
-            "category": cat_name,
-            "subtype": subtype,
-            "location": "القاهرة الجديدة",
-            "area": area,
-            "beds": beds,
-            "baths": baths,
-            "description": snippet if snippet else title,
-            "seller_name": "مالك",
-            "seller_profile": seller_key,
-            "seller_ads_count": 1,
-            "scraped_timestamp": now_ts,
-            "scraped_date": now_cairo
-        })
+                price_text, price_num, area, beds, baths = extract_specs(full_text)
+                cat_name, subtype = detect_category_and_subtype(title, snippet, item["category"])
+                deal_name = detect_deal(title, snippet, item["deal"])
+
+                seen_urls.add(ad_url)
+                candidates.append({
+                    "schema_version": SCHEMA_VERSION,
+                    "ad_id": ad_id,
+                    "title": title or "عقار بالقاهرة الجديدة",
+                    "url": ad_url,
+                    "price_text": price_text,
+                    "price_num": price_num,
+                    "deal": deal_name,
+                    "category": cat_name,
+                    "subtype": subtype,
+                    "location": "القاهرة الجديدة",
+                    "area": area,
+                    "beds": beds,
+                    "baths": baths,
+                    "description": snippet if snippet else title,
+                    "seller_name": "مالك",
+                    "seller_profile": seller_key,
+                    "seller_ads_count": 1,
+                    "scraped_timestamp": now_ts,
+                    "scraped_date": now_cairo
+                })
+        except Exception as e:
+            print(f"Error: {e}")
 
     all_combined = candidates + valid_existing_ads
     final_ads = []
@@ -275,6 +248,7 @@ def scrape_all():
         ad["seller_ads_count"] = count
         final_ads.append(ad)
 
+    final_ads.sort(key=lambda x: x.get("ad_id", 0), reverse=True)
     unique_owners = len({ad.get("seller_profile") or ad.get("url") for ad in final_ads})
 
     payload = {
@@ -288,7 +262,7 @@ def scrape_all():
 
     with open("ads.json", "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
-    print(f"Completed safely: {len(final_ads)} active owner ads from {unique_owners} owners.")
+    print(f"Done: {len(final_ads)} active owner ads from {unique_owners} owners.")
 
 if __name__ == "__main__":
     scrape_all()
