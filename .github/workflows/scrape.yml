@@ -1,0 +1,42 @@
+name: Scrape Dubizzle 4 Times Daily
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 19 * * *'
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    services:
+      flaresolverr:
+        image: ghcr.io/flaresolverr/flaresolverr:latest
+        ports:
+          - 8191:8191
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -U curl_cffi beautifulsoup4 requests duckduckgo-search
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Save updated ads and blocklist
+        run: |
+          git config user.name "Auto Scraper"
+          git config user.email "actions@github.com"
+          git add ads.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update owner ads and purge >7d" && git push)
