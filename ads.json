@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/04, 12:01 PM",
+  "last_scrape": "2026/11/04, 02:14 PM",
   "total_ads": 11,
   "blocked_count": 4,
   "blocked_users": [
@@ -8,7 +8,7 @@
     "ElQima Real Estate",
     "Home group"
   ],
-  "checked_ids_v2": [],
+  "checked_ids_v3": [],
   "ads": [
     {
       "schema_version": 24,
