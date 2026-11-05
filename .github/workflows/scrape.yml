@@ -1,0 +1,43 @@
+name: Scrape Dubizzle Hourly
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dubizzle-scraper
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml curl_cffi
+
+      - name: Run scraper
+        run: |
+          python scraper.py
+
+      - name: Commit and Push updated ads.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull --rebase origin main || true
+          git add ads.json
+          git diff --staged --quiet || git commit -m "Auto-update New Cairo owner ads"
+          git push origin main
