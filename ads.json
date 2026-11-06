@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 12:38 AM",
+  "last_scrape": "2026/11/07, 01:02 AM",
   "total_ads": 20,
   "checked_ids_v7": [
     208532447,
@@ -38,6 +38,7 @@
     502437865,
     502533913,
     502606299,
+    502642057,
     502776562,
     502823515,
     502865178,
@@ -78,22 +79,27 @@
     503475153,
     503482036,
     503490654,
+    503494413,
     503509688,
     503596338,
     503599265,
     503612977,
     503621865,
+    503650915,
     503701471,
     503706201,
+    503709408,
     503717178,
     503717251,
     503717300,
+    503718146,
     503723132,
     503731054,
     503760323,
     503785051,
     503806218,
     503811279,
+    503816384,
     503817132,
     503832020,
     503840721,
@@ -132,6 +138,8 @@
     503942052,
     503951953,
     503953366,
+    503955939,
+    503958225,
     503962340,
     503963980,
     503965028,
@@ -263,6 +271,7 @@
     504183219,
     504185659,
     504186151,
+    504186907,
     504187564,
     504187568,
     504188828,
@@ -313,6 +322,7 @@
     504259748,
     504259760,
     504266944,
+    504267598,
     504267741,
     504268791,
     504289374,
@@ -345,6 +355,7 @@
     504340279,
     504340308,
     504341074,
+    504341562,
     504342482,
     504343014,
     504343057,
@@ -412,6 +423,7 @@
     504365100,
     504365901,
     504366089,
+    504366382,
     504367550,
     504367769,
     504368633,
@@ -452,6 +464,7 @@
     504375591,
     504375718,
     504376190,
+    504376281,
     504376406,
     504376452,
     504376456,
@@ -495,6 +508,7 @@
     504378594,
     504378602,
     504378621,
+    504378650,
     504378661,
     504378711,
     504378769,
@@ -626,10 +640,18 @@
     504379903,
     504379905,
     504379908,
+    504379914,
     504379929,
     504379932,
+    504379955,
     504379963,
-    504379976
+    504379973,
+    504379976,
+    504380016,
+    504380020,
+    504380025,
+    504380028,
+    504380031
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -653,7 +675,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D9%85%D9%86%D8%B7%D9%82%D9%87-%D8%A7%D9%84%D8%A3%D9%86%D8%AF%D9%84%D8%B3-%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%AB%D9%85%D8%B1-%D8%A7%D9%84%D8%B5%D8%BA%D9%8A%D8%B1%D9%87-%D8%B9%D9%85%D8%A7%D8%B1%D9%87-%D9%A9-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID504238147.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:34:11.693849+02:00"
+      "scraped_at": "2026-11-05T12:34:11.693849+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209423433,
@@ -674,7 +697,8 @@
       "url": "https://www.dubizzle.com.eg/ad/fully-furnished-rooftop-studio-for-rent-south-academy-new-cairo-ID209423433.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T16:52:33.147756+02:00"
+      "scraped_at": "2026-11-06T16:52:33.147756+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209422796,
@@ -695,7 +719,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-%D8%A7%D9%85%D8%A7%D9%85-%D9%85%D8%AF%D8%B1%D8%B3%D8%A9-mase-ID209422796.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T16:52:40.470348+02:00"
+      "scraped_at": "2026-11-06T16:52:40.470348+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209422246,
@@ -716,7 +741,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%A2%D9%A6%D9%A0-%D9%85%D8%AA%D8%B1-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%A8%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%A7%D9%88%D9%84-ID209422246.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T14:23:38.700498+02:00"
+      "scraped_at": "2026-11-06T14:23:38.700498+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209421299,
@@ -737,7 +763,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B1%D9%88%D9%81-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A8%D9%85%D8%AF%D8%AE%D9%84-%D9%81%D9%86%D8%AF%D9%82%D9%8A-%D9%88%D8%A7%D8%B3%D8%A7%D9%86%D8%B3%D9%8A%D8%B1-%D9%81%D9%8A-%D8%A7%D9%84%D8%A8%D9%86%D9%81%D8%B3%D8%AC-%D9%81%D9%8A%D9%84%D8%A7%D8%AA-ID209421299.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T14:43:22.597039+02:00"
+      "scraped_at": "2026-11-06T14:43:22.597039+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209417259,
@@ -757,7 +784,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D9%84%D8%A7%DA%A4%D9%8A-145%D9%85-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D8%A8%D8%AF%D9%88%D9%86-%D9%88%D8%B3%D9%8A%D8%B7-ID209417259.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-05T22:59:38.071629+02:00"
+      "scraped_at": "2026-11-05T22:59:38.071629+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209415226,
@@ -778,7 +806,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D9%81%D8%B1%D8%B5%D8%A9-%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%D9%8A%D8%A9-%D9%85%D9%85%D9%8A%D8%B2%D8%A9-%D8%A8%D8%A8%D9%8A%D8%AA-%D8%A7%D9%84%D9%88%D8%B7%D9%86-%D8%AF%D9%88%D8%B1-%D8%A3%D8%B1%D8%B6%D9%8A-%D8%A8%D8%AD%D8%AF%D9%8A%D9%82%D8%A9-%D8%AF%D9%88%D8%B1-%D8%A3%D9%88%D9%84-%D8%A8%D8%A5%D8%AC%D9%85%D8%A7%D9%84%D9%8A-345%D9%85-ID209415226.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T16:52:46.906928+02:00"
+      "scraped_at": "2026-11-06T16:52:46.906928+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209414242,
@@ -799,7 +828,8 @@
       "url": "https://www.dubizzle.com.eg/ad/54-sqm-retail-shop-for-sale-iv-business-park-new-cairo-ID209414242.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T14:23:55.893334+02:00"
+      "scraped_at": "2026-11-06T14:23:55.893334+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209410221,
@@ -819,7 +849,8 @@
       "url": "https://www.dubizzle.com.eg/ad/apartment-in-90-avenue-ID209410221.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-05T23:25:57.288001+02:00"
+      "scraped_at": "2026-11-05T23:25:57.288001+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209402630,
@@ -839,7 +870,8 @@
       "url": "https://www.dubizzle.com.eg/ad/big-flat-or-two-smaller-ones-with-terrace-ID209402630.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:34:39.873730+02:00"
+      "scraped_at": "2026-11-05T12:34:39.873730+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209396889,
@@ -859,7 +891,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D8%B3%D9%83%D9%86%D9%8A%D8%A9-%D9%83%D9%85%D8%A8%D9%88%D9%86%D8%AF-%D9%84%D8%A7%D9%85%D9%8A%D8%B2%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D9%86%D8%AF%D9%84%D8%B3-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209396889.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-05T18:00:06.875330+02:00"
+      "scraped_at": "2026-11-05T18:00:06.875330+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209391228,
@@ -879,7 +912,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A7%D9%84%D9%85%D9%85%D9%81%D8%B1%D9%88%D8%B4-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D8%B3%D8%AA%D9%88%D8%AF%D9%8A%D9%88-%D9%81%D9%8A%D9%84%D8%AF%D8%AC-%D8%AC%D9%8A%D8%AA-%D8%A8%D8%A7%D9%84%D9%85-%D9%87%D9%8A%D9%84%D8%B2-village-gate-ID209391228.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-05T17:59:57.369631+02:00"
+      "scraped_at": "2026-11-05T17:59:57.369631+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209375862,
@@ -899,7 +933,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%84%D8%A8%D9%86%D9%81%D8%B3%D8%AC-%D9%A1%D9%A1-ID209375862.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-05T16:57:24.494653+02:00"
+      "scraped_at": "2026-11-05T16:57:24.494653+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 208976669,
@@ -920,7 +955,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A8%D8%AF%D8%A7%D8%B1-%D9%85%D8%B5%D8%B1-%D8%A7%D9%84%D9%82%D8%B1%D9%86%D9%81%D9%84-ID208976669.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T14:43:32.671519+02:00"
+      "scraped_at": "2026-11-06T14:43:32.671519+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209408747,
@@ -940,7 +976,8 @@
       "url": "https://www.dubizzle.com.eg/ad/medical-park-premier-ID209408747.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:34:29.691283+02:00"
+      "scraped_at": "2026-11-05T12:34:29.691283+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209382952,
@@ -960,7 +997,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D9%83%D9%88%D9%85%D8%A8%D8%A7%D9%88%D9%86%D8%AF-%D8%AC%D8%A7%D8%B1%D8%AF%D9%86-%D9%87%D8%A7%D9%8A%D8%AA%D8%B3-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209382952.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:34:49.274824+02:00"
+      "scraped_at": "2026-11-05T12:34:49.274824+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209352320,
@@ -980,7 +1018,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%A1%D9%A8%D9%A0-%D9%85%D8%AA%D8%B1-%D9%81%D9%8A-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D8%A7%D9%84%D8%AD%D9%8A-%D8%A7%D9%84%D8%AA%D8%A7%D9%86%D9%8A-ID209352320.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:35:00.964341+02:00"
+      "scraped_at": "2026-11-05T12:35:00.964341+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 208755167,
@@ -1000,7 +1039,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%85%D9%85%D9%8A%D8%B2%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%AF%D8%A7%D8%B1-%D9%85%D8%B5%D8%B1-%D8%A7%D9%84%D9%82%D8%B1%D9%86%D9%81%D9%84-ID208755167.html",
       "today_verified": true,
       "verified_v11": true,
-      "scraped_at": "2026-11-05T12:35:19.992719+02:00"
+      "scraped_at": "2026-11-05T12:35:19.992719+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209371578,
@@ -1020,7 +1060,8 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8-%D8%B3%D9%88%D8%A8%D8%B1-%D9%84%D9%88%D9%83%D8%B3-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%A7%D9%84%D8%A3%D9%86%D8%AF%D9%84%D8%B3-%D8%AF%D9%82%D9%8A%D9%82%D8%AA%D9%8A%D9%86-%D9%85%D9%86-%D8%A7%D9%84%D8%AA%D8%B3%D8%B9%D9%8A%D9%86-%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A-ID209371578.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T00:22:39.289600+02:00"
+      "scraped_at": "2026-11-06T00:22:39.289600+02:00",
+      "source": "دوبيزل"
     },
     {
       "ad_id": 209270450,
@@ -1041,7 +1082,67 @@
       "url": "https://www.dubizzle.com.eg/ad/%D8%AF%D9%88%D8%A8%D9%84%D9%8A%D9%83%D8%B3-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%A7%D9%85%D8%A7%D9%85-%D9%81%D9%86%D8%AF%D9%82-%D8%A7%D9%84%D8%AF%D9%88%D8%B3%D9%8A%D8%AA-ID209270450.html",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-06T17:25:11.571008+02:00"
+      "scraped_at": "2026-11-06T17:25:11.571008+02:00",
+      "source": "دوبيزل"
     }
+  ],
+  "last_run_report": {
+    "run_time": "2026/11/07, 01:02 AM",
+    "total_saved_owners": 20,
+    "dubizzle_total": 20,
+    "aqarmap_total": 0,
+    "opensooq_total": 0,
+    "sale_total": 13,
+    "rent_total": 7,
+    "total_inspected_this_run": 36,
+    "dubizzle_inspected": 22,
+    "extra_inspected": 14,
+    "total_new_owners_this_run": 0,
+    "dubizzle_new_owners": 0,
+    "extra_new_owners": 0,
+    "total_brokers_banned_this_run": 36,
+    "total_excluded_this_run": 0,
+    "total_blacklisted_accounts": 1,
+    "total_checked_ads_memory": 664
+  },
+  "checked_extra_v3": [
+    707236209,
+    707242049,
+    707265697,
+    707267579,
+    707285538,
+    707320377,
+    707322480,
+    707354519,
+    707382524,
+    707384105,
+    707384155,
+    707384626,
+    707388211,
+    707388580
+  ],
+  "telegram_chat_ids": [],
+  "telegram_welcomed_ids": [],
+  "telegram_last_update_id": 0,
+  "notified_ids_v1": [
+    208755167,
+    208976669,
+    209270450,
+    209352320,
+    209371578,
+    209375862,
+    209382952,
+    209391228,
+    209396889,
+    209402630,
+    209408747,
+    209410221,
+    209414242,
+    209415226,
+    209417259,
+    209421299,
+    209422246,
+    209422796,
+    209423433
   ]
 }
