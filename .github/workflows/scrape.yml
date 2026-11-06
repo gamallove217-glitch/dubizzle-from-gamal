@@ -1,0 +1,66 @@
+name: Scrape Dubizzle Hourly
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scraper.py'
+      - 'extra_radar.py'
+      - '.github/workflows/scrape.yml'
+
+concurrency:
+  group: dubizzle-continuous-loop
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml curl_cffi
+
+      - name: Run 16 Automated Cycles Every 15 Minutes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          for cycle in $(seq 1 16); do
+            echo "=========================================="
+            echo "Starting Cycle $cycle of 16 at $(date -u)"
+            echo "=========================================="
+
+            git fetch origin main || true
+            git reset --hard origin/main || true
+
+            python scraper.py | tee dubizzle_run.log || true
+            python extra_radar.py || true
+
+            git add ads.json
+            if ! git diff --staged --quiet; then
+              git commit -m "Auto-update ads.json (Cycle $cycle)"
+              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+            else
+              echo "No changes in Cycle $cycle"
+            fi
+
+            if [ "$cycle" -lt 16 ]; then
+              echo "Sleeping 15 minutes until next cycle..."
+              sleep 900
+            fi
+          done
