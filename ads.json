@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 03:12 AM",
+  "last_scrape": "2026/11/07, 03:34 AM",
   "total_ads": 23,
   "checked_ids_v7": [
     208532447,
@@ -119,6 +119,7 @@
     503903739,
     503903778,
     503903781,
+    503903872,
     503905761,
     503907473,
     503908174,
@@ -174,6 +175,7 @@
     504006771,
     504007404,
     504007417,
+    504007983,
     504008795,
     504013143,
     504015476,
@@ -367,6 +369,7 @@
     504325163,
     504326468,
     504330652,
+    504331035,
     504333014,
     504333191,
     504336332,
@@ -655,6 +658,7 @@
     504379778,
     504379784,
     504379788,
+    504379808,
     504379822,
     504379835,
     504379839,
@@ -1193,25 +1197,27 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 03:12 AM",
+    "run_time": "2026/11/07, 03:34 AM",
     "total_saved_owners": 23,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
     "opensooq_total": 3,
     "sale_total": 16,
     "rent_total": 7,
-    "total_inspected_this_run": 35,
-    "dubizzle_inspected": 10,
-    "extra_inspected": 25,
+    "total_inspected_this_run": 30,
+    "dubizzle_inspected": 4,
+    "extra_inspected": 26,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 10,
-    "total_excluded_this_run": 0,
+    "total_brokers_banned_this_run": 2,
+    "total_excluded_this_run": 3,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 690
+    "total_checked_ads_memory": 695
   },
-  "checked_extra_v5": [],
+  "checked_extra_v5": [
+    880980752
+  ],
   "telegram_chat_ids": [],
   "telegram_welcomed_ids": [],
   "notified_ids_v1": [
