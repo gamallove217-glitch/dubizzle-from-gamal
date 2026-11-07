@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 02:25 AM",
+  "last_scrape": "2026/11/07, 02:48 AM",
   "total_ads": 23,
   "checked_ids_v7": [
     208532447,
@@ -97,6 +97,7 @@
     503723132,
     503731054,
     503760323,
+    503767266,
     503785051,
     503806218,
     503811279,
@@ -229,6 +230,7 @@
     504116995,
     504118961,
     504119012,
+    504119285,
     504122840,
     504128034,
     504131039,
@@ -242,6 +244,7 @@
     504144132,
     504144709,
     504146351,
+    504146802,
     504148754,
     504150228,
     504151042,
@@ -291,11 +294,13 @@
     504194214,
     504194296,
     504194457,
+    504194502,
     504194790,
     504199241,
     504199913,
     504201398,
     504201625,
+    504202902,
     504203785,
     504204071,
     504204650,
@@ -674,7 +679,9 @@
     504380031,
     504380047,
     504380058,
-    504380063
+    504380063,
+    504380111,
+    504380116
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1176,36 +1183,29 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 02:25 AM",
+    "run_time": "2026/11/07, 02:48 AM",
     "total_saved_owners": 23,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
     "opensooq_total": 3,
     "sale_total": 16,
     "rent_total": 7,
-    "total_inspected_this_run": 31,
-    "dubizzle_inspected": 2,
-    "extra_inspected": 29,
-    "total_new_owners_this_run": 3,
+    "total_inspected_this_run": 33,
+    "dubizzle_inspected": 7,
+    "extra_inspected": 26,
+    "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
-    "extra_new_owners": 3,
-    "total_brokers_banned_this_run": 1,
-    "total_excluded_this_run": 2,
+    "extra_new_owners": 0,
+    "total_brokers_banned_this_run": 7,
+    "total_excluded_this_run": 1,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 677
+    "total_checked_ads_memory": 681
   },
   "checked_extra_v5": [
-    880980752,
-    888278850,
-    889052484,
-    889668370
+    880980752
   ],
-  "telegram_chat_ids": [
-    "5812887819"
-  ],
-  "telegram_welcomed_ids": [
-    "5812887819"
-  ],
+  "telegram_chat_ids": [],
+  "telegram_welcomed_ids": [],
   "notified_ids_v1": [
     208755167,
     208976669,
@@ -1227,8 +1227,6 @@
     209422796,
     209423433,
     504238147,
-    888278850,
-    889052484,
-    889668370
+    888278850
   ]
 }
