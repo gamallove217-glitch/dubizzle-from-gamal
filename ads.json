@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 11:19 PM",
+  "last_scrape": "2026/11/07, 11:22 PM",
   "total_ads": 25,
   "checked_ids_v7": [
     208532447,
@@ -2647,8 +2647,7 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
-      "_dub_log": "Kept existing owners: 25 | Fresh unchecked candidates: 0 | Banned accounts: 1\nTotal inspected this run: 0 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {}\nSaved 25 verified fresh New Cairo owner ads.\n"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
     },
     {
       "ad_id": 889551978,
@@ -3201,7 +3200,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "سطح",
+      "subtype": "شقة",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -3415,7 +3414,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "عقار تجاري",
+      "subtype": "طبي",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -3532,5 +3531,54 @@
       "scraped_at": "2026-11-06T17:25:11.571008+02:00",
       "source": "دوبيزل"
     }
-  ]
+  ],
+  "notified_ids_v1": [
+    208755167,
+    208976669,
+    209270450,
+    209352320,
+    209371578,
+    209375862,
+    209382952,
+    209391228,
+    209396889,
+    209402630,
+    209408747,
+    209410221,
+    209414242,
+    209415226,
+    209417259,
+    209421299,
+    209422246,
+    209422796,
+    209423433,
+    504238147,
+    888278850
+  ],
+  "last_run_report": {
+    "run_time": "2026/11/07, 11:22 PM",
+    "total_saved_owners": 25,
+    "dubizzle_total": 21,
+    "aqarmap_total": 1,
+    "opensooq_total": 3,
+    "sale_total": 17,
+    "rent_total": 8,
+    "total_inspected_this_run": 0,
+    "dubizzle_inspected": 0,
+    "extra_inspected": 0,
+    "total_new_owners_this_run": 0,
+    "dubizzle_new_owners": 0,
+    "extra_new_owners": 0,
+    "total_brokers_banned_this_run": 0,
+    "total_excluded_this_run": 0,
+    "total_blacklisted_accounts": 1,
+    "total_checked_ads_memory": 1312
+  },
+  "checked_extra_v13": [
+    889511380,
+    889526108,
+    889551978
+  ],
+  "telegram_chat_ids": [],
+  "telegram_welcomed_ids": []
 }
