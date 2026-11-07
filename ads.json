@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 02:48 PM",
+  "last_scrape": "2026/11/07, 02:59 PM",
   "total_ads": 21,
   "checked_ids_v7": [
     208532447,
@@ -982,7 +982,10 @@
     504381282,
     504381298,
     504381311,
-    504381318
+    504381318,
+    504381421,
+    504381447,
+    504381451
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1031,7 +1034,7 @@
       "scraped_at": "2026-11-05T12:34:11.693849+02:00",
       "source": "دوبيزل",
       "_extra_meta": {
-        "checked_extra_v8": [
+        "checked_extra_v9": [
           888278850,
           889052484
         ],
@@ -1108,7 +1111,7 @@
       "scraped_at": "2026-11-06T16:52:33.147756+02:00",
       "source": "دوبيزل",
       "_extra_meta": {
-        "checked_extra_v8": [
+        "checked_extra_v9": [
           888278850,
           889052484
         ],
@@ -1185,7 +1188,7 @@
       "scraped_at": "2026-11-06T16:52:40.470348+02:00",
       "source": "دوبيزل",
       "_extra_meta": {
-        "checked_extra_v8": [
+        "checked_extra_v9": [
           888278850,
           889052484
         ],
@@ -1548,8 +1551,8 @@
       "beds": "3 غرف",
       "baths": "2 حمام",
       "deal": "بيع",
-      "category": "عقار تجاري للبيع",
-      "subtype": "إداري",
+      "category": "شقق للبيع",
+      "subtype": "شقة",
       "seller_name": "عادل",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -1628,25 +1631,25 @@
     888278850
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 02:48 PM",
+    "run_time": "2026/11/07, 02:59 PM",
     "total_saved_owners": 21,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
     "opensooq_total": 1,
     "sale_total": 14,
     "rent_total": 7,
-    "total_inspected_this_run": 64,
-    "dubizzle_inspected": 64,
+    "total_inspected_this_run": 3,
+    "dubizzle_inspected": 3,
     "extra_inspected": 0,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 64,
+    "total_brokers_banned_this_run": 3,
     "total_excluded_this_run": 0,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 983
+    "total_checked_ads_memory": 986
   },
-  "checked_extra_v8": [
+  "checked_extra_v9": [
     888278850,
     889052484
   ],
