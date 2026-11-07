@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 11:41 PM",
+  "last_scrape": "2026/11/07, 11:50 PM",
   "total_ads": 25,
   "checked_ids_v7": [
     208532447,
@@ -1625,8 +1625,7 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
-      "_dub_log": "Kept existing owners: 25 | Fresh unchecked candidates: 38 | Banned accounts: 1\nChecked Ad 504383454 (منذ 8 دقائق): Active_Ads=99 | Seller=real-xperts-5001599\nChecked Ad 504383409 (منذ 38 دقائق): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383401 (منذ 41 دقائق): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383385 (منذ 51 دقائق): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383383 (منذ 52 دقائق): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383373 (منذ 26 دقائق): Active_Ads=99 | Seller=mahmoud-ismail-5007398\nChecked Ad 504383365 (منذ 1 ساعة): Active_Ads=99 | Seller=modern-home-5000412\nChecked Ad 504383348 (منذ 1 ساعة): Active_Ads=99 | Seller=modern-home-5000412\nChecked Ad 504383344 (منذ 1 ساعة): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383339 (منذ 1 ساعة): Active_Ads=99 | Seller=mohamed-elattar-17768\nChecked Ad 504383338 (منذ 1 ساعة): Active_Ads=99 | Seller=4u-real-estate-26425\nChecked Ad 504383336 (منذ 47 دقائق): Active_Ads=99 | Seller=arjaa-real-estate-14608\nChecked Ad 504383332 (منذ 1 ساعة): Active_Ads=99 | Seller=4u-real-estate-26425\nChecked Ad 504383330 (منذ 1 ساعة): Active_Ads=99 | Seller=modern-home-5000412\nChecked Ad 504383324 (منذ 1 ساعة): Active_Ads=99 | Seller=forsa-property-5005547\nChecked Ad 504383272 (منذ 2 ساعات): Active_Ads=99 | Seller=modern-home-5000412\nTotal inspected this run: 16 | Queue remaining: 22 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 16}\nSaved 25 verified fresh New Cairo owner ads.\n"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
     },
     {
       "ad_id": 889551978,
@@ -2179,7 +2178,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "سطح",
+      "subtype": "شقة",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -2393,7 +2392,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "عقار تجاري",
+      "subtype": "طبي",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -2512,23 +2511,23 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 11:22 PM",
+    "run_time": "2026/11/07, 11:50 PM",
     "total_saved_owners": 25,
     "dubizzle_total": 21,
     "aqarmap_total": 1,
     "opensooq_total": 3,
     "sale_total": 17,
     "rent_total": 8,
-    "total_inspected_this_run": 0,
-    "dubizzle_inspected": 0,
+    "total_inspected_this_run": 16,
+    "dubizzle_inspected": 16,
     "extra_inspected": 0,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 0,
+    "total_brokers_banned_this_run": 16,
     "total_excluded_this_run": 0,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 1312
+    "total_checked_ads_memory": 801
   },
   "checked_extra_v13": [
     889511380,
