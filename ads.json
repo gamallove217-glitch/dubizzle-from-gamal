@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 06:31 AM",
+  "last_scrape": "2026/11/07, 06:52 AM",
   "total_ads": 23,
   "checked_ids_v7": [
     208532447,
@@ -341,6 +341,7 @@
     504220576,
     504222253,
     504223327,
+    504225101,
     504225197,
     504227533,
     504232514,
@@ -1227,7 +1228,7 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 06:31 AM",
+    "run_time": "2026/11/07, 06:52 AM",
     "total_saved_owners": 23,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
@@ -1240,10 +1241,10 @@
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 1,
-    "total_excluded_this_run": 0,
+    "total_brokers_banned_this_run": 0,
+    "total_excluded_this_run": 1,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 724
+    "total_checked_ads_memory": 725
   },
   "checked_extra_v5": [],
   "telegram_chat_ids": [],
