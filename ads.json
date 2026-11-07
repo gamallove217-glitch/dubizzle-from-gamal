@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 07:14 AM",
+  "last_scrape": "2026/11/07, 07:26 AM",
   "total_ads": 23,
   "checked_ids_v7": [
     208532447,
@@ -296,6 +296,7 @@
     504182964,
     504183097,
     504183219,
+    504184459,
     504185659,
     504186151,
     504186907,
@@ -345,6 +346,7 @@
     504223327,
     504225101,
     504225197,
+    504226524,
     504227533,
     504232514,
     504233485,
@@ -1231,23 +1233,23 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 07:14 AM",
+    "run_time": "2026/11/07, 07:26 AM",
     "total_saved_owners": 23,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
     "opensooq_total": 3,
     "sale_total": 16,
     "rent_total": 7,
-    "total_inspected_this_run": 29,
-    "dubizzle_inspected": 3,
+    "total_inspected_this_run": 28,
+    "dubizzle_inspected": 2,
     "extra_inspected": 26,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 4,
-    "total_excluded_this_run": 0,
+    "total_brokers_banned_this_run": 1,
+    "total_excluded_this_run": 2,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 729
+    "total_checked_ads_memory": 731
   },
   "checked_extra_v5": [
     880980752
