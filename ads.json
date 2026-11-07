@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 03:46 PM",
+  "last_scrape": "2026/11/07, 04:07 PM",
   "total_ads": 21,
   "checked_ids_v7": [
     208532447,
@@ -128,6 +128,7 @@
     503469512,
     503475153,
     503482036,
+    503482980,
     503490654,
     503494413,
     503507178,
@@ -135,6 +136,7 @@
     503536898,
     503596338,
     503599265,
+    503608915,
     503612977,
     503621865,
     503628579,
@@ -964,6 +966,7 @@
     504380886,
     504380902,
     504380905,
+    504380907,
     504380910,
     504380920,
     504380940,
@@ -1037,8 +1040,10 @@
     504381647,
     504381654,
     504381667,
+    504381676,
     504381682,
-    504381687
+    504381687,
+    504381841
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1684,23 +1689,23 @@
     888278850
   ],
   "last_run_report": {
-    "run_time": "2026/11/07, 03:46 PM",
+    "run_time": "2026/11/07, 04:07 PM",
     "total_saved_owners": 21,
     "dubizzle_total": 20,
     "aqarmap_total": 0,
     "opensooq_total": 1,
     "sale_total": 14,
     "rent_total": 7,
-    "total_inspected_this_run": 34,
-    "dubizzle_inspected": 34,
+    "total_inspected_this_run": 5,
+    "dubizzle_inspected": 5,
     "extra_inspected": 0,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 33,
-    "total_excluded_this_run": 1,
+    "total_brokers_banned_this_run": 5,
+    "total_excluded_this_run": 0,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 1039
+    "total_checked_ads_memory": 1044
   },
   "checked_extra_v10": [
     888278850,
