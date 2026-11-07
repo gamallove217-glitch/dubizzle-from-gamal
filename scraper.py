@@ -45,7 +45,7 @@ STRICT_FORBIDDEN_EVERYWHERE = [
     "الشيخ زايد", "6 أكتوبر", "٦ أكتوبر", "حدائق أكتوبر", "الهرم", "حدائق الأهرام",
     "فيصل", "المهندسين", "الدقي", "العجوزة", "المعادي", "زهراء المعادي",
     "العاشر من رمضان", "المقطم", "الهضبة الوسطى",
-    "عقارات مصايف للبيع", "عقارات مصايف للإيجار", "عقارات مصايف"
+    "شاليه للبيع", "شاليه للإيجار", "شاليه للايجار", "راس الحكمة", "رأس الحكمة", "مراسي", "الجونة"
 ]
 
 EXCLUDE_CITIES = STRICT_FORBIDDEN_EVERYWHERE + [
@@ -63,45 +63,41 @@ LIVE_DUBIZZLE_GROUPS = [
     [
         "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/",
         "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/",
         "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/",
         "https://www.dubizzle.com.eg/properties/villas-for-sale/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/",
         "https://www.dubizzle.com.eg/properties/villas-for-rent/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/",
         "https://www.dubizzle.com.eg/properties/commercial-for-sale/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/",
         "https://www.dubizzle.com.eg/properties/commercial-for-rent/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/?page=2"
     ],
     [
         "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/",
         "https://www.dubizzle.com.eg/properties/buildings-lands/5th-settlement/",
-        "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/q-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83/"
+        "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/?page=2"
     ]
 ]
 
 QUERIES = [
-    'site:dubizzle.com.eg/ad/ "القاهرة الجديدة" "من المالك" -الرحاب -مدينتي -الشروق -"مصر الجديدة" -"مدينة نصر"',
-    'site:dubizzle.com.eg/ad/ "التجمع الخامس" "من المالك" -الرحاب -مدينتي -الشروق -"مصر الجديدة" -"مدينة نصر"',
-    'site:dubizzle.com.eg/ad/ "التجمع الخامس" "بدون وسيط" -"مصر الجديدة" -"مدينة نصر"',
-    'site:dubizzle.com.eg/ad/ "القاهرة الجديدة" "بدون وسيط" -"مصر الجديدة" -"مدينة نصر"',
     'site:dubizzle.com.eg/ad/ "فلل للبيع" "القاهرة الجديدة" -"مصر الجديدة" -"مدينة نصر"',
     'site:dubizzle.com.eg/ad/ "فلل للإيجار" "القاهرة الجديدة" -"مصر الجديدة" -"مدينة نصر"',
     'site:dubizzle.com.eg/ad/ "فيلا منفصلة" "التجمع الخامس"',
@@ -167,7 +163,8 @@ def strip_villa_neighborhood_names(txt):
 
 def classify_deal_category_subtype(url, title_clean, desc_clean, before_desc_clean, price_num):
     u_dec = urllib.parse.unquote(url).lower()
-    t_and_u = f"{title_clean} {u_dec}".lower()
+    t_low = (title_clean or "").lower()
+    t_and_u = f"{t_low} {u_dec}".lower()
     header_str = (before_desc_clean or "").lower()
 
     deal = "بيع"
@@ -178,14 +175,16 @@ def classify_deal_category_subtype(url, title_clean, desc_clean, before_desc_cle
     elif 0 < price_num < 150000:
         deal = "إيجار"
 
-    if any(w in header_str for w in ["مبانى و أراضى", "مباني و أراضي", "مباني واراضي", "buildings-lands"]) or any(
+    is_explicit_apt = any(w in t_low for w in ["شقة", "شقه", "apartment", "flat", "دوبلكس", "دوبليكس", "بنتهاوس", "ستوديو", "استوديو", "studio", "رووف", "روف"])
+
+    if (any(w in header_str for w in ["مبانى و أراضى", "مباني و أراضي", "مباني واراضي", "buildings-lands"]) or any(
         w in t_and_u for w in ["قطعة أرض", "قطعه ارض", "أرض للبيع", "ارض للبيع", "أرض سكنية", "ارض سكنيه", "أرض تجارية", "عمارة كاملة", "عماره كامله", "عمارة للبيع", "عماره للبيع", "مبنى كامل"]
-    ):
+    )) and not is_explicit_apt:
         return deal, "مبانى و أراضى", "مبانى و أراضى"
 
-    if any(w in header_str for w in ["عقار تجارى", "عقار تجاري", "عقارات تجارية", "commercial-for"]) or any(
-        w in t_and_u for w in ["مكتب", "إداري", "اداري", "عيادة", "عياده", "محل ", "محل للبيع", "محل للايجار", "محل للإيجار", "تجاري", "تجارى", "معرض", "صيدلية", "صيدليه", "مقر اداري", "مقر إداري", "مبنى تجاري", "مبنى إداري", "مخزن", "مصنع", "مطعم", "كافيه"]
-    ):
+    if (any(w in header_str for w in ["عقار تجارى", "عقار تجاري", "عقارات تجارية", "commercial-for"]) or any(
+        w in t_and_u for w in ["retail", "shop", "medical", "clinic", "office", "business park", "مكتب", "إداري", "اداري", "عيادة", "عياده", "محل ", "محل للبيع", "محل للايجار", "محل للإيجار", "تجاري", "تجارى", "معرض", "صيدلية", "صيدليه", "مقر اداري", "مقر إداري", "مبنى تجاري", "مبنى إداري", "مخزن", "مصنع", "مطعم", "كافيه"]
+    )) and not is_explicit_apt:
         category = "عقار تجاري للإيجار" if deal == "إيجار" else "عقار تجاري للبيع"
         return deal, category, "عقار تجاري"
 
@@ -197,7 +196,7 @@ def classify_deal_category_subtype(url, title_clean, desc_clean, before_desc_cle
         category = "شقق للإيجار" if deal == "إيجار" else "شقق للبيع"
         return deal, category, "ستوديو"
 
-    if any(w in t_and_u for w in ["غرفة للإيجار", "غرفه للايجار", "غرفة مفروشة", "غرفة مشتركة", "سكن طلاب", "غرفة "]):
+    if any(w in t_and_u for w in ["غرفة للإيجار", "غرفه للايجار", "غرفة مفروشة", "غرفة مشتركة", "سكن طلاب"]) and not is_explicit_apt:
         return "إيجار", "شقق للإيجار", "غرفة"
 
     if any(w in t_and_u for w in ["دوبلكس", "دوبليكس", "duplex"]):
@@ -289,19 +288,27 @@ def load_existing():
                     checked.add(aid)
                     continue
                 if a.get("verified_v11") is True or a.get("verified_v12") is True:
-                    deal, cat, sub = classify_deal_category_subtype(
-                        a.get("url", ""),
-                        a.get("title", ""),
-                        a.get("description", ""),
-                        "",
-                        int(a.get("price_num", 0))
-                    )
-                    a["deal"] = deal
-                    a["category"] = cat
-                    a["subtype"] = sub
+                    if a.get("source", "دوبيزل") == "دوبيزل":
+                        deal, cat, sub = classify_deal_category_subtype(
+                            a.get("url", ""),
+                            a.get("title", ""),
+                            a.get("description", ""),
+                            "",
+                            int(a.get("price_num", 0))
+                        )
+                        a["deal"] = deal
+                        a["category"] = cat
+                        a["subtype"] = sub
                     kept.append(a)
 
-            checked |= set(data.get("checked_ids_v7", []))
+            if "checked_ids_v8" in data:
+                checked |= set(data.get("checked_ids_v8", []))
+            else:
+                for old_cid in data.get("checked_ids_v7", []):
+                    cid_int = int(old_cid)
+                    if 209150000 <= cid_int < 300000000 and cid_int not in hard_banned_ids:
+                        continue
+                    checked.add(cid_int)
     except Exception:
         pass
 
@@ -377,7 +384,7 @@ def extract_links_from_text_or_html(raw_content):
         clean_u, ad_id = normalize_dubizzle_url(m.group(0))
         if not clean_u or not ad_id:
             continue
-        window = raw_content[max(0, m.start() - 320):min(len(raw_content), m.end() + 320)]
+        window = raw_content[max(0, m.start() - 260):min(len(raw_content), m.end() + 260)]
         card_snip = clean_markdown_to_text(window)
         if ad_id not in links or len(card_snip) > len(links[ad_id][1]):
             links[ad_id] = (clean_u, card_snip)
@@ -401,6 +408,8 @@ def direct_dubizzle_fallback(cffi_sess, url, timeout_sec=20):
                 if "/ad/" in href or "/profile/" in href or "/companies/" in href:
                     full_h = "https://www.dubizzle.com.eg" + href if href.startswith("/") else href
                     links_buf.append(f"[{a.get_text(' ', strip=True)}]({full_h})")
+            for tag in soup.find_all(["nav", "header", "footer", "script", "style"]):
+                tag.decompose()
             body_txt = soup.get_text(" ", strip=True)
             if "تم النشر بواسطة" in body_txt or "الوصف" in body_txt or "لم يعد هذا الإعلان متاح" in body_txt:
                 return title_line + "\n" + body_txt + "\n" + "\n".join(links_buf)
@@ -499,8 +508,16 @@ def search_engines(session):
     return found
 
 
+def slice_from_h1(raw_text):
+    m_h1 = re.search(r"^#\s+.+$", raw_text, flags=re.M)
+    if m_h1:
+        return raw_text[max(0, m_h1.start() - 180):]
+    return raw_text
+
+
 def check_ad_freshness(raw_text):
-    before_desc = raw_text.split("الوصف")[0] if "الوصف" in raw_text else raw_text[:2200]
+    sliced = slice_from_h1(raw_text)
+    before_desc = sliced.split("الوصف")[0] if "الوصف" in sliced else sliced[:2200]
     header_txt = clean_markdown_to_text(before_desc)
 
     m_old = re.search(
@@ -698,9 +715,10 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
     if fallback_s:
         related_today.update(extract_related_fresh(fallback_s, exclude_ids=checked_ids))
 
-    combined_raw = raw_s + "\n" + fallback_s
+    sliced_raw = slice_from_h1(raw_s)
+    combined_raw = sliced_raw + "\n" + (slice_from_h1(fallback_s) if fallback_s else "")
     desc_clean = ""
-    for src in [raw_s, fallback_s]:
+    for src in [sliced_raw, fallback_s]:
         if src and "الوصف" in src:
             after_desc = src.split("الوصف")[-1]
             for stop_w in ["تم النشر بواسطة", "الموقع", "معرّف الإعلان", "معرف الإعلان", "رقم الإعلان", "اقرأ المزيد في التطبيق", "الكماليات"]:
@@ -715,19 +733,19 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
     if m_h1:
         title_clean = clean_markdown_to_text(m_h1.group(1))
     if not title_clean:
-        m_t = re.search(r"Title:\s*(.+?)(?:\n|\|)", combined_raw)
+        m_t = re.search(r"Title:\s*(.+?)(?:\n|\|)", raw_s)
         if m_t:
             title_clean = clean_markdown_to_text(m_t.group(1))
 
-    top_sec = clean_markdown_to_text(raw_s.split("تم النشر بواسطة")[0] if "تم النشر بواسطة" in raw_s else raw_s[:3000])
-    before_desc_clean = clean_markdown_to_text(raw_s.split("الوصف")[0] if "الوصف" in raw_s else raw_s[:1800])
+    top_sec = clean_markdown_to_text(sliced_raw.split("تم النشر بواسطة")[0] if "تم النشر بواسطة" in sliced_raw else sliced_raw[:2500])
+    before_desc_clean = clean_markdown_to_text(sliced_raw.split("الوصف")[0] if "الوصف" in sliced_raw else sliced_raw[:1400])
     loc_box_clean = clean_markdown_to_text(combined_raw.split("الموقع")[-1][:220]) if "الموقع" in combined_raw else ""
 
     official_loc_and_title = f"{title_clean} {before_desc_clean} {loc_box_clean}"
     entire_ad_text = f"{official_loc_and_title} {desc_clean}"
 
     for bad_city in STRICT_FORBIDDEN_EVERYWHERE:
-        if bad_city in entire_ad_text:
+        if bad_city in official_loc_and_title:
             print(f"Skipped Excluded Area ({bad_city}) in Ad {ad_id}")
             return None, True, "EXCLUDED_AREA", {}
 
@@ -779,6 +797,7 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
     return {
         "ad_id": ad_id,
+        "source": "دوبيزل",
         "title": title_clean[:130] if title_clean else "وحدة بالقاهرة الجديدة",
         "price_num": price_num,
         "price_text": price_text,
@@ -802,12 +821,9 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
 def priority_score(item_tuple):
     uid, u, snip, tier = item_tuple
-    u_dec = urllib.parse.unquote(u)
     score = tier * 30000000000
     if 208950000 <= uid < 300000000:
-        score += 15000000000
-    if any(w in (snip + " " + u_dec) for w in ["من المالك", "بدون وسيط", "المالك مباشر", "من-المالك", "بدون-وسيط"]):
-        score += 8000000000
+        score += 20000000000
     score += uid
     return score
 
@@ -831,9 +847,10 @@ def scrape_all():
 
     for rec_id, rec_url in RECOVER_OWNER_URLS.items():
         if rec_id not in kept_ads and rec_id not in checked_ids:
-            candidates[rec_id] = (rec_url, "من المالك القاهرة الجديدة التجمع", 3)
+            candidates[rec_id] = (rec_url, "القاهرة الجديدة التجمع", 3)
 
-    for a in existing_ads:
+    dubizzle_existing_only = [a for a in existing_ads if a.get("source", "دوبيزل") == "دوبيزل"]
+    for a in dubizzle_existing_only[:12]:
         try:
             raw_seed = jina_get(req_sess, cffi_sess, a["url"], timeout_sec=22)
             for rid, rval in extract_related_fresh(raw_seed, exclude_ids=checked_ids).items():
@@ -899,6 +916,7 @@ def scrape_all():
         "last_scrape": now_dt.strftime("%Y/%m/%d, %I:%M %p"),
         "total_ads": len(final_ads),
         "checked_ids_v7": sorted(list(checked_ids))[-5000:],
+        "checked_ids_v8": sorted(list(checked_ids))[-5000:],
         "banned_accounts_v7": sorted(list(banned_accounts))[-2000:],
         "ads": final_ads
     }
