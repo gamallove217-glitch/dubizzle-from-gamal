@@ -2,7 +2,7 @@ name: Scrape Dubizzle Hourly
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/25 * * * *'
   workflow_dispatch:
   push:
     branches:
@@ -20,9 +20,23 @@ permissions:
   contents: write
 
 jobs:
-  scrape_and_update:
+  radar_matrix_loop:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 45
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        step_phase: [
+          "1_dubizzle", "1_extra",
+          "2_dubizzle", "2_extra",
+          "3_dubizzle", "3_extra",
+          "4_dubizzle", "4_extra",
+          "5_dubizzle", "5_extra",
+          "6_dubizzle", "6_extra",
+          "7_dubizzle", "7_extra",
+          "8_dubizzle", "8_extra"
+        ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,34 +49,50 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4 lxml curl_cffi
 
-      - name: Run Continuous Radar Loop (Every 15 Minutes)
+      - name: Execute Independent Radar Phase (${{ matrix.step_phase }})
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          for cycle in $(seq 1 16); do
-            echo "=========================================="
-            echo "Starting Radar Cycle $cycle of 16 at $(date -u)"
-            echo "=========================================="
+          git fetch origin main || true
+          git reset --hard origin/main || true
 
-            git fetch origin main || true
-            git reset --hard origin/main || true
+          PHASE="${{ matrix.step_phase }}"
+          echo "=========================================="
+          echo "Running Phase: $PHASE on Fresh Server IP"
+          echo "=========================================="
 
+          if [[ "$PHASE" == *"_dubizzle" ]]; then
             python scraper.py | tee dubizzle_run.log || true
-
-            git fetch origin main || true
-            git checkout origin/main -- extra_radar.py || true
-
+            python -c '
+          import json, os
+          if os.path.exists("ads.json") and os.path.exists("dubizzle_run.log"):
+              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
+              with open("dubizzle_run.log", "r", encoding="utf-8", errors="ignore") as f: log_txt = f.read()[-15000:]
+              if d.get("ads"): d["ads"][0]["_dub_log"] = log_txt
+              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
+          ' || true
+          else
+            python -c '
+          import json, os
+          if os.path.exists("ads.json"):
+              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
+              for a in d.get("ads", []):
+                  if "_dub_log" in a:
+                      with open("dubizzle_run.log", "w", encoding="utf-8") as lf: lf.write(a.pop("_dub_log"))
+                      break
+              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
+          ' || true
             python extra_radar.py || true
+          fi
 
-            git add ads.json
-            if ! git diff --staged --quiet; then
-              git commit -m "Auto-update New Cairo owner ads (Cycle $cycle)"
-              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
-            fi
+          git add ads.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update ads.json ($PHASE)"
+            git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+          fi
 
-            if [ "$cycle" -lt 16 ]; then
-              echo "Cycle $cycle complete. Sleeping 15 minutes before next cycle..."
-              sleep 900
-            fi
-          done
+          if [[ "$PHASE" == *"_extra" ]] && [[ "$PHASE" != "8_extra" ]]; then
+            echo "Phase $PHASE complete. Sleeping 12 minutes before next cycle..."
+            sleep 720
+          fi
