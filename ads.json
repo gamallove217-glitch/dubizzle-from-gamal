@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/08, 01:08 AM",
+  "last_scrape": "2026/11/08, 01:23 AM",
   "total_ads": 30,
   "checked_ids_v7": [
     208532447,
@@ -809,6 +809,7 @@
     504377148,
     504377308,
     504377533,
+    504377582,
     504377620,
     504377626,
     504377740,
@@ -1672,6 +1673,7 @@
     504377148,
     504377308,
     504377533,
+    504377582,
     504377620,
     504377626,
     504377740,
@@ -1751,7 +1753,8 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
+      "_dub_log": "Kept existing owners: 30 | Fresh unchecked candidates: 1 | Banned accounts: 1\nChecked Ad 504377582 (منذ 4 ساعات): Active_Ads=99 | Seller=better-estate-5000130\nTotal inspected this run: 1 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 1}\nSaved 30 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889551978,
@@ -2261,7 +2264,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "غرفة",
+      "subtype": "شقة",
       "seller_name": "دكتور حمدي خفاجي",
       "account_id": "ebcf7d01-77c3-4b39-81f8-8083eb4dfe6b",
       "seller_ads_count": 1,
@@ -2392,7 +2395,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -2415,7 +2418,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -2628,7 +2631,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
