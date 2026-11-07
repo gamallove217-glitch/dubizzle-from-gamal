@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 07:16 PM",
+  "last_scrape": "2026/11/07, 07:27 PM",
   "total_ads": 24,
   "checked_ids_v7": [
     208532447,
@@ -1281,8 +1281,7 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
-      "_dub_log": "Kept existing owners: 24 | Fresh unchecked candidates: 34 | Banned accounts: 1\nChecked Ad 504035513 (منذ 56 دقائق): Active_Ads=99 | Seller=el-boushi-for-real-estate-5000719\nChecked Ad 504035329 (منذ 39 دقائق): Active_Ads=99 | Seller=el-boushi-for-real-estate-5000719\nChecked Ad 504382959 (منذ 8 دقائق): Active_Ads=99 | Seller=hause-properties-5005430\nChecked Ad 504382951 (منذ 13 دقائق): Active_Ads=99 | Seller=shrk-alsoydy-lltsoyk-alaakary-7307\nChecked Ad 504382950 (منذ 14 دقائق): Active_Ads=99 | Seller=4-c-834\nChecked Ad 504382945 (منذ 15 دقائق): Active_Ads=99 | Seller=hause-properties-5005430\nChecked Ad 504382943 (منذ 15 دقائق): Active_Ads=99 | Seller=enfrad-real-estate-1153\nChecked Ad 504382889 (منذ 33 دقائق): Active_Ads=99 | Seller=ericson-5001374\nChecked Ad 504382884 (منذ 33 دقائق): Active_Ads=99 | Seller=new-brookfield-5001877\nChecked Ad 504382867 (منذ 29 دقائق): Active_Ads=99 | Seller=mktb-rhab-gyt-11275\nChecked Ad 504382862 (منذ 42 دقائق): Active_Ads=99 | Seller=retaj-real-estate-consultancy-25\nChecked Ad 504382858 (منذ 43 دقائق): Active_Ads=99 | Seller=h-house-for-real-estate-20611\nChecked Ad 504382830 (منذ 29 دقائق): Active_Ads=99 | Seller=mktb-rhab-gyt-11275\nChecked Ad 504382824 (منذ 54 دقائق): Active_Ads=99 | Seller=new-avenue-128\nChecked Ad 504382779 (منذ 1 ساعة): Active_Ads=99 | Seller=h-house-for-real-estate-20611\nChecked Ad 504382777 (منذ 30 دقائق): Active_Ads=99 | Seller=mktb-rhab-gyt-11275\nChecked Ad 504382739 (منذ 16 دقائق): Active_Ads=99 | Seller=s-signature-5000384\nChecked Ad 504382714 (منذ 1 ساعة): Active_Ads=99 | Seller=4-c-834\nChecked Ad 504382705 (منذ 1 ساعة): Active_Ads=99 | Seller=gh-elite-5001574\nChecked Ad 504382689 (منذ 1 ساعة): Active_Ads=99 | Seller=multiplex-real-estate-5001978\nChecked Ad 504309389 (منذ 34 دقائق): Active_Ads=99 | Seller=sfr-8279\nChecked Ad 504309281 (منذ 32 دقائق): Active_Ads=99 | Seller=sfr-8279\nChecked Ad 504297063 (منذ 33 دقائق): Active_Ads=99 | Seller=sfr-8279\nChecked Ad 504272152 (منذ 7 دقائق): Active_Ads=99 | Seller=sfr-8279\nChecked Ad 504223527 (منذ 24 دقائق): Active_Ads=99 | Seller=4-c-834\nChecked Ad 504223185 (منذ 42 دقائق): Active_Ads=99 | Seller=east-west-5006531\nChecked Ad 504177349 (منذ 26 دقائق): Active_Ads=99 | Seller=imkan-investment-6169\nChecked Ad 504022131 (منذ 31 دقائق): Active_Ads=99 | Seller=el-boushi-for-real-estate-5000719\nChecked Ad 503954533 (منذ 24 دقائق): Active_Ads=99 | Seller=moustafa-mamadouh-18354\nChecked Ad 503882459 (منذ 40 دقائق): Active_Ads=99 | Seller=el-boushi-for-real-estate-5000719\nChecked Ad 503664044 (منذ 16 دقائق): Active_Ads=99 | Seller=elmongez-investment-5000511\nChecked Ad 503363359 (منذ 9 دقائق): Active_Ads=99 | Seller=mostafa-hamdon-5001202\nChecked Ad 503220886 (منذ 1 ساعة): Active_Ads=99 | Seller=horizon-161\nChecked Ad 502853766 (منذ 40 دقائق): Active_Ads=99 | Seller=horizon-161\nTotal inspected this run: 34 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 34}\nSaved 24 verified fresh New Cairo owner ads.\n"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
     },
     {
       "ad_id": 889551978,
@@ -1315,9 +1314,9 @@
       "area": "206 م²",
       "beds": "3 غرف",
       "baths": "",
-      "deal": "بيع",
-      "category": "شقق للبيع",
-      "subtype": "شقة",
+      "deal": "إيجار",
+      "category": "شقق للإيجار",
+      "subtype": "غرفة",
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
@@ -1813,7 +1812,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "سطح",
+      "subtype": "شقة",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -1877,8 +1876,8 @@
       "beds": "",
       "baths": "",
       "deal": "بيع",
-      "category": "شقق للبيع",
-      "subtype": "شقة",
+      "category": "عقار تجاري للبيع",
+      "subtype": "عقار تجاري",
       "seller_name": "Sherif Ahmed",
       "account_id": "c10464d2-c074-4e94-bb0e-1f17b2bce57d",
       "seller_ads_count": 1,
@@ -2026,8 +2025,8 @@
       "beds": "",
       "baths": "",
       "deal": "بيع",
-      "category": "شقق للبيع",
-      "subtype": "شقة",
+      "category": "عقار تجاري للبيع",
+      "subtype": "طبي",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -2144,5 +2143,54 @@
       "scraped_at": "2026-11-06T17:25:11.571008+02:00",
       "source": "دوبيزل"
     }
-  ]
+  ],
+  "notified_ids_v1": [
+    208755167,
+    208976669,
+    209270450,
+    209352320,
+    209371578,
+    209375862,
+    209382952,
+    209391228,
+    209396889,
+    209402630,
+    209408747,
+    209410221,
+    209414242,
+    209415226,
+    209417259,
+    209421299,
+    209422246,
+    209422796,
+    209423433,
+    504238147,
+    888278850
+  ],
+  "last_run_report": {
+    "run_time": "2026/11/07, 07:27 PM",
+    "total_saved_owners": 24,
+    "dubizzle_total": 20,
+    "aqarmap_total": 1,
+    "opensooq_total": 3,
+    "sale_total": 16,
+    "rent_total": 8,
+    "total_inspected_this_run": 34,
+    "dubizzle_inspected": 34,
+    "extra_inspected": 0,
+    "total_new_owners_this_run": 0,
+    "dubizzle_new_owners": 0,
+    "extra_new_owners": 0,
+    "total_brokers_banned_this_run": 34,
+    "total_excluded_this_run": 0,
+    "total_blacklisted_accounts": 1,
+    "total_checked_ads_memory": 1257
+  },
+  "checked_extra_v13": [
+    889511380,
+    889526108,
+    889551978
+  ],
+  "telegram_chat_ids": [],
+  "telegram_welcomed_ids": []
 }
