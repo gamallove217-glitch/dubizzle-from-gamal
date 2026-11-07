@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/07, 11:25 AM",
+  "last_scrape": "2026/11/07, 11:49 AM",
   "total_ads": 23,
   "checked_ids_v7": [
     208532447,
@@ -18,6 +18,7 @@
     209185722,
     209186461,
     209198260,
+    209264457,
     209270450,
     209365202,
     209383863,
@@ -53,6 +54,7 @@
     502981995,
     503033718,
     503120151,
+    503120568,
     503131046,
     503138817,
     503152788,
@@ -92,6 +94,7 @@
     503612977,
     503621865,
     503628579,
+    503638281,
     503650915,
     503664643,
     503668111,
@@ -264,6 +267,8 @@
     504144709,
     504146351,
     504146802,
+    504147855,
+    504147881,
     504148754,
     504150228,
     504151042,
@@ -321,6 +326,7 @@
     504194457,
     504194502,
     504194790,
+    504198821,
     504199241,
     504199913,
     504201398,
@@ -381,6 +387,7 @@
     504289374,
     504293074,
     504293128,
+    504294192,
     504296632,
     504301229,
     504302068,
@@ -417,6 +424,8 @@
     504343057,
     504343080,
     504344707,
+    504344766,
+    504345934,
     504346049,
     504346105,
     504346230,
@@ -745,6 +754,7 @@
     504380157,
     504380164,
     504380167,
+    504380183,
     504380185,
     504380188,
     504380191,
@@ -753,7 +763,10 @@
     504380199,
     504380200,
     504380228,
-    504380235
+    504380235,
+    504380323,
+    504380342,
+    504380376
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1352,30 +1365,6 @@
       "source": "دوبيزل"
     }
   ],
-  "last_run_report": {
-    "run_time": "2026/11/07, 11:25 AM",
-    "total_saved_owners": 23,
-    "dubizzle_total": 20,
-    "aqarmap_total": 0,
-    "opensooq_total": 3,
-    "sale_total": 16,
-    "rent_total": 7,
-    "total_inspected_this_run": 26,
-    "dubizzle_inspected": 0,
-    "extra_inspected": 26,
-    "total_new_owners_this_run": 0,
-    "dubizzle_new_owners": 0,
-    "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 1,
-    "total_excluded_this_run": 0,
-    "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 753
-  },
-  "checked_extra_v6": [
-    880980752
-  ],
-  "telegram_chat_ids": [],
-  "telegram_welcomed_ids": [],
   "notified_ids_v1": [
     208755167,
     208976669,
@@ -1398,5 +1387,29 @@
     209423433,
     504238147,
     888278850
-  ]
+  ],
+  "last_run_report": {
+    "run_time": "2026/11/07, 11:49 AM",
+    "total_saved_owners": 23,
+    "dubizzle_total": 20,
+    "aqarmap_total": 0,
+    "opensooq_total": 3,
+    "sale_total": 16,
+    "rent_total": 7,
+    "total_inspected_this_run": 38,
+    "dubizzle_inspected": 13,
+    "extra_inspected": 25,
+    "total_new_owners_this_run": 0,
+    "dubizzle_new_owners": 0,
+    "extra_new_owners": 0,
+    "total_brokers_banned_this_run": 12,
+    "total_excluded_this_run": 1,
+    "total_blacklisted_accounts": 1,
+    "total_checked_ads_memory": 766
+  },
+  "checked_extra_v6": [
+    880980752
+  ],
+  "telegram_chat_ids": [],
+  "telegram_welcomed_ids": []
 }
