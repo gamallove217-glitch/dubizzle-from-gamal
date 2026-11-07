@@ -1,0 +1,68 @@
+name: Scrape Dubizzle Hourly
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scraper.py'
+      - 'extra_radar.py'
+      - '.github/workflows/scrape.yml'
+
+concurrency:
+  group: dubizzle-continuous-loop
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
+permissions:
+  contents: write
+
+jobs:
+  scrape_and_update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml curl_cffi
+
+      - name: Run Continuous Radar Loop (Every 15 Minutes)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          for cycle in $(seq 1 16); do
+            echo "=========================================="
+            echo "Starting Radar Cycle $cycle of 16 at $(date -u)"
+            echo "=========================================="
+
+            git fetch origin main || true
+            git reset --hard origin/main || true
+
+            python scraper.py | tee dubizzle_run.log || true
+
+            git fetch origin main || true
+            git checkout origin/main -- extra_radar.py || true
+
+            python extra_radar.py || true
+
+            git add ads.json
+            if ! git diff --staged --quiet; then
+              git commit -m "Auto-update New Cairo owner ads (Cycle $cycle)"
+              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+            fi
+
+            if [ "$cycle" -lt 16 ]; then
+              echo "Cycle $cycle complete. Sleeping 15 minutes before next cycle..."
+              sleep 900
+            fi
+          done
