@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/08, 11:36 PM",
+  "last_scrape": "2026/11/08, 11:53 PM",
   "total_ads": 56,
   "checked_ids_v7": [
     186447351,
@@ -191,6 +191,7 @@
     503725213,
     503725979,
     503726361,
+    503729922,
     503730944,
     503731054,
     503737278,
@@ -200,6 +201,7 @@
     503741452,
     503743030,
     503743557,
+    503746643,
     503749316,
     503755122,
     503755144,
@@ -315,10 +317,12 @@
     504001996,
     504003850,
     504004690,
+    504005440,
     504005509,
     504006771,
     504007404,
     504007417,
+    504007627,
     504007712,
     504007863,
     504007983,
@@ -607,6 +611,7 @@
     504218473,
     504218692,
     504218950,
+    504219019,
     504219022,
     504219027,
     504219038,
@@ -1108,7 +1113,14 @@
     504389920,
     504389966,
     504389977,
-    504389983
+    504389983,
+    504390003,
+    504390015,
+    504390031,
+    504390040,
+    504390061,
+    504390102,
+    504390108
   ],
   "checked_ids_v10": [
     186447351,
@@ -1300,6 +1312,7 @@
     503725213,
     503725979,
     503726361,
+    503729922,
     503730944,
     503731054,
     503737278,
@@ -1309,6 +1322,7 @@
     503741452,
     503743030,
     503743557,
+    503746643,
     503749316,
     503755122,
     503755144,
@@ -1424,10 +1438,12 @@
     504001996,
     504003850,
     504004690,
+    504005440,
     504005509,
     504006771,
     504007404,
     504007417,
+    504007627,
     504007712,
     504007863,
     504007983,
@@ -1716,6 +1732,7 @@
     504218473,
     504218692,
     504218950,
+    504219019,
     504219022,
     504219027,
     504219038,
@@ -2217,7 +2234,14 @@
     504389920,
     504389966,
     504389977,
-    504389983
+    504389983,
+    504390003,
+    504390015,
+    504390031,
+    504390040,
+    504390061,
+    504390102,
+    504390108
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -2243,7 +2267,8 @@
       "url": "https://eg.opensooq.com/ar/search/289799804",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-08T23:01:14.424634+02:00"
+      "scraped_at": "2026-11-08T23:01:14.424634+02:00",
+      "_dub_log": "Kept existing owners: 56 | Fresh unchecked candidates: 12 | Banned accounts: 1\nChecked Ad 504390108 (منذ 3 دقائق): Active_Ads=99 | Seller=scouts-5000310\nChecked Ad 504390102 (منذ 6 دقائق): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390061 (منذ 24 دقائق): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390040 (منذ 34 دقائق): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390031 (منذ 39 دقائق): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390015 (منذ 48 دقائق): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390003 (منذ 56 دقائق): Active_Ads=99 | Seller=al-adnan-1170\nChecked Ad 504219019 (منذ 27 دقائق): Active_Ads=99 | Seller=capital-agency-10345\nChecked Ad 504007627 (منذ 2 ساعات): Active_Ads=99 | Seller=maak-real-estate-5000102\nChecked Ad 504005440 (منذ 59 دقائق): Active_Ads=99 | Seller=black-code-investments-5001038\nChecked Ad 503746643 (منذ 53 دقائق): Active_Ads=99 | Seller=imkan-investment-6169\nChecked Ad 503729922 (منذ 2 ساعات): Active_Ads=99 | Seller=capital-agency-10345\nTotal inspected this run: 12 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 12}\nSaved 56 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889747572,
@@ -5954,7 +5979,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -5977,7 +6002,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -6212,7 +6237,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -6717,6 +6742,5 @@
     209423433,
     504238147,
     888278850
-  ],
-  "telegram_last_update_id": 0
+  ]
 }
