@@ -79,7 +79,10 @@ AQARMAP_SETTLEMENT_ZONES = [
     "cairo/new-cairo/bait-el-watan",
     "cairo/new-cairo/compounds",
     "cairo/new-cairo/el-katameya",
-    "cairo/new-cairo/shorouk"
+    "cairo/new-cairo/shorouk",
+    "cairo/new-cairo/6th-settlement",
+    "cairo/new-cairo/first-settlement",
+    "cairo/new-cairo/third-settlement"
 ]
 
 AQARMAP_PROP_TYPES = [
@@ -125,10 +128,18 @@ EXTRA_QUERIES = [
     'site:aqarmap.com.eg/ar/listing "جنوب الأكاديمية" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "الأندلس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "القرنفل" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "فيلا" "التجمع الخامس" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "إداري" "التجمع الخامس" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "تجاري" "التجمع الخامس" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "طبي" "التجمع الخامس" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "فيلا للإيجار" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "فلل للبيع" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "أرض" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "إداري" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "تجاري" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "عيادة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "محل" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "للإيجار" "القاهرة الجديدة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "شقق للايجار" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "duplex" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "بنتهاوس" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "ستوديو" "مالك عقار"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "المالك"',
     'site:eg.opensooq.com/ar "القاهرة الجديدة" "المالك"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "من المالك"',
@@ -137,7 +148,12 @@ EXTRA_QUERIES = [
     'site:eg.opensooq.com/ar "النرجس" "المالك"',
     'site:eg.opensooq.com/ar "اللوتس" "المالك"',
     'site:eg.opensooq.com/ar "الياسمين" "المالك"',
-    'site:eg.opensooq.com/ar "البنفسج" "المالك"'
+    'site:eg.opensooq.com/ar "البنفسج" "المالك"',
+    'site:eg.opensooq.com/ar "فلل" "المالك"',
+    'site:eg.opensooq.com/ar "أراضي" "المالك"',
+    'site:eg.opensooq.com/ar "إيجار" "المالك"',
+    'site:eg.opensooq.com/ar "تجاري" "المالك"',
+    'site:eg.opensooq.com/ar "إداري" "المالك"'
 ]
 
 
@@ -313,6 +329,9 @@ def check_opensooq_freshness(core_text, oid):
         return True, m_rel.group(0)
     if "أمس" in core_text[:3000] or "اليوم" in core_text[:3000]:
         return True, "اليوم/أمس"
+    # Check ID threshold first — newer listings have higher oid
+    if oid >= 286000000:
+        return True, "حديث (السوق المفتوح)"
     m_date = re.search(r"\b(\d{2})-(\d{2})-(20\d{2})\b", core_text[:3000])
     if m_date:
         dd, mm, yyyy = int(m_date.group(1)), int(m_date.group(2)), int(m_date.group(3))
@@ -321,8 +340,6 @@ def check_opensooq_freshness(core_text, oid):
         if yyyy == 2026 and mm == 10 and dd >= 10:
             return True, m_date.group(0)
         return False, f"OLD_DATE_{m_date.group(0)}"
-    if oid >= 286000000:
-        return True, "حديث (السوق المفتوح)"
     return False, "OLD_OPENSOOQ"
 
 
@@ -408,7 +425,7 @@ def discover_extra_candidates(req_sess, cffi_sess, existing_os_urls=None):
         for (deal, ptype) in AQARMAP_PROP_TYPES
     ]
     random.shuffle(aqar_combos)
-    for cat_u in aqar_combos[:5]:
+    for cat_u in aqar_combos[:10]:
         raw_cat = fetch_page(req_sess, cffi_sess, cat_u, timeout_sec=20)
         if raw_cat:
             for m in re.finditer(r"(?:https?://aqarmap\.com\.eg)?(/ar/listing/(\d{7})-[^\s\"'<>)\]?]+)", raw_cat):
@@ -453,7 +470,7 @@ def discover_extra_candidates(req_sess, cffi_sess, existing_os_urls=None):
 
     q_list = list(EXTRA_QUERIES)
     random.shuffle(q_list)
-    for q in q_list[:18]:
+    for q in q_list[:25]:
         enc = urllib.parse.quote(q)
         for s_url in [
             f"https://search.yahoo.com/search?p={enc}&b=1",
@@ -1024,6 +1041,9 @@ def run_extra_radar():
     cffi_sess = cffi_requests.Session(impersonate="chrome120")
 
     existing_os_urls = [a.get("link", "") for a in (data.get("ads") or []) if a.get("source") == "السوق المفتوح" and a.get("link")]
+    # Additional hardcoded OpenSooq listing URLs for more diverse crawling
+    extra_os_start = ["https://eg.opensooq.com/ar/search/286924884", "https://eg.opensooq.com/ar/search/288468900", "https://eg.opensooq.com/ar/search/286978162"]
+    existing_os_urls = [u for u in existing_os_urls if u] + [u for u in extra_os_start if u not in existing_os_urls]
     aqar_cands, os_cands = discover_extra_candidates(req_sess, cffi_sess, existing_os_urls)
 
     extra_inspected = 0
@@ -1031,7 +1051,7 @@ def run_extra_radar():
     extra_banned = 0
     extra_excluded = 0
 
-    for uid, cand_info in list(aqar_cands.items())[:12]:
+    for uid, cand_info in list(aqar_cands.items())[:30]:
         if uid in kept_map or uid in checked_extra:
             continue
         item, mark_chk, reason = parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts)
@@ -1050,7 +1070,7 @@ def run_extra_radar():
             print(f"[Aqarmap] ADDED Live Owner: {uid} | {item['category']} ({item['subtype']}) | {item['price_text']} | {item['seller_name']}")
         time.sleep(3.2)
 
-    for uid, cand_info in list(os_cands.items())[:10]:
+    for uid, cand_info in list(os_cands.items())[:20]:
         if uid in kept_map or uid in checked_extra:
             continue
         item, mark_chk, reason = parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts)
