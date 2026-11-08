@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/08, 11:41 AM",
+  "last_scrape": "2026/11/08, 11:55 AM",
   "total_ads": 31,
   "checked_ids_v7": [
     208532447,
@@ -201,6 +201,7 @@
     503864300,
     503866465,
     503875460,
+    503879394,
     503882455,
     503882459,
     503882488,
@@ -361,6 +362,7 @@
     504076619,
     504077018,
     504077847,
+    504084296,
     504084493,
     504084866,
     504085444,
@@ -506,6 +508,7 @@
     504205241,
     504205395,
     504205538,
+    504205540,
     504205611,
     504205632,
     504206069,
@@ -532,6 +535,7 @@
     504212334,
     504212368,
     504212526,
+    504212796,
     504212909,
     504214232,
     504215073,
@@ -927,7 +931,10 @@
     504383963,
     504383967,
     504384032,
-    504384079
+    504384079,
+    504384164,
+    504384187,
+    504384227
   ],
   "checked_ids_v10": [
     208532447,
@@ -1129,6 +1136,7 @@
     503864300,
     503866465,
     503875460,
+    503879394,
     503882455,
     503882459,
     503882488,
@@ -1289,6 +1297,7 @@
     504076619,
     504077018,
     504077847,
+    504084296,
     504084493,
     504084866,
     504085444,
@@ -1434,6 +1443,7 @@
     504205241,
     504205395,
     504205538,
+    504205540,
     504205611,
     504205632,
     504206069,
@@ -1460,6 +1470,7 @@
     504212334,
     504212368,
     504212526,
+    504212796,
     504212909,
     504214232,
     504215073,
@@ -1855,7 +1866,10 @@
     504383963,
     504383967,
     504384032,
-    504384079
+    504384079,
+    504384164,
+    504384187,
+    504384227
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1881,7 +1895,8 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
+      "_dub_log": "Kept existing owners: 31 | Fresh unchecked candidates: 7 | Banned accounts: 1\nChecked Ad 504384227 (منذ 1 دقيقة): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504384187 (منذ 6 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504384164 (منذ 9 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504212796 (منذ 4 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504205540 (منذ 31 دقائق): Active_Ads=99 | Seller=escan-1277\nChecked Ad 504084296 (منذ 19 دقائق): Active_Ads=99 | Seller=remax-1st-choice-5000265\nChecked Ad 503879394 (منذ 5 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nTotal inspected this run: 7 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 7}\nSaved 31 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889551978,
@@ -2413,7 +2428,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "غرفة",
+      "subtype": "شقة",
       "seller_name": "دكتور حمدي خفاجي",
       "account_id": "ebcf7d01-77c3-4b39-81f8-8083eb4dfe6b",
       "seller_ads_count": 1,
@@ -2544,7 +2559,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -2567,7 +2582,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -2780,7 +2795,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
