@@ -2,7 +2,7 @@ name: Scrape Dubizzle Hourly
 
 on:
   schedule:
-    - cron: '*/25 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
   push:
     branches:
@@ -22,7 +22,7 @@ permissions:
 jobs:
   radar_matrix_loop:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       max-parallel: 1
       fail-fast: false
