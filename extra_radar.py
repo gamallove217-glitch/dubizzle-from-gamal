@@ -71,7 +71,7 @@ WORDS_TO_SANITIZE_IN_DESC = [
     "مدينتي", "مدينتى", "الشروق", "مدينة الشروق", "مدينة المستقبل", "المستقبل سيتي",
     "مدينة بدر", "العبور", "العاصمة الإدارية", "العاصمه الاداريه", "تاج سيتي",
     "هليوبوليس الجديدة", "جاردينيا سيتي", "المقطم", "المعادي", "شيراتون", "النزهة",
-    "جاردينيا"
+    "جاردينيا", "عقارات مصايف"
 ]
 
 AQARMAP_SETTLEMENT_ZONES = [
@@ -89,9 +89,7 @@ AQARMAP_PROP_TYPES = [
     ("for-sale", "villa"),
     ("for-rent", "villa"),
     ("for-sale", "land"),
-    ("for-rent", "land"),
     ("for-sale", "building"),
-    ("for-rent", "building"),
     ("for-sale", "administrative"),
     ("for-rent", "administrative"),
     ("for-sale", "commercial"),
@@ -126,25 +124,20 @@ EXTRA_QUERIES = [
     'site:aqarmap.com.eg/ar/listing "بيت الوطن" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "جنوب الأكاديمية" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "الأندلس" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "المستثمرين" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "القرنفل" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "فيلا" "التجمع الخامس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "إداري" "التجمع الخامس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "تجاري" "التجمع الخامس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "طبي" "التجمع الخامس" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "أراضي" "التجمع الخامس" "مالك عقار"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "المالك"',
     'site:eg.opensooq.com/ar "القاهرة الجديدة" "المالك"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "من المالك"',
-    'site:eg.opensooq.com/ar "القاهرة الجديدة" "من المالك"',
     'site:eg.opensooq.com/ar "التجمع الأول" "المالك"',
     'site:eg.opensooq.com/ar "التجمع الثالث" "المالك"',
     'site:eg.opensooq.com/ar "النرجس" "المالك"',
     'site:eg.opensooq.com/ar "اللوتس" "المالك"',
     'site:eg.opensooq.com/ar "الياسمين" "المالك"',
-    'site:eg.opensooq.com/ar "البنفسج" "المالك"',
-    'site:eg.opensooq.com/ar "بيت الوطن" "المالك"',
-    'site:eg.opensooq.com/ar "القطامية" "المالك"'
+    'site:eg.opensooq.com/ar "البنفسج" "المالك"'
 ]
 
 
@@ -258,7 +251,7 @@ def classify_unit(url, title_clean, header_clean, price_num):
         category = "شقق للإيجار" if deal == "إيجار" else "شقق للبيع"
         return deal, category, "ستوديو"
 
-    if any(w in all_check for w in ["غرف ومشاركة", "غرفة للإيجار", "غرفه للايجار", "غرفة مفروشة", "غرفة "]):
+    if any(w in t_and_u for w in ["غرف ومشاركة", "غرفة للإيجار", "غرفه للايجار", "غرفة مفروشة"]) and not is_explicit_apt and (0 < price_num < 150000):
         return "إيجار", "شقق للإيجار", "غرفة"
 
     if any(w in t_and_u for w in ["دوبلكس", "دوبليكس", "duplex", "تريبلكس"]):
@@ -301,12 +294,14 @@ def check_aqarmap_freshness(core_text, lid):
         day_num, month_ar, yr_str = int(m_pub.group(1)), m_pub.group(2), m_pub.group(3)
         if yr_str == "2026" and month_ar in ("نوفمبر", "ديسمبر"):
             return True, f"{day_num} {month_ar} 2026"
-        if yr_str == "2026" and month_ar in ("أكتوبر", "اكتوبر") and day_num >= 15:
+        if yr_str == "2026" and month_ar in ("أكتوبر", "اكتوبر") and day_num >= 10:
             return True, f"{day_num} {month_ar} 2026"
         return False, f"OLD_DATE_{day_num}_{month_ar}_{yr_str}"
 
     if "اليوم" in text_no_build_year[:1200] or "أمس" in text_no_build_year[:1200]:
         return True, "اليوم"
+    if lid >= 7150000:
+        return True, "2026"
     return False, "NO_RECENT_DATE"
 
 
@@ -327,7 +322,14 @@ def check_opensooq_freshness(core_text, oid):
     return False, "OLD_OPENSOOQ"
 
 
-def fetch_page(req_sess, cffi_sess, url, timeout_sec=24):
+def to_google_translate_proxy(url):
+    p = urllib.parse.urlsplit(url)
+    host_dash = p.netloc.replace(".", "-")
+    q = f"{p.query}&_x_tr_sl=en&_x_tr_tl=ar&_x_tr_hl=ar" if p.query else "_x_tr_sl=en&_x_tr_tl=ar&_x_tr_hl=ar"
+    return f"https://{host_dash}.translate.goog{p.path}?{q}"
+
+
+def fetch_page(req_sess, cffi_sess, url, timeout_sec=22):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -342,40 +344,48 @@ def fetch_page(req_sess, cffi_sess, url, timeout_sec=24):
             r = cffi_sess.get("https://r.jina.ai/" + url, headers=headers, timeout=timeout_sec)
             if r.status_code == 429 or "Too Many Requests" in r.text:
                 if attempt == 0:
-                    time.sleep(10)
+                    time.sleep(8)
                     continue
-            if r.status_code == 200 and len(r.text) > 500 and "Too Many Requests" not in r.text and "Target URL returned error" not in r.text:
+            if r.status_code == 200 and len(r.text) > 500 and "Too Many Requests" not in r.text and "Just a moment..." not in r.text:
                 txt = r.text
-                m_h1 = re.search(r"^#\s+(.+)$", txt, flags=re.M)
-                if m_h1:
-                    title_line = f"# {m_h1.group(1).strip()}\n"
-                combined_parts.append(txt)
-                for m_l in re.finditer(r"https?://(?:aqarmap\.com\.eg/ar/listing/\d{7}-[^\s\"'<>)\]]+|eg\.opensooq\.com/ar/[^\s\"'<>)\]]+?/\d{9,10})", txt):
-                    links_buf.append(m_l.group(0))
-                break
+                if "متر" in txt or "جنيه" in txt or "المعلن" in txt or "/listing/" in txt:
+                    m_h1 = re.search(r"^#\s+(.+)$", txt, flags=re.M)
+                    if m_h1:
+                        title_line = f"# {m_h1.group(1).strip()}\n"
+                    combined_parts.append(txt)
+                    for m_l in re.finditer(r"https?://(?:aqarmap\.com\.eg/ar/listing/\d{7}-[^\s\"'<>)\]]+|eg\.opensooq\.com/ar/[^\s\"'<>)\]]+?/\d{9,10})", txt):
+                        links_buf.append(m_l.group(0))
+                    break
         except Exception:
             pass
 
     if not combined_parts:
-        try:
-            r2 = cffi_sess.get(url, headers=headers, timeout=16, allow_redirects=True)
-            if r2.status_code == 200 and len(r2.text) > 800 and "Just a moment" not in r2.text:
-                soup = BeautifulSoup(r2.text, "lxml")
-                base = "https://aqarmap.com.eg" if "aqarmap" in url else "https://eg.opensooq.com"
-                for a in soup.find_all("a", href=True):
-                    raw_href = a["href"]
-                    href = urllib.parse.unquote(raw_href)
-                    if "/listing/" in href or re.search(r"/\d{9,10}\b", href):
-                        full_h = base + raw_href if raw_href.startswith("/") else raw_href
-                        links_buf.append(full_h)
-                h1 = soup.find("h1")
-                if h1 and not title_line:
-                    title_line = f"# {h1.get_text(' ', strip=True)}\n"
-                for tag in soup.find_all(["head", "title", "script", "style", "nav", "footer", "noscript", "svg", "iframe"]):
-                    tag.decompose()
-                combined_parts.append(soup.get_text(" ", strip=True))
-        except Exception:
-            pass
+        candidate_urls = [url]
+        if "aqarmap.com.eg" in url:
+            candidate_urls.insert(0, to_google_translate_proxy(url))
+        for cand_u in candidate_urls:
+            try:
+                r2 = cffi_sess.get(cand_u, headers=headers, timeout=16, allow_redirects=True)
+                if r2.status_code == 200 and len(r2.text) > 800 and "Just a moment" not in r2.text:
+                    soup = BeautifulSoup(r2.text, "lxml")
+                    base = "https://aqarmap.com.eg" if "aqarmap" in url else "https://eg.opensooq.com"
+                    for a in soup.find_all("a", href=True):
+                        raw_href = a["href"]
+                        href = urllib.parse.unquote(raw_href)
+                        if "/listing/" in href or re.search(r"/\d{9,10}\b", href):
+                            full_h = base + raw_href if raw_href.startswith("/") else raw_href
+                            links_buf.append(full_h)
+                    h1 = soup.find("h1")
+                    if h1 and not title_line:
+                        title_line = f"# {h1.get_text(' ', strip=True)}\n"
+                    for tag in soup.find_all(["head", "title", "script", "style", "nav", "footer", "noscript", "svg", "iframe"]):
+                        tag.decompose()
+                    body_t = soup.get_text(" ", strip=True)
+                    if "متر" in body_t or "جنيه" in body_t or "المعلن" in body_t:
+                        combined_parts.append(body_t)
+                        break
+            except Exception:
+                pass
 
     if not combined_parts and not links_buf:
         return ""
@@ -392,23 +402,23 @@ def discover_extra_candidates(req_sess, cffi_sess):
         for (deal, ptype) in AQARMAP_PROP_TYPES
     ]
     random.shuffle(aqar_combos)
-    for cat_u in aqar_combos[:2]:
-        raw_cat = fetch_page(req_sess, cffi_sess, cat_u, timeout_sec=22)
+    for cat_u in aqar_combos[:3]:
+        raw_cat = fetch_page(req_sess, cffi_sess, cat_u, timeout_sec=20)
         if raw_cat:
-            for m in re.finditer(r"(?:https?://aqarmap\.com\.eg)?(/ar/listing/(\d{7})-[^\s\"'<>)\]]+)", raw_cat):
+            for m in re.finditer(r"(?:https?://aqarmap\.com\.eg)?(/ar/listing/(\d{7})-[^\s\"'<>)\]?]+)", raw_cat):
                 lid = int(m.group(2))
                 full_u = "https://aqarmap.com.eg" + m.group(1) if m.group(1).startswith("/") else m.group(1)
                 uid = 700000000 + lid
                 if lid >= 7050000 and not has_forbidden_url_slug(full_u):
                     aqar_cands[uid] = {"url": full_u}
-        time.sleep(3.0)
+        time.sleep(2.0)
 
     os_sample = list(OPENSOOQ_CATEGORY_URLS)
     random.shuffle(os_sample)
-    for os_u in os_sample[:2]:
-        raw_os = fetch_page(req_sess, cffi_sess, os_u, timeout_sec=22)
+    for os_u in os_sample[:3]:
+        raw_os = fetch_page(req_sess, cffi_sess, os_u, timeout_sec=20)
         if raw_os:
-            for m in re.finditer(r"(?:https?://eg\.opensooq\.com)?(/ar/[^\s\"'<>)\]]+?/(\d{9,10}))", raw_os):
+            for m in re.finditer(r"(?:https?://eg\.opensooq\.com)?(/ar/[^\s\"'<>)\]?]+?/(\d{9,10}))", raw_os):
                 oid = int(m.group(2))
                 full_u = "https://eg.opensooq.com" + m.group(1) if m.group(1).startswith("/") else m.group(1)
                 uid = 800000000 + (oid % 100000000)
@@ -417,11 +427,11 @@ def discover_extra_candidates(req_sess, cffi_sess):
                         "url": f"https://eg.opensooq.com/ar/search/{oid}",
                         "oid": oid
                     }
-        time.sleep(3.0)
+        time.sleep(2.0)
 
     q_list = list(EXTRA_QUERIES)
     random.shuffle(q_list)
-    for q in q_list[:20]:
+    for q in q_list[:18]:
         enc = urllib.parse.quote(q)
         for s_url in [
             f"https://search.yahoo.com/search?p={enc}&b=1",
@@ -470,7 +480,6 @@ def discover_extra_candidates(req_sess, cffi_sess):
 
 def parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     url = cand_info["url"]
-
     if has_forbidden_url_slug(url):
         return None, True, "EXCLUDED_AREA"
 
@@ -478,7 +487,7 @@ def parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     if lid < 7050000:
         return None, True, "OLD_AD"
 
-    raw = fetch_page(req_sess, cffi_sess, url, timeout_sec=24)
+    raw = fetch_page(req_sess, cffi_sess, url, timeout_sec=22)
     if not raw or len(raw) < 500:
         return None, False, "NO_PAGE"
 
@@ -631,7 +640,7 @@ def parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     if oid < 289000000:
         return None, True, "OLD_AD"
 
-    raw = fetch_page(req_sess, cffi_sess, url, timeout_sec=24)
+    raw = fetch_page(req_sess, cffi_sess, url, timeout_sec=22)
     if not raw or len(raw) < 400:
         return None, False, "NO_PAGE"
 
@@ -946,7 +955,7 @@ def run_extra_radar():
     unverified_fallback_ids = {
         889052484, 888278850, 706956728, 706442058, 707324352,
         707320377, 707317268, 707316652, 707283386, 707114653,
-        707092368, 707019572, 707002090
+        707092368, 707019572, 707002090, 705932405, 706898048
     }
     all_existing_list = list(ads)
     for backup_ad in saved_meta.get("extra_ads_backup", []):
@@ -973,7 +982,7 @@ def run_extra_radar():
         a["subtype"] = sub
         kept_map[aid] = a
 
-    checked_extra = set(int(x) for x in (data.get("checked_extra_v13") or saved_meta.get("checked_extra_v13") or []) if str(x).isdigit())
+    checked_extra = set(int(x) for x in (data.get("checked_extra_v15") or saved_meta.get("checked_extra_v15") or []) if str(x).isdigit())
     banned_accounts = set(data.get("banned_accounts_v7", []))
 
     if not data.get("telegram_chat_ids") and saved_meta.get("telegram_chat_ids"):
@@ -1059,7 +1068,7 @@ def run_extra_radar():
         "total_brokers_banned_this_run": dub_stats["banned_brokers"] + extra_banned,
         "total_excluded_this_run": dub_stats["excluded_or_old"] + extra_excluded,
         "total_blacklisted_accounts": len(banned_accounts),
-        "total_checked_ads_memory": len(checked_extra) + len(data.get("checked_ids_v7", []))
+        "total_checked_ads_memory": len(checked_extra) + len(data.get("checked_ids_v10", []))
     }
 
     print("==========================================")
@@ -1069,14 +1078,14 @@ def run_extra_radar():
     data["last_scrape"] = now_dt.strftime("%Y/%m/%d, %I:%M %p")
     data["total_ads"] = len(final_ads)
     data["last_run_report"] = run_report
-    data["checked_extra_v13"] = sorted(list(checked_extra))[-4000:]
+    data["checked_extra_v15"] = sorted(list(checked_extra))[-4000:]
     data["banned_accounts_v7"] = sorted(list(banned_accounts))[-2500:]
 
     sync_telegram_and_send_reports(data, run_report)
 
     extra_only_list = [dict(a) for a in final_ads if a.get("source") in ("عقارماب", "السوق المفتوح")]
     meta_payload = {
-        "checked_extra_v13": data["checked_extra_v13"][-2000:],
+        "checked_extra_v15": data["checked_extra_v15"][-2000:],
         "telegram_chat_ids": data.get("telegram_chat_ids", []),
         "telegram_welcomed_ids": data.get("telegram_welcomed_ids", []),
         "notified_ids_v1": data.get("notified_ids_v1", [])[-2000:],
