@@ -14,8 +14,7 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
 TG_B64_LIST = [
-    "OTE4NTkwNjUyNzpBQUhSZ3FsOEJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ==",
-    "OTE4NTkwNjUyNzpBQUhSZ3FJOFJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ=="
+    "OTE4NTkwNjUyNzpBQUhSZ3FsOEJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ=="
 ]
 
 STRICT_NEW_CAIRO_HEADER = [
@@ -140,6 +139,14 @@ EXTRA_QUERIES = [
     'site:aqarmap.com.eg/ar/listing "duplex" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "بنتهاوس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "ستوديو" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "إداري" "القاهرة الجديدة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "عيادة" "القاهرة الجديدة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "مكتب" "القاهرة الجديدة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "أرض للإيجار" "القاهرة الجديدة" "مالك عقار"',
+    'site:aqarmap.com.eg/ar/listing "land" "new cairo" "owner"',
+    'site:aqarmap.com.eg/ar/listing "commercial" "new cairo" "owner"',
+    'site:aqarmap.com.eg/ar/listing "administrative" "new cairo" "owner"',
+    'site:aqarmap.com.eg/ar/listing "medical" "new cairo" "owner"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "المالك"',
     'site:eg.opensooq.com/ar "القاهرة الجديدة" "المالك"',
     'site:eg.opensooq.com/ar "التجمع الخامس" "من المالك"',
@@ -153,7 +160,10 @@ EXTRA_QUERIES = [
     'site:eg.opensooq.com/ar "أراضي" "المالك"',
     'site:eg.opensooq.com/ar "إيجار" "المالك"',
     'site:eg.opensooq.com/ar "تجاري" "المالك"',
-    'site:eg.opensooq.com/ar "إداري" "المالك"'
+    'site:eg.opensooq.com/ar "إداري" "المالك"',
+    'site:eg.opensooq.com/ar "عيادة" "المالك"',
+    'site:eg.opensooq.com/ar "مكتب" "المالك"',
+    'site:eg.opensooq.com/ar "للايجار" "المالك"'
 ]
 
 
@@ -852,18 +862,23 @@ def sync_telegram_and_send_reports(data, run_report):
     welcomed_ids = set(str(x) for x in data.get("telegram_welcomed_ids", []) if str(x).strip())
 
     try:
-        std_requests.get(f"https://api.telegram.org/bot{tg_token}/deleteWebhook", timeout=6)
+        std_requests.get(f"https://api.telegram.org/bot{tg_token}/deleteWebhook?drop_pending_updates=false", timeout=6)
     except Exception:
         pass
 
+    last_update_id = int(data.get("telegram_last_update_id", 0) or 0)
     try:
+        offset = last_update_id + 1 if last_update_id > 0 else 0
         r = std_requests.get(
-            f"https://api.telegram.org/bot{tg_token}/getUpdates?limit=100",
-            timeout=10
+            f"https://api.telegram.org/bot{tg_token}/getUpdates?limit=50&timeout=1&offset={offset}&allowed_updates=message,my_chat_member,channel_post",
+            timeout=8
         )
         if r.status_code == 200:
             updates = r.json().get("result", [])
             for u in updates:
+                uid = u.get("update_id", 0)
+                if uid > last_update_id:
+                    last_update_id = uid
                 for key in ("message", "edited_message", "my_chat_member", "channel_post"):
                     msg = u.get(key)
                     if isinstance(msg, dict):
@@ -976,6 +991,7 @@ def sync_telegram_and_send_reports(data, run_report):
     data["telegram_chat_ids"] = sorted(list(chat_ids))
     data["telegram_welcomed_ids"] = sorted(list(welcomed_ids))
     data["notified_ids_v1"] = sorted(list(notified_ids))[-5000:]
+    data["telegram_last_update_id"] = last_update_id
 
 
 def run_extra_radar():
