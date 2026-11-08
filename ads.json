@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/08, 11:55 AM",
+  "last_scrape": "2026/11/08, 11:58 AM",
   "total_ads": 31,
   "checked_ids_v7": [
     208532447,
@@ -1895,8 +1895,7 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
-      "_dub_log": "Kept existing owners: 31 | Fresh unchecked candidates: 7 | Banned accounts: 1\nChecked Ad 504384227 (منذ 1 دقيقة): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504384187 (منذ 6 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504384164 (منذ 9 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504212796 (منذ 4 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nChecked Ad 504205540 (منذ 31 دقائق): Active_Ads=99 | Seller=escan-1277\nChecked Ad 504084296 (منذ 19 دقائق): Active_Ads=99 | Seller=remax-1st-choice-5000265\nChecked Ad 503879394 (منذ 5 دقائق): Active_Ads=99 | Seller=aabdalrhmn-almslmy-5002044\nTotal inspected this run: 7 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 7}\nSaved 31 verified fresh New Cairo owner ads.\n"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
     },
     {
       "ad_id": 889551978,
@@ -2428,7 +2427,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "غرفة",
       "seller_name": "دكتور حمدي خفاجي",
       "account_id": "ebcf7d01-77c3-4b39-81f8-8083eb4dfe6b",
       "seller_ads_count": 1,
@@ -2559,7 +2558,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "سطح",
+      "subtype": "شقة",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -2582,7 +2581,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "شقة مفروشة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -2795,7 +2794,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "عقار تجاري",
+      "subtype": "طبي",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -2914,23 +2913,23 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/08, 11:41 AM",
+    "run_time": "2026/11/08, 11:58 AM",
     "total_saved_owners": 31,
     "dubizzle_total": 27,
     "aqarmap_total": 1,
     "opensooq_total": 3,
     "sale_total": 18,
     "rent_total": 13,
-    "total_inspected_this_run": 36,
-    "dubizzle_inspected": 36,
+    "total_inspected_this_run": 7,
+    "dubizzle_inspected": 7,
     "extra_inspected": 0,
-    "total_new_owners_this_run": 1,
-    "dubizzle_new_owners": 1,
+    "total_new_owners_this_run": 0,
+    "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
-    "total_brokers_banned_this_run": 35,
+    "total_brokers_banned_this_run": 7,
     "total_excluded_this_run": 0,
     "total_blacklisted_accounts": 1,
-    "total_checked_ads_memory": 929
+    "total_checked_ads_memory": 936
   },
   "checked_extra_v13": [
     889511380,
