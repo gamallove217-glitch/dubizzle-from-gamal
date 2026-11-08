@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/08, 09:07 PM",
+  "last_scrape": "2026/11/08, 09:24 PM",
   "total_ads": 45,
   "checked_ids_v7": [
     186447351,
@@ -167,6 +167,7 @@
     503661519,
     503664044,
     503664643,
+    503664951,
     503667695,
     503668111,
     503671231,
@@ -1079,7 +1080,8 @@
     504389410,
     504389441,
     504389452,
-    504389467
+    504389467,
+    504389651
   ],
   "checked_ids_v10": [
     186447351,
@@ -1247,6 +1249,7 @@
     503661519,
     503664044,
     503664643,
+    503664951,
     503667695,
     503668111,
     503671231,
@@ -2159,7 +2162,8 @@
     504389410,
     504389441,
     504389452,
-    504389467
+    504389467,
+    504389651
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -2185,7 +2189,8 @@
       "url": "https://eg.opensooq.com/ar/search/289747572",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-08T20:51:45.964054+02:00"
+      "scraped_at": "2026-11-08T20:51:45.964054+02:00",
+      "_dub_log": "Kept existing owners: 45 | Fresh unchecked candidates: 2 | Banned accounts: 1\nChecked Ad 504389651 (منذ 24 دقائق): Active_Ads=99 | Seller=alalmany-lltnmy-alaakary-5002027\nChecked Ad 503664951 (منذ 38 دقائق): Active_Ads=99 | Seller=blue-rent-21606\nTotal inspected this run: 2 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 2}\nSaved 45 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889668370,
@@ -4541,7 +4546,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -4564,7 +4569,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -4799,7 +4804,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
