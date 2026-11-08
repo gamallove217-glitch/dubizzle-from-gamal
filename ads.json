@@ -1,7 +1,8 @@
 {
-  "last_scrape": "2026/11/08, 01:59 PM",
-  "total_ads": 31,
+  "last_scrape": "2026/11/08, 02:14 PM",
+  "total_ads": 32,
   "checked_ids_v7": [
+    208049206,
     208532447,
     208961921,
     209002337,
@@ -652,6 +653,7 @@
     504309389,
     504309621,
     504310731,
+    504311718,
     504311821,
     504311822,
     504313882,
@@ -904,6 +906,7 @@
     504383102,
     504383139,
     504383202,
+    504383219,
     504383263,
     504383272,
     504383298,
@@ -980,9 +983,11 @@
     504385339,
     504385403,
     504385445,
-    504385572
+    504385572,
+    504385747
   ],
   "checked_ids_v10": [
+    208049206,
     208532447,
     208961921,
     209002337,
@@ -1633,6 +1638,7 @@
     504309389,
     504309621,
     504310731,
+    504311718,
     504311821,
     504311822,
     504313882,
@@ -1885,6 +1891,7 @@
     504383102,
     504383139,
     504383202,
+    504383219,
     504383263,
     504383272,
     504383298,
@@ -1961,7 +1968,8 @@
     504385339,
     504385403,
     504385445,
-    504385572
+    504385572,
+    504385747
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -1987,7 +1995,8 @@
       "url": "https://eg.opensooq.com/ar/search/289668370",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-07T02:27:12.448810+02:00"
+      "scraped_at": "2026-11-07T02:27:12.448810+02:00",
+      "_dub_log": "Kept existing owners: 31 | Fresh unchecked candidates: 4 | Banned accounts: 1\nChecked Ad 504385747 (منذ 20 دقائق): Active_Ads=99 | Seller=fekra-re-5001881\nChecked Ad 504383219 (منذ 55 دقائق): Active_Ads=99 | Seller=hazem-mostafa-5002267\nChecked Ad 504311718 (منذ 17 دقائق): Active_Ads=99 | Seller=aba-althhb-5002320\nChecked Ad 208049206 (منذ 2 ساعات): Active_Ads=2 | Seller=User 2v28NN\n[4] ADDED: 208049206 | شقق للإيجار (شقة) | 21,000 ج.م | User 2v28NN (Active Ads: 2)\nTotal inspected this run: 4 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 3, 'ADDED_OWNER_2_ADS': 1}\nSaved 32 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889551978,
@@ -2692,7 +2701,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -2715,7 +2724,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -2919,6 +2928,28 @@
       "source": "دوبيزل"
     },
     {
+      "ad_id": 208049206,
+      "source": "دوبيزل",
+      "title": "شقة للايجار المفروش في التجمع الخامس - من المالك - المستثمرين الجنوبيه",
+      "price_num": 21000,
+      "price_text": "21,000 ج.م",
+      "area": "145 م²",
+      "beds": "2 غرف",
+      "baths": "2 حمام",
+      "deal": "إيجار",
+      "category": "شقق للإيجار",
+      "subtype": "شقة",
+      "seller_name": "User 2v28NN",
+      "account_id": "051fbb91-680c-4e4e-ac27-91d105b8f93a",
+      "seller_ads_count": 2,
+      "fresh_tier": 3,
+      "description": "[منذ 2 ساعات] شقة للايجار المفروش في التجمع الخامس - من المالك - المستثمرين الجنوبيه",
+      "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A7%D9%84%D9%85%D9%81%D8%B1%D9%88%D8%B4-%D9%81%D9%8A-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%AB%D9%85%D8%B1%D9%8A%D9%86-%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A%D9%87-ID208049206.html",
+      "today_verified": true,
+      "verified_v12": true,
+      "scraped_at": "2026-11-08T14:17:11.287809+02:00"
+    },
+    {
       "ad_id": 209408747,
       "title": "Medical park premier",
       "price_num": 11000000,
@@ -2928,7 +2959,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
