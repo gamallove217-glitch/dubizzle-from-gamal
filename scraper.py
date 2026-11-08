@@ -64,18 +64,25 @@ FRONTEND_SANITIZE_WORDS = [
 DUBIZZLE_CATEGORY_BASES = [
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/",
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/",
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/",
     "https://www.dubizzle.com.eg/properties/villas-for-sale/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/villas-for-sale/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/",
     "https://www.dubizzle.com.eg/properties/villas-for-rent/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/villas-for-rent/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/",
     "https://www.dubizzle.com.eg/properties/commercial-for-sale/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/commercial-for-sale/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/",
     "https://www.dubizzle.com.eg/properties/commercial-for-rent/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/commercial-for-rent/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/",
-    "https://www.dubizzle.com.eg/properties/buildings-lands/5th-settlement/"
+    "https://www.dubizzle.com.eg/properties/buildings-lands/5th-settlement/",
+    "https://www.dubizzle.com.eg/properties/buildings-lands/1st-settlement/"
 ]
 
 

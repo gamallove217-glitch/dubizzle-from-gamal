@@ -2,7 +2,7 @@ name: Scrape Dubizzle Hourly
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
   push:
     branches:
@@ -31,11 +31,7 @@ jobs:
           "1_dubizzle", "1_extra",
           "2_dubizzle", "2_extra",
           "3_dubizzle", "3_extra",
-          "4_dubizzle", "4_extra",
-          "5_dubizzle", "5_extra",
-          "6_dubizzle", "6_extra",
-          "7_dubizzle", "7_extra",
-          "8_dubizzle", "8_extra"
+          "4_dubizzle", "4_extra"
         ]
     steps:
       - name: Checkout repository
@@ -92,7 +88,7 @@ jobs:
             git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
           fi
 
-          if [[ "$PHASE" == *"_extra" ]] && [[ "$PHASE" != "8_extra" ]]; then
-            echo "Phase $PHASE complete. Sleeping 12 minutes before next cycle..."
-            sleep 720
+          if [[ "$PHASE" == *"_extra" ]] && [[ "$PHASE" != "4_extra" ]]; then
+            echo "Phase $PHASE complete. Sleeping 5 minutes before next cycle..."
+            sleep 300
           fi
