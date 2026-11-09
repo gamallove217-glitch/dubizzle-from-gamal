@@ -491,7 +491,9 @@ const CFG = Object.assign({
   LOG_TOPIC:     "gamal_masyada_visitors_2738_v2",
   BAN_TOPIC:     "gamal_masyada_bans_2738_v1",
   CONTACT_TOPIC: "gamal_masyada_contacted_2738_v1",
-  MAX_OWNER_ADS: 6,          // FIX(M4): أقصى عدد إعلانات يُعتبر «مالك» مش «سمسار»
+  // ✅ القاعدة: المالك = 1 أو 2 أو 3 أو 4 إعلانات نشطة بس (مطابق لـ scraper.py:1179).
+  //    إصلاح M4 كان بيرفعها لـ 6، وده كان بيتعارض مع القاعدة — اتظبطت على 4.
+  MAX_OWNER_ADS: 4,
   REFRESH_MS:    120000      // FIX(H6): كل دقيقتين بدل 45 ثانية
 }, window.__CFG || {});
 const ADMIN_PASS    = CFG.ADMIN_PASS;
@@ -870,8 +872,9 @@ function isCleanAd(ad){
   for(const bad of STRICT_FORBIDDEN){
     if(text.includes(bad)) return false;
   }
-  // ✅ FIX(M4): القاعدة القديمة (1..4) كانت بتخفي أي مالك عنده 5 إعلانات،
-  //    وكانت بتخفي كمان الإعلان اللي العدد فيه ناقص أو 0.
+  // ✅ FIX(M4): الجزء المهم من الإصلاح ده إن الإعلان اللي مفيش له عدد
+  //    (عقارماب والسوق المفتوح مالهمش seller_ads_count) ما يتخفيش.
+  //    القاعدة نفسها فضلت 1..4 زي ما هي — دي قاعدة المالك.
   const cnt = Number(ad.seller_ads_count || 0);
   if(!Number.isFinite(cnt) || cnt <= 0) return true;   // مفيش بيانات ⇒ ما نخفيش
   return cnt <= CFG.MAX_OWNER_ADS;
