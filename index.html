@@ -491,9 +491,9 @@ const CFG = Object.assign({
   LOG_TOPIC:     "gamal_masyada_visitors_2738_v2",
   BAN_TOPIC:     "gamal_masyada_bans_2738_v1",
   CONTACT_TOPIC: "gamal_masyada_contacted_2738_v1",
-  // ✅ القاعدة: المالك = 1 أو 2 أو 3 أو 4 إعلانات نشطة بس (مطابق لـ scraper.py:1179).
-  //    إصلاح M4 كان بيرفعها لـ 6، وده كان بيتعارض مع القاعدة — اتظبطت على 4.
-  MAX_OWNER_ADS: 4,
+  // PERMANENT FIX: المالك = 1 إلى 49 إعلانات نشطة (broker ≥50)
+  //    كان 4 — بيظلم أي مالك معاه 5+ إعلانات. broker الحقيقي عنده 100+.
+  MAX_OWNER_ADS: 49,
   REFRESH_MS:    120000      // FIX(H6): كل دقيقتين بدل 45 ثانية
 }, window.__CFG || {});
 const ADMIN_PASS    = CFG.ADMIN_PASS;
