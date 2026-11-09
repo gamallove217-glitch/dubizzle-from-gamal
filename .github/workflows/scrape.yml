@@ -1,94 +1,97 @@
-name: Scrape Dubizzle Hourly
+name: Scrape Dubizzle
 
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
+    inputs:
+      max_runtime_minutes:
+        description: 'ميزانية زمن السكريبر بالدقايق'
+        required: false
+        default: '25'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'scraper.py'
       - 'extra_radar.py'
+      - 'requirements.txt'
       - '.github/workflows/scrape.yml'
 
+# ✅ FIX(H4): قبل كده كان `cancel-in-progress: ${{ github.event_name != 'schedule' }}`
+#    مع group واحد ثابت. النتيجة المقيسة: 6 من آخر 12 رَن اتلغوا — ومنهم رَن الجدولة
+#    الوحيد (42519075880). كل push كان بيقتل الرَن الشغال، فالسكريبر ماكملش ولا مرة.
+#    دلوقتي: الرَن الجديد بيستنى اللي قبله يخلص (cancel-in-progress: false).
 concurrency:
-  group: dubizzle-continuous-loop
-  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+  group: dubizzle-radar
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
-  radar_matrix_loop:
+  radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        step_phase: [
-          "1_dubizzle", "1_extra",
-          "2_dubizzle", "2_extra",
-          "3_dubizzle", "3_extra",
-          "4_dubizzle", "4_extra"
-        ]
+    # ✅ FIX(H4): كان 8 مراحل × max-parallel:1 + sleep 300 = دورة ~6 ساعات.
+    #    ده كان بيخلي الجدولة الساعية (cron) مستحيلة — الرَن ما بيخلصش قبل ما
+    #    يبدأ اللي بعده. بقى رَن واحد بميزانية زمن واضحة.
+    timeout-minutes: 45
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml curl_cffi
+        run: pip install -r requirements.txt
 
-      - name: Execute Independent Radar Phase (${{ matrix.step_phase }})
+      - name: Run Dubizzle radar
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          NTFY_BAN_TOPIC: ${{ secrets.NTFY_BAN_TOPIC }}
+          MAX_RUNTIME_SECONDS: ${{ fromJSON(inputs.max_runtime_minutes || '25') * 60 }}
+          DISCOVERY_BUDGET_SECONDS: 150
+        # ✅ FIX(M7): `python -u` — من غيرها stdout بيتخزن في buffer وكل مرحلة
+        #    بتظهر بطابع زمني واحد، فـاللوجات كانت بتبقى مضلّلة تماماً في التشخيص.
+        # ✅ FIX(M6): شيلنا `|| true` — كان بيخفي أي فشل. لو السكريبر وقع،
+        #    الرَن لازم يظهر أحمر عشان تعرف إن فيه مشكلة.
+        # `tee` عشان extra_radar.py يقدر يقرا dubizzle_run.log — بس من غير
+        # التهريب القديم جوه ads.json (FIX L1). اللوج كمان بيترفع كـ artifact تحت.
+        run: python -u scraper.py 2>&1 | tee dubizzle_run.log
+
+      - name: Run extra sources radar (aqarmap + opensooq)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        if: ${{ !cancelled() }}
+        run: python -u extra_radar.py
+
+      - name: Upload run logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-logs-${{ github.run_number }}
+          path: '*.log'
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Commit ads.json
+        # ✅ FIX(L1): كان اللوج بيتخبّى جوه ads.json في `ads[0]["_dub_log"]`
+        #    (15 ألف حرف من اللوج جوه ملف البيانات!). اللوجات دلوقتي بتترفع
+        #    كـ artifact نظيف فوق، وملف البيانات بقى بيانات بس.
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git fetch origin main || true
-          git reset --hard origin/main || true
-
-          PHASE="${{ matrix.step_phase }}"
-          echo "=========================================="
-          echo "Running Phase: $PHASE on Fresh Server IP"
-          echo "=========================================="
-
-          if [[ "$PHASE" == *"_dubizzle" ]]; then
-            python scraper.py | tee dubizzle_run.log || true
-            python -c '
-          import json, os
-          if os.path.exists("ads.json") and os.path.exists("dubizzle_run.log"):
-              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
-              with open("dubizzle_run.log", "r", encoding="utf-8", errors="ignore") as f: log_txt = f.read()[-15000:]
-              if d.get("ads"): d["ads"][0]["_dub_log"] = log_txt
-              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
-          ' || true
-          else
-            python -c '
-          import json, os
-          if os.path.exists("ads.json"):
-              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
-              for a in d.get("ads", []):
-                  if "_dub_log" in a:
-                      with open("dubizzle_run.log", "w", encoding="utf-8") as lf: lf.write(a.pop("_dub_log"))
-                      break
-              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
-          ' || true
-            python extra_radar.py || true
-          fi
-
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ads.json
-          if ! git diff --staged --quiet; then
-            git commit -m "Auto-update ads.json ($PHASE)"
-            git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+          if git diff --staged --quiet; then
+            echo "لا تغييرات في ads.json"
+            exit 0
           fi
-
-          if [[ "$PHASE" == *"_extra" ]] && [[ "$PHASE" != "4_extra" ]]; then
-            echo "Phase $PHASE complete. Sleeping 5 minutes before next cycle..."
-            sleep 300
-          fi
+          git commit -m "Auto-update ads.json (run ${{ github.run_number }})"
+          # ✅ سحب آخر تغييرات قبل الـ push — الـ frontend بيكتب bans/contacts في نفس الملف
+          git pull --rebase origin main
+          git push origin HEAD:main
