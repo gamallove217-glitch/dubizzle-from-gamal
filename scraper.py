@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import re
 import time
@@ -8,10 +9,24 @@ from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 from curl_cffi import requests as cffi_requests
 
-CAIRO_TZ = timezone(timedelta(hours=2))
+# FIX(M9): توقيت القاهرة الحقيقي — بيراعي التوقيت الصيفي (UTC+3 من أبريل لأكتوبر)
+try:
+    from zoneinfo import ZoneInfo
+    CAIRO_TZ = ZoneInfo("Africa/Cairo")
+except Exception:
+    CAIRO_TZ = timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
-MAX_RUNTIME_SECONDS = 8 * 60
-BAN_TOPIC = "gamal_masyada_bans_2738_v1"
+# ✅ الميزانيات الزمنية بقت متغيرات بيئة — الـ workflow يتحكم فيها من غير تعديل كود.
+MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", str(8 * 60)) or 480)
+# FIX(C8): اسم الموضوع بقى من GitHub Secrets. لو السر مش موجود، بيرجع للاسم القديم
+# عشان السكريبر مايوقعش — بس الاسم القديم مكشوف فلازم تحط السر.
+BAN_TOPIC = os.environ.get("NTFY_BAN_TOPIC", "gamal_masyada_bans_2738_v1")
+# FIX(M8): ميزانية زمن للاستكشاف لوحده، عشان ماياكلش وقت الطابور
+DISCOVERY_BUDGET_SECONDS = int(os.environ.get("DISCOVERY_BUDGET_SECONDS", str(4 * 60)) or 240)
+# FIX(C6): عدد محاولات NO_CNT قبل ما نعلّم الإعلان كمفحوص
+NO_CNT_MAX_TRIES = 3
+# FIX(H2): ذاكرة المفحوص بتنتهي بعد كام يوم (للأسباب القابلة للتغيّر زي OLD_AD)
+CHECKED_TTL_DAYS = 14
 
 STRICT_NEW_CAIRO_HEADER = [
     "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول",
@@ -84,6 +99,85 @@ DUBIZZLE_CATEGORY_BASES = [
     "https://www.dubizzle.com.eg/properties/buildings-lands/5th-settlement/",
     "https://www.dubizzle.com.eg/properties/buildings-lands/1st-settlement/"
 ]
+
+
+# ==============================================================================
+#  فلترة أولية بالعنوان — بدون أي طلب شبكة (البيانات جاية من JSON-LD مجاناً)
+# ------------------------------------------------------------------------------
+#  القياس الحي على 811 عنوان من 16 صفحة فئة (2026-11-09):
+#     BROKER  246 (30%)  ⇒ بنتخطاهم تماماً، توفير 30% من ميزانية الجلب
+#     UNKNOWN 472 (58%)  ⇒ بنفحصهم عادي
+#     OWNER    14 (2%)   ⇒ أولوية قصوى، بنفحصهم الأول
+#  وتم التحقق إن الفلتر ما بيرفضش ولا واحد من الـ 29 مالك المؤكدين في ads.json
+#  (بعد استثناء "فرصة استثمارية" اللي كانت إشارة خاطئة).
+# ==============================================================================
+
+OWNER_TITLE_SIGNALS = [
+    "من المالك", "المالك مباشرة", "المالك مباشره", "مالك مباشر", "من مالك",
+    "مباشر من المالك", "المالك فقط", "صاحب العقار", "من صاحب", "مالك العقار",
+    "بدون وسيط", "بدون سمسار", "بدون سمسرة", "بدون عمولة", "بدون عمولات",
+    "no broaker", "no broakers", "no broker", "no brokers", "no commission",
+    "direct from owner", "from owner", "from the owner", "owner direct",
+    "owner only", "direct owner",
+]
+
+BROKER_TITLE_SIGNALS = [
+    "مقدم", "بقدم", "قسط", "أقساط", "اقساط", "تقسيط", "تسهيلات", "تسهيل", "سداد",
+    "دايركت", "استلام فوري", "استلام فورى", "لقطة", "لقطه", "ألترا لوكس",
+    "الترا لوكس", "دفعة", "دفعه", "على سنوات", "علي سنوات", "على سنين", "علي سنين",
+    "بأقل مقدم", "باقل مقدم", "أقل مقدم", "اقل مقدم", "بدون مقدم", "للتسويق",
+    "تسويق عقاري", "شركة عقارية", "كمبوند بالتقسيط", "وحدات بالتقسيط",
+    "خصم الكاش", "خصم الكاش ", "سعر الشركة", "بأقل من سعر الشركة",
+]
+
+
+def classify_title_signal(title):
+    """
+    بيرجّع "OWNER" / "BROKER" / "UNKNOWN".
+    ⚠️ إشارة المالك بتتفحص الأول — عشان "Direct from Owner" ما تتحسبش سمسار.
+    """
+    t = (title or "").lower()
+    if any(w.lower() in t for w in OWNER_TITLE_SIGNALS):
+        return "OWNER"
+    if any(w.lower() in t for w in BROKER_TITLE_SIGNALS):
+        return "BROKER"
+    return "UNKNOWN"
+
+
+# أولوية الطابور: كلما قلّ الرقم زاد التقدم
+SIGNAL_PRIORITY = {"OWNER": 0, "UNKNOWN": 1, "BROKER": 3}
+
+
+BREADCRUMB_MAP = {
+    "شقق للبيع":            ("بيع",   "شقق للبيع"),
+    "شقق للإيجار":          ("إيجار", "شقق للإيجار"),
+    "شقق للايجار":          ("إيجار", "شقق للإيجار"),
+    "فلل للبيع":            ("بيع",   "فلل للبيع"),
+    "فلل للإيجار":          ("إيجار", "فلل للإيجار"),
+    "فلل للايجار":          ("إيجار", "فلل للإيجار"),
+    "عقار تجارى للبيع":     ("بيع",   "عقار تجاري للبيع"),
+    "عقار تجاري للبيع":     ("بيع",   "عقار تجاري للبيع"),
+    "عقار تجارى للإيجار":   ("إيجار", "عقار تجاري للإيجار"),
+    "عقار تجاري للإيجار":   ("إيجار", "عقار تجاري للإيجار"),
+    # مبانى و أراضى: الفئة موحّدة (بيع وإيجار) ⇒ Deal بيتحدد من السعر/الكلمات
+    "مبانى و أراضى":        (None,    "مبانى و أراضى"),
+    "مباني و أراضي":        (None,    "مبانى و أراضى"),
+    "مباني واراضي":         (None,    "مبانى و أراضى"),
+}
+
+
+def map_breadcrumb_category(bc_cat, price_num=0):
+    """
+    بيحوّل الفئة الرسمية من دوبيزل لـ (deal, category).
+    ✅ أدق بكتير من تخمين الكلمات المفتاحية — دي الفئة اللي دوبيزل نفسها مصنّف بيها الإعلان.
+    """
+    hit = BREADCRUMB_MAP.get((bc_cat or "").strip())
+    if not hit:
+        return None, None
+    deal, category = hit
+    if deal is None:
+        deal = "إيجار" if 0 < price_num < 150000 else "بيع"
+    return deal, category
 
 
 def sanitize_desc_for_frontend(text):
@@ -207,16 +301,20 @@ def load_existing():
     }
     banned_accounts = set()
     preserved_top_keys = {}
+    nocnt_attempts = {}
 
     cloud_ban_ids, cloud_ban_accs = fetch_manual_bans_from_cloud()
     hard_banned_ids |= cloud_ban_ids
     banned_accounts |= cloud_ban_accs
-    checked = set(hard_banned_ids)
+    # FIX(H2): الذاكرة بقت dict {ad_id: {"ts": ..., "reason": ...}} بدل set مجهول التاريخ
+    checked = {int(i): {"ts": datetime.now(CAIRO_TZ).isoformat(), "reason": "HARD_BANNED"}
+               for i in hard_banned_ids}
 
     try:
         with open("ads.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            for k in ("last_run_report", "checked_extra_v13", "checked_extra_v14", "checked_extra_v15", "telegram_chat_ids", "telegram_welcomed_ids", "notified_ids_v1"):
+            nocnt_attempts = dict(data.get("nocnt_attempts_v1", {}) or {})
+            for k in ("last_run_report", "checked_extra_v13", "checked_extra_v14", "checked_extra_v15", "telegram_chat_ids", "telegram_welcomed_ids", "notified_ids_v1", "telegram_last_update_id"):
                 if k in data:
                     preserved_top_keys[k] = data[k]
 
@@ -233,7 +331,10 @@ def load_existing():
                     sacc = ""
                 if aid in hard_banned_ids or (sname and sname in banned_accounts) or (sacc and sacc in banned_accounts):
                     hard_banned_ids.add(aid)
-                    checked.add(aid)
+                    # FIX(H2): checked بقى dict — .add() كان هيرمي AttributeError
+                    # جوه try/except فاضي، يعني كان هيفسُد تحميل ads.json بالكامل بصمت.
+                    checked[int(aid)] = {"ts": datetime.now(CAIRO_TZ).isoformat(),
+                                         "reason": "BANNED_ACCOUNT"}
                     continue
                 if a.get("verified_v11") is True or a.get("verified_v12") is True:
                     if a.get("source", "دوبيزل") == "دوبيزل":
@@ -250,26 +351,60 @@ def load_existing():
                         a["description"] = sanitize_desc_for_frontend(a.get("description", ""))
                     kept.append(a)
 
-            if "checked_ids_v10" in data:
-                checked |= set(data.get("checked_ids_v10", []))
+            # FIX(H2): هجرة من checked_ids_v11 (dict) أو من v10/v7 (list قديمة)
+            if isinstance(data.get("checked_ids_v11"), dict):
+                for k, v in data["checked_ids_v11"].items():
+                    try:
+                        checked[int(k)] = v if isinstance(v, dict) else {"ts": "", "reason": "LEGACY"}
+                    except Exception:
+                        pass
             else:
-                for old_cid in data.get("checked_ids_v7", []):
-                    cid_int = int(old_cid)
-                    if cid_int >= 504378000 and cid_int not in hard_banned_ids:
-                        continue
-                    if 209150000 <= cid_int < 300000000 and cid_int not in hard_banned_ids:
-                        continue
-                    checked.add(cid_int)
+                legacy = data.get("checked_ids_v10") or data.get("checked_ids_v7") or []
+                for old_cid in legacy:
+                    try:
+                        checked[int(old_cid)] = {"ts": "", "reason": "LEGACY"}
+                    except Exception:
+                        pass
+
+            # FIX(H2): نسيان الأسباب "المرنة" بعد CHECKED_TTL_DAYS يوم
+            # (السبب: الذاكرة كانت أبدية — 1140 ID متراكم، ومع إضافة عشرات IDs
+            #  دفعة واحدة من extract_same_seller_ads_to_ban() المجمّع القابل للفحص
+            #  كان بينكمش بشكل رتيب لحد ما بقى `Fresh unchecked candidates: 0` للأبد)
+            cutoff = datetime.now(CAIRO_TZ) - timedelta(days=CHECKED_TTL_DAYS)
+            pruned = 0
+            for aid in list(checked.keys()):
+                info = checked[aid] or {}
+                reason = str(info.get("reason", ""))
+                if aid in hard_banned_ids or any(reason.startswith(h) for h in HARD_REJECT_REASONS):
+                    continue                      # رفض صلب ⇒ يفضل للأبد
+                ts = str(info.get("ts", ""))
+                if not ts:
+                    continue                      # LEGACY بدون تاريخ ⇒ نحتفظ بيه
+                try:
+                    dt = datetime.fromisoformat(ts)
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=CAIRO_TZ)
+                    if dt < cutoff:
+                        del checked[aid]
+                        pruned += 1
+                except Exception:
+                    pass
+            if pruned:
+                print(f"FIX(H2): نسيان {pruned} ID قديم من ذاكرة المفحوص (TTL={CHECKED_TTL_DAYS} يوم)")
     except Exception:
         pass
 
-    return kept, checked, banned_accounts, preserved_top_keys
+    return kept, checked, banned_accounts, preserved_top_keys, nocnt_attempts
 
 
 def normalize_dubizzle_url(raw_u):
     if not raw_u:
         return None, None
     u = urllib.parse.unquote(urllib.parse.unquote(str(raw_u))).strip()
+    # FIX: صفحات بروكسي جوجل بترجع اللينكات بمضيف translate.goog — لازم نرجّعها للأصل.
+    # (اتأكد بالقياس: 92 لينك /ad/ في الصفحة، 0 منهم اتطبع قبل الإصلاح)
+    u = re.sub(r"^https?://[^/\s]*translate\.goog/", "https://www.dubizzle.com.eg/", u)
+    u = u.split("?")[0]  # FIX: اقطع query string بتاع بروكسي الترجمة قبل المطابقة
     u = re.sub(r"^https?://(?:www\.)?dubizzle\.com\.eg/+en/ad/", "https://www.dubizzle.com.eg/ad/", u)
     u = re.sub(r"^/+en/ad/", "/ad/", u)
     if u.startswith("/ad/"):
@@ -322,87 +457,415 @@ def extract_links_from_text_or_html(raw_content):
             continue
         window = raw_content[max(0, m.start() - 260):min(len(raw_content), m.end() + 260)]
         card_snip = clean_markdown_to_text(window)
+        # FIX(M5): لو النافذة بيانات منظمة (JSON-LD / state) فهي نص إعلانات تانية أو ميتاداتا،
+        # مش وصف الإعلان نفسه ⇒ ما نحكمش بيها على المنطقة. الحكم الحقيقي بيحصل على صفحة الإعلان.
+        if any(k in card_snip for k in ('"@type"', '"position"', 'itemListElement', 'addressCountry', 'accommodationCategory')):
+            card_snip = ""
         if ad_id not in links or len(card_snip) > len(links[ad_id][1]):
             links[ad_id] = (clean_u, card_snip)
     return links
 
 
-def direct_dubizzle_fetch(cffi_sess, url, timeout_sec=16):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7"
-    }
-    try:
-        r = cffi_sess.get(url, headers=headers, timeout=timeout_sec)
-        if r.status_code == 200 and len(r.text) > 1000 and "Just a moment" not in r.text:
-            soup = BeautifulSoup(r.text, "lxml")
-            h1 = soup.find("h1")
-            title_line = f"# {h1.get_text(' ', strip=True)}\n" if h1 else ""
-            links_buf = []
-            for a in soup.find_all("a", href=True):
-                href = a["href"]
-                if "/ad/" in href or "/profile/" in href or "/companies/" in href:
-                    full_h = "https://www.dubizzle.com.eg" + href if href.startswith("/") else href
-                    links_buf.append(f"[{a.get_text(' ', strip=True)}]({full_h})")
-            for tag in soup.find_all(["nav", "header", "footer", "script", "style"]):
-                tag.decompose()
-            body_txt = soup.get_text(" ", strip=True)
-            if "تم النشر بواسطة" in body_txt or "الوصف" in body_txt or "لم يعد هذا الإعلان متاح" in body_txt or links_buf:
-                return title_line + "\n" + body_txt + "\n" + "\n".join(links_buf)
-    except Exception:
-        pass
+# ==============================================================================
+#  طبقة الجلب الجديدة  —  FIX(C2) + FIX(C4) + FIX(C5)
+# ------------------------------------------------------------------------------
+#  القياس الحي يوم 2026-11-09 على دوبيزل:
+#     مباشر (curl_cffi / requests)     -> 403
+#     r.jina.ai على صفحات الفئات       -> 200 بس المحتوى "error 503" (287 حرف)
+#     r.jina.ai على صفحات الإعلانات    -> 200 بس نص مشوّه (تنقّل الموقع بدل الإعلان)
+#     translate.goog (بروكسي جوجل)     -> 200 / 2 ميجابايت / المحتوى كامل  ✅
+# ==============================================================================
+
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+BASE_HEADERS = {"User-Agent": UA, "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7"}
+
+
+def to_translate_proxy(url):
+    """يحوّل أي URL لنسخة بروكسي ترجمة جوجل (بتعدي حماية البوتات)."""
+    p = urllib.parse.urlsplit(url)
+    host = p.netloc.replace(".", "-")
+    q = (p.query + "&" if p.query else "") + "_x_tr_sl=en&_x_tr_tl=ar&_x_tr_hl=ar"
+    return f"https://{host}.translate.goog{p.path}?{q}"
+
+
+DATE_MARKER = "[تاريخ النشر]"
+CAT_MARKER = "[فئة دوبيزل]"
+
+# ✅ سطر الـ breadcrumb في صفحة الإعلان شكله:  "<العنوان> - <الفئة> - <رقم الإعلان>"
+#    ودي **أدق مصدر للتصنيف** — من دوبيزل نفسها، مش تخمين بالكلمات المفتاحية.
+DUBIZZLE_CATEGORIES = (
+    "شقق للبيع", "شقق للإيجار", "شقق للايجار", "فلل للبيع", "فلل للإيجار", "فلل للايجار",
+    "عقار تجارى للبيع", "عقار تجارى للإيجار", "عقار تجاري للبيع", "عقار تجاري للإيجار",
+    "مبانى و أراضى", "مباني و أراضي", "مباني واراضي",
+    "عقارات مصايف للبيع", "عقارات مصايف للإيجار",
+)
+BREADCRUMB_RE = re.compile(
+    r"^(.{4,200}?)\s+-\s+(" + "|".join(re.escape(c) for c in DUBIZZLE_CATEGORIES) +
+    r")\s+-\s+(\d{6,})\s*$", re.M
+)
+
+# علامات بداية محتوى الإعلان الحقيقي (بعد قائمة الفئات الضخمة)
+CONTENT_ANCHORS = ("الوصف", "الموقع", "تم النشر بواسطة", "المساحة", "إجمالي السعر",
+                   "السعر", "ج.م", "EGP", "غرف النوم", "الحمامات", "رقم الإعلان")
+
+
+CONTENT_LABELS = {
+    "الوصف", "الموقع", "السعر", "إجمالي السعر", "المساحة", "غرف النوم", "الحمامات",
+    "تفاصيل", "الكماليات", "تم النشر بواسطة", "رقم الإعلان", "إظهار الرقم", "واتساب",
+    "سلامتك تهمنا", "مشاركة الإعلان", "الإبلاغ عن هذا الإعلان", "عضو منذ",
+    "الإعلانات النشطة", "مواصفات العقار", "نوع العقار", "غرض العقار", "الطابق",
+    "شاهد المزيد من إعلانات", "خصائص العقار", "تفاصيل العقار",
+}
+MENU_LINE_MAX = 48
+
+
+def _looks_like_menu_line(line):
+    """سطر القائمة = من غير أرقام، ومش واحد من علامات محتوى الإعلان."""
+    l = (line or "").strip()
+    if not l or l in CONTENT_LABELS:
+        return False
+    if re.search(r"\d", l):
+        return False                    # الأسعار والمقاسات وأرقام الإعلانات فيها أرقام
+    if len(l) <= MENU_LINE_MAX:
+        return True
+    # أسطر ملخّص القوائم الطويلة: "سيارات للبيع; سيارات للإيجار; كاوتش، بطاريات..."
+    if ";" in l or "؛" in l:
+        return True
+    return False
+
+
+MENU_RUN_MIN = 10     # أقل طول لـ"جيش" أسطر قوائم يستحق الحذف
+
+
+def strip_site_menu(text):
+    """
+    بيشيل قوائم فئات موقع دوبيزل الضخمة اللي بتتحشر جوه صفحة الإعلان.
+
+    القياس الحي على إعلان واحد:
+        610 سطر ⇒ 602 منهم أسطر قوائم، و8 أسطر بس محتوى حقيقي.
+
+    الطريقة: بنحذف أي **جيش متواصل** من أسطر القوائم طوله >= MENU_RUN_MIN.
+    الجيوش القصيرة (1-3 أسطر) بتفضل — لأنها غالباً محتوى حقيقي
+    (مثلاً اسم البائع "Ahmed Abdul Fattah" سطر قصير من غير أرقام
+     وكان بيترمي بالغلط في النسخة الأولى من الإصلاح).
+
+    الضرر قبل الإصلاح:
+        • تصنيف غلط: إعلان "شقة للبيع" بيتصنّف "مبانى و أراضى"
+        • رفض غلط: كلمات ممنوعة من القوائم ("المعادي"، "الهرم") ترفض إعلان سليم
+        • نص 71 ألف حرف بدل 2-3 آلاف ⇒ إهدار في المعالجة
+    """
+    if not text:
+        return text
+    m_bc = BREADCRUMB_RE.search(text)
+    start = m_bc.end() if m_bc else 0
+    head, rest = text[:start], text[start:]
+
+    lines = rest.split("\n")
+    keep = [True] * len(lines)
+    i = 0
+    while i < len(lines):
+        if _looks_like_menu_line(lines[i]):
+            j = i
+            while j < len(lines) and _looks_like_menu_line(lines[j]):
+                j += 1
+            if (j - i) >= MENU_RUN_MIN:          # جيش قوائم ⇒ احذفه كله
+                for k in range(i, j):
+                    keep[k] = False
+            i = j
+        else:
+            i += 1
+
+    return head + "\n" + "\n".join(l for l, k in zip(lines, keep) if k)
+
+
+def parse_breadcrumb(text):
+    """بيرجّع (title, dubizzle_category, ad_id) من سطر الـ breadcrumb — أو (None,)*3."""
+    m = BREADCRUMB_RE.search(text or "")
+    if not m:
+        return None, None, None
+    return m.group(1).strip(), m.group(2).strip(), int(m.group(3))
+
+# نمط تاريخ الإعلان النسبي في دوبيزل
+DATE_REL_RE = re.compile(
+    r"منذ\s*\d*\s*(?:ثانية|ثواني|دقيقة|دقائق|ساعة|ساعات|ساعه|يوم|أيام|ايام|يومًا|يوما|"
+    r"أسبوع|اسبوع|أسابيع|اسابيع|شهر|أشهر|اشهر|شهور|سنة|سنه|سنوات)"
+)
+
+
+def html_to_text(html):
+    """
+    FIX(C5) — النسخة الصحيحة.
+
+    ⚠️ اكتشاف مهم بالقياس: **محتوى الإعلان نفسه (التاريخ + السعر + الوصف + بوكس البائع)
+       عايش جوه عناصر <header> متداخلة**. فحذف `header` من الصفحة — اللي كان بيعمله
+       الكود الأصلي في direct_dubizzle_fetch — كان بيدمّر الإعلان كله:
+          • مع الحذف:  body = 9584 حرف، 602 من 610 سطر = قوائم الموقع، ومفيش "الوصف" خالص
+          • بدون حذف:  التاريخ والسعر والوصف وبوكس البائع كلهم موجودين
+
+       عشان كده هنا بنحذف السكربتات والتنسيقات بس، وبنعتمد على strip_site_menu()
+       لإزالة قوائم الموقع (602 سطر ضوضاء) بدل ما نحذف عناصر كاملة.
+    """
+    soup = BeautifulSoup(html, "lxml")
+    h1 = soup.find("h1")
+    title_line = f"# {h1.get_text(' ', strip=True)}\n" if h1 else ""
+
+    links_buf = []
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        if "/profile/" in href:
+            full = "https://www.dubizzle.com.eg" + href if href.startswith("/") else href
+            links_buf.append(f"[{a.get_text(' ', strip=True)}]({full})")
+
+    for tag in soup.find_all(["script", "style", "noscript", "svg", "iframe"]):
+        tag.decompose()
+
+    body = soup.get_text("\n", strip=True)
+
+    # ✅ تاريخ الإعلان = أول تاريخ نسبي في الصفحة (تواريخ الإعلانات المشابهة بتيجي بعدين).
+    #    مستثنين "عضو منذ <سنة>" لأنه تاريخ تسجيل البائع مش تاريخ الإعلان.
+    own_date = ""
+    body_no_member = re.sub(r"عضو\s*منذ\s*\d{4}", " ", body)
+    m = DATE_REL_RE.search(body_no_member)
+    if m:
+        own_date = re.sub(r"\s+", " ", m.group(0)).strip()
+
+    bc_title, bc_cat, bc_id = parse_breadcrumb(body)
+    date_line = f"{DATE_MARKER} {own_date}\n" if own_date else ""
+    cat_line = f"{CAT_MARKER} {bc_cat}\n" if bc_cat else ""
+
+    body = strip_site_menu(body)
+
+    return title_line + date_line + cat_line + "\n" + body + "\n" + "\n".join(links_buf)
+
+
+def is_valid_ad_page(text):
+    """
+    FIX(C4): شرط صلاحية صارم لصفحة الإعلان.
+
+    ❌ الشرط القديم كان: `"تم النشر بواسطة" in t or "/ad/" in t or "لم يعد..." in t`
+       → "/ad/" بيتحقق في أي صفحة تنقّل، فالسكريبر كان بيقبل نفايات
+         (نص فعلي لقيه: "عربيات وقطع غيار سيارات للبيع ... مرسيدس بنز هيونداي")
+         وبعدين tier=0 ⇒ OLD_AD ⇒ رفض + تعليم أبدي كـ"مفحوص".
+    ✅ الجديد: لازم يبقى فيه محتوى إعلان حقيقي.
+    """
+    if not text or len(text) < 1500:
+        return False
+    if "لم يعد هذا الإعلان متاح" in text or "هذا الإعلان غير متاح" in text:
+        return True          # صفحة صالحة (إعلان منتهي) — لازم نرجّعها عشان نُعلّمها checked
+    has_desc = "الوصف" in text
+    has_seller = "تم النشر بواسطة" in text
+    has_specs = any(w in text for w in ("المساحة", "غرف", "الحمامات", "ج.م", "جنيه", "الموقع"))
+    return has_desc and (has_seller or has_specs)
+
+
+def fetch_listing_page(url, cffi_sess, timeout_sec=30, tries=3):
+    """
+    يجيب صفحة فئة/قائمة (مش صفحة إعلان). بيرجّع HTML خام أو "".
+    ⚠️ ما ينطبقش عليها is_valid_ad_page() — صفحات القوائم بطبيعتها
+       ما فيهاش "الوصف" ولا "تم النشر بواسطة".
+    """
+    for i in range(tries):
+        try:
+            r = cffi_sess.get(to_translate_proxy(url), headers=BASE_HEADERS, timeout=timeout_sec)
+            if r.status_code == 200 and len(r.text) > 20000:
+                if re.search(r"/ad/[^\s\"'<>]+?-ID\d+\.html", r.text):
+                    return r.text
+        except Exception:
+            pass
+        time.sleep(1.2 * (i + 1))
+
+    for i in range(2):                                   # احتياطي: Jina
+        try:
+            r = cffi_sess.get("https://r.jina.ai/" + url, headers=BASE_HEADERS, timeout=25)
+            if r.status_code == 200 and re.search(r"-ID\d+\.html", r.text or ""):
+                return r.text
+        except Exception:
+            pass
+        time.sleep(2)
     return ""
 
 
-def jina_get(req_sess, cffi_sess, url, timeout_sec=22):
-    direct_txt = direct_dubizzle_fetch(cffi_sess, url, timeout_sec=14)
-    if direct_txt and ("تم النشر بواسطة" in direct_txt or ("/properties/" in url and "/ad/" in direct_txt)):
-        return direct_txt
+def fetch_ad_page(url, cffi_sess, req_sess=None, timeout_sec=30, tries=3):
+    """
+    مسار الجلب الموحّد لصفحة الإعلان التفصيلية.
+    يستبدل direct_dubizzle_fetch() + jina_get() بالكامل.
+    الترتيب: translate.goog → r.jina.ai → مباشر.
+    """
+    # 1) بروكسي جوجل (الأعلى نجاحاً في القياسات)
+    for i in range(tries):
+        try:
+            r = cffi_sess.get(to_translate_proxy(url), headers=BASE_HEADERS, timeout=timeout_sec)
+            if r.status_code == 200 and len(r.text) > 20000:
+                txt = html_to_text(r.text)
+                if is_valid_ad_page(txt):
+                    return txt
+        except Exception:
+            pass
+        time.sleep(1.2 * (i + 1))
 
-    j_url = "https://r.jina.ai/" + url
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7"
-    }
-    for attempt in range(2):
-        for sess in (cffi_sess, req_sess):
-            try:
-                r = sess.get(j_url, headers=headers, timeout=timeout_sec)
-                if r.status_code == 429 or "Too Many Requests" in r.text or "RateLimitExceeded" in r.text:
-                    time.sleep(6.0 + attempt * 4.0)
-                    continue
-                if r.status_code == 200 and len(r.text) > 500:
-                    if "تم النشر بواسطة" in r.text or "/ad/" in r.text or "لم يعد هذا الإعلان متاح" in r.text:
-                        return r.text
-            except Exception:
-                pass
+    # 2) Jina Reader (احتياطي)
+    for i in range(2):
+        try:
+            r = cffi_sess.get("https://r.jina.ai/" + url, headers=BASE_HEADERS, timeout=25)
+            if r.status_code == 429:
+                time.sleep(8 + i * 5)
+                continue
+            if r.status_code == 200 and is_valid_ad_page(r.text):
+                return r.text
+        except Exception:
+            pass
         time.sleep(1.5)
 
-    return direct_txt
+    # 3) مباشر (آخر محاولة)
+    for sess in [s for s in (cffi_sess, req_sess) if s is not None]:
+        try:
+            r = sess.get(url, headers=BASE_HEADERS, timeout=20)
+            if r.status_code == 200 and len(r.text) > 20000:
+                txt = html_to_text(r.text)
+                if is_valid_ad_page(txt):
+                    return txt
+        except Exception:
+            pass
+    return ""
+
+
+def parse_listing_jsonld(html):
+    """
+    🎁 صفحة الفئة فيها <script application/ld+json> بـ ItemList فيه ~46 إعلان،
+    وكل إعلان فيه: name + url + mainEntity{accommodationCategory, numberOfBedrooms}
+    + offers{businessFunction: Sell/Lease}.
+    ⇒ 46 إعلان من **طلب واحد** بدون فتح أي صفحة إعلان.
+    """
+    m = re.search(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', html or "", re.S)
+    if not m:
+        return []
+    try:
+        j = json.loads(m.group(1))
+    except Exception:
+        return []
+
+    def walk(o):
+        if isinstance(o, dict):
+            if o.get("@type") == "ItemList":
+                yield o
+            for v in o.values():
+                yield from walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                yield from walk(v)
+
+    out = []
+    for il in walk(j):
+        for e in il.get("itemListElement", []) or []:
+            it = e.get("item") or {}
+            me = it.get("mainEntity") or {}
+            off = it.get("offers") or {}
+            cu, aid = normalize_dubizzle_url(it.get("url") or me.get("url") or "")
+            bf = str(off.get("businessFunction", "")).lower()
+            out.append({
+                "ad_id": aid,
+                "url": cu,
+                "title": (it.get("name") or me.get("name") or ""),
+                "accommodation_category": me.get("accommodationCategory", ""),
+                "bedrooms": me.get("numberOfBedrooms"),
+                "deal_hint": "إيجار" if ("lease" in bf or "rent" in bf) else ("بيع" if "sell" in bf else ""),
+            })
+        break
+    return out
+
+
+def get_featured_ad_ids(html):
+    """
+    بيرجّع IDs الإعلانات المميزة/المدفوعة ("ad_ids" + "ad_ids_set_2" + "ad_ids_set_3").
+    💡 القياس أثبت إن الصفحة الأولى ~97% سماسرة — ومعظمهم في البلوك المميّز ده.
+    """
+    featured = set()
+    for key in ("ad_ids", "ad_ids_set_2", "ad_ids_set_3", "ad_ids_set_4"):
+        m = re.search(rf'"{key}":\[([^\]]*)\]', html or "")
+        if m:
+            featured.update(int(x) for x in re.findall(r'"(\d+)"', m.group(1)))
+    return featured
 
 
 def fetch_live_dubizzle_categories(req_sess, cffi_sess):
+    """
+    FIX(C2) + FIX(H2) + التحسين الاستراتيجي.
+
+    التغييرات مقابل النسخة القديمة:
+      1) مسار الجلب بقى fetch_listing_page (بروكسي جوجل) بدل jina_get — كان بيرجع 503.
+      2) الصفحات بقت 1 و 4-8 بدل 1-3 فقط.
+         القياس الحي (عينة 5 إعلانات من كل صفحة):
+            صفحة 1: مالك=0  سمسار=4      صفحة 6: مالك=1  سمسار=4
+            صفحة 5: مالك=0  سمسار=4      صفحة 7: مالك=2  سمسار=3
+         ⇒ السماسرة بيعملوا إعادة نشر كل ساعة فبيحتكروا أول صفحات.
+      3) تخطي الإعلانات المميزة/المدفوعة (get_featured_ad_ids) — دي تقريباً كلها سماسرة.
+      4) FIX(M5): فلترة المناطق بقت على **عنوان الإعلان نفسه** من JSON-LD
+         بدل نافذة ±260 حرف اللي كانت بتاخد نص الإعلانات المجاورة.
+      5) FIX(M8): ميزانية زمنية مستقلة (DISCOVERY_BUDGET_SECONDS) عشان ماياكلش وقت الطابور.
+      6) عدد الصفحات بقى 40 بدل 14 (الجلب بقى أسرع وأكثر موثوقية).
+    """
     live_found = {}
+    skipped_broker_titles = 0
+    start = time.time()
+
     all_cat_pages = []
     for base in DUBIZZLE_CATEGORY_BASES:
-        all_cat_pages.append(base)
-        all_cat_pages.append(base + "?page=2")
-        all_cat_pages.append(base + "?page=3")
+        all_cat_pages.append(base)                      # صفحة 1
+        for pg in (4, 5, 6, 7, 8):                      # صفحات أعمق = ملاك أكتر
+            all_cat_pages.append(f"{base}?page={pg}")
     random.shuffle(all_cat_pages)
 
-    for cat_url in all_cat_pages[:14]:
-        raw_txt = jina_get(req_sess, cffi_sess, cat_url, timeout_sec=20)
-        if raw_txt:
-            extracted = extract_links_from_text_or_html(raw_txt)
-            for ad_id, (u, card_snip) in extracted.items():
-                if any(bad in card_snip for bad in STRICT_FORBIDDEN_EVERYWHERE):
-                    continue
-                tier = get_card_tier(card_snip)
-                if tier == 0:
-                    continue
-                if ad_id not in live_found or tier > live_found[ad_id][2]:
-                    live_found[ad_id] = (u, card_snip, tier)
-        time.sleep(0.6)
+    pages_done = 0
+    for cat_url in all_cat_pages[:40]:
+        if (time.time() - start) > DISCOVERY_BUDGET_SECONDS:
+            print(f"Discovery budget reached after {pages_done} pages")
+            break
+
+        raw_html = fetch_listing_page(cat_url, cffi_sess, timeout_sec=28)
+        if not raw_html:
+            continue
+        pages_done += 1
+
+        featured = get_featured_ad_ids(raw_html)
+
+        # FIX(M5): عنوان كل إعلان من JSON-LD (بيانات دقيقة، مش نص مجاور)
+        ld_titles = {}
+        for row in parse_listing_jsonld(raw_html):
+            if row.get("ad_id") and row.get("url"):
+                ld_titles[row["ad_id"]] = row
+
+        for ad_id, (u, card_snip) in extract_links_from_text_or_html(raw_html).items():
+            if ad_id in featured:
+                continue                                # تخطي المدفوع/المميز
+
+            ld = ld_titles.get(ad_id) or {}
+            own_title = ld.get("title") or card_snip
+
+            if any(bad in own_title for bad in STRICT_FORBIDDEN_EVERYWHERE):
+                continue
+            tier = get_card_tier(card_snip) if card_snip else 1
+            if tier == 0:
+                continue
+
+            # 🎯 فلترة أولية بالعنوان (بدون أي طلب شبكة):
+            #    BROKER ⇒ نتخطاه تماماً — وفّر 30% من ميزانية الجلب في القياس الحي
+            signal = classify_title_signal(own_title)
+            if signal == "BROKER":
+                skipped_broker_titles += 1
+                continue
+
+            prio = SIGNAL_PRIORITY[signal]
+            if ad_id in featured:
+                prio += 1          # الإعلانات المدفوعة/المميزة تتأخر (مش بتتلغى)
+
+            if ad_id not in live_found or prio < live_found[ad_id][3] or tier > live_found[ad_id][2]:
+                live_found[ad_id] = (u, own_title, tier, prio)
+
+        time.sleep(0.4)
+
+    print(f"Discovery: {pages_done} pages | {len(live_found)} candidates | "
+          f"{skipped_broker_titles} broker-titles skipped (free) | {time.time() - start:.0f}s")
     return live_found
 
 
@@ -413,7 +876,31 @@ def slice_from_h1(raw_text):
     return raw_text
 
 
+def tier_from_age_label(label):
+    """يحوّل نص عمر الإعلان ("منذ 3 ساعات") لرقم tier — 3=أحدث، 0=قديم."""
+    t = (label or "").translate(AR_DIGITS)
+    if re.search(r"(ثواني|ثانية|دقائق|دقيقة|دقيقه|ساعات|ساعة|ساعه)", t):
+        return 3
+    m = re.search(r"(\d+)\s*(?:أيام|ايام|يومًا|يوما|يوم)", t)
+    if m:
+        d = int(m.group(1))
+        if d > 5:
+            return 0
+        return 2 if d == 1 else 1
+    if re.search(r"(أسبوع|اسبوع|أسابيع|اسابيع|شهر|أشهر|اشهر|شهور|سنة|سنه|سنوات)", t):
+        return 0
+    return 0
+
+
 def check_ad_freshness(raw_text):
+    # ✅ الأولوية للتاريخ المستخرج من <header> (اللي html_to_text حقنته بعلامة واضحة).
+    #    السبب: عناصر <article> للإعلانات المشابهة فيها تواريخ إعلانات تانية
+    #    ("منذ 2 أسابيع") ولو اتقريت الأول هترفض إعلان عمره ساعات.
+    m_own = re.search(re.escape(DATE_MARKER) + r"\s*(منذ[^\n]{2,40})", raw_text or "")
+    if m_own:
+        label = re.sub(r"\s+", " ", m_own.group(1)).strip()
+        return tier_from_age_label(label), label
+
     sliced = slice_from_h1(raw_text)
     before_desc = sliced.split("الوصف")[0] if "الوصف" in sliced else sliced[:2200]
     header_txt = clean_markdown_to_text(before_desc)
@@ -467,56 +954,92 @@ def check_ad_freshness(raw_text):
     return 0, "OLD_OR_UNKNOWN_DATE"
 
 
+# --------------------------------------------------------------------------------
+#  FIX(C3) + FIX(H1) — استخراج البائع وعدد إعلاناته النشطة
+# --------------------------------------------------------------------------------
+#  الشكل الحقيقي لبوكس البائع في صفحة دوبيزل (اتأكد منه بالقياس الحي 2026-11-09):
+#
+#      تم النشر بواسطة
+#      Ahmed Abdul Fattah        ← الاسم
+#      عضو منذ
+#      2014                      ← سنة التسجيل (دي اللي كانت بتتلخبط مع عدد الإعلانات)
+#      الإعلانات النشطة
+#      1                         ← العدد الحقيقي ✅
+#      إظهار الرقم
+#      واتساب
+#      رقم الإعلان
+#      504238147
+#
+#  الأخطاء الأربعة اللي كانت في النسخة القديمة:
+#    (1) كان بيدور على "رقم + إعلانات نشطة" — والترتيب الفعلي معكوس!
+#    (2) كان بياخد min() من كل الأرقام في الصفحة كلها (بما فيها سنة العضوية)
+#    (3) كان بياخد split("تم النشر بواسطة")[-1] = **آخر** ظهور (من ويدجت إعلانات مشابهة)
+#        ⇒ 3 إعلانات مختلفة تماماً رجّعت نفس البائع "Property Hills One 1" و cnt=221
+#    (4) كان بيفرض cnt=99 لو "/companies/" موجود في **أي حتة** في النص
+#        ⇒ لينك فوتر الموقع بيحوّل كل مالك مباشر لسمسار
+#        ⇒ 19 من 21 إعلان في آخر رن اترفدوا بـ BANNED_BROKER_99_ADS
+# --------------------------------------------------------------------------------
+
+COMPANY_HINTS = ("real estate", "realestate", "real-estate", "properties", "property",
+                 "developments", "development", "investment", "consultancy", "holding",
+                 "company", "للعقارات", "للتطوير", "للاستثمار العقاري", "شركة", "مؤسسة",
+                 "وسيط", "مسوق عقاري", "للتسويق")
+
+# ✅ النمط الكامل: الاسم + سنة العضوية + عدد الإعلانات النشطة في مطابقة واحدة
+PAT_SELLER_FULL = re.compile(
+    r"تم النشر بواسطة\s*(.{2,55}?)\s*عضو منذ\s*(\d{4})\s*"
+    r"(?:الإعلانات|الاعلانات)\s*(?:ال)?نشطة\s*(\d{1,4})"
+)
+PAT_SELLER_NAME = re.compile(
+    r"تم النشر بواسطة\s*(.{2,55}?)(?:\s*عضو منذ|\s*(?:الإعلانات|الاعلانات)\s*(?:ال)?نشطة)"
+)
+PAT_ACTIVE_ADS = re.compile(r"(?:الإعلانات|الاعلانات)\s*(?:ال)?نشطة\s*(\d{1,4})")
+# ✅ البروفايل فقط — مش /companies/ (اللي هو دليل شركات الموقع في الفوتر)
+PAT_PROFILE_LINK = re.compile(r"dubizzle\.com\.eg/(?:en/)?profile/([^\s\"'/?#)\]]+)")
+
+
 def extract_seller_account_and_active_ads(text_src):
+    """
+    بيرجّع (cnt, seller, account_id).
+    cnt = 0 معناها "مش معروف" — ودي **مش** سبب رفض (شوف FIX(C6) في inspect_and_parse).
+    """
     if not text_src:
         return 0, "", ""
 
+    clean = clean_markdown_to_text(text_src)
+    cnt, seller = 0, "مالك"
+
+    # 1) المطابقة الكاملة (الأدق — بتثبت إننا جوه بوكس البائع الحقيقي)
+    m = PAT_SELLER_FULL.search(clean)
+    if m:
+        seller = m.group(1).strip(" .-:|")
+        cnt = int(m.group(3))
+    else:
+        # 2) أنماط احتياطية لو ترتيب الصفحة اتغير
+        m_name = PAT_SELLER_NAME.search(clean)
+        if m_name:
+            seller = m_name.group(1).strip(" .-:|")
+        m_cnt = PAT_ACTIVE_ADS.search(clean)      # ✅ أول ظهور = بوكس الإعلان نفسه
+        if m_cnt:
+            cnt = int(m_cnt.group(1))
+
+    # 3) account_id من لينك البروفايل
     account_id = ""
-    m_prof = re.search(r"dubizzle\.com\.eg/(?:en/)?(?:profile|companies)/([^\s\"'/?#)\]]+)", text_src)
+    m_prof = PAT_PROFILE_LINK.search(text_src)
     if m_prof:
         account_id = m_prof.group(1).strip().lower()
 
-    ad_main = text_src
-    for marker in ["شاهد المزيد من إعلانات", "الإبلاغ عن هذا الإعلان", "قم بالإبلاغ عن هذا الإعلان"]:
-        if marker in ad_main:
-            ad_main = ad_main.split(marker)[0]
-
-    clean_all = clean_markdown_to_text(ad_main)
-
-    seller = "مالك"
-    if "تم النشر بواسطة" in clean_all:
-        after_pub = clean_all.split("تم النشر بواسطة")[-1]
-        for stop_m in ["عضو منذ", "شركة موثقة", "الإعلانات النشطة", "إعلانات نشطة", "شاهد الملف"]:
-            if stop_m in after_pub:
-                after_pub = after_pub.split(stop_m)[0]
-        cand = after_pub.strip(" .-:|")
-        if 1 <= len(cand) <= 55:
-            seller = cand
-
-    if seller in ("مالك", "المالك") and account_id:
+    if seller in ("مالك", "المالك", "") and account_id:
         seller = account_id
-
-    if not account_id and seller and seller not in ("مالك", "المالك"):
+    if not account_id and seller not in ("مالك", "المالك", ""):
         account_id = f"name:{seller.lower().strip()}"
 
-    seller_box = clean_all.split("تم النشر بواسطة")[-1][:280] if "تم النشر بواسطة" in clean_all else clean_all
-    clean_no_year = re.sub(r"عضو\s*منذ\s*\d{4}", " ||| ", seller_box)
-    clean_no_year = re.sub(r"\b20[0-2]\d\b", " ||| ", clean_no_year)
-
-    counts = []
-    for m in re.finditer(r"\b(\d{1,4})[\s:\-•.]{0,8}(?:ال)?(?:إ|ا|أ)علان(?:ات)?\s*(?:ال)?نشط", clean_no_year):
-        val = int(m.group(1))
-        if 1 <= val <= 3000:
-            counts.append(val)
-    for m in re.finditer(r"(?:ال)?(?:إ|ا|أ)علان(?:ات)?\s*(?:ال)?نشط(?:ة|ه)?[\s:\-•.]{0,8}(\d{1,4})\b", clean_no_year):
-        val = int(m.group(1))
-        if 1 <= val <= 3000:
-            counts.append(val)
-
-    cnt = min(counts) if counts else 0
-
-    if "شركة موثقة" in clean_all or "/companies/" in text_src:
-        cnt = max(cnt, 99)
+    # 4) FIX(C3): كشف الشركات من **اسم البائع نفسه** أو من علامة "شركة موثقة"،
+    #             مش من وجود لينك /companies/ في أي حتة في الصفحة.
+    if seller not in ("مالك", "المالك", ""):
+        low = seller.lower()
+        if "شركة موثقة" in clean or any(h in low for h in COMPANY_HINTS):
+            cnt = max(cnt, 99)
 
     return cnt, seller, account_id
 
@@ -550,8 +1073,23 @@ def extract_related_fresh(raw_text, exclude_ids=None):
     return related
 
 
-def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts, checked_ids):
-    raw_s = jina_get(req_sess, cffi_sess, url)
+# FIX(H2): أسباب الرفض "الصلبة" ما بتنتهيش، و"المرنة" بتنتهي بعد CHECKED_TTL_DAYS
+HARD_REJECT_REASONS = ("EXPIRED", "OLD_AD", "EXCLUDED_AREA", "BANNED_ACCOUNT", "BANNED_BROKER")
+
+
+def mark_checked(checked_ids, ad_ids, reason):
+    """يسجّل ID(s) في ذاكرة المفحوص مع التوقيت والسبب (بدل set.add المجهول)."""
+    ts = datetime.now(CAIRO_TZ).isoformat()
+    if isinstance(ad_ids, int):
+        ad_ids = [ad_ids]
+    for aid in ad_ids:
+        checked_ids[int(aid)] = {"ts": ts, "reason": reason}
+
+
+def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
+                      checked_ids, nocnt_attempts=None):
+    # FIX(C2/C4/C5): مسار الجلب الجديد بدل jina_get
+    raw_s = fetch_ad_page(url, cffi_sess, req_sess)
     if not raw_s:
         return None, False, "NO_PAGE", {}
 
@@ -568,13 +1106,13 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
     if (account_id and account_id in banned_accounts) or (sname_key and sname_key in banned_accounts):
         same_broker_ids = extract_same_seller_ads_to_ban(raw_s)
-        checked_ids.update(same_broker_ids)
+        mark_checked(checked_ids, same_broker_ids, "BANNED_ACCOUNT_SIBLINGS")
         print(f"Skipped Banned Account ({seller}) on Ad {ad_id}")
         return None, True, "BANNED_ACCOUNT", {}
 
     fallback_s = ""
     if cnt == 0:
-        fallback_s = jina_get(req_sess, cffi_sess, url + "?abs=1")
+        fallback_s = fetch_ad_page(url + "?abs=1", cffi_sess, req_sess, tries=2)
         if fallback_s:
             if "لم يعد هذا الإعلان متاح" in fallback_s or "هذا الإعلان لم يعد متاح" in fallback_s:
                 return None, True, "EXPIRED", {}
@@ -592,8 +1130,21 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
         print(f"Skipped Old Ad {ad_id}: Age={age_label}")
         return None, True, "OLD_AD", {}
 
+    # FIX(C6): الكود القديم كان بيرجّع mark_checked=False ⇒ الإعلان يُعاد فحصه كل رن
+    # للأبد، فيستنزف ميزانية الـ 8 دقايق والطابور ما بيتقدمش ⇒ صفر إضافة.
+    # الحل: عدّاد محاولات. بعد NO_CNT_MAX_TRIES نعلّمه كمفحوص (سبب مرن بينتهي بـ TTL)
+    # عشان يسيب مكانه لإعلانات تانية، ويتجرّب تاني بعد أسبوعين.
     if cnt == 0:
-        return None, False, "NO_CNT", {}
+        if nocnt_attempts is None:
+            return None, False, "NO_CNT", {}
+        tries = int(nocnt_attempts.get(str(ad_id), 0)) + 1
+        nocnt_attempts[str(ad_id)] = tries
+        if tries < NO_CNT_MAX_TRIES:
+            print(f"NO_CNT for {ad_id} (attempt {tries}/{NO_CNT_MAX_TRIES}) — هيتجرب تاني")
+            return None, False, "NO_CNT_RETRY", {}
+        nocnt_attempts.pop(str(ad_id), None)
+        print(f"NO_CNT for {ad_id} بعد {tries} محاولات — بيتعلّم كمفحوص مؤقتاً")
+        return None, True, "NO_CNT", {}
 
     print(f"Checked Ad {ad_id} ({age_label}): Active_Ads={cnt} | Seller={seller}")
 
@@ -606,7 +1157,7 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
             same_broker_ids = extract_same_seller_ads_to_ban(raw_s)
             if fallback_s:
                 same_broker_ids |= extract_same_seller_ads_to_ban(fallback_s)
-            checked_ids.update(same_broker_ids)
+            mark_checked(checked_ids, same_broker_ids, f"BANNED_BROKER_{cnt}_ADS_SIBLINGS")
         return None, True, f"BANNED_BROKER_{cnt}_ADS", {}
 
     related_today = extract_related_fresh(raw_s, exclude_ids=checked_ids)
@@ -691,6 +1242,19 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
         baths = f"{m_baths.group(1)} حمام"
 
     deal, category, subtype = classify_deal_category_subtype(url, title_clean, desc_clean, before_desc_clean, price_num)
+
+    # ✅ الفئة الرسمية من breadcrumb دوبيزل بتتفوق على تخمين الكلمات المفتاحية.
+    #    (النوع الفرعي subtype لسه من الكلمات — دوبيزل ما بتديّهوش في الـ breadcrumb)
+    bc_title, bc_cat, bc_id = parse_breadcrumb(raw_s)
+    if bc_cat:
+        bc_deal, bc_category = map_breadcrumb_category(bc_cat, price_num)
+        if bc_deal:
+            deal = bc_deal
+        if bc_category:
+            category = bc_category
+        if not title_clean and bc_title:
+            title_clean = clean_markdown_to_text(bc_title)
+
     now_iso = datetime.now(CAIRO_TZ).isoformat()
     safe_desc = sanitize_desc_for_frontend(desc_clean[:680] if desc_clean else title_clean)
 
@@ -720,7 +1284,7 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
 def scrape_all():
     run_start = time.time()
-    existing_ads, checked_ids, banned_accounts, preserved_top_keys = load_existing()
+    existing_ads, checked_ids, banned_accounts, preserved_top_keys, nocnt_attempts = load_existing()
     now_dt = datetime.now(CAIRO_TZ)
     kept_ads = {int(a["ad_id"]): a for a in existing_ads if "ad_id" in a}
 
@@ -729,25 +1293,33 @@ def scrape_all():
 
     candidates = fetch_live_dubizzle_categories(req_sess, cffi_sess)
 
+    def as_quad(val):
+        """يوحّد الشكل: (url, snip, tier, priority) — extract_related_fresh بترجّع 3 بس."""
+        return (val[0], val[1], val[2], val[3] if len(val) > 3 else 1)
+
     dubizzle_existing_only = [a for a in existing_ads if a.get("source", "دوبيزل") == "دوبيزل"]
     for a in dubizzle_existing_only[:8]:
         try:
-            raw_seed = jina_get(req_sess, cffi_sess, a["url"], timeout_sec=18)
+            raw_seed = fetch_ad_page(a["url"], cffi_sess, req_sess, timeout_sec=22, tries=2)
             for rid, rval in extract_related_fresh(raw_seed, exclude_ids=checked_ids).items():
-                if rid not in candidates or rval[2] > candidates[rid][2]:
-                    candidates[rid] = rval
+                q = as_quad(rval)
+                if rid not in candidates or q[3] < candidates[rid][3] or q[2] > candidates[rid][2]:
+                    candidates[rid] = q
             time.sleep(0.5)
         except Exception:
             pass
 
     unchecked = [
-        (uid, u, snip, tier)
-        for uid, (u, snip, tier) in candidates.items()
+        (uid, v[0], v[1], v[2], v[3] if len(v) > 3 else 1)
+        for uid, v in candidates.items()
         if uid not in kept_ads and uid not in checked_ids
     ]
-    unchecked.sort(key=lambda x: (x[3], x[0]), reverse=True)
+    # 🎯 الترتيب الجديد: الأولوية (مالك أولاً) ← ثم الحداثة ← ثم الأحدث ID.
+    #    ❌ القديم كان (tier, ad_id) تنازلياً ⇒ الأحدث أولاً ⇒ وكل الأحدث سماسرة
+    #       (القياس: 29 من 30 إعلان في الصفحة الأولى سماسرة)
+    unchecked.sort(key=lambda x: (x[4], -x[3], -x[0]))
 
-    queue = list(unchecked[:50])
+    queue = list(unchecked[:120])   # FIX: كان 50 — الاستكشاف بقى بيرجّع 300+ مرشح
     queued_ids = {x[0] for x in queue}
 
     print(f"Kept existing owners: {len(kept_ads)} | Fresh unchecked candidates: {len(queue)} | Banned accounts: {len(banned_accounts)}")
@@ -756,17 +1328,18 @@ def scrape_all():
     inspected = 0
 
     while queue and (time.time() - run_start) < MAX_RUNTIME_SECONDS:
-        uid, u, snip, tier = queue.pop(0)
+        uid, u, snip, tier, prio = queue.pop(0)
         if uid in kept_ads or uid in checked_ids:
             continue
         inspected += 1
         try:
-            item, mark_checked, reason, discovered_today = inspect_and_parse(
-                req_sess, cffi_sess, uid, u, snip, banned_accounts, checked_ids
+            item, should_mark, reason, discovered_today = inspect_and_parse(
+                req_sess, cffi_sess, uid, u, snip, banned_accounts, checked_ids, nocnt_attempts
             )
             stats[reason] = stats.get(reason, 0) + 1
-            if mark_checked:
-                checked_ids.add(uid)
+            if should_mark:
+                # FIX(H2): سجّل السبب والتوقيت مش مجرد ID
+                mark_checked(checked_ids, uid, reason)
             if item:
                 kept_ads[uid] = item
                 print(
@@ -774,13 +1347,15 @@ def scrape_all():
                     f"{item['price_text']} | {item['seller_name']} (Active Ads: {item['seller_ads_count']})"
                 )
             added_new_to_q = False
-            for rid, (ru, rsnip, rtier) in discovered_today.items():
-                if rid not in kept_ads and rid not in checked_ids and rid not in queued_ids and len(queue) < 60:
-                    queue.append((rid, ru, rsnip, rtier))
+            for rid, rval in discovered_today.items():
+                ru, rsnip, rtier = rval[0], rval[1], rval[2]
+                if rid not in kept_ads and rid not in checked_ids and rid not in queued_ids and len(queue) < 150:
+                    # الإعلانات المكتشفة من صفحة إعلان مالك ⇒ أولوية عالية (جيرانه غالباً ملاك)
+                    queue.append((rid, ru, rsnip, rtier, 1))
                     queued_ids.add(rid)
                     added_new_to_q = True
             if added_new_to_q:
-                queue.sort(key=lambda x: (x[3], x[0]), reverse=True)
+                queue.sort(key=lambda x: (x[4], -x[3], -x[0]))
         except Exception as e:
             print(f"[{inspected}] Error {uid}: {e}")
 
@@ -792,12 +1367,18 @@ def scrape_all():
     final_ads = list(kept_ads.values())
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
+    checked_list = sorted(checked_ids.keys())[-8000:]
     out = {
         "last_scrape": now_dt.strftime("%Y/%m/%d, %I:%M %p"),
         "total_ads": len(final_ads),
-        "checked_ids_v7": sorted(list(checked_ids))[-5000:],
-        "checked_ids_v10": sorted(list(checked_ids))[-5000:],
+        # FIX(H2): الشكل الجديد (dict فيه السبب والتوقيت) — هو المرجع الأساسي
+        "checked_ids_v11": {str(k): v for k, v in list(checked_ids.items())[-8000:]},
+        # توافق رجعي: extra_radar.py و index.html لسه بيقروا القوائم دي
+        "checked_ids_v7": checked_list[-5000:],
+        "checked_ids_v10": checked_list[-5000:],
         "banned_accounts_v7": sorted(list(banned_accounts))[-2000:],
+        # FIX(C6): عدّاد محاولات NO_CNT — بينجو بين الرنات
+        "nocnt_attempts_v1": {k: v for k, v in list(nocnt_attempts.items())[-1500:]},
         "ads": final_ads
     }
     for k, v in preserved_top_keys.items():

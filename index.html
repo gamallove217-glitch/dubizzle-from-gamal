@@ -478,11 +478,48 @@ header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;backg
 <div id="list" class="grid"></div>
 
 <script>
-const ADMIN_PASS = "2738";
-const USER_PASS = "3399";
-const LOG_TOPIC = "gamal_masyada_visitors_2738_v2";
-const BAN_TOPIC = "gamal_masyada_bans_2738_v1";
-const CONTACT_TOPIC = "gamal_masyada_contacted_2738_v1";
+// ── FIX(H5/C8): الإعدادات الحساسة ────────────────────────────────
+// ⚠️ أي قيمة مكتوبة في ملف HTML هي قيمة «علنية» بحكم الطبيعة — أي حد يفتح
+//    الصفحة يقدر يقراها من الـ source. فـ«قفل الـ VIP» ده شكلي مش حماية حقيقية،
+//    وموضوعات ntfy العلنية بتسمح لأي حد يبعت/يمسح بياناتك.
+//    الحماية الحقيقية محتاجة خادم صغير (Cloudflare Worker) يتحقق من سرّ.
+//    أقل حاجة تعملها دلوقتي: غيّر القيم دي لأرقام/كلمات عشوائية طويلة (UUID)
+//    عشان محدش يقدر يخمّنها، وافصلها في ملف config.js خارج الـ git.
+const CFG = Object.assign({
+  ADMIN_PASS:    "2738",
+  USER_PASS:     "3399",
+  LOG_TOPIC:     "gamal_masyada_visitors_2738_v2",
+  BAN_TOPIC:     "gamal_masyada_bans_2738_v1",
+  CONTACT_TOPIC: "gamal_masyada_contacted_2738_v1",
+  MAX_OWNER_ADS: 6,          // FIX(M4): أقصى عدد إعلانات يُعتبر «مالك» مش «سمسار»
+  REFRESH_MS:    120000      // FIX(H6): كل دقيقتين بدل 45 ثانية
+}, window.__CFG || {});
+const ADMIN_PASS    = CFG.ADMIN_PASS;
+const USER_PASS     = CFG.USER_PASS;
+const LOG_TOPIC     = CFG.LOG_TOPIC;
+const BAN_TOPIC     = CFG.BAN_TOPIC;
+const CONTACT_TOPIC = CFG.CONTACT_TOPIC;
+
+// ── FIX(C7): أدوات تهريب النصوص ──────────────────────────────────
+// كل بيانات الإعلانات (العنوان/الوصف/اسم البائع/الرابط) نصوص جاية من مواقع
+// خارجية. كانت بتتحط في innerHTML زي ما هي ⇒ أي إعلان فيه <img onerror=...>
+// كان هيشغّل كود في متصفح كل الزوار ويسرق كلمة السر والموضوعات.
+function esc(v){
+  return String(v == null ? "" : v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function safeHref(v){
+  const t = String(v || "").trim();
+  if(/^(https?:)?\/\//i.test(t) || /^mailto:/i.test(t)) return esc(t);
+  return "#";                    // بيمنع javascript: و data:
+}
+function jsStr(v){               // نص جوه onclick='...'
+  return String(v == null ? "" : v)
+    .replace(/\\/g,"\\\\").replace(/'/g,"\\'")
+    .replace(/</g,"\\u003c").replace(/>/g,"\\u003e")
+    .replace(/\r?\n/g," ");
+}
 
 let ALL_ADS = [];
 let LAST_RUN_REPORT = null;
@@ -807,14 +844,16 @@ function normalizeAdCategoryClient(ad){
     ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
     return ad;
   }
-  if(t.includes("غرفة") || t.includes("غرفه")){
-    ad.subtype = "غرفة";
-    ad.category = "شقق للإيجار";
-    return ad;
-  }
+  // ✅ FIX(M3): "شقة" لازم تتفحص قبل "غرفة" — لأن "شقة 3 غرف" كانت بتتصنّف
+  //    "غرفة" (وإيجار إجباري) لمجرد إنها فيها كلمة "غرف".
   if(t.includes("شقة") || t.includes("شقه") || t.includes("apartment")){
     ad.subtype = "شقة";
     ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
+    return ad;
+  }
+  if(t.includes("غرفة") || t.includes("غرفه")){
+    ad.subtype = "غرفة";
+    ad.category = "شقق للإيجار";
     return ad;
   }
   return ad;
@@ -831,8 +870,11 @@ function isCleanAd(ad){
   for(const bad of STRICT_FORBIDDEN){
     if(text.includes(bad)) return false;
   }
-  const cnt = Number(ad.seller_ads_count || 1);
-  return cnt >= 1 && cnt <= 4;
+  // ✅ FIX(M4): القاعدة القديمة (1..4) كانت بتخفي أي مالك عنده 5 إعلانات،
+  //    وكانت بتخفي كمان الإعلان اللي العدد فيه ناقص أو 0.
+  const cnt = Number(ad.seller_ads_count || 0);
+  if(!Number.isFinite(cnt) || cnt <= 0) return true;   // مفيش بيانات ⇒ ما نخفيش
+  return cnt <= CFG.MAX_OWNER_ADS;
 }
 
 function extractPhone(text){
@@ -950,17 +992,17 @@ function render(){
     const srcClass = srcLabel === "عقارماب" ? "b-src-aqar" : (srcLabel === "السوق المفتوح" ? "b-src-os" : "b-src-dub");
     const catLabel = a.category || (a.deal==="إيجار" ? "شقق للإيجار" : "شقق للبيع");
     const subLabel = a.subtype || "شقة";
-    const safeSeller = String(a.seller_name || "المالك").replace(/'/g, "\\'");
-    const safeAcc = String(a.account_id || "").replace(/'/g, "\\'");
-    const ownBadgeText = srcLabel === "دوبيزل" ? `المالك (${a.seller_ads_count||1} إعلان)` : `مالك العقار`;
+    const safeSeller = jsStr(a.seller_name || "المالك");
+    const safeAcc = jsStr(a.account_id || "");
+    const ownBadgeText = srcLabel === "دوبيزل" ? `المالك (${esc(a.seller_ads_count||1)} إعلان)` : `مالك العقار`;
 
     return `
     <div class="card ${views?'opened':''} ${isCont?'contacted':''}">
       <div>
         <div class="badges">
-          <span class="badge ${srcClass}">${srcLabel}</span>
-          <span class="badge b-cat">${catLabel}</span>
-          <span class="badge b-sub">${subLabel}</span>
+          <span class="badge ${srcClass}">${esc(srcLabel)}</span>
+          <span class="badge b-cat">${esc(catLabel)}</span>
+          <span class="badge b-sub">${esc(subLabel)}</span>
           <span class="badge b-own">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>${ownBadgeText}</span>
@@ -969,41 +1011,41 @@ function render(){
         </div>
 
         <div class="price-row">
-          <div class="price">${a.price_text || 'مدرج بالإعلان'}</div>
+          <div class="price">${esc(a.price_text || 'مدرج بالإعلان')}</div>
           <div class="deal-tag">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك مباشر'}</div>
         </div>
 
-        <div class="title">${a.title}</div>
+        <div class="title">${esc(a.title)}</div>
 
         <div class="specs">
           <span class="spec-pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <span>${a.area||'مدرج'}</span>
+            <span>${esc(a.area||'مدرج')}</span>
           </span>
           ${a.beds ? `<span class="spec-pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
-            <span>${a.beds}</span>
+            <span>${esc(a.beds)}</span>
           </span>` : ''}
           ${a.baths ? `<span class="spec-pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-            <span>${a.baths}</span>
+            <span>${esc(a.baths)}</span>
           </span>` : ''}
         </div>
 
-        <div class="desc">${a.description || a.title}</div>
+        <div class="desc">${esc(a.description || a.title)}</div>
       </div>
 
       <div>
         <div class="seller-bar">
           <span class="seller-name">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>${a.seller_name||'المالك'}</span>
+            <span>${esc(a.seller_name||'المالك')}</span>
           </span>
           <span class="ad-id-pill">#${a.ad_id}</span>
         </div>
 
         <div class="actions">
-          <a class="btn btn-open" href="${a.url}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
+          <a class="btn btn-open" href="${safeHref(a.url)}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             <span>فتح في ${srcLabel}</span>
           </a>
@@ -1012,7 +1054,7 @@ function render(){
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                 <span>واتساب مباشر</span>
               </a>`
-            : `<a class="btn btn-wa-in" href="${a.url}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
+            : `<a class="btn btn-wa-in" href="${safeHref(a.url)}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 <span>الرقم بالإعلان</span>
               </a>`
@@ -1033,10 +1075,15 @@ function render(){
 }
 
 async function fetchLiveJson(){
+  // ✅ FIX(H6): الترتيب القديم كان بيبدأ بـ api.github.com — وده حدّه 60 طلب/ساعة
+  //    من غير توكن. مع التحديث كل 45 ثانية كان بيخلص الحد في ~45 دقيقة، وبعدها
+  //    الموقع يقع على نسخة CDN قديمة (raw بتتكاش ~5 دقائق).
+  //    الترتيب الجديد: الملف المحلي الأول (أحدث حاجة، من غير حدود)، وبعدين
+  //    الـ CDN، وapi.github.com آخر ملاذ.
   const urls = [
-    'https://api.github.com/repos/gamallove217-glitch/dubizzle-from-gamal/contents/ads.json?t=' + Date.now(),
+    'ads.json?t=' + Date.now(),
     'https://raw.githubusercontent.com/gamallove217-glitch/dubizzle-from-gamal/main/ads.json?t=' + Date.now(),
-    'ads.json?t=' + Date.now()
+    'https://api.github.com/repos/gamallove217-glitch/dubizzle-from-gamal/contents/ads.json?t=' + Date.now()
   ];
   for(const u of urls){
     try{
@@ -1062,7 +1109,9 @@ async function load(){
   }
 }
 load();
-setInterval(load, 45000);
+// ✅ FIX(H6): كل دقيقتين، وفقط لما التبويب مفتوح — عشان ما نحرقش حدّ GitHub
+//    وإحنا مش شايفين الصفحة أصلاً.
+setInterval(()=>{ if(!document.hidden) load(); }, CFG.REFRESH_MS);
 </script>
 </body>
 </html>

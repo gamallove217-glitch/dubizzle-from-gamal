@@ -1,2 +1,9 @@
 __pycache__/
+*.pyc
 *.bak
+*.log
+
+# ملفات عمل محلية — مش المفروض تتعملها commit
+_test/
+config.js
+.env

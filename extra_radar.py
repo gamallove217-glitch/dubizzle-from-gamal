@@ -7,15 +7,36 @@ import time
 import urllib.parse
 import requests as std_requests
 from datetime import datetime, timezone, timedelta
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None
 from bs4 import BeautifulSoup
 from curl_cffi import requests as cffi_requests
 
-CAIRO_TZ = timezone(timedelta(hours=2))
+# ✅ FIX: المنطقة الزمنية الحقيقية بدل +2 ثابتة
+CAIRO_TZ = ZoneInfo("Africa/Cairo") if ZoneInfo else timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
-TG_B64_LIST = [
-    "OTE4NTkwNjUyNzpBQUhSZ3FsOEJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ=="
-]
+# ── FIX(C1): توكن تليجرام كان مكتوب في الكود (base64 = ترميز مش تشفير) ──
+# أي حد يفتح الملف ياخد التوكن ويبعت من البوت بتاعك. اتنقل لمتغير بيئة.
+# ضيفه في: Settings → Secrets and variables → Actions → TELEGRAM_BOT_TOKEN
+TG_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
+TG_B64_LIST = [TG_TOKEN] if TG_TOKEN else []
+if not TG_B64_LIST:
+    print("⚠️  TELEGRAM_BOT_TOKEN مش موجود في البيئة — إرسال تليجرام متعطّل في الرَن ده.")
+
+# ── FIX(M1): حدود الـ ID كانت "قنابل موقوتة" مكتوبة يدوي في الكود ──
+# كل ما المواقع تكبر الأرقام دي بتبقى قديمة. بقيت متغيرات بيئة تتغيّر من غير ما تلمس الكود.
+AQARMAP_MIN_ID  = int(os.environ.get("AQARMAP_MIN_ID", "7150000") or 0)
+OPENSOOQ_MIN_ID = int(os.environ.get("OPENSOOQ_MIN_ID", "289000000") or 0)
+MAX_AD_AGE_DAYS = int(os.environ.get("MAX_AD_AGE_DAYS", "12") or 12)
+
+AR_MONTHS = {
+    "يناير": 1, "فبراير": 2, "مارس": 3, "أبريل": 4, "ابريل": 4, "مايو": 5, "يونيو": 6,
+    "يوليو": 7, "أغسطس": 8, "اغسطس": 8, "سبتمبر": 9, "أكتوبر": 10, "اكتوبر": 10,
+    "نوفمبر": 11, "ديسمبر": 12,
+}
 
 STRICT_NEW_CAIRO_HEADER = [
     "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول",
@@ -319,17 +340,22 @@ def check_aqarmap_freshness(core_text, lid):
         text_no_build_year
     )
     if m_pub:
-        day_num, month_ar, yr_str = int(m_pub.group(1)), m_pub.group(2), m_pub.group(3)
-        if yr_str == "2026" and month_ar in ("نوفمبر", "ديسمبر"):
-            return True, f"{day_num} {month_ar} 2026"
-        if yr_str == "2026" and month_ar in ("أكتوبر", "اكتوبر") and day_num >= 10:
-            return True, f"{day_num} {month_ar} 2026"
+        day_num, month_ar, yr_str = int(m_pub.group(1)), m_pub.group(2), int(m_pub.group(3))
+        # ✅ FIX(M1): مقارنة حقيقية بتاريخ النهارده بدل "2026" و"نوفمبر" المكتوبة يدوي
+        mm = AR_MONTHS.get(month_ar)
+        if mm:
+            try:
+                pub = datetime(yr_str, mm, day_num, tzinfo=CAIRO_TZ)
+                if (datetime.now(CAIRO_TZ) - pub).days <= MAX_AD_AGE_DAYS:
+                    return True, f"{day_num} {month_ar} {yr_str}"
+            except ValueError:
+                pass
         return False, f"OLD_DATE_{day_num}_{month_ar}_{yr_str}"
 
     if "اليوم" in text_no_build_year[:1200] or "أمس" in text_no_build_year[:1200]:
         return True, "اليوم"
-    if lid >= 7150000:
-        return True, "2026"
+    if lid >= AQARMAP_MIN_ID:
+        return True, "حديث (حسب الـ ID)"
     return False, "NO_RECENT_DATE"
 
 
@@ -340,7 +366,7 @@ def check_opensooq_freshness(core_text, oid):
     if "أمس" in core_text[:3000] or "اليوم" in core_text[:3000]:
         return True, "اليوم/أمس"
     # Check ID threshold first — newer listings have higher oid
-    if oid >= 286000000:
+    if oid >= OPENSOOQ_MIN_ID:
         return True, "حديث (السوق المفتوح)"
     m_date = re.search(r"\b(\d{2})-(\d{2})-(20\d{2})\b", core_text[:3000])
     if m_date:
@@ -455,7 +481,7 @@ def discover_extra_candidates(req_sess, cffi_sess, existing_os_urls=None):
                 oid = int(m.group(2))
                 full_u = "https://eg.opensooq.com" + m.group(1) if m.group(1).startswith("/") else m.group(1)
                 uid = 800000000 + (oid % 100000000)
-                if oid >= 289000000 and not has_forbidden_url_slug(full_u):
+                if oid >= OPENSOOQ_MIN_ID and not has_forbidden_url_slug(full_u):
                     opensooq_cands[uid] = {
                         "url": f"https://eg.opensooq.com/ar/search/{oid}",
                         "oid": oid
@@ -471,7 +497,7 @@ def discover_extra_candidates(req_sess, cffi_sess, existing_os_urls=None):
                 for m in re.finditer(r"(?:https?://eg\.opensooq\.com)?(/ar/[^\s\"'<>)\]?]+?/(\d{9,10}))", raw_os_listing):
                     oid = int(m.group(2))
                     uid = 800000000 + (oid % 100000000)
-                    if oid >= 289000000 and uid not in opensooq_cands:
+                    if oid >= OPENSOOQ_MIN_ID and uid not in opensooq_cands:
                         opensooq_cands[uid] = {
                             "url": f"https://eg.opensooq.com/ar/search/{oid}",
                             "oid": oid
@@ -515,7 +541,7 @@ def discover_extra_candidates(req_sess, cffi_sess, existing_os_urls=None):
                         if m_os:
                             oid = int(m_os.group(1))
                             uid = 800000000 + (oid % 100000000)
-                            if oid >= 289000000 and uid not in opensooq_cands:
+                            if oid >= OPENSOOQ_MIN_ID and uid not in opensooq_cands:
                                 opensooq_cands[uid] = {
                                     "url": f"https://eg.opensooq.com/ar/search/{oid}",
                                     "oid": oid
@@ -692,7 +718,7 @@ def parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     if has_forbidden_url_slug(url):
         return None, True, "EXCLUDED_AREA"
 
-    if oid < 289000000:
+    if oid < OPENSOOQ_MIN_ID:
         return None, True, "OLD_AD"
 
     raw = fetch_page(req_sess, cffi_sess, url, timeout_sec=22)
@@ -1032,15 +1058,19 @@ def run_extra_radar():
             continue
         if a.get("source") == "عقارماب" and int(a.get("price_num", 0)) == 0:
             continue
-        deal, cat, sub = classify_unit(
-            a.get("url", ""),
-            a.get("title", ""),
-            a.get("description", ""),
-            int(a.get("price_num", 0))
-        )
-        a["deal"] = deal
-        a["category"] = cat
-        a["subtype"] = sub
+        # ✅ FIX(H3): إعلانات دوبيزل بتوصل متصنّفة صح من scraper.py (من الفئة الرسمية
+        #    في breadcrumb دوبيزل). إعادة تصنيفها هنا بالكلمات المفتاحية كانت بتقلب النتيجة —
+        #    إعلان "شقة للبيع" كان بيتحوّل "مبانى و أراضى".
+        if a.get("source") != "دوبيزل" or not a.get("category"):
+            deal, cat, sub = classify_unit(
+                a.get("url", ""),
+                a.get("title", ""),
+                a.get("description", ""),
+                int(a.get("price_num", 0))
+            )
+            a["deal"] = deal
+            a["category"] = cat
+            a["subtype"] = sub
         kept_map[aid] = a
 
     checked_extra = set(int(x) for x in (data.get("checked_extra_v15") or saved_meta.get("checked_extra_v15") or []) if str(x).isdigit())
@@ -1056,7 +1086,12 @@ def run_extra_radar():
     req_sess = std_requests.Session()
     cffi_sess = cffi_requests.Session(impersonate="chrome120")
 
-    existing_os_urls = [a.get("link", "") for a in (data.get("ads") or []) if a.get("source") == "السوق المفتوح" and a.get("link")]
+    # ✅ FIX(M2): الإعلانات بتتخزن بمفتاح "url" مش "link" ⇒ القائمة دي كانت فاضية دايماً
+    existing_os_urls = [
+        (a.get("url") or a.get("link") or "")
+        for a in (data.get("ads") or [])
+        if a.get("source") == "السوق المفتوح" and (a.get("url") or a.get("link"))
+    ]
     # Additional hardcoded OpenSooq listing URLs for more diverse crawling
     extra_os_start = ["https://eg.opensooq.com/ar/search/286924884", "https://eg.opensooq.com/ar/search/288468900", "https://eg.opensooq.com/ar/search/286978162"]
     existing_os_urls = [u for u in existing_os_urls if u] + [u for u in extra_os_start if u not in existing_os_urls]
