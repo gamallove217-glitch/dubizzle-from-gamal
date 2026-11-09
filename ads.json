@@ -1,6 +1,4868 @@
 {
-  "last_scrape": "2026/11/09, 04:51 AM",
+  "last_scrape": "2026/11/09, 05:09 AM",
   "total_ads": 64,
+  "checked_ids_v11": {
+    "504371232": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504144709": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209420390": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504371178": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504371218": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209365202": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354549": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504371289": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "186447351": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "208049206": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "208532447": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "208961921": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209002337": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209002813": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209047328": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209055601": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209104136": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209134054": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209135923": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209144956": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209418110": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209428414": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209429732": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209432587": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209432944": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209435294": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209436022": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209437359": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209438166": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "209442852": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501277671": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501346558": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501365395": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501401136": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501442980": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501459261": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "501470478": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502079415": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502148095": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502154909": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502156618": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502275798": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502277365": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502280371": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502288546": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502295718": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502437865": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502445448": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502448367": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502508986": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502529924": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502533913": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502573636": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502576529": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502579687": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502582405": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502603016": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502606299": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502615321": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502618996": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502639695": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502642057": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502649013": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502666572": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502667864": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502705837": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502705935": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502776562": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502823515": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502852038": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502853766": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502865178": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502866794": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502880643": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502893627": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502910661": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502929036": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502952262": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502956604": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502957892": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502970908": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "502981995": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503010997": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503033718": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503043782": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503088411": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503093820": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503119173": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503120151": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503120568": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503131046": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503133507": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503135466": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503138817": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503152734": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503152788": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503183345": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503188515": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503191811": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503196470": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503206558": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503213273": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503217477": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503220886": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503244283": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503245870": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503264893": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503276825": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503286226": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503286301": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503288816": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503289087": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503290095": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503292428": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503298425": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503308034": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503308967": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503313338": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503319656": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503326785": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503326896": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503338773": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503347916": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503354312": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503363359": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503371191": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503373206": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503385413": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503395494": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503396110": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503399706": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503401492": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503402752": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503402882": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503404392": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503418624": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503418649": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503431492": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503433595": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503447007": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503449590": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503450156": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503453627": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503458177": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503469512": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503475153": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503479793": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503482036": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503482980": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503483954": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503484030": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503490654": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503494413": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503507178": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503509688": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503531475": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503536898": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503546487": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503556645": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503558236": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503569798": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503574534": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503596338": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503599265": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503599927": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503608915": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503612977": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503621865": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503628579": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503634634": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503638281": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503650915": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503661519": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503664044": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503664643": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503664951": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503667695": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503668111": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503671231": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503684561": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503689923": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503695780": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503700447": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503701471": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503706201": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503709408": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503717178": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503717251": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503717300": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503718146": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503718165": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503723132": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503724262": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503725213": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503725979": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503726361": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503729922": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503730944": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503731054": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503737278": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503737926": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503738106": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503738843": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503741452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503743030": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503743557": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503746643": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503749316": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503755122": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503755144": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503755857": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503760323": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503767002": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503767266": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503772756": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503776066": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503785051": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503800023": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503806218": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503806244": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503810502": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503811279": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503816384": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503817132": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503832020": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503839932": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503840721": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503841999": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503845314": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503850617": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503854447": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503864300": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503866465": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503875460": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503879394": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503882455": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503882459": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503882488": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503884042": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503885646": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503888072": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503893045": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503893531": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503893599": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503897460": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503897962": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503898024": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503898869": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503900121": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503900294": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503902282": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503902446": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503902938": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503903739": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503903778": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503903781": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503903872": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503905761": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503907473": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503908174": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503911171": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503911234": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503912581": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503912935": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503916597": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503916891": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503917007": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503918618": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503919130": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503922036": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503923487": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503926092": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503927525": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503929112": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503929779": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503932800": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503933013": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503933244": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503933877": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503934447": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503935698": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503938367": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503938439": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503942052": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503944949": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503951953": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503953366": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503954533": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503955939": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503958225": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503962340": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503963980": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503964188": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503965028": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503967857": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503968226": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503969844": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503971078": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503971914": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503974341": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503974659": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503975881": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503978334": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503978384": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503984675": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503985760": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503991826": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503993556": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503993998": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503994901": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503995752": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503996658": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503998003": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503998171": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503999178": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "503999222": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504000115": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504001620": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504001931": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504001981": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504001996": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504003850": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504004690": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504005440": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504005509": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504006771": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007404": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007417": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007627": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007712": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007863": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504007983": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504008795": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504009103": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504009452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504013143": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504014225": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504015476": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504016781": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504017518": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504019158": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504019991": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504022028": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504022131": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504023452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504025295": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504026341": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504026622": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504026973": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504028968": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504029650": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504029653": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504029717": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504030020": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504031180": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504031345": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504033316": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504033669": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504034120": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504035329": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504035396": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504035513": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504035733": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504035961": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036191": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036344": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036373": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036416": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036645": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036696": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504036714": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504037120": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504037473": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504039054": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504039897": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504039943": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504040169": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504040818": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504040907": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504040974": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504041556": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504042386": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504043454": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504045363": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504046122": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504046483": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504047892": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504048356": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504049227": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504052259": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504055204": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504058371": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504060024": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504061139": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504062014": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504062592": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504063112": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504064000": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504064316": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504064900": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504065073": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504065710": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504067976": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504071879": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504073003": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504075217": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504076619": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504077018": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504077847": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504084296": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504084493": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504084866": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504085444": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504091005": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504091383": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504091638": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504091836": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504093081": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504093113": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504094282": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504095852": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504096018": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504096728": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504101898": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504103564": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504104111": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504105618": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504107638": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504108280": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504109913": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504111621": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504114921": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504116183": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504116787": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504116985": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504116995": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504118961": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504119012": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504119285": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504122840": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504125700": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504128034": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504131039": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504131845": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504135803": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504135939": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504136475": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504139152": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504139392": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504139431": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504139846": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504142111": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504142269": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504143835": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504144132": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504146135": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504146351": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504146802": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504147855": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504147881": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504148754": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504150204": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504150228": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151042": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151063": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151244": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151283": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151424": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504151429": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504155738": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504156506": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504157418": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504158463": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504160246": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504162338": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504164191": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504165280": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504165289": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504165587": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504166050": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504166419": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504166525": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504166997": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504168886": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504169124": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504169719": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504170949": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504172139": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504173301": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504174290": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504177010": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504177280": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504177349": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504177572": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504177820": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504178570": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504178629": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504179744": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504179761": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504179822": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504180086": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504180101": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504180342": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504181296": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504181997": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504182964": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504183097": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504183219": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504184459": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504185659": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504186151": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504186907": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504187564": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504187568": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504188828": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504189790": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504191598": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504193634": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504193651": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504193717": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504194214": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504194296": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504194457": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504194502": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504194790": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504198015": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504198821": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504198966": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504199241": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504199854": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504199913": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504200146": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504200574": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504200826": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504200945": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504201398": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504201625": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504201667": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504201750": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504202357": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504202490": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504202527": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504202610": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504202902": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504203785": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204071": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204105": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204597": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204617": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204650": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504204921": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205021": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205080": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205184": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205241": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205395": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205538": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205540": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205611": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504205632": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504206069": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504206134": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504206634": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504207260": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504207570": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504207953": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504208764": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504208902": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209143": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209190": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209426": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209614": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209692": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209699": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504209733": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504210018": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504210349": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504210452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504210597": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504211120": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504211229": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504211361": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504211707": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212144": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212152": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212215": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212334": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212368": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212526": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212796": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504212909": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504214232": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215073": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215102": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215220": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215300": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215312": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215412": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215435": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215477": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215762": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215790": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215888": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215952": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504215956": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504216595": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217379": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217450": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217532": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217623": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217790": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504217886": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218020": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218293": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218356": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218472": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218473": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218692": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504218950": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219019": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219022": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219027": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219038": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219045": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219195": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219461": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219516": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219873": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504219972": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504220165": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504220443": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504220576": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504220732": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504221082": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504221333": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504221505": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504222253": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504222550": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504222912": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504223185": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504223197": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504223327": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504223421": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504223527": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504224076": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504225101": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504225197": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504225756": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504225971": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504226097": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504226105": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504226524": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504226952": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504227533": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504228890": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504228930": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504229038": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504229527": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504232514": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504232970": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233354": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233485": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233513": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233565": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233589": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504233766": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504234175": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504234578": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504237228": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504240022": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504240225": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504240946": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504243002": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504245120": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504246307": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504247427": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504249968": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504250147": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504250721": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504251626": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504259748": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504259760": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504263739": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504266944": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504267598": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504267741": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504268791": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504272152": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504280983": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504289374": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504292535": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504293074": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504293128": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504294192": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504295710": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504296632": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504297063": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504301229": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504302068": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504302689": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504303153": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504305474": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504307502": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504308903": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504309281": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504309343": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504309389": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504309621": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504310731": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504311718": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504311821": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504311822": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504313882": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504315244": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504315262": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504318642": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504320206": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504320590": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504323703": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504325163": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504325177": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504326468": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504330652": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504331035": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504333014": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504333191": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504335899": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504336332": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504337359": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504337380": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504338038": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504338389": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504338582": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504338629": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504339082": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504339778": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504340279": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504340308": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504341074": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504341562": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504341810": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504342482": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504342516": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504343014": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504343057": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504343080": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504343145": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504344707": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504344766": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504344813": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504345934": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346049": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346105": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346230": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346342": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346409": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346693": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504346966": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504347250": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504347649": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504348201": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504349389": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504349495": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504349548": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504349601": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504349760": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504350341": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504350344": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504350928": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504351506": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504351931": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504351976": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504352086": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504352260": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504352410": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504352911": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504353175": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504353185": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504353435": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354157": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354295": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354869": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354906": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504354941": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504355260": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504355388": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504355479": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504355612": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504355896": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504356241": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504356246": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357207": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357367": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357414": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357429": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357440": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357444": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357454": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357562": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357784": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504357807": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504358669": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504358814": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504358974": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504359215": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504359857": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504359859": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504360007": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504360658": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361023": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361193": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361377": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361383": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361462": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361475": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361491": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361511": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361568": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361596": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361819": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504361878": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362396": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362400": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362447": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362604": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362709": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362803": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362818": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362839": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362864": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362937": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504362958": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504363351": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504363374": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504364152": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504364301": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504364362": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504365100": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504365105": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504365901": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504365973": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504366015": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504366089": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504366382": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504366632": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504367158": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504367383": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504367550": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504367769": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504367807": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368226": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368600": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368633": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368636": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368644": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368700": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504368969": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369135": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369415": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369497": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369512": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369622": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369744": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369871": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504369956": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504370462": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504370473": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504370508": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504371204": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504371522": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372271": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372443": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372579": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372610": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372659": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372847": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504372949": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504373422": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504373440": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504373793": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504373956": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504373959": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374070": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374072": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374102": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374153": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374159": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374250": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374321": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374553": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374591": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374734": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374780": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374820": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504374987": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375070": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375270": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375279": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375330": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375544": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375591": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375699": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375718": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375860": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504375928": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376150": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376190": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376281": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376406": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376456": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376526": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376677": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376684": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376702": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376815": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376914": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504376988": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377147": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377148": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377308": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377533": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377582": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377620": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377626": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377740": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504377754": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380111": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380116": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380136": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380143": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380148": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380207": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504380401": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381024": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381158": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381165": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381229": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381379": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381516": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504381899": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382112": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382257": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382544": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382648": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382662": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382711": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382737": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382777": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382782": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382830": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382843": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382867": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382940": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382943": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382960": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504382999": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383007": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383074": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383098": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383102": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383139": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383202": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383219": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383263": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383272": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383298": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383302": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383317": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383324": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383330": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383332": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383336": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383337": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383338": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383339": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383344": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383348": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383365": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383373": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383383": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383385": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383401": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383409": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383454": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383476": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383480": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383496": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383516": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383523": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383538": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383542": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383549": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383570": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383583": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383604": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383605": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383618": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383622": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383638": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383642": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383667": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383668": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383717": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383727": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383748": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383833": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383857": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383864": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383923": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383943": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383947": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383963": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504383967": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384032": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384055": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384058": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384079": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384126": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384164": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384187": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384227": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384291": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384318": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384320": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384367": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384381": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384411": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384416": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384419": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384442": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384509": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384567": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384608": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384642": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384667": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384735": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384770": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504384801": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385046": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385081": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385113": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385215": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385311": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385339": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385345": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385403": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385445": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385572": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385747": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385749": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385808": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385833": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504385938": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386026": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386057": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386305": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386350": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386411": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386418": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386423": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386474": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386535": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386605": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386626": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386645": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386655": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386678": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386711": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386717": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386719": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386750": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386770": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504386951": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387069": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387174": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387195": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387201": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387519": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387542": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387929": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387949": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504387966": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388008": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388019": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388031": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388058": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388077": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388094": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388333": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388408": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388424": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388512": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388591": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388720": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388725": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388739": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388827": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388832": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388883": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504388891": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389060": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389125": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389136": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389138": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389217": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389235": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389276": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389295": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389307": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389319": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389402": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389410": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389441": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389452": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389467": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389555": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389651": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389704": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389738": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389745": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389747": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389756": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389920": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389966": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389972": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389977": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504389983": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390003": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390015": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390031": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390040": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390061": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390102": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390106": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390108": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390132": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390134": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390135": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390169": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390194": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390213": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390220": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390226": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390280": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390302": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390314": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390370": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390376": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390378": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504390381": {
+      "ts": "",
+      "reason": "LEGACY"
+    },
+    "504224947": {
+      "ts": "2026-11-09T05:14:37.278271+02:00",
+      "reason": "BANNED_BROKER_213_ADS"
+    },
+    "504385446": {
+      "ts": "2026-11-09T05:14:39.433801+02:00",
+      "reason": "BANNED_BROKER_99_ADS"
+    },
+    "504390425": {
+      "ts": "2026-11-09T05:14:41.476915+02:00",
+      "reason": "BANNED_BROKER_370_ADS"
+    },
+    "504390422": {
+      "ts": "2026-11-09T05:14:43.038280+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390419": {
+      "ts": "2026-11-09T05:14:45.049897+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390373": {
+      "ts": "2026-11-09T05:14:47.065412+02:00",
+      "reason": "BANNED_BROKER_147_ADS"
+    },
+    "504390360": {
+      "ts": "2026-11-09T05:14:49.026288+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390353": {
+      "ts": "2026-11-09T05:14:51.127529+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390345": {
+      "ts": "2026-11-09T05:14:52.708590+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390341": {
+      "ts": "2026-11-09T05:14:54.840143+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390336": {
+      "ts": "2026-11-09T05:14:56.976083+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390330": {
+      "ts": "2026-11-09T05:14:59.089876+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504390167": {
+      "ts": "2026-11-09T05:15:01.236689+02:00",
+      "reason": "BANNED_BROKER_97_ADS"
+    },
+    "504390095": {
+      "ts": "2026-11-09T05:15:02.821073+02:00",
+      "reason": "BANNED_BROKER_262_ADS"
+    },
+    "504390088": {
+      "ts": "2026-11-09T05:15:04.867708+02:00",
+      "reason": "BANNED_BROKER_743_ADS"
+    },
+    "504390053": {
+      "ts": "2026-11-09T05:15:07.071066+02:00",
+      "reason": "BANNED_BROKER_548_ADS"
+    },
+    "504389997": {
+      "ts": "2026-11-09T05:15:09.337332+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389981": {
+      "ts": "2026-11-09T05:15:11.693004+02:00",
+      "reason": "BANNED_BROKER_163_ADS"
+    },
+    "504389963": {
+      "ts": "2026-11-09T05:15:13.779011+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389957": {
+      "ts": "2026-11-09T05:15:15.882063+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389940": {
+      "ts": "2026-11-09T05:15:18.016406+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389904": {
+      "ts": "2026-11-09T05:15:20.190419+02:00",
+      "reason": "BANNED_BROKER_288_ADS"
+    },
+    "504389885": {
+      "ts": "2026-11-09T05:15:23.961726+02:00",
+      "reason": "BANNED_BROKER_99_ADS"
+    },
+    "504389866": {
+      "ts": "2026-11-09T05:15:26.024220+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389849": {
+      "ts": "2026-11-09T05:15:29.813189+02:00",
+      "reason": "BANNED_BROKER_99_ADS"
+    },
+    "504389843": {
+      "ts": "2026-11-09T05:15:32.123726+02:00",
+      "reason": "BANNED_BROKER_139_ADS"
+    },
+    "504389841": {
+      "ts": "2026-11-09T05:15:35.692735+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389835": {
+      "ts": "2026-11-09T05:15:37.791834+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389793": {
+      "ts": "2026-11-09T05:15:40.010380+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389779": {
+      "ts": "2026-11-09T05:15:41.955623+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389775": {
+      "ts": "2026-11-09T05:15:43.912633+02:00",
+      "reason": "BANNED_BROKER_99_ADS"
+    },
+    "504389741": {
+      "ts": "2026-11-09T05:15:46.159782+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389695": {
+      "ts": "2026-11-09T05:15:48.182523+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389676": {
+      "ts": "2026-11-09T05:15:50.284724+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389633": {
+      "ts": "2026-11-09T05:15:52.202554+02:00",
+      "reason": "BANNED_BROKER_13_ADS"
+    },
+    "504389507": {
+      "ts": "2026-11-09T05:15:54.197369+02:00",
+      "reason": "BANNED_BROKER_258_ADS"
+    },
+    "504389447": {
+      "ts": "2026-11-09T05:17:04.166095+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389323": {
+      "ts": "2026-11-09T05:16:01.864902+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389003": {
+      "ts": "2026-11-09T05:16:18.718084+02:00",
+      "reason": "BANNED_BROKER_174_ADS_SIBLINGS"
+    },
+    "504389070": {
+      "ts": "2026-11-09T05:16:18.718084+02:00",
+      "reason": "BANNED_BROKER_174_ADS_SIBLINGS"
+    },
+    "503764922": {
+      "ts": "2026-11-09T05:16:18.718084+02:00",
+      "reason": "BANNED_BROKER_174_ADS_SIBLINGS"
+    },
+    "504284765": {
+      "ts": "2026-11-09T05:16:18.718084+02:00",
+      "reason": "BANNED_BROKER_174_ADS_SIBLINGS"
+    },
+    "503156990": {
+      "ts": "2026-11-09T05:16:18.718084+02:00",
+      "reason": "BANNED_BROKER_174_ADS_SIBLINGS"
+    },
+    "504389284": {
+      "ts": "2026-11-09T05:16:18.718105+02:00",
+      "reason": "BANNED_BROKER_174_ADS"
+    },
+    "504389249": {
+      "ts": "2026-11-09T05:16:22.388706+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389233": {
+      "ts": "2026-11-09T05:16:26.172332+02:00",
+      "reason": "BANNED_BROKER_99_ADS"
+    },
+    "504389206": {
+      "ts": "2026-11-09T05:16:29.261039+02:00",
+      "reason": "BANNED_BROKER_105_ADS"
+    },
+    "504389912": {
+      "ts": "2026-11-09T05:16:48.377668+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389170": {
+      "ts": "2026-11-09T05:16:48.377668+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389932": {
+      "ts": "2026-11-09T05:16:48.377668+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389762": {
+      "ts": "2026-11-09T05:16:48.377668+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389203": {
+      "ts": "2026-11-09T05:16:48.377697+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389642": {
+      "ts": "2026-11-09T05:17:04.166095+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389347": {
+      "ts": "2026-11-09T05:17:04.166095+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389655": {
+      "ts": "2026-11-09T05:17:04.166095+02:00",
+      "reason": "BANNED_ACCOUNT_SIBLINGS"
+    },
+    "504389161": {
+      "ts": "2026-11-09T05:17:04.166123+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389146": {
+      "ts": "2026-11-09T05:17:05.597744+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389140": {
+      "ts": "2026-11-09T05:17:07.170585+02:00",
+      "reason": "BANNED_BROKER_70_ADS"
+    },
+    "504389097": {
+      "ts": "2026-11-09T05:17:08.639056+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389088": {
+      "ts": "2026-11-09T05:17:10.629917+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389050": {
+      "ts": "2026-11-09T05:17:14.196563+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389013": {
+      "ts": "2026-11-09T05:17:20.677133+02:00",
+      "reason": "BANNED_ACCOUNT"
+    },
+    "504389001": {
+      "ts": "2026-11-09T05:17:24.631444+02:00",
+      "reason": "BANNED_BROKER_33_ADS"
+    },
+    "504388986": {
+      "ts": "2026-11-09T05:17:26.560579+02:00",
+      "reason": "BANNED_ACCOUNT"
+    }
+  },
   "checked_ids_v7": [
     186447351,
     208049206,
@@ -92,6 +4954,7 @@
     503138817,
     503152734,
     503152788,
+    503156990,
     503183345,
     503188515,
     503191811,
@@ -208,6 +5071,7 @@
     503755144,
     503755857,
     503760323,
+    503764922,
     503767002,
     503767266,
     503772756,
@@ -642,6 +5506,7 @@
     504223421,
     504223527,
     504224076,
+    504224947,
     504225101,
     504225197,
     504225756,
@@ -686,6 +5551,7 @@
     504268791,
     504272152,
     504280983,
+    504284765,
     504289374,
     504292535,
     504293074,
@@ -1050,6 +5916,7 @@
     504385345,
     504385403,
     504385445,
+    504385446,
     504385572,
     504385747,
     504385749,
@@ -1103,44 +5970,93 @@
     504388832,
     504388883,
     504388891,
+    504388986,
+    504389001,
+    504389003,
+    504389013,
+    504389050,
     504389060,
+    504389070,
+    504389088,
+    504389097,
     504389125,
     504389136,
     504389138,
+    504389140,
+    504389146,
+    504389161,
+    504389170,
+    504389203,
+    504389206,
     504389217,
+    504389233,
     504389235,
+    504389249,
     504389276,
+    504389284,
     504389295,
     504389307,
     504389319,
+    504389323,
+    504389347,
     504389402,
     504389410,
     504389441,
+    504389447,
     504389452,
     504389467,
+    504389507,
     504389555,
+    504389633,
+    504389642,
     504389651,
+    504389655,
+    504389676,
+    504389695,
     504389704,
     504389738,
+    504389741,
     504389745,
     504389747,
     504389756,
+    504389762,
+    504389775,
+    504389779,
+    504389793,
+    504389835,
+    504389841,
+    504389843,
+    504389849,
+    504389866,
+    504389885,
+    504389904,
+    504389912,
     504389920,
+    504389932,
+    504389940,
+    504389957,
+    504389963,
     504389966,
     504389972,
     504389977,
+    504389981,
     504389983,
+    504389997,
     504390003,
     504390015,
     504390031,
     504390040,
+    504390053,
     504390061,
+    504390088,
+    504390095,
     504390102,
     504390106,
     504390108,
     504390132,
     504390134,
     504390135,
+    504390167,
     504390169,
     504390194,
     504390213,
@@ -1149,10 +6065,20 @@
     504390280,
     504390302,
     504390314,
+    504390330,
+    504390336,
+    504390341,
+    504390345,
+    504390353,
+    504390360,
     504390370,
+    504390373,
     504390376,
     504390378,
-    504390381
+    504390381,
+    504390419,
+    504390422,
+    504390425
   ],
   "checked_ids_v10": [
     186447351,
@@ -1245,6 +6171,7 @@
     503138817,
     503152734,
     503152788,
+    503156990,
     503183345,
     503188515,
     503191811,
@@ -1361,6 +6288,7 @@
     503755144,
     503755857,
     503760323,
+    503764922,
     503767002,
     503767266,
     503772756,
@@ -1795,6 +6723,7 @@
     504223421,
     504223527,
     504224076,
+    504224947,
     504225101,
     504225197,
     504225756,
@@ -1839,6 +6768,7 @@
     504268791,
     504272152,
     504280983,
+    504284765,
     504289374,
     504292535,
     504293074,
@@ -2203,6 +7133,7 @@
     504385345,
     504385403,
     504385445,
+    504385446,
     504385572,
     504385747,
     504385749,
@@ -2256,44 +7187,93 @@
     504388832,
     504388883,
     504388891,
+    504388986,
+    504389001,
+    504389003,
+    504389013,
+    504389050,
     504389060,
+    504389070,
+    504389088,
+    504389097,
     504389125,
     504389136,
     504389138,
+    504389140,
+    504389146,
+    504389161,
+    504389170,
+    504389203,
+    504389206,
     504389217,
+    504389233,
     504389235,
+    504389249,
     504389276,
+    504389284,
     504389295,
     504389307,
     504389319,
+    504389323,
+    504389347,
     504389402,
     504389410,
     504389441,
+    504389447,
     504389452,
     504389467,
+    504389507,
     504389555,
+    504389633,
+    504389642,
     504389651,
+    504389655,
+    504389676,
+    504389695,
     504389704,
     504389738,
+    504389741,
     504389745,
     504389747,
     504389756,
+    504389762,
+    504389775,
+    504389779,
+    504389793,
+    504389835,
+    504389841,
+    504389843,
+    504389849,
+    504389866,
+    504389885,
+    504389904,
+    504389912,
     504389920,
+    504389932,
+    504389940,
+    504389957,
+    504389963,
     504389966,
     504389972,
     504389977,
+    504389981,
     504389983,
+    504389997,
     504390003,
     504390015,
     504390031,
     504390040,
+    504390053,
     504390061,
+    504390088,
+    504390095,
     504390102,
     504390106,
     504390108,
     504390132,
     504390134,
     504390135,
+    504390167,
     504390169,
     504390194,
     504390213,
@@ -2302,14 +7282,42 @@
     504390280,
     504390302,
     504390314,
+    504390330,
+    504390336,
+    504390341,
+    504390345,
+    504390353,
+    504390360,
     504390370,
+    504390373,
     504390376,
     504390378,
-    504390381
+    504390381,
+    504390419,
+    504390422,
+    504390425
   ],
   "banned_accounts_v7": [
-    "name:ehab amin"
+    "name:aqarpedia for resale",
+    "name:bigger asset",
+    "name:crest views for real estate",
+    "name:egy property",
+    "name:ehab amin",
+    "name:forsa property",
+    "name:gh elite",
+    "name:goals master",
+    "name:infinity land",
+    "name:mahmoud fathy",
+    "name:mahmoud nour",
+    "name:mavista",
+    "name:ninety two",
+    "name:noor future",
+    "name:penates",
+    "name:prime location",
+    "name:property hills one 1",
+    "name:taj real estate marketing"
   ],
+  "nocnt_attempts_v1": {},
   "ads": [
     {
       "ad_id": 889799804,
@@ -2331,7 +7339,8 @@
       "url": "https://eg.opensooq.com/ar/search/289799804",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-08T23:01:14.424634+02:00"
+      "scraped_at": "2026-11-08T23:01:14.424634+02:00",
+      "_dub_log": "Discovery budget reached after 31 pages\nDiscovery: 31 pages | 316 candidates | 84 broker-titles skipped (free) | 277s\nKept existing owners: 64 | Fresh unchecked candidates: 120 | Banned accounts: 1\nChecked Ad 504224947 (منذ 9 ساعات): Active_Ads=213 | Seller=Forsa Property\nChecked Ad 504385446 (منذ 7 ساعات): Active_Ads=99 | Seller=SFR\nChecked Ad 504390425 (منذ 1 ساعة): Active_Ads=370 | Seller=Bigger Asset\nSkipped Banned Account (Bigger Asset) on Ad 504390422\nSkipped Banned Account (Bigger Asset) on Ad 504390419\nChecked Ad 504390373 (منذ 3 ساعات): Active_Ads=147 | Seller=Mahmoud Nour\nSkipped Banned Account (Mahmoud Nour) on Ad 504390360\nSkipped Banned Account (Mahmoud Nour) on Ad 504390353\nSkipped Banned Account (Mahmoud Nour) on Ad 504390345\nSkipped Banned Account (Mahmoud Nour) on Ad 504390341\nSkipped Banned Account (Mahmoud Nour) on Ad 504390336\nSkipped Banned Account (Mahmoud Nour) on Ad 504390330\nChecked Ad 504390167 (منذ 5 ساعات): Active_Ads=97 | Seller=Goals master\nChecked Ad 504390095 (منذ 5 ساعات): Active_Ads=262 | Seller=Property Hills One 1\nChecked Ad 504390088 (منذ 6 ساعات): Active_Ads=743 | Seller=Egy Property\nChecked Ad 504390053 (منذ 6 ساعات): Active_Ads=548 | Seller=GH Elite\nSkipped Banned Account (Mahmoud Nour) on Ad 504389997\nChecked Ad 504389981 (منذ 6 ساعات): Active_Ads=163 | Seller=Mavista\nSkipped Banned Account (Egy Property) on Ad 504389963\nSkipped Banned Account (Mahmoud Nour) on Ad 504389957\nSkipped Banned Account (Egy Property) on Ad 504389940\nChecked Ad 504389904 (منذ 7 ساعات): Active_Ads=288 | Seller=prime location\nChecked Ad 504389885 (منذ 7 ساعات): Active_Ads=99 | Seller=Hause properties\nSkipped Banned Account (Property Hills One 1) on Ad 504389866\nChecked Ad 504389849 (منذ 8 ساعات): Active_Ads=99 | Seller=Closer Real Estate\nChecked Ad 504389843 (منذ 8 ساعات): Active_Ads=139 | Seller=Taj Real Estate Marketing\nSkipped Banned Account (Egy Property) on Ad 504389841\nSkipped Banned Account (Taj Real Estate Marketing) on Ad 504389835\nSkipped Banned Account (Property Hills One 1) on Ad 504389793\nSkipped Banned Account (Egy Property) on Ad 504389779\nChecked Ad 504389775 (منذ 8 ساعات): Active_Ads=99 | Seller=Crest views for real estate\nSkipped Banned Account (Egy Property) on Ad 504389741\nSkipped Banned Account (Taj Real Estate Marketing) on Ad 504389695\nSkipped Banned Account (Taj Real Estate Marketing) on Ad 504389676\nChecked Ad 504389633 (منذ 8 ساعات): Active_Ads=13 | Seller=Mahmoud Fathy\nChecked Ad 504389507 (منذ 10 ساعات): Active_Ads=258 | Seller=Crest views for real estate\nChecked Ad 504389447 (منذ 10 ساعات): Active_Ads=63 | Seller=Noor Future\nSkipped Banned Account (Noor Future) on Ad 504389323\nChecked Ad 504389284 (منذ 11 ساعات): Active_Ads=174 | Seller=Penates\nSkipped Banned Account (Noor Future) on Ad 504389249\nChecked Ad 504389233 (منذ 11 ساعات): Active_Ads=99 | Seller=Egypt Best Properties (EBP\nChecked Ad 504389206 (منذ 11 ساعات): Active_Ads=105 | Seller=Aqarpedia For Resale\nSkipped Banned Account (Egy Property) on Ad 504389203\nSkipped Banned Account (Noor Future) on Ad 504389161\nSkipped Banned Account (Aqarpedia For Resale) on Ad 504389146\nChecked Ad 504389140 (منذ 8 ساعات): Active_Ads=70 | Seller=Ninety Two\nSkipped Banned Account (Aqarpedia For Resale) on Ad 504389097\nSkipped Banned Account (Ninety Two) on Ad 504389088\nSkipped Banned Account (Aqarpedia For Resale) on Ad 504389050\nSkipped Banned Account (Aqarpedia For Resale) on Ad 504389013\nChecked Ad 504389001 (منذ 11 ساعات): Active_Ads=33 | Seller=Infinity Land\nSkipped Banned Account (Noor Future) on Ad 504388986\nTotal inspected this run: 52 | Queue remaining: 67 | Total banned accounts: 18\nInspection Summary: {'BANNED_BROKER_213_ADS': 1, 'BANNED_BROKER_99_ADS': 5, 'BANNED_BROKER_370_ADS': 1, 'BANNED_ACCOUNT': 30, 'BANNED_BROKER_147_ADS': 1, 'BANNED_BROKER_97_ADS': 1, 'BANNED_BROKER_262_ADS': 1, 'BANNED_BROKER_743_ADS': 1, 'BANNED_BROKER_548_ADS': 1, 'BANNED_BROKER_163_ADS': 1, 'BANNED_BROKER_288_ADS': 1, 'BANNED_BROKER_139_ADS': 1, 'BANNED_BROKER_13_ADS': 1, 'BANNED_BROKER_258_ADS': 1, 'BANNED_BROKER_63_ADS': 1, 'BANNED_BROKER_174_ADS': 1, 'BANNED_BROKER_105_ADS': 1, 'BANNED_BROKER_70_ADS': 1, 'BANNED_BROKER_33_ADS': 1}\nSaved 64 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889747572,
@@ -6965,7 +11974,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -6988,7 +11997,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -7223,7 +12232,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
