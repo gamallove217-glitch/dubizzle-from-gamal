@@ -17,12 +17,16 @@ except Exception:
     CAIRO_TZ = timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 # ✅ الميزانيات الزمنية بقت متغيرات بيئة — الـ workflow يتحكم فيها من غير تعديل كود.
-MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", str(8 * 60)) or 480)
+MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", str(25 * 60)) or 1500)
 # FIX(C8): اسم الموضوع بقى من GitHub Secrets. لو السر مش موجود، بيرجع للاسم القديم
 # عشان السكريبر مايوقعش — بس الاسم القديم مكشوف فلازم تحط السر.
 BAN_TOPIC = os.environ.get("NTFY_BAN_TOPIC", "gamal_masyada_bans_2738_v1")
 # FIX(M8): ميزانية زمن للاستكشاف لوحده، عشان ماياكلش وقت الطابور
 DISCOVERY_BUDGET_SECONDS = int(os.environ.get("DISCOVERY_BUDGET_SECONDS", str(4 * 60)) or 240)
+# ✅ FIX: اللوج الحي على GitHub أثبت المشكلة دي — الاكتشاف خد 277 ثانية من أصل
+#    ميزانية 480، ففضل للفحص 203 ثانية بس ⇒ فحص 52 إعلان من 120 ووقف،
+#    وفاضل 67 في الطابور ما اتفحصوش. دلوقتي للفحص ميزانيته المستقلة.
+INSPECTION_BUDGET_SECONDS = int(os.environ.get("INSPECTION_BUDGET_SECONDS", str(10 * 60)) or 600)
 # FIX(C6): عدد محاولات NO_CNT قبل ما نعلّم الإعلان كمفحوص
 NO_CNT_MAX_TRIES = 3
 # FIX(H2): ذاكرة المفحوص بتنتهي بعد كام يوم (للأسباب القابلة للتغيّر زي OLD_AD)
@@ -314,7 +318,10 @@ def load_existing():
         with open("ads.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             nocnt_attempts = dict(data.get("nocnt_attempts_v1", {}) or {})
-            for k in ("last_run_report", "checked_extra_v13", "checked_extra_v14", "checked_extra_v15", "telegram_chat_ids", "telegram_welcomed_ids", "notified_ids_v1", "telegram_last_update_id"):
+            # ✅ FIX(C10): "last_run_report" اتشالت من القائمة دي — scraper.py بقى
+            #    بيكتبها بنفسه. لو فضلت هنا كانت بتكتب فوق التقرير الجديد بالتقرير
+            #    القديم المجمّد (وده بالظبط اللي كان بيجمّد العداد على 29).
+            for k in ("checked_extra_v13", "checked_extra_v14", "checked_extra_v15", "telegram_chat_ids", "telegram_welcomed_ids", "notified_ids_v1", "telegram_last_update_id"):
                 if k in data:
                     preserved_top_keys[k] = data[k]
 
@@ -1327,7 +1334,9 @@ def scrape_all():
     stats = {}
     inspected = 0
 
-    while queue and (time.time() - run_start) < MAX_RUNTIME_SECONDS:
+    inspect_start = time.time()
+    while queue and (time.time() - inspect_start) < INSPECTION_BUDGET_SECONDS \
+            and (time.time() - run_start) < MAX_RUNTIME_SECONDS:
         uid, u, snip, tier, prio = queue.pop(0)
         if uid in kept_ads or uid in checked_ids:
             continue
@@ -1367,6 +1376,49 @@ def scrape_all():
     final_ads = list(kept_ads.values())
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
+    # ══ FIX(C10): scraper.py ماكانش بيكتب last_run_report خالص ══
+    # كان بينقل التقرير القديم زي ما هو (preserved_top_keys)، والكاتب الوحيد كان
+    # extra_radar.py — وبيجيب أرقام دوبيزل عن طريق **تحليل ملف لوج** مش من البيانات.
+    # النتيجة: العداد اللي إنت شايفه في الصفحة (dubizzle_total) بيتجمّد تماماً لو
+    # extra_radar مااشتغلش أو فشل أو اللوج ماوصلوش. ده سبب تاني لتجمّد «29».
+    # دلوقتي كل سكريبر بيكتب أرقامه الحقيقية بنفسه، من البيانات مباشرة.
+    prev_report = preserved_top_keys.get("last_run_report") or {}
+    added_owners    = sum(v for k, v in stats.items() if k.startswith("ADDED_OWNER"))
+    banned_brokers  = sum(v for k, v in stats.items() if k.startswith("BANNED"))
+    excluded_or_old = sum(v for k, v in stats.items() if k in (
+        "OLD_AD", "OLD_OR_UNKNOWN_DATE", "EXPIRED", "EXCLUDED_AREA", "NOT_NEW_CAIRO"))
+    extra_inspected = int(prev_report.get("extra_inspected") or 0)
+    extra_added     = int(prev_report.get("extra_new_owners") or 0)
+
+    dub_total    = sum(1 for a in final_ads if a.get("source", "دوبيزل") == "دوبيزل")
+    aqar_total   = sum(1 for a in final_ads if a.get("source") == "عقارماب")
+    os_total     = sum(1 for a in final_ads if a.get("source") == "السوق المفتوح")
+    sale_total   = sum(1 for a in final_ads if a.get("deal") == "بيع")
+    rent_total   = sum(1 for a in final_ads if a.get("deal") == "إيجار")
+
+    run_report = {
+        "run_time": now_dt.strftime("%Y/%m/%d, %I:%M %p"),
+        "total_saved_owners": len(final_ads),
+        "dubizzle_total": dub_total,
+        "aqarmap_total": aqar_total,
+        "opensooq_total": os_total,
+        "sale_total": sale_total,
+        "rent_total": rent_total,
+        "total_inspected_this_run": inspected + extra_inspected,
+        "dubizzle_inspected": inspected,
+        "extra_inspected": extra_inspected,
+        "total_new_owners_this_run": added_owners + extra_added,
+        "dubizzle_new_owners": added_owners,
+        "extra_new_owners": extra_added,
+        "total_brokers_banned_this_run": banned_brokers,
+        "total_excluded_this_run": excluded_or_old,
+        "total_blacklisted_accounts": len(banned_accounts),
+        "total_checked_ads_memory": len(checked_ids),
+    }
+    print("==========================================")
+    print(f"RUN REPORT SUMMARY: {json.dumps(run_report, ensure_ascii=False)}")
+    print("==========================================")
+
     checked_list = sorted(checked_ids.keys())[-8000:]
     out = {
         "last_scrape": now_dt.strftime("%Y/%m/%d, %I:%M %p"),
@@ -1379,10 +1431,13 @@ def scrape_all():
         "banned_accounts_v7": sorted(list(banned_accounts))[-2000:],
         # FIX(C6): عدّاد محاولات NO_CNT — بينجو بين الرنات
         "nocnt_attempts_v1": {k: v for k, v in list(nocnt_attempts.items())[-1500:]},
+        "last_run_report": run_report,
         "ads": final_ads
     }
     for k, v in preserved_top_keys.items():
         out[k] = v
+    # ✅ ضمان إضافي: التقرير الجديد ما يتكتبش فوقه أي حاجة محفوظة
+    out["last_run_report"] = run_report
 
     with open("ads.json", "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)

@@ -867,15 +867,36 @@ def parse_dubizzle_log():
     return dub_stats
 
 
+TG_TOKEN_SHAPE = re.compile(r"^\d{6,}:[A-Za-z0-9_-]{30,}$")
+
+
 def get_working_tg_token():
-    for b64_s in TG_B64_LIST:
-        try:
-            tok = base64.b64decode(b64_s).decode("utf-8")
-            r = std_requests.get(f"https://api.telegram.org/bot{tok}/getMe", timeout=8)
-            if r.status_code == 200 and r.json().get("ok"):
-                return tok
-        except Exception:
-            pass
+    """
+    ✅ FIX: متغير البيئة TELEGRAM_BOT_TOKEN فيه التوكن **خام**
+       (شكله `123456789:AAH...`)، مش base64 زي ما كان مكتوب في الكود القديم.
+       بنجرّب الخام الأول، ولو ما طابقش الشكل بنفكّ base64 للتوافق مع أي إعداد قديم.
+    """
+    for raw in TG_B64_LIST:
+        cands = []
+        raw = (raw or "").strip()
+        if not raw:
+            continue
+        if TG_TOKEN_SHAPE.match(raw):
+            cands.append(raw)                       # توكن خام من البيئة
+        else:
+            try:                                    # متوافق مع الشكل القديم (base64)
+                cands.append(base64.b64decode(raw).decode("utf-8").strip())
+            except Exception:
+                pass
+        for tok in cands:
+            if not tok:
+                continue
+            try:
+                r = std_requests.get(f"https://api.telegram.org/bot{tok}/getMe", timeout=8)
+                if r.status_code == 200 and r.json().get("ok"):
+                    return tok
+            except Exception:
+                pass
     return ""
 
 
@@ -1144,6 +1165,20 @@ def run_extra_radar():
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
     dub_stats = parse_dubizzle_log()
+    # ✅ FIX(C10): parse_dubizzle_log() بتقرا ملف dubizzle_run.log. لو الملف مش موجود
+    #    (الـ workflow الجديد بيرفع اللوج كـ artifact بدل ما يهرّبه جوه ads.json)،
+    #    الأرقام كانت بترجع صفر ⇒ العداد يظهر «0 مفحوص / 0 جديد» رغم إن السكريبر اشتغل.
+    #    الحل: ناخد الأرقام من التقرير اللي scraper.py كتبه بنفسه في ads.json.
+    if not any(dub_stats.values()):
+        _prev = data.get("last_run_report") or {}
+        dub_stats = {
+            "inspected":       int(_prev.get("dubizzle_inspected") or 0),
+            "added_owners":    int(_prev.get("dubizzle_new_owners") or 0),
+            "banned_brokers":  int(_prev.get("total_brokers_banned_this_run") or 0),
+            "excluded_or_old": int(_prev.get("total_excluded_this_run") or 0),
+        }
+        if any(dub_stats.values()):
+            print(f"[report] مفيش dubizzle_run.log — أخدت أرقام دوبيزل من التقرير المحفوظ: {dub_stats}")
 
     dub_total = sum(1 for a in final_ads if a.get("source", "دوبيزل") == "دوبيزل")
     aqar_total = sum(1 for a in final_ads if a.get("source") == "عقارماب")
@@ -1168,7 +1203,9 @@ def run_extra_radar():
         "total_brokers_banned_this_run": dub_stats["banned_brokers"] + extra_banned,
         "total_excluded_this_run": dub_stats["excluded_or_old"] + extra_excluded,
         "total_blacklisted_accounts": len(banned_accounts),
-        "total_checked_ads_memory": len(checked_extra) + len(data.get("checked_ids_v10", []))
+        # ✅ FIX: كان بيعدّ checked_ids_v10 (قائمة قديمة) — المرجع الحالي v11 (dict).
+        "total_checked_ads_memory": len(checked_extra) + len(
+            data.get("checked_ids_v11") or data.get("checked_ids_v10") or [])
     }
 
     print("==========================================")
