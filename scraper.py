@@ -177,6 +177,7 @@ def forbidden_area_hit(text, forbidden_list):
 
 
 DUBIZZLE_CATEGORY_BASES = [
+    # التجمعات الأساسية (التركيز الأساسي)
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/",
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/5th-settlement/",
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/1st-settlement/",
@@ -197,7 +198,14 @@ DUBIZZLE_CATEGORY_BASES = [
     "https://www.dubizzle.com.eg/properties/commercial-for-rent/1st-settlement/",
     "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/",
     "https://www.dubizzle.com.eg/properties/buildings-lands/5th-settlement/",
-    "https://www.dubizzle.com.eg/properties/buildings-lands/1st-settlement/"
+    "https://www.dubizzle.com.eg/properties/buildings-lands/1st-settlement/",
+    # التجمعات الإضافية (لقاء إعلانات جديدة مكررة أقل)
+    "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/sheikh-zayed/",
+    "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/el-shorouk/",
+    "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/obour-city/",
+    "https://www.dubizzle.com.eg/properties/villas-for-sale/sheikh-zayed/",
+    "https://www.dubizzle.com.eg/properties/villas-for-sale/el-shorouk/",
+    "https://www.dubizzle.com.eg/properties/villas-for-sale/obour-city/",
 ]
 
 
@@ -989,12 +997,12 @@ def fetch_live_dubizzle_categories(req_sess, cffi_sess):
     all_cat_pages = []
     for base in DUBIZZLE_CATEGORY_BASES:
         all_cat_pages.append(base)                      # صفحة 1
-        for pg in (4, 5, 6, 7, 8):                      # صفحات أعمق = ملاك أكتر
+        for pg in (4, 5, 6, 7, 8, 9, 10):                # صفحات أعمق = ملاك أكتر
             all_cat_pages.append(f"{base}?page={pg}")
     random.shuffle(all_cat_pages)
 
     pages_done = 0
-    for cat_url in all_cat_pages[:40]:
+    for cat_url in all_cat_pages[:60]:
         if (time.time() - start) > DISCOVERY_BUDGET_SECONDS:
             print(f"Discovery budget reached after {pages_done} pages")
             break
@@ -1325,7 +1333,10 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
     print(f"Checked Ad {ad_id} ({age_label}): Active_Ads={cnt} | Seller={seller}")
 
-    if cnt not in (1, 2, 3, 4):
+    # PERMANENT FIX: broker threshold raised from >4 to >=50.
+    # Seller عادي ممكن يكون عنده 5-49 إعلان نشطة — ده مش broker.
+    # broker الحقيقي (شركة/سمسار) عنده 100+ إعلان.
+    if cnt >= 50:
         if cnt != 99:
             if account_id and account_id not in ("name:مالك", "name:المالك"):
                 banned_accounts.add(account_id)
