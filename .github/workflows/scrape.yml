@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
-    inputs:
-      max_runtime_minutes:
-        description: 'ميزانية زمن السكريبر بالدقايق'
-        required: false
-        default: '25'
   push:
     branches: [main]
     paths:
@@ -17,7 +12,7 @@ on:
       - 'requirements.txt'
       - '.github/workflows/scrape.yml'
 
-# ✅ FIX(H4): قبل كده كان `cancel-in-progress: ${{ github.event_name != 'schedule' }}`
+# ✅ FIX(H4): قبل كده كان cancel-in-progress مربوط بـ github.event_name != schedule
 #    مع group واحد ثابت. النتيجة المقيسة: 6 من آخر 12 رَن اتلغوا — ومنهم رَن الجدولة
 #    الوحيد (42519075880). كل push كان بيقتل الرَن الشغال، فالسكريبر ماكملش ولا مرة.
 #    دلوقتي: الرَن الجديد بيستنى اللي قبله يخلص (cancel-in-progress: false).
@@ -54,7 +49,11 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           NTFY_BAN_TOPIC: ${{ secrets.NTFY_BAN_TOPIC }}
-          MAX_RUNTIME_SECONDS: ${{ fromJSON(inputs.max_runtime_minutes || '25') * 60 }}
+          # ✅ كان `${{ fromJSON(inputs.max_runtime_minutes || '25') * 60 }}` — وده
+          #    كسر الرَن تماماً: سياق `inputs` متاح بس في workflow_dispatch، فلما
+          #    الرَن جاء من `push` GitHub رفض الملف ووقع الرَن من غير أي وظيفة.
+          #    القيمة دلوقتي ثابتة. لو عايز تغيّرها غيّر الرقم هنا (بالثواني).
+          MAX_RUNTIME_SECONDS: 1500
           DISCOVERY_BUDGET_SECONDS: 150
         # ✅ FIX(M7): `python -u` — من غيرها stdout بيتخزن في buffer وكل مرحلة
         #    بتظهر بطابع زمني واحد، فـاللوجات كانت بتبقى مضلّلة تماماً في التشخيص.
