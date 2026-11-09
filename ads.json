@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/09, 01:38 AM",
+  "last_scrape": "2026/11/09, 04:11 AM",
   "total_ads": 61,
   "checked_ids_v7": [
     186447351,
@@ -839,6 +839,7 @@
     504365105,
     504365901,
     504365973,
+    504366015,
     504366089,
     504366382,
     504366632,
@@ -1046,6 +1047,7 @@
     504385215,
     504385311,
     504385339,
+    504385345,
     504385403,
     504385445,
     504385572,
@@ -1139,9 +1141,18 @@
     504390132,
     504390134,
     504390135,
+    504390169,
+    504390194,
     504390213,
     504390220,
-    504390226
+    504390226,
+    504390280,
+    504390302,
+    504390314,
+    504390370,
+    504390376,
+    504390378,
+    504390381
   ],
   "checked_ids_v10": [
     186447351,
@@ -1981,6 +1992,7 @@
     504365105,
     504365901,
     504365973,
+    504366015,
     504366089,
     504366382,
     504366632,
@@ -2188,6 +2200,7 @@
     504385215,
     504385311,
     504385339,
+    504385345,
     504385403,
     504385445,
     504385572,
@@ -2281,9 +2294,18 @@
     504390132,
     504390134,
     504390135,
+    504390169,
+    504390194,
     504390213,
     504390220,
-    504390226
+    504390226,
+    504390280,
+    504390302,
+    504390314,
+    504390370,
+    504390376,
+    504390378,
+    504390381
   ],
   "banned_accounts_v7": [
     "name:ehab amin"
@@ -2309,7 +2331,8 @@
       "url": "https://eg.opensooq.com/ar/search/289799804",
       "today_verified": true,
       "verified_v12": true,
-      "scraped_at": "2026-11-08T23:01:14.424634+02:00"
+      "scraped_at": "2026-11-08T23:01:14.424634+02:00",
+      "_dub_log": "Kept existing owners: 61 | Fresh unchecked candidates: 11 | Banned accounts: 1\nChecked Ad 504390381 (منذ 1 ساعة): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390378 (منذ 1 ساعة): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390376 (منذ 1 ساعة): Active_Ads=99 | Seller=mostafa-nabil-35987\nChecked Ad 504390370 (منذ 2 ساعات): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390314 (منذ 2 ساعات): Active_Ads=99 | Seller=mostafa-nabil-35987\nChecked Ad 504390302 (منذ 3 ساعات): Active_Ads=99 | Seller=falcon-real-estate-1016\nChecked Ad 504390280 (منذ 2 ساعات): Active_Ads=99 | Seller=mostafa-nabil-35987\nChecked Ad 504390194 (منذ 4 ساعات): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504390169 (منذ 4 ساعات): Active_Ads=99 | Seller=mahmoud-nour-5001785\nChecked Ad 504385345 (منذ 3 ساعات): Active_Ads=99 | Seller=falcon-real-estate-1016\nChecked Ad 504366015 (منذ 5 أيام): Active_Ads=99 | Seller=kmg-real-estate-5001210\nTotal inspected this run: 11 | Queue remaining: 0 | Total banned accounts: 1\nInspection Summary: {'BANNED_BROKER_99_ADS': 11}\nSaved 61 verified fresh New Cairo owner ads.\n"
     },
     {
       "ad_id": 889747572,
@@ -6631,7 +6654,7 @@
       "baths": "2 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة",
+      "subtype": "سطح",
       "seller_name": "نورهان عبدالعزيز",
       "account_id": "97d50d9f-113e-4aa0-acf6-d4d61dfe4bde",
       "seller_ads_count": 1,
@@ -6654,7 +6677,7 @@
       "baths": "3 حمام",
       "deal": "إيجار",
       "category": "شقق للإيجار",
-      "subtype": "شقة مفروشة",
+      "subtype": "شقة",
       "seller_name": "Amr Mohamed",
       "account_id": "c689a30d-8954-4a06-870d-26f197d99e3c",
       "seller_ads_count": 2,
@@ -6889,7 +6912,7 @@
       "baths": "",
       "deal": "بيع",
       "category": "عقار تجاري للبيع",
-      "subtype": "طبي",
+      "subtype": "عقار تجاري",
       "seller_name": "Youssef abdellatif",
       "seller_ads_count": 1,
       "fresh_tier": 2,
@@ -7451,6 +7474,5 @@
     209423433,
     504238147,
     888278850
-  ],
-  "telegram_last_update_id": 0
+  ]
 }
