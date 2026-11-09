@@ -299,6 +299,8 @@ def fetch_manual_bans_from_cloud():
 
 def load_existing():
     kept = []
+    dropped_unverified = []
+    dropped_banned = []
     hard_banned_ids = {
         504371289, 504371232, 504371218, 504371178, 209365202,
         209420390, 504354549, 504144709
@@ -337,6 +339,7 @@ def load_existing():
                 if sacc in ("name:مالك", "name:المالك"):
                     sacc = ""
                 if aid in hard_banned_ids or (sname and sname in banned_accounts) or (sacc and sacc in banned_accounts):
+                    dropped_banned.append((aid, str(a.get("seller_name", ""))[:24]))
                     hard_banned_ids.add(aid)
                     # FIX(H2): checked بقى dict — .add() كان هيرمي AttributeError
                     # جوه try/except فاضي، يعني كان هيفسُد تحميل ads.json بالكامل بصمت.
@@ -344,19 +347,26 @@ def load_existing():
                                          "reason": "BANNED_ACCOUNT"}
                     continue
                 if a.get("verified_v11") is True or a.get("verified_v12") is True:
+                    # ✅ FIX(H3 في scraper): الكود كان **بيعيد تصنيف كل إعلان دوبيزل محفوظ
+                    #    في كل رَن** بالكلمات المفتاحية — فبيمسح التصنيف الصح اللي جاي من
+                    #    الـ breadcrumb الرسمي وقت الإضافة. يعني الإعلان يتصنّف صح أول مرة،
+                    #    وبعدين يتقلب في الرَن اللي بعده. (نفس عيب H3 اللي في extra_radar.)
+                    #    دلوقتي: بنحترم التصنيف المحفوظ، وبنكمّل الناقص بس.
                     if a.get("source", "دوبيزل") == "دوبيزل":
-                        deal, cat, sub = classify_deal_category_subtype(
-                            a.get("url", ""),
-                            a.get("title", ""),
-                            a.get("description", ""),
-                            "",
-                            int(a.get("price_num", 0))
-                        )
-                        a["deal"] = deal
-                        a["category"] = cat
-                        a["subtype"] = sub
+                        if not a.get("category") or not a.get("deal"):
+                            deal, cat, sub = classify_deal_category_subtype(
+                                a.get("url", ""), a.get("title", ""),
+                                a.get("description", ""), "", int(a.get("price_num", 0)))
+                            a["deal"] = deal or a.get("deal")
+                            a["category"] = cat or a.get("category")
+                            a["subtype"] = a.get("subtype") or sub
                         a["description"] = sanitize_desc_for_frontend(a.get("description", ""))
                     kept.append(a)
+                else:
+                    # ✅ FIX: الإعلانات دي كانت بتترمي **من غير أي سطر في اللوج** —
+                    #    مستحيل تعرف إن بياناتك بتقل. دلوقتي بتتسجّل.
+                    dropped_unverified.append((aid, a.get("source", "دوبيزل"),
+                                               str(a.get("seller_name", ""))[:24]))
 
             # FIX(H2): هجرة من checked_ids_v11 (dict) أو من v10/v7 (list قديمة)
             if isinstance(data.get("checked_ids_v11"), dict):
@@ -401,7 +411,18 @@ def load_existing():
     except Exception:
         pass
 
-    return kept, checked, banned_accounts, preserved_top_keys, nocnt_attempts
+    # ✅ FIX: بنبلّغ عن أي إعلان اتحذف وليه — قبل كده كان بيختفي في صمت تام.
+    if dropped_banned:
+        print(f"⚠️  حُذف {len(dropped_banned)} إعلان محفوظ لأن حساب البائع بقى محظور:")
+        for aid, nm in dropped_banned[:10]:
+            print(f"     - {aid} | {nm}")
+    if dropped_unverified:
+        print(f"⚠️  حُذف {len(dropped_unverified)} إعلان محفوظ من غير علامة verified_v11/v12:")
+        for aid, src, nm in dropped_unverified[:10]:
+            print(f"     - {aid} | {src} | {nm}")
+
+    return (kept, checked, banned_accounts, preserved_top_keys, nocnt_attempts,
+            dropped_banned, dropped_unverified)
 
 
 def normalize_dubizzle_url(raw_u):
@@ -1291,7 +1312,8 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
 
 def scrape_all():
     run_start = time.time()
-    existing_ads, checked_ids, banned_accounts, preserved_top_keys, nocnt_attempts = load_existing()
+    (existing_ads, checked_ids, banned_accounts, preserved_top_keys, nocnt_attempts,
+     dropped_banned, dropped_unverified) = load_existing()
     now_dt = datetime.now(CAIRO_TZ)
     kept_ads = {int(a["ad_id"]): a for a in existing_ads if "ad_id" in a}
 

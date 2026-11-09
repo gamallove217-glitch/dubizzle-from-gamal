@@ -1060,11 +1060,16 @@ def run_extra_radar():
             if not saved_meta:
                 saved_meta = meta_cand
 
+    # ✅ FIX(L7): كانت قائمة بـ 15 رقم إعلان مكتوبة يدوي في الكود، وبتتمسح من
+    #    ads.json في **كل رَن** من غير أي سطر في اللوج. لو رجعت الإعلانات دي ظهرت
+    #    تاني من المصدر، كانت بتتمسح تاني — يعني شغل ضايع للأبد.
+    #    بقت من متغير بيئة (فاضية افتراضياً)، وأي حذف بيتسجّل في اللوج.
     unverified_fallback_ids = {
-        889052484, 888278850, 706956728, 706442058, 707324352,
-        707320377, 707317268, 707316652, 707283386, 707114653,
-        707092368, 707019572, 707002090, 705932405, 706898048
+        int(x) for x in re.split(r"[,\s]+", (os.environ.get("DROP_AD_IDS") or "").strip())
+        if x.isdigit()
     }
+    if unverified_fallback_ids:
+        print(f"⚠️  هيتم حذف {len(unverified_fallback_ids)} إعلان بسبب DROP_AD_IDS")
     all_existing_list = list(ads)
     for backup_ad in saved_meta.get("extra_ads_backup", []):
         if isinstance(backup_ad, dict) and "ad_id" in backup_ad:

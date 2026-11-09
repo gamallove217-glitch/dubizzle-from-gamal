@@ -91,6 +91,18 @@ jobs:
             exit 0
           fi
           git commit -m "Auto-update ads.json (run ${{ github.run_number }})"
-          # ✅ سحب آخر تغييرات قبل الـ push — الـ frontend بيكتب bans/contacts في نفس الملف
-          git pull --rebase origin main
-          git push origin HEAD:main
+          # ✅ FIX: الرَن 42558853056 فشل هنا بالظبط:
+          #    "CONFLICT (content): Merge conflict in ads.json"
+          #    لأن رَن تاني (من الـ workflow القديم) كان بيعدّل نفس الملف في نفس الوقت.
+          #    ads.json ملف **مولَّد** — فالنسخة بتاعتنا هي الأحدث والأصح.
+          #    -X theirs في rebase = رجّح commit بتاعنا (الترجمة معكوسة في rebase).
+          if ! git pull --rebase -X theirs origin main; then
+            echo "::warning::تعارض في ads.json — بنحاول merge بدل rebase"
+            git rebase --abort || true
+            git pull --no-rebase -X ours --no-edit origin main || true
+          fi
+          if ! git push origin HEAD:main; then
+            echo "::warning::الـ push فشل — الرَن الجاي هيحمل البيانات الأحدث"
+            git pull --rebase -X theirs origin main || true
+            git push origin HEAD:main
+          fi
