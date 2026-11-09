@@ -34,7 +34,7 @@ INSPECTION_BUDGET_SECONDS = int(os.environ.get("INSPECTION_BUDGET_SECONDS", str(
 # FIX(C6): عدد محاولات NO_CNT قبل ما نعلّم الإعلان كمفحوص
 NO_CNT_MAX_TRIES = 3
 # FIX(H2): ذاكرة المفحوص بتنتهي بعد كام يوم (للأسباب القابلة للتغيّر زي OLD_AD)
-CHECKED_TTL_DAYS = 14
+CHECKED_TTL_DAYS = 7
 
 STRICT_NEW_CAIRO_HEADER = [
     "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول",
