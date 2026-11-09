@@ -18,6 +18,9 @@ from curl_cffi import requests as cffi_requests
 CAIRO_TZ = ZoneInfo("Africa/Cairo") if ZoneInfo else timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
+# PERMANENT FIX: TTL لجميع الإعلانات (7 أيام)
+CHECKED_TTL_DAYS = int(os.environ.get("CHECKED_TTL_DAYS", "7") or 7)
+
 # ── FIX(C1): توكن تليجرام كان مكتوب في الكود (base64 = ترميز مش تشفير) ──
 # أي حد يفتح الملف ياخد التوكن ويبعت من البوت بتاعك. اتنقل لمتغير بيئة.
 # ضيفه في: Settings → Secrets and variables → Actions → TELEGRAM_BOT_TOKEN
@@ -1244,6 +1247,26 @@ def run_extra_radar():
         time.sleep(3.2)
 
     final_ads = list(kept_map.values())
+    # PERMANENT FIX: حذف الإعلانات القديمة (>7 أيام) من extra sources
+    ad_cutoff = datetime.now(CAIRO_TZ) - timedelta(days=CHECKED_TTL_DAYS)
+    kept_after_ttl = []
+    ttl_pruned_extra = 0
+    for a in final_ads:
+        ts_str = str(a.get("scraped_at") or a.get("verified_at") or "")
+        if ts_str:
+            try:
+                dt = datetime.fromisoformat(ts_str)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=CAIRO_TZ)
+                if dt < ad_cutoff:
+                    ttl_pruned_extra += 1
+                    continue
+            except Exception:
+                pass
+        kept_after_ttl.append(a)
+    if ttl_pruned_extra:
+        print(f"PERMANENT FIX: حُذف {ttl_pruned_extra} إعلان قديم (>{CHECKED_TTL_DAYS} أيام) من extra sources")
+    final_ads = kept_after_ttl
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
     dub_stats = parse_dubizzle_log()

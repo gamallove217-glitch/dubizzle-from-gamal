@@ -540,20 +540,21 @@ def load_existing():
                     except Exception:
                         pass
 
-            # FIX(H2): نسيان الأسباب "المرنة" بعد CHECKED_TTL_DAYS يوم
-            # (السبب: الذاكرة كانت أبدية — 1140 ID متراكم، ومع إضافة عشرات IDs
-            #  دفعة واحدة من extract_same_seller_ads_to_ban() المجمّع القابل للفحص
-            #  كان بينكمش بشكل رتيب لحد ما بقى `Fresh unchecked candidates: 0` للأبد)
+            # PERMANENT FIX: نسيان **كل** المفحوصين بعد CHECKED_TTL_DAYS يوم
+            # (بدون استثناء — الـuser طلب: "كل إعلان يُمحى بعد 7 أيام")
+            # السبب: الذاكرة كانت بتمسك BANNED_BROKER و BANNED_ACCOUNT للأبد
+            # ⇒ 3046 ID متراكم ⇒ الـdiscovery بيلاقي نفس الإعلانات كل رن
+            #   و بيخلاص الطابور بسرعة ⇒ صفر إضافة.
+            # بعد التغيير ده: كل ID يتحذف بعد 7 أيام، ويتجرّب تاني لو رجع.
             cutoff = datetime.now(CAIRO_TZ) - timedelta(days=CHECKED_TTL_DAYS)
             pruned = 0
             for aid in list(checked.keys()):
                 info = checked[aid] or {}
-                reason = str(info.get("reason", ""))
-                if aid in hard_banned_ids or any(reason.startswith(h) for h in HARD_REJECT_REASONS):
-                    continue                      # رفض صلب ⇒ يفضل للأبد
                 ts = str(info.get("ts", ""))
                 if not ts:
-                    continue                      # LEGACY بدون تاريخ ⇒ نحتفظ بيه
+                    # LEGACY بدون تاريخ ⇒ نتحف بيه 7 أيام كمان من وقت التشغيل
+                    checked[aid] = {"ts": datetime.now(CAIRO_TZ).isoformat(), "reason": "LEGACY"}
+                    ts = checked[aid]["ts"]
                 try:
                     dt = datetime.fromisoformat(ts)
                     if dt.tzinfo is None:
@@ -564,7 +565,7 @@ def load_existing():
                 except Exception:
                     pass
             if pruned:
-                print(f"FIX(H2): نسيان {pruned} ID قديم من ذاكرة المفحوص (TTL={CHECKED_TTL_DAYS} يوم)")
+                print(f"PERMANENT FIX: نسيان {pruned} ID قديم من ذاكرة المفحوص (TTL={CHECKED_TTL_DAYS} يوم، كل الأسباب)")
     except Exception:
         pass
 
@@ -1565,6 +1566,27 @@ def scrape_all():
     print(f"Inspection Summary: {stats}")
 
     final_ads = list(kept_ads.values())
+    # PERMANENT FIX: حذف الإعلانات القديمة (>7 أيام) من ads.json
+    # الـuser طلب: "كل إعلان يُمحى بعد 7 أيام"
+    ad_cutoff = datetime.now(CAIRO_TZ) - timedelta(days=CHECKED_TTL_DAYS)
+    kept_after_ttl = []
+    ttl_pruned = 0
+    for a in final_ads:
+        ts_str = str(a.get("scraped_at") or a.get("verified_at") or "")
+        if ts_str:
+            try:
+                dt = datetime.fromisoformat(ts_str)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=CAIRO_TZ)
+                if dt < ad_cutoff:
+                    ttl_pruned += 1
+                    continue
+            except Exception:
+                pass
+        kept_after_ttl.append(a)
+    if ttl_pruned:
+        print(f"PERMANENT FIX: حُذف {ttl_pruned} إعلان قديم (>{CHECKED_TTL_DAYS} أيام) من ads.json")
+    final_ads = kept_after_ttl
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
     # ══ FIX(C10): scraper.py ماكانش بيكتب last_run_report خالص ══
