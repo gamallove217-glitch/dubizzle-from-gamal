@@ -47,7 +47,7 @@ NEW_CAIRO_WORDS = [
     "الحي التاني", "الحي الثالث", "الحي التالت", "الحي الرابع", "الحي الخامس",
     "النرجس", "اللوتس", "الأندلس", "الاندلس", "الياسمين", "البنفسج",
     "جنوب الأكاديمية", "جنوب الاكاديمية", "الاكاديمية", "شرق الأكاديمية", "شرق الاكاديمية",
-    "المستثمرين", "بيت الوطن", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة",
+    "المستثمرين", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة",
     "ابو الهول", "أبو الهول", "جاردينيا هايتس", "غرب الجولف", "غرب أرابيلا", "غرب ارابيلا",
     "أرابيلا", "ارابيلا", "الشويفات", "الداون تاون", "التسعين", "القطامية", "القطاميه",
     "كايرو فيستيفال", "كايرو فستيفال", "ميفيدا", "ماونتن فيو", "هايد بارك", "بالم هيلز",
@@ -68,7 +68,9 @@ STRICT_FORBIDDEN_EVERYWHERE = [
     "الشيخ زايد", "6 أكتوبر", "٦ أكتوبر", "حدائق أكتوبر", "الهرم", "حدائق الأهرام",
     "فيصل", "المهندسين", "الدقي", "العجوزة", "المعادي", "زهراء المعادي",
     "العاشر من رمضان", "المقطم", "الهضبة الوسطى",
-    "شاليه للبيع", "شاليه للإيجار", "شاليه للايجار", "راس الحكمة", "رأس الحكمة", "مراسي", "الجونة"
+    "شاليه للبيع", "شاليه للإيجار", "شاليه للايجار", "راس الحكمة", "رأس الحكمة", "مراسي", "الجونة",
+    # 🆕 بيت الوطن — ممنوعة زي مدينتي بالظبط، بس بحماية من «تبعد عن بيت الوطن»
+    "بيت الوطن", "بيت الوطنى", "بيت الوطن الجديد"
 ]
 
 EXCLUDE_CITIES = STRICT_FORBIDDEN_EVERYWHERE + [
@@ -81,8 +83,98 @@ FRONTEND_SANITIZE_WORDS = [
     "مصر الجديدة", "مصر الجديده", "مدينة نصر", "مدينه نصر", "زهراء مدينة نصر",
     "الكوربة", "أرض الجولف", "ارض الجولف", "ميدان الحجاز", "روكسي", "الماظة", "ألماظة",
     "شيراتون", "النزهة", "عباس العقاد", "مكرم عبيد", "مصطفى النحاس",
-    "الرحاب", "مدينتي", "الشروق", "العاصمة الإدارية", "مدينة المستقبل", "عقارات مصايف"
+    "الرحاب", "مدينتي", "الشروق", "العاصمة الإدارية", "مدينة المستقبل", "عقارات مصايف",
+    "بيت الوطن", "بيت الوطنى"
 ]
+
+# ==============================================================================
+#  🛡️ حماية من اللبس (طلب المالك 2026-11-09)
+# ------------------------------------------------------------------------------
+#  المشكلة: المطابقة الحرفية للكلمات بتظلم الإعلان السليم.
+#    • «شقة تبعد عن بيت الوطن 5 دقايق»   ⇒ مش في بيت الوطن، لازم تفضل
+#    • «بدون أقساط من المالك»             ⇒ كاش، لازم تفضل
+#    • «بدون مقدم»                        ⇒ كانت مصنّفة سمسار! غلط صريح
+#  الحل: لما نلاقي كلمة، نبصّ في الـ 26 حرف اللي قبلها. لو فيه نفي أو
+#        إشارة مسافة **بيحكمها مباشرةً** (من غير حرف عطف بينهم) ⇒ نتجاهلها.
+#  حرف العطف مهم: «بدون مقدم وأقساط على 5 سنين» ⇒ «بدون» بتحكم «مقدم» بس،
+#        «أقساط» بعد الواو ⇒ إعلان تقسيط ⇒ مرفوض. صح.
+# ==============================================================================
+
+# كلمات التقسيط/الأقساط — لو الإعلان نفسه بيقدّمها ⇒ مرفوض
+INSTALLMENT_WORDS = [
+    "بالتقسيط", "تقسيط", "أقساط", "اقساط", "بالأقساط", "بالاقساط", "قسط",
+    "مقدم", "بقدم", "بمقدم", "دفعة", "دفعه", "أقل مقدم", "اقل مقدم",
+    "تسهيلات", "تسهيل", "نظام سداد", "أنظمة سداد", "انظمة سداد",
+    "خطة سداد", "خطط سداد", "سداد ميسر", "سداد مرن",
+    "على سنوات", "علي سنوات", "على سنين", "علي سنين", "لسنوات", "لسنين",
+    "خصم الكاش", "سعر الشركة",
+    "installment", "installments", "down payment", "payment plan",
+]
+
+# النفي — لو جه قبل الكلمة مباشرةً ⇒ الكلمة ملغاة
+NEGATION_RE = re.compile(
+    r"(?:^|[\s،,;.\-–—(|«»\"])"
+    r"(?:بدون|بلا|لا|مش|ليس|غير|من\s+غير|منغير|مفيش|خالي|خالٍ|مبقتش|no|not|without|zero)"
+    r"(?=$|[\s،,;.\-–—)|«»\"])"
+)
+
+# إشارة مسافة/مرجع — لو جه قبل اسم المنطقة ⇒ المنطقة مش موقع الإعلان
+AREA_HINT_RE = re.compile(
+    r"(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|خلفها|"
+    r"أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|"
+    r"على\s+بعد|علي\s+بعد|بعد|لسه\s+موصل|"
+    r"(?:^|[\s،,;.\-–—(|])(?:مش|ليس|غير|بدون|بلا|لا)(?=$|[\s،,;.\-–—)|]))"
+)
+
+# حروف العطف — لو فصلت بين النفي والكلمة ⇒ النفي ما بيحكمهاش
+CONJUNCTION_MARKS = (" و", "،", ",", "+", "|", " أو ", " او ", " ثم ", ";", " وكذلك ", " و")
+
+LOOKBACK_CHARS = 26
+
+
+def _governed_before(text, start, pattern):
+    """فيه حاجة من `pattern` بتحكم الكلمة اللي عند الموضع `start`؟"""
+    if not text or start <= 0:
+        return False
+    window = text[max(0, start - LOOKBACK_CHARS):start]
+    best = None
+    for m in pattern.finditer(window):
+        best = m                       # آخر تطابق = الأقرب للكلمة
+    if best is None:
+        return False
+    between = window[best.end():]
+    if any(c in between for c in CONJUNCTION_MARKS):
+        return False                   # فيه عطف ⇒ النفي/المرجع ما بيحكمش الكلمة
+    return True
+
+
+def area_is_the_location(text, area):
+    """`area` مذكورة كموقع حقيقي للإعلان (مش كمرجع مسافة)؟"""
+    t = text or ""
+    for m in re.finditer(re.escape(area), t):
+        if not _governed_before(t, m.start(), AREA_HINT_RE):
+            return True
+    return False
+
+
+def has_installment_offer(text):
+    """الإعلان نفسه معروض بتقسيط/أقساط؟ بيتجاهل «بدون أقساط» و«لا تقسيط»."""
+    t = (text or "").lower()
+    for w in INSTALLMENT_WORDS:
+        wl = w.lower()
+        for m in re.finditer(re.escape(wl), t):
+            if not _governed_before(t, m.start(), NEGATION_RE):
+                return True
+    return False
+
+
+def forbidden_area_hit(text, forbidden_list):
+    """بيرجّع أول منطقة محظورة الإعلان **واقع فيها فعلاً**، أو None."""
+    for bad in forbidden_list:
+        if area_is_the_location(text, bad):
+            return bad
+    return None
+
 
 DUBIZZLE_CATEGORY_BASES = [
     "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/",
@@ -133,7 +225,8 @@ BROKER_TITLE_SIGNALS = [
     "مقدم", "بقدم", "قسط", "أقساط", "اقساط", "تقسيط", "تسهيلات", "تسهيل", "سداد",
     "دايركت", "استلام فوري", "استلام فورى", "لقطة", "لقطه", "ألترا لوكس",
     "الترا لوكس", "دفعة", "دفعه", "على سنوات", "علي سنوات", "على سنين", "علي سنين",
-    "بأقل مقدم", "باقل مقدم", "أقل مقدم", "اقل مقدم", "بدون مقدم", "للتسويق",
+        # ⚠️ «بدون مقدم» اتشالت — كانت بتظلم المالك اللي بيبيع كاش
+    "بأقل مقدم", "باقل مقدم", "أقل مقدم", "اقل مقدم", "للتسويق",
     "تسويق عقاري", "شركة عقارية", "كمبوند بالتقسيط", "وحدات بالتقسيط",
     "خصم الكاش", "خصم الكاش ", "سعر الشركة", "بأقل من سعر الشركة",
 ]
@@ -147,6 +240,9 @@ def classify_title_signal(title):
     t = (title or "").lower()
     if any(w.lower() in t for w in OWNER_TITLE_SIGNALS):
         return "OWNER"
+    # 🛡️ كلمات التقسيط بتتفحص بوعي بالنفي: «بدون أقساط» ⇒ مش سمسار
+    if has_installment_offer(t):
+        return "BROKER"
     if any(w.lower() in t for w in BROKER_TITLE_SIGNALS):
         return "BROKER"
     return "UNKNOWN"
@@ -923,7 +1019,7 @@ def fetch_live_dubizzle_categories(req_sess, cffi_sess):
             ld = ld_titles.get(ad_id) or {}
             own_title = ld.get("title") or card_snip
 
-            if any(bad in own_title for bad in STRICT_FORBIDDEN_EVERYWHERE):
+            if forbidden_area_hit(own_title, STRICT_FORBIDDEN_EVERYWHERE):
                 continue
             tier = get_card_tier(card_snip) if card_snip else 1
             if tier == 0:
@@ -1144,7 +1240,7 @@ def extract_related_fresh(raw_text, exclude_ids=None):
     for rid, (ru, rcard) in extract_links_from_text_or_html(raw_text).items():
         if rid in exclude_ids:
             continue
-        if any(bad in rcard for bad in STRICT_FORBIDDEN_EVERYWHERE):
+        if forbidden_area_hit(rcard, STRICT_FORBIDDEN_EVERYWHERE):
             continue
         tier = get_card_tier(rcard)
         if tier == 0:
@@ -1274,15 +1370,24 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
     official_loc_and_title = f"{title_clean} {before_desc_clean} {loc_box_clean}"
     entire_ad_text = f"{official_loc_and_title} {desc_clean}"
 
-    for bad_city in STRICT_FORBIDDEN_EVERYWHERE:
-        if bad_city in official_loc_and_title:
-            print(f"Skipped Excluded Area ({bad_city}) in Ad {ad_id}")
-            return None, True, "EXCLUDED_AREA", {}
+    # 🛡️ FIX(طلب المالك): المطابقة بقت واعية بالسياق.
+    #    «تبعد عن بيت الوطن 5 دقايق» ⇒ مش في بيت الوطن ⇒ الإعلان يعدي.
+    #    «شقة في بيت الوطن»         ⇒ مرفوض.
+    bad_hit = forbidden_area_hit(official_loc_and_title, STRICT_FORBIDDEN_EVERYWHERE)
+    if bad_hit:
+        print(f"Skipped Excluded Area ({bad_hit}) in Ad {ad_id}")
+        return None, True, "EXCLUDED_AREA", {}
 
-    for bad_sat in EXCLUDE_CITIES:
-        if bad_sat in official_loc_and_title:
-            print(f"Skipped Excluded Location ({bad_sat}) in Ad {ad_id}")
-            return None, True, "EXCLUDED_AREA", {}
+    bad_hit = forbidden_area_hit(official_loc_and_title, EXCLUDE_CITIES)
+    if bad_hit:
+        print(f"Skipped Excluded Location ({bad_hit}) in Ad {ad_id}")
+        return None, True, "EXCLUDED_AREA", {}
+
+    # 🛡️ FIX(طلب المالك): مرفوض أي إعلان نفسه بالتقسيط/الأقساط.
+    #    «بدون أقساط» و«لا تقسيط» و«كاش فقط» ⇒ بيتقبلوا عادي.
+    if has_installment_offer(f"{official_loc_and_title} {desc_clean}"):
+        print(f"Skipped Installment Ad (تقسيط/أقساط) in Ad {ad_id}")
+        return None, True, "INSTALLMENT_AD", {}
 
     if not any(w in official_loc_and_title for w in STRICT_NEW_CAIRO_HEADER):
         print(f"Skipped Non-New-Cairo Location in Ad {ad_id}")

@@ -395,7 +395,7 @@ header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;backg
 <div class="filters-panel">
   <div class="search-box">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="qSearch" placeholder="ابحث بالمنطقة في التجمعات (النرجس، اللوتس، الياسمين، البنفسج، جنوب الأكاديمية، بيت الوطن...)" oninput="render()">
+    <input type="text" id="qSearch" placeholder="ابحث بالمنطقة في التجمعات (النرجس، اللوتس، الياسمين، البنفسج، جنوب الأكاديمية، الأندلس...)" oninput="render()">
   </div>
 
   <div class="filter-section">
@@ -780,7 +780,8 @@ const STRICT_FORBIDDEN = [
   "مصر الجديدة","مصر الجديده","مدينة نصر","مدينه نصر","زهراء مدينة نصر",
   "الكوربة","أرض الجولف","ارض الجولف","ميدان الحجاز","روكسي","الماظة","ألماظة",
   "شيراتون","النزهة","عباس العقاد","مكرم عبيد","مصطفى النحاس",
-  "الرحاب","مدينتي","الشروق","العاصمة الإدارية","مدينة المستقبل"
+  "الرحاب","مدينتي","الشروق","العاصمة الإدارية","مدينة المستقبل",
+  "بيت الوطن","بيت الوطنى","بيت الوطن الجديد"
 ];
 
 function normalizeAdCategoryClient(ad){
@@ -861,6 +862,68 @@ function normalizeAdCategoryClient(ad){
   return ad;
 }
 
+// ============================================================================
+//  🛡️ حماية من اللبس (طلب المالك 2026-11-09) — نفس منطق scraper.py بالظبط
+//    • «شقة تبعد عن بيت الوطن 5 دقايق» ⇒ مش في بيت الوطن ⇒ تظهر عادي
+//    • «بدون أقساط من المالك»          ⇒ كاش ⇒ تظهر عادي
+//    • «بدون مقدم وأقساط على 5 سنين»   ⇒ الواو فصلت النفي ⇒ تقسيط ⇒ تختفي
+// ============================================================================
+const INSTALLMENT_WORDS = [
+  "بالتقسيط","تقسيط","أقساط","اقساط","بالأقساط","بالاقساط","قسط",
+  "مقدم","بقدم","بمقدم","دفعة","دفعه","أقل مقدم","اقل مقدم",
+  "تسهيلات","تسهيل","نظام سداد","أنظمة سداد","انظمة سداد",
+  "خطة سداد","خطط سداد","سداد ميسر","سداد مرن",
+  "على سنوات","علي سنوات","على سنين","علي سنين","لسنوات","لسنين",
+  "خصم الكاش","سعر الشركة",
+  "installment","installments","down payment","payment plan"
+];
+const NEGATION_RE = new RegExp("(?:^|[\\s،,;.\\-–—(|«»\"])(?:بدون|بلا|لا|مش|ليس|غير|من\\s+غير|منغير|مفيش|خالي|خالٍ|مبقتش|no|not|without|zero)(?=$|[\\s،,;.\\-–—)|«»\"])","g");
+const AREA_HINT_RE = new RegExp("(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|خلفها|أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|على\\s+بعد|علي\\s+بعد|بعد|لسه\\s+موصل|(?:^|[\\s،,;.\\-–—(|])(?:مش|ليس|غير|بدون|بلا|لا)(?=$|[\\s،,;.\\-–—)|]))","g");
+const CONJUNCTION_MARKS = [" و","،",",","+","|"," أو "," او "," ثم ",";"," وكذلك "];
+const LOOKBACK_CHARS = 26;
+
+function governedBefore(text, start, re){
+  if(!text || start <= 0) return false;
+  const win = text.slice(Math.max(0, start - LOOKBACK_CHARS), start);
+  re.lastIndex = 0;
+  let m, best = null;
+  while((m = re.exec(win)) !== null){
+    best = m;
+    if(m.index === re.lastIndex) re.lastIndex++;
+  }
+  if(!best) return false;
+  const between = win.slice(best.index + best[0].length);
+  return !CONJUNCTION_MARKS.some(c => between.includes(c));
+}
+
+function areaIsTheLocation(text, area){
+  const t = text || "";
+  let idx = t.indexOf(area);
+  while(idx !== -1){
+    if(!governedBefore(t, idx, AREA_HINT_RE)) return true;
+    idx = t.indexOf(area, idx + 1);
+  }
+  return false;
+}
+
+function hasInstallmentOffer(text){
+  const t = (text || "").toLowerCase();
+  for(const w of INSTALLMENT_WORDS){
+    const wl = w.toLowerCase();
+    let idx = t.indexOf(wl);
+    while(idx !== -1){
+      if(!governedBefore(t, idx, NEGATION_RE)) return true;
+      idx = t.indexOf(wl, idx + 1);
+    }
+  }
+  return false;
+}
+
+function forbiddenAreaHit(text, list){
+  for(const bad of list){ if(areaIsTheLocation(text, bad)) return bad; }
+  return null;
+}
+
 function isCleanAd(ad){
   if(bannedIdsMap[String(ad.ad_id)]) return false;
   const sNameKey = "name:" + String(ad.seller_name || "").toLowerCase().trim();
@@ -869,9 +932,10 @@ function isCleanAd(ad){
 
   const text = ((ad.title||"") + " " + (ad.description||"")).toLowerCase();
   if(text.includes("عقارات مصايف") || text.includes("شاليه ")) return false;
-  for(const bad of STRICT_FORBIDDEN){
-    if(text.includes(bad)) return false;
-  }
+  // 🛡️ واعية بالسياق: «تبعد عن بيت الوطن» تظهر، «في بيت الوطن» تختفي
+  if(forbiddenAreaHit(text, STRICT_FORBIDDEN)) return false;
+  // 🛡️ مرفوض أي إعلان نفسه بالتقسيط — «بدون أقساط» بيعدي عادي
+  if(hasInstallmentOffer(text)) return false;
   // ✅ FIX(M4): الجزء المهم من الإصلاح ده إن الإعلان اللي مفيش له عدد
   //    (عقارماب والسوق المفتوح مالهمش seller_ads_count) ما يتخفيش.
   //    القاعدة نفسها فضلت 1..4 زي ما هي — دي قاعدة المالك.

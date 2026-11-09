@@ -50,7 +50,7 @@ NEW_CAIRO_WORDS = [
     "الحي التاني", "الحي الثالث", "الحي التالت", "الحي الرابع", "الحي الخامس",
     "النرجس", "اللوتس", "الأندلس", "الاندلس", "الياسمين", "البنفسج",
     "جنوب الأكاديمية", "جنوب الاكاديمية", "الاكاديمية", "شرق الأكاديمية", "شرق الاكاديمية",
-    "المستثمرين", "بيت الوطن", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة",
+    "المستثمرين", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة",
     "ابو الهول", "أبو الهول", "جاردينيا هايتس", "غرب الجولف", "غرب أرابيلا", "غرب ارابيلا",
     "أرابيلا", "ارابيلا", "الشويفات", "الداون تاون", "التسعين", "القطامية", "القطاميه",
     "كايرو فيستيفال", "كايرو فستيفال", "ميفيدا", "ماونتن فيو", "هايد بارك", "بالم هيلز",
@@ -83,7 +83,9 @@ STRICT_FORBIDDEN_HEADER = [
     "مدينة الرحاب", "شقق للبيع في الرحاب", "في الرحاب", "بمدينتي", "في مدينتي",
     "مدينة الشروق", "في الشروق", "مدينة المستقبل", "المستقبل سيتي", "مدينة بدر",
     "مدينة العبور", "في العبور", "العاصمة الإدارية", "العاصمه الاداريه", "حدائق العاصمة",
-    "تاج سيتي", "هليوبوليس الجديدة", "هليوبوليس الجديده"
+    "تاج سيتي", "هليوبوليس الجديدة", "هليوبوليس الجديده",
+    # 🆕 بيت الوطن — ممنوعة زي مدينتي، بحماية من «تبعد عن بيت الوطن»
+    "بيت الوطن", "بيت الوطنى", "بيت الوطن الجديد"
 ]
 
 WORDS_TO_SANITIZE_IN_DESC = [
@@ -91,8 +93,77 @@ WORDS_TO_SANITIZE_IN_DESC = [
     "مدينتي", "مدينتى", "الشروق", "مدينة الشروق", "مدينة المستقبل", "المستقبل سيتي",
     "مدينة بدر", "العبور", "العاصمة الإدارية", "العاصمه الاداريه", "تاج سيتي",
     "هليوبوليس الجديدة", "جاردينيا سيتي", "المقطم", "المعادي", "شيراتون", "النزهة",
-    "جاردينيا", "عقارات مصايف"
+    "جاردينيا", "عقارات مصايف", "بيت الوطن", "بيت الوطنى"
 ]
+
+# ==============================================================================
+#  🛡️ حماية من اللبس — نفس منطق scraper.py بالظبط (الملف ده مستقل فما ينفعش يستورده)
+#    • «تبعد عن بيت الوطن 5 دقايق»  ⇒ مش في بيت الوطن ⇒ تعدي
+#    • «بدون أقساط من المالك»        ⇒ كاش ⇒ تعدي
+#    • «بدون مقدم وأقساط على 5 سنين» ⇒ الواو فصلت النفي ⇒ تقسيط ⇒ مرفوض
+# ==============================================================================
+INSTALLMENT_WORDS = [
+    "بالتقسيط", "تقسيط", "أقساط", "اقساط", "بالأقساط", "بالاقساط", "قسط",
+    "مقدم", "بقدم", "بمقدم", "دفعة", "دفعه", "أقل مقدم", "اقل مقدم",
+    "تسهيلات", "تسهيل", "نظام سداد", "أنظمة سداد", "انظمة سداد",
+    "خطة سداد", "خطط سداد", "سداد ميسر", "سداد مرن",
+    "على سنوات", "علي سنوات", "على سنين", "علي سنين", "لسنوات", "لسنين",
+    "خصم الكاش", "سعر الشركة",
+    "installment", "installments", "down payment", "payment plan",
+]
+NEGATION_RE = re.compile(
+    r"(?:^|[\s،,;.\-–—(|«»\"])"
+    r"(?:بدون|بلا|لا|مش|ليس|غير|من\s+غير|منغير|مفيش|خالي|خالٍ|مبقتش|no|not|without|zero)"
+    r"(?=$|[\s،,;.\-–—)|«»\"])"
+)
+AREA_HINT_RE = re.compile(
+    r"(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|خلفها|"
+    r"أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|"
+    r"على\s+بعد|علي\s+بعد|بعد|لسه\s+موصل|"
+    r"(?:^|[\s،,;.\-–—(|])(?:مش|ليس|غير|بدون|بلا|لا)(?=$|[\s،,;.\-–—)|]))"
+)
+CONJUNCTION_MARKS = (" و", "،", ",", "+", "|", " أو ", " او ", " ثم ", ";", " وكذلك ")
+LOOKBACK_CHARS = 26
+
+
+def _governed_before(text, start, pattern):
+    if not text or start <= 0:
+        return False
+    window = text[max(0, start - LOOKBACK_CHARS):start]
+    best = None
+    for m in pattern.finditer(window):
+        best = m
+    if best is None:
+        return False
+    between = window[best.end():]
+    if any(c in between for c in CONJUNCTION_MARKS):
+        return False
+    return True
+
+
+def area_is_the_location(text, area):
+    t = text or ""
+    for m in re.finditer(re.escape(area), t):
+        if not _governed_before(t, m.start(), AREA_HINT_RE):
+            return True
+    return False
+
+
+def has_installment_offer(text):
+    t = (text or "").lower()
+    for w in INSTALLMENT_WORDS:
+        for m in re.finditer(re.escape(w.lower()), t):
+            if not _governed_before(t, m.start(), NEGATION_RE):
+                return True
+    return False
+
+
+def forbidden_area_hit(text, forbidden_list):
+    for bad in forbidden_list:
+        if area_is_the_location(text, bad):
+            return bad
+    return None
+
 
 AQARMAP_SETTLEMENT_ZONES = [
     "cairo/new-cairo",
@@ -144,7 +215,7 @@ EXTRA_QUERIES = [
     'site:aqarmap.com.eg/ar/listing "اللوتس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "الياسمين" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "البنفسج" "مالك عقار"',
-    'site:aqarmap.com.eg/ar/listing "بيت الوطن" "مالك عقار"',
+    # 🆕 اتشال: كان بيدوّر على بيت الوطن بالاسم — المنطقة بقت ممنوعة
     'site:aqarmap.com.eg/ar/listing "جنوب الأكاديمية" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "الأندلس" "مالك عقار"',
     'site:aqarmap.com.eg/ar/listing "القرنفل" "مالك عقار"',
@@ -633,9 +704,12 @@ def parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     header_only = f"{title_clean} {ad_core[:450]}"
     header_and_desc = f"{header_only} {desc_clean}"
 
-    for bad in STRICT_FORBIDDEN_HEADER:
-        if bad in header_only:
-            return None, True, "EXCLUDED_AREA"
+    # 🛡️ واعية بالسياق: «قريب من بيت الوطن» تعدي، «في بيت الوطن» تترفض
+    _hit = forbidden_area_hit(header_only, STRICT_FORBIDDEN_HEADER)
+    if _hit:
+        return None, True, "EXCLUDED_AREA"
+    if has_installment_offer(header_and_desc):
+        return None, True, "INSTALLMENT_AD"
 
     if not any(w in header_and_desc.lower() for w in [x.lower() for x in STRICT_NEW_CAIRO_HEADER]):
         return None, True, "NOT_NEW_CAIRO"
@@ -760,9 +834,12 @@ def parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     header_only = f"{title_clean} {ad_core[:400]}"
     header_and_desc = f"{title_clean} {ad_core.split('بلغ عن إساءة')[0]}"
 
-    for bad in STRICT_FORBIDDEN_HEADER:
-        if bad in title_clean:
-            return None, True, "EXCLUDED_AREA"
+    # 🛡️ واعية بالسياق + رفض التقسيط
+    _hit = forbidden_area_hit(title_clean, STRICT_FORBIDDEN_HEADER)
+    if _hit:
+        return None, True, "EXCLUDED_AREA"
+    if has_installment_offer(header_and_desc):
+        return None, True, "INSTALLMENT_AD"
 
     if not any(w in header_and_desc.lower() for w in [x.lower() for x in STRICT_NEW_CAIRO_HEADER]):
         return None, True, "NOT_NEW_CAIRO"
