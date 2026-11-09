@@ -221,7 +221,7 @@ jobs:
       - name: Run Dubizzle radar
         if: ${{ steps.gate.outputs.skip != 'true' }}
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           NTFY_BAN_TOPIC: ${{ secrets.NTFY_BAN_TOPIC }}
           # ✅ كان `${{ fromJSON(inputs.max_runtime_minutes || '25') * 60 }}` — وده
           #    كسر الرَن تماماً: سياق `inputs` متاح بس في workflow_dispatch، فلما
@@ -239,7 +239,7 @@ jobs:
 
       - name: Run extra sources radar (aqarmap + opensooq)
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
         if: ${{ !cancelled() && steps.gate.outputs.skip != 'true' }}
         run: python -u extra_radar.py
 
