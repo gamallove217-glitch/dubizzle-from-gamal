@@ -2,12 +2,37 @@ name: Scrape Dubizzle
 
 on:
   schedule:
-    # 🆕 FIX(طلب المالك 2026-11-09): كل ساعتين بالظبط
-    #   الدقيقة 23 بدل 0 ⇒ خارج زحمة رأس الساعة (توثيق GitHub بيوصي بده بالاسم)
-    #   كل ساعتين بدل كل ساعة ⇒ الرَن (15 دقيقة) مايتعارضش أبداً مع الكرون الجاي
-    #   ⇒ صفر إلغاءات من الـ concurrency
-    #   القياس قبل الإصلاح: 3.1 رَن/يوم (13% من المفروض) · البيانات قديمة 6.5 ساعة
-    - cron: '23 */2 * * *'
+    # ==========================================================================
+    #  🛡️ الجدولة المضمونة (طلب المالك 2026-11-09 — علشان الاشتراكات الشهرية)
+    # --------------------------------------------------------------------------
+    #  المشكلة المقيسة: GitHub `schedule` **best-effort مش مضمون**. التوثيق الرسمي:
+    #    "The schedule event can be delayed during periods of high loads…
+    #     High load times include the start of every hour. If the load is
+    #     sufficiently high enough, some queued jobs may be dropped."
+    #  والرَن المرمي **ما بيسيبش أي أثر** — مش failed ولا cancelled ولا skipped.
+    #
+    #  القياس على المستودع ده قبل الإصلاح (cron '0 * * * *'):
+    #     13 رَن في 4.2 يوم = 3.1/يوم ⇒ **13% بس** من الـ 24 المتوقعة
+    #     وسيط الفجوة 6.5 ساعة · أقصى فجوة 14.1 ساعة · 6 من 13 اتلغوا
+    #     متوسط التأخير عن رأس الساعة: 31 دقيقة
+    #
+    #  الحل: مش بنعتمد على خانة واحدة — بنعمل **4 محاولات في كل نافذة ساعتين**
+    #  (كل 30 دقيقة، في دقايق :07 و :37 = خارج زحمة رأس الساعة)، و**بوابة ذكية**
+    #  أول الرَن بتقرر: لو فيه رَن ناجح من أقل من 100 دقيقة ⇒ الرَن بيخرج في
+    #  ~10 ثواني من غير ما يشتغل.
+    #
+    #     احتمال إن GitHub يرمي محاولة واحدة       ≈ 10%
+    #     احتمال إن يرمي الأربعة في نفس النافذة   ≈ 0.1⁴ = 0.01%
+    #     ⇒ أسوأ تأخير عملي: 30 دقيقة (بدل 14 ساعة)
+    #
+    #  النتيجة: رَن حقيقي كل ساعتين بالظبط (00:07 · 02:07 · 04:07 …) والباقي no-op.
+    #  التكلفة: صفر — المستودع عام فدقايق GitHub Actions مجانية.
+    #
+    #  ⚠️ البوابة بتشتغل على `schedule` بس. `workflow_dispatch` (الزرار اليدوي
+    #     أو أي نداء خارجي) و`push` **بيشتغلوا دايماً من غير بوابة** — عشان لو
+    #     دوست بإيدك يشتغل فوراً، ولو حبيت تضيف مجدول خارجي بعدين مايتعارضش.
+    # ==========================================================================
+    - cron: '7,37 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -27,6 +52,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: read   # 🆕 للبوابة — عشان تسأل عن آخر رَن ناجح
 
 jobs:
   radar:
@@ -36,21 +62,94 @@ jobs:
     #    يبدأ اللي بعده. بقى رَن واحد بميزانية زمن واضحة.
     timeout-minutes: 45
     steps:
+      # ========================================================================
+      #  🚦 البوابة — أول خطوة، قبل الـ checkout كمان (عشان الـ no-op يبقى رخيص)
+      #     بتشتغل على `schedule` بس. لو الـ API فشل ⇒ **beneshtaghel احتياطاً**
+      #     (fail-safe = run) — أحسن نجيب بيانات مرتين من إننا مانجيبهاش خالص.
+      # ========================================================================
+      - name: 🚦 بوابة التكرار (schedule فقط)
+        id: gate
+        if: ${{ github.event_name == 'schedule' }}
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          THRESHOLD=100   # دقيقة — لو آخر نجاح أقل من كده، الرَن ده زيادة
+          NOW=$(date +%s)
+
+          echo "### 🚦 بوابة الجدولة" >> "$GITHUB_STEP_SUMMARY"
+
+          RESP=$(curl -sf --max-time 25 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/scrape.yml/runs?status=success&per_page=10" || true)
+
+          if [ -z "$RESP" ]; then
+            echo "::warning::الاستعلام من API فشل — هنشتغل احتياطاً (fail-safe = run)"
+            echo "⚠️ الاستعلام فشل ⇒ هنشتغل احتياطاً" >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          LAST=$(printf '%s' "$RESP" | python3 -c '
+          import sys, json
+          from datetime import datetime
+          try:
+              d = json.load(sys.stdin)
+          except Exception:
+              print(0); raise SystemExit
+          ts = []
+          for r in d.get("workflow_runs", []):
+              x = r.get("run_started_at") or r.get("created_at")
+              if not x:
+                  continue
+              try:
+                  ts.append(datetime.fromisoformat(x.replace("Z", "+00:00")).timestamp())
+              except Exception:
+                  pass
+          print(int(max(ts)) if ts else 0)
+          ')
+
+          if [ "$LAST" -le 0 ]; then
+            echo "مفيش رَن ناجح مسجّل ⇒ هنشتغل"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          AGE=$(( (NOW - LAST) / 60 ))
+          echo "آخر رَن ناجح من **$AGE دقيقة** (الحد $THRESHOLD دقيقة)" >> "$GITHUB_STEP_SUMMARY"
+          echo "آخر رَن ناجح من $AGE دقيقة · الحد $THRESHOLD دقيقة"
+
+          if [ "$AGE" -lt "$THRESHOLD" ]; then
+            echo "⏭️  البيانات لسه جديدة — الرَن ده هيخرج من غير شغل (no-op)"
+            echo "⏭️ **no-op** — البيانات لسه جديدة من $AGE دقيقة" >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "▶️  البيانات قديمة $AGE دقيقة — هنشتغل"
+            echo "▶️ **هنشتغل** — البيانات قديمة $AGE دقيقة" >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: ${{ steps.gate.outputs.skip != 'true' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
       - name: Set up Python
+        if: ${{ steps.gate.outputs.skip != 'true' }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
 
       - name: Install dependencies
+        if: ${{ steps.gate.outputs.skip != 'true' }}
         run: pip install -r requirements.txt
 
       - name: Run Dubizzle radar
+        if: ${{ steps.gate.outputs.skip != 'true' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           NTFY_BAN_TOPIC: ${{ secrets.NTFY_BAN_TOPIC }}
@@ -71,11 +170,11 @@ jobs:
       - name: Run extra sources radar (aqarmap + opensooq)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.gate.outputs.skip != 'true' }}
         run: python -u extra_radar.py
 
       - name: Upload run logs
-        if: ${{ always() }}
+        if: ${{ always() && steps.gate.outputs.skip != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: radar-logs-${{ github.run_number }}
@@ -84,6 +183,7 @@ jobs:
           retention-days: 7
 
       - name: Commit ads.json
+        if: ${{ steps.gate.outputs.skip != 'true' }}
         # ✅ FIX(L1): كان اللوج بيتخبّى جوه ads.json في `ads[0]["_dub_log"]`
         #    (15 ألف حرف من اللوج جوه ملف البيانات!). اللوجات دلوقتي بتترفع
         #    كـ artifact نظيف فوق، وملف البيانات بقى بيانات بس.
