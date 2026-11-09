@@ -2,593 +2,273 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>مصيدة الملاك | VIP</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>مصيدة الملاك VIP | لوحة تحكم</title>
 <style>
 :root{
-  --bg-deep:#050811;
-  --bg-main:#090d1a;
-  --card-bg:linear-gradient(145deg,rgba(19,27,46,0.95),rgba(11,16,30,0.98));
-  --card-border:rgba(212,175,55,0.18);
-  --card-border-hover:rgba(212,175,55,0.48);
-  --gold-primary:#d4af37;
-  --gold-light:#f3e5ab;
-  --gold-dark:#aa7c11;
-  --gold-grad:linear-gradient(135deg,#f3e5ab 0%,#d4af37 50%,#aa7c11 100%);
-  --emerald:#10b981;
-  --emerald-grad:linear-gradient(135deg,#10b981 0%,#059669 100%);
-  --blue:#3b82f6;
-  --red:#ef4444;
-  --text-main:#f8fafc;
-  --text-muted:#94a3b8;
-  --surface:#0f1629;
+  --bg:#0a0e1a; --card:#131a2e; --card2:#1a2240;
+  --border:rgba(212,175,55,.15); --border-hov:rgba(212,175,55,.4);
+  --gold:#d4af37; --gold-l:#f3e5ab; --gold-d:#aa7c11;
+  --emerald:#10b981; --blue:#3b82f6; --red:#ef4444;
+  --text:#f8fafc; --muted:#94a3b8; --dim:#64748b;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
-body{
-  background-color:var(--bg-deep);
-  background-image:
-    radial-gradient(circle at 15% 0%,rgba(212,175,55,0.09) 0%,transparent 45%),
-    radial-gradient(circle at 85% 100%,rgba(16,185,129,0.06) 0%,transparent 45%);
-  color:var(--text-main);
-  padding:14px;
-  max-width:1220px;
-  margin:0 auto;
-  min-height:100vh;
-}
-svg{width:18px;height:18px;flex-shrink:0;vertical-align:middle}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);min-height:100vh;padding:12px;max-width:1400px;margin:0 auto}
+svg{width:20px;height:20px;flex-shrink:0}
 
-#lockScreen{
-  position:fixed;inset:0;
-  background:radial-gradient(circle at center,#0f172a 0%,#040710 100%);
-  z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;
-}
-.lock-box{
-  background:var(--card-bg);
-  border:1px solid var(--card-border-hover);
-  box-shadow:0 25px 60px rgba(0,0,0,0.85),0 0 35px rgba(212,175,55,0.12);
-  border-radius:24px;padding:34px 26px;width:100%;max-width:400px;text-align:center;
-  position:relative;overflow:hidden;
-}
-.lock-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-grad)}
-.lock-crest{
-  width:64px;height:64px;margin:0 auto 16px;border-radius:18px;
-  background:var(--gold-grad);color:#050811;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 10px 25px rgba(212,175,55,0.35);
-}
-.lock-crest svg{width:34px;height:34px}
-.lock-box h2{
-  background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  font-size:1.65rem;font-weight:900;margin-bottom:6px;
-}
-.lock-box p{color:var(--text-muted);font-size:.88rem;margin-bottom:22px}
-.lock-input-wrap{position:relative;margin-bottom:14px}
-.lock-input-wrap input{
-  width:100%;padding:13px 16px;border-radius:14px;
-  border:1px solid rgba(255,255,255,0.1);background:rgba(6,9,19,0.85);
-  color:#fff;text-align:center;font-size:1rem;font-weight:700;transition:.25s;
-}
-.lock-input-wrap input:focus{outline:none;border-color:var(--gold-primary);box-shadow:0 0 15px rgba(212,175,55,0.2)}
-.lock-btn{
-  width:100%;padding:13px;border-radius:14px;border:none;
-  background:var(--gold-grad);color:#050811;font-weight:900;font-size:1.05rem;
-  cursor:pointer;box-shadow:0 8px 20px rgba(212,175,55,0.3);transition:.2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.lock-btn:active{transform:scale(0.98)}
-.err-msg{color:var(--red);font-size:.85rem;font-weight:700;margin-top:12px;display:none}
+#lockScreen{position:fixed;inset:0;background:radial-gradient(circle at center,#0f172a 0%,#040710 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-box{background:var(--card);border:1px solid var(--border-hov);border-radius:20px;padding:30px 24px;width:100%;max-width:380px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.8)}
+.lock-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-l),var(--gold),var(--gold-d))}
+.lock-crest{width:56px;height:56px;margin:0 auto 14px;border-radius:14px;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(212,175,55,.3)}
+.lock-crest svg{width:30px;height:30px}
+.lock-box h2{background:linear-gradient(135deg,var(--gold-l),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.lock-box p{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+.lock-input-wrap{margin-bottom:12px}
+.lock-input-wrap input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(6,9,19,.85);color:#fff;text-align:center;font-size:1rem;font-weight:700;transition:.25s}
+.lock-input-wrap input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 15px rgba(212,175,55,.2)}
+.lock-btn{width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 20px rgba(212,175,55,.3);transition:.2s}
+.lock-btn:active{transform:scale(.98)}
+.err-msg{color:var(--red);font-size:.82rem;font-weight:700;margin-top:10px;display:none}
 
-header{
-  background:var(--card-bg);border:1px solid var(--card-border);
-  box-shadow:0 14px 35px rgba(0,0,0,0.5);
-  border-radius:22px;padding:18px 20px;margin-bottom:18px;
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
-  position:relative;overflow:hidden;
-}
-header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:var(--gold-grad)}
-.brand{display:flex;align-items:center;gap:14px}
-.logo-badge{
-  width:54px;height:54px;border-radius:16px;background:var(--gold-grad);color:#050811;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 22px rgba(212,175,55,0.3);
-}
-.logo-badge svg{width:30px;height:30px}
-.brand-text h1{
-  font-size:1.45rem;font-weight:900;letter-spacing:-0.3px;
-  background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.brand-text .sub{color:var(--text-muted);font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:6px;margin-top:2px}
-.header-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sync-pill{
-  background:rgba(16,185,129,0.1);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);
-  padding:7px 14px;border-radius:99px;font-size:.78rem;font-weight:700;
-  display:none;align-items:center;gap:8px;
-}
-.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 10px var(--emerald)}
-.hdr-btn{
-  background:var(--surface);color:var(--text-main);border:1px solid rgba(255,255,255,0.1);
-  padding:8px 13px;border-radius:12px;font-size:.78rem;font-weight:700;cursor:pointer;
-  display:inline-flex;align-items:center;gap:6px;transition:.2s;
-}
-.hdr-btn:hover{border-color:var(--gold-primary);color:var(--gold-light)}
-.hdr-btn.gold{border-color:rgba(212,175,55,0.4);color:var(--gold-light);background:rgba(212,175,55,0.1)}
-.hdr-btn.danger{color:#fca5a5;border-color:rgba(239,68,68,0.25)}
+header{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-badge{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(212,175,55,.3)}
+.logo-badge svg{width:26px;height:26px}
+.brand-text h1{font-size:1.3rem;font-weight:800}
+.brand-text p{font-size:.78rem;color:var(--muted)}
+.header-stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat-pill{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700}
+.stat-pill .v{color:var(--gold);font-size:1rem}
+.stat-pill .l{color:var(--muted);font-size:.72rem}
+.icon-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--muted);transition:.2s;position:relative}
+.icon-btn:hover{border-color:var(--border-hov);color:var(--gold)}
+.badge{position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:8px;font-size:.65rem;font-weight:800;padding:1px 5px;min-width:16px;text-align:center}
 
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
-@media(min-width:768px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
-.stat-card{
-  background:var(--card-bg);border:1px solid var(--card-border);
-  border-radius:18px;padding:16px;display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 10px 25px rgba(0,0,0,0.4);position:relative;overflow:hidden;
-}
-.stat-info .lbl{font-size:.78rem;color:var(--text-muted);font-weight:700}
-.stat-info .num{font-size:1.7rem;font-weight:900;color:var(--text-main);line-height:1.2;margin-top:2px}
-.stat-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}
-.stat-icon svg{width:24px;height:24px}
-.stat-gold .stat-icon{background:rgba(212,175,55,0.14);color:var(--gold-primary);border:1px solid rgba(212,175,55,0.3)}
-.stat-gold .num{color:var(--gold-primary)}
-.stat-green .stat-icon{background:rgba(16,185,129,0.14);color:var(--emerald);border:1px solid rgba(16,185,129,0.3)}
-.stat-green .num{color:var(--emerald)}
-.stat-amber .stat-icon{background:rgba(245,158,11,0.14);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
-.stat-blue .stat-icon{background:rgba(59,130,246,0.14);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:"";position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(212,175,55,.08),transparent)}
+.stat-card .icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat-card .icon.gold{background:rgba(212,175,55,.15);color:var(--gold)}
+.stat-card .icon.emerald{background:rgba(16,185,129,.15);color:var(--emerald)}
+.stat-card .icon.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.stat-card .icon.red{background:rgba(239,68,68,.15);color:var(--red)}
+.stat-card .num{font-size:1.8rem;font-weight:800;line-height:1}
+.stat-card .lbl{font-size:.78rem;color:var(--muted);margin-top:4px}
+.stat-card .sub{font-size:.7rem;color:var(--dim);margin-top:2px}
 
-.filters-panel{
-  background:var(--card-bg);border:1px solid var(--card-border);
-  border-radius:22px;padding:18px;margin-bottom:20px;
-  box-shadow:0 12px 30px rgba(0,0,0,0.45);
-  display:flex;flex-direction:column;gap:15px;
-}
-.search-box{position:relative}
-.search-box svg{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  color:var(--gold-primary);width:20px;height:20px;pointer-events:none;
-}
-.search-box input{
-  width:100%;padding:13px 44px 13px 16px;border-radius:14px;
-  background:var(--surface);border:1px solid rgba(212,175,55,0.22);
-  color:var(--text-main);font-size:.9rem;font-weight:600;transition:.2s;
-}
-.search-box input:focus{outline:none;border-color:var(--gold-primary);box-shadow:0 0 15px rgba(212,175,55,0.15)}
-.filter-section{display:flex;flex-direction:column;gap:8px}
-.filter-title{font-size:.78rem;color:var(--gold-primary);font-weight:800;display:flex;align-items:center;gap:6px}
-.filter-title svg{width:15px;height:15px}
-.tabs-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-.tabs-row::-webkit-scrollbar{display:none}
-.tab-btn{
-  background:var(--surface);color:var(--text-muted);
-  border:1px solid rgba(255,255,255,0.08);
-  padding:8px 15px;border-radius:12px;font-size:.82rem;font-weight:700;
-  cursor:pointer;white-space:nowrap;transition:.2s;display:inline-flex;align-items:center;gap:6px;
-}
-.tab-btn:hover{border-color:rgba(212,175,55,0.35);color:var(--text-main)}
-.tab-btn.active{
-  background:var(--gold-grad);color:#050811;border-color:transparent;
-  font-weight:900;box-shadow:0 4px 14px rgba(212,175,55,0.3);
-}
-.controls-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.ctrl-input{
-  background:var(--surface);color:var(--text-main);border:1px solid rgba(255,255,255,0.1);
-  padding:11px 14px;border-radius:12px;font-size:.85rem;font-weight:700;width:100%;
-}
-.ctrl-input:focus{outline:none;border-color:var(--gold-primary)}
+.search-bar{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;transition:.2s}
+.search-bar:focus-within{border-color:var(--border-hov);box-shadow:0 0 15px rgba(212,175,55,.1)}
+.search-bar svg{color:var(--muted);flex-shrink:0}
+.search-bar input{flex:1;background:transparent;border:none;color:var(--text);font-size:1rem;font-weight:600;outline:none}
+.search-bar input::placeholder{color:var(--dim)}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
-.card{
-  background:var(--card-bg);border:1px solid var(--card-border);
-  border-radius:22px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;
-  box-shadow:0 14px 32px rgba(0,0,0,0.5);transition:.25s;position:relative;overflow:hidden;
-}
-.card::before{
-  content:"";position:absolute;top:0;right:0;left:0;height:3px;
-  background:linear-gradient(90deg,transparent,var(--gold-primary),transparent);opacity:.55;
-}
-.card:hover{border-color:var(--card-border-hover);transform:translateY(-2px)}
-.card.opened{border-color:rgba(148,163,184,0.2);opacity:.92}
-.card.contacted{border-color:rgba(16,185,129,0.55);box-shadow:0 12px 30px rgba(16,185,129,0.12)}
-.card.contacted::before{background:var(--emerald-grad);opacity:1}
+.filters-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.filters-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.filters-row:last-child{margin-bottom:0}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.filter-select{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--text);font-size:.85rem;font-weight:600;cursor:pointer;outline:none;transition:.2s;min-width:120px}
+.filter-select:focus{border-color:var(--border-hov)}
+.filter-select option{background:var(--card2)}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;color:var(--muted)}
+.chip:hover{border-color:var(--border-hov);color:var(--text)}
+.chip.active{background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;border-color:transparent;font-weight:800}
+.filter-reset{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:.2s}
+.filter-reset:hover{border-color:var(--red);color:var(--red)}
 
-.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.badge{padding:4px 9px;border-radius:8px;font-size:.73rem;font-weight:800;display:inline-flex;align-items:center;gap:4px}
-.badge svg{width:13px;height:13px}
-.b-src-dub{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.35)}
-.b-src-aqar{background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35)}
-.b-src-os{background:rgba(245,158,11,0.15);color:#fde68a;border:1px solid rgba(245,158,11,0.35)}
-.b-cat{background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)}
-.b-sub{background:rgba(139,92,246,0.15);color:#ddd6fe;border:1px solid rgba(139,92,246,0.3)}
-.b-own{background:rgba(212,175,55,0.15);color:var(--gold-light);border:1px solid rgba(212,175,55,0.35)}
-.b-state{background:rgba(255,255,255,0.06);color:#cbd5e1;margin-right:auto}
-.b-state.unread{background:rgba(16,185,129,0.18);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35)}
+.sort-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.sort-bar .count{font-size:.85rem;color:var(--muted);font-weight:600}
+.sort-bar .count span{color:var(--gold);font-weight:800;font-size:1rem}
+.sort-select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;outline:none}
 
-.price-row{
-  display:flex;align-items:baseline;justify-content:space-between;
-  background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.18);
-  padding:10px 14px;border-radius:14px;margin-top:10px;
-}
-.price{font-size:1.35rem;font-weight:900;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.deal-tag{font-size:.76rem;font-weight:800;color:var(--gold-light)}
+.ads-list{display:flex;flex-direction:column;gap:10px}
+.ad-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;transition:.25s;position:relative;overflow:hidden;cursor:pointer}
+.ad-card:hover{border-color:var(--border-hov);transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.ad-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--source-color,var(--gold))}
+.ad-top{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:10px}
+.ad-title{font-size:1.05rem;font-weight:700;flex:1;line-height:1.4}
+.ad-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.badge-tag{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.badge-tag.source-dubizzle{background:rgba(59,130,246,.15);color:#60a5fa}
+.badge-tag.source-aqarmap{background:rgba(16,185,129,.15);color:#34d399}
+.badge-tag.source-opensooq{background:rgba(212,175,55,.15);color:var(--gold)}
+.badge-tag.fresh{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-tag.tier3{background:rgba(16,185,129,.2);color:var(--emerald)}
+.badge-tag.tier2{background:rgba(59,130,246,.15);color:#60a5fa}
+.badge-tag.tier1{background:rgba(148,163,184,.15);color:var(--muted)}
+.ad-price{font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:8px}
+.ad-details{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;font-size:.82rem;color:var(--muted)}
+.ad-details span{display:flex;align-items:center;gap:4px}
+.ad-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ad-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ad-seller{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--text)}
+.ad-seller .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald)}
+.ad-seller .ads-count{color:var(--muted);font-size:.72rem}
+.ad-link{font-size:.75rem;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;transition:.2s}
+.ad-link:hover{color:#93c5fd}
 
-.title{font-size:1rem;font-weight:800;line-height:1.5;color:#fff;margin-top:10px}
-.specs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.spec-pill{
-  background:var(--surface);border:1px solid rgba(255,255,255,0.07);
-  padding:6px 11px;border-radius:10px;font-size:.78rem;font-weight:700;color:#cbd5e1;
-  display:inline-flex;align-items:center;gap:6px;
-}
-.spec-pill svg{width:15px;height:15px;color:var(--gold-primary)}
-.desc{
-  color:#cbd5e1;font-size:.82rem;line-height:1.65;max-height:96px;overflow-y:auto;
-  background:rgba(6,9,19,0.75);border:1px solid rgba(255,255,255,0.05);
-  padding:10px 12px;border-radius:12px;margin-top:10px;
-}
-.seller-bar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);
-  font-size:.8rem;color:var(--text-muted);margin-bottom:10px;
-}
-.seller-name{display:inline-flex;align-items:center;gap:6px;color:var(--text-main);font-weight:700}
-.seller-name svg{width:16px;height:16px;color:var(--gold-primary)}
-.ad-id-pill{font-family:monospace;font-size:.75rem;background:var(--surface);padding:3px 8px;border-radius:6px;color:var(--text-muted)}
+#notifPanel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px}
+#notifPanel.show{display:flex}
+.notif-box{background:var(--card);border:1px solid var(--border-hov);border-radius:18px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.8)}
+.notif-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.notif-header h3{font-size:1.1rem;font-weight:800}
+.notif-close{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--muted);font-size:1.2rem;font-weight:700;transition:.2s}
+.notif-close:hover{border-color:var(--red);color:var(--red)}
+.notif-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.notif-item{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s}
+.notif-item:hover{border-color:var(--border-hov)}
+.notif-item .time{font-size:.7rem;color:var(--dim);margin-bottom:4px}
+.notif-item .msg{font-size:.85rem;line-height:1.4}
+.notif-item .msg strong{color:var(--gold)}
+.notif-empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem}
 
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.btn{
-  padding:11px 10px;border-radius:12px;border:none;font-weight:800;font-size:.82rem;
-  cursor:pointer;text-align:center;text-decoration:none;
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.2s;
-}
-.btn:active{transform:scale(0.98)}
-.btn-open{background:var(--gold-grad);color:#050811;box-shadow:0 6px 16px rgba(212,175,55,0.22)}
-.btn-wa{background:var(--emerald-grad);color:#04130e;box-shadow:0 6px 16px rgba(16,185,129,0.22)}
-.btn-wa-in{background:var(--surface);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1)}
-.btn-contact-toggle{
-  grid-column:span 2;background:var(--surface);color:var(--text-muted);
-  border:1px solid rgba(255,255,255,0.1);padding:9px;font-size:.8rem;
-}
-.btn-contact-toggle.active{background:rgba(16,185,129,0.16);color:#6ee7b7;border-color:rgba(16,185,129,0.45)}
-.btn-ban-seller{
-  grid-column:span 2;background:rgba(239,68,68,0.1);color:#fca5a5;
-  border:1px solid rgba(239,68,68,0.3);padding:8px;font-size:.78rem;
-}
-.btn-ban-seller:hover{background:rgba(239,68,68,0.22);border-color:rgba(239,68,68,0.55)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state svg{width:48px;height:48px;margin-bottom:16px;opacity:.3}
+.empty-state p{font-size:.9rem}
 
-.empty{
-  text-align:center;padding:50px 20px;color:var(--text-muted);
-  background:var(--card-bg);border-radius:22px;border:1px solid var(--card-border);font-weight:700;
+@media(max-width:640px){
+  body{padding:8px}
+  .header-stats{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .filter-select{min-width:100px}
+  .ad-price{font-size:1.1rem}
 }
-
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(3,6,14,0.85);backdrop-filter:blur(6px);
-  z-index:9998;display:none;align-items:center;justify-content:center;padding:16px;
-}
-.modal-box{
-  background:var(--card-bg);border:1px solid var(--card-border-hover);
-  border-radius:22px;padding:22px;width:100%;max-width:520px;max-height:84vh;overflow-y:auto;
-  box-shadow:0 25px 60px rgba(0,0,0,0.9);
-}
-.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.rep-item{background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(212,175,55,0.18)}
-.rep-item .r-lbl{font-size:.75rem;color:var(--text-muted);font-weight:700}
-.rep-item .r-val{font-size:1.25rem;font-weight:900;color:var(--gold-light);margin-top:3px}
 </style>
 </head>
 <body>
 
 <div id="lockScreen">
   <div class="lock-box">
-    <div class="lock-crest">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    </div>
+    <div class="lock-crest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
     <h2>مصيدة الملاك VIP</h2>
     <p>منظومة رصد الملاك المباشرين بالقاهرة الجديدة</p>
-    <div class="lock-input-wrap">
-      <input type="text" id="vName" placeholder="الاسم بالكامل">
-    </div>
-    <div class="lock-input-wrap">
-      <input type="password" id="vPass" placeholder="كود المرور السري">
-    </div>
-    <button class="lock-btn" onclick="unlock()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span>تسجيل الدخول للمنظومة</span>
-    </button>
+    <div class="lock-input-wrap"><input type="text" id="vName" placeholder="الاسم بالكامل"></div>
+    <div class="lock-input-wrap"><input type="password" id="vPass" placeholder="كود المرور السري"></div>
+    <button class="lock-btn" onclick="unlock()">تسجيل الدخول للمنظومة</button>
     <div class="err-msg" id="errMsg">كود المرور غير صحيح</div>
   </div>
 </div>
 
-<div id="visitorModal" class="modal-overlay" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <h3 style="color:var(--gold-primary);font-weight:900;display:flex;align-items:center;gap:8px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>سجل الزوار والأجهزة</span>
-      </h3>
+<div id="notifPanel" onclick="if(event.target===this)closeNotif()">
+  <div class="notif-box">
+    <div class="notif-header">
+      <h3>🔔 الإشعارات</h3>
+      <button class="notif-close" onclick="closeNotif()">✕</button>
     </div>
-    <div id="visitorList" style="font-size:.84rem;color:var(--text-main);display:flex;flex-direction:column;gap:8px"></div>
-    <button class="lock-btn" onclick="document.getElementById('visitorModal').style.display='none'" style="margin-top:16px">إغلاق النافذة</button>
-  </div>
-</div>
-
-<div id="reportModal" class="modal-overlay" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
-    <h3 style="color:var(--gold-primary);font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:10px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span>تقرير آخر رن تفصيلي</span>
-    </h3>
-    <div id="reportContent" style="font-size:.85rem;color:var(--text-main)"></div>
-    <button class="lock-btn" onclick="document.getElementById('reportModal').style.display='none'" style="margin-top:16px">إغلاق التقرير</button>
+    <div class="notif-list" id="notifList"></div>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="logo-badge">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>
-    </div>
+    <div class="logo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
     <div class="brand-text">
-      <h1>مصيدة الملاك</h1>
-      <div class="sub">
-        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold-primary)" stroke-width="2.2" style="width:15px;height:15px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>القاهرة الجديدة والتجمعات فقط • دوبيزل + عقارماب + السوق المفتوح</span>
-      </div>
+      <h1>مصيدة الملاك VIP</h1>
+      <p>لوحة تحكم — رصد الملاك المباشرين</p>
     </div>
   </div>
-  <div class="header-controls">
-    <div class="sync-pill" id="syncPill">
-      <span class="pulse-dot"></span>
-      <span id="syncTime">جاري التحديث...</span>
-    </div>
-    <button id="reportBtn" class="hdr-btn gold" onclick="showRunReport()" style="display:none">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      <span>تقرير الرن</span>
+  <div class="header-stats" id="headerStats"></div>
+  <div style="display:flex;gap:8px">
+    <button class="icon-btn" onclick="toggleNotif()" title="الإشعارات">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge" id="notifBadge" style="display:none">0</span>
     </button>
-    <button id="visitorBtn" class="hdr-btn" onclick="showVisitors()" style="display:none">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span>سجل الزوار</span>
-    </button>
-    <button class="hdr-btn danger" onclick="lockApp()">
+    <button class="icon-btn" onclick="lockApp()" title="قفل">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span>قفل</span>
     </button>
   </div>
 </header>
 
-<div class="stats-grid">
-  <div class="stat-card stat-gold">
-    <div class="stat-info">
-      <div class="lbl">إجمالي الملاك</div>
-      <div class="num" id="stTotal">0</div>
-    </div>
-    <div class="stat-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
-    </div>
-  </div>
-  <div class="stat-card stat-green">
-    <div class="stat-info">
-      <div class="lbl">لم يفتح بعد</div>
-      <div class="num" id="stUnread">0</div>
-    </div>
-    <div class="stat-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    </div>
-  </div>
-  <div class="stat-card stat-amber">
-    <div class="stat-info">
-      <div class="lbl">وحدات بيع</div>
-      <div class="num" id="stSale">0</div>
-    </div>
-    <div class="stat-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-  </div>
-  <div class="stat-card stat-blue">
-    <div class="stat-info">
-      <div class="lbl">وحدات إيجار</div>
-      <div class="num" id="stRent">0</div>
-    </div>
-    <div class="stat-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-    </div>
-  </div>
+<div class="stats-grid" id="statsGrid"></div>
+
+<div class="search-bar">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+  <input type="text" id="searchInput" placeholder="ابحث بعنوان الإعلان أو المالك أو المنطقة..." oninput="filterAds()">
 </div>
 
 <div class="filters-panel">
-  <div class="search-box">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="qSearch" placeholder="ابحث بالمنطقة في التجمعات (النرجس، اللوتس، الياسمين، البنفسج، جنوب الأكاديمية، الأندلس...)" oninput="render()">
-  </div>
-
-  <div class="filter-section">
-    <div class="filter-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <span>المصدر (المنصة العقارية)</span>
-    </div>
-    <div class="tabs-row" id="srcTabs">
-      <button class="tab-btn active" onclick="setSrc('الكل',this)">الكل</button>
-      <button class="tab-btn" onclick="setSrc('دوبيزل',this)">دوبيزل</button>
-      <button class="tab-btn" onclick="setSrc('عقارماب',this)">عقارماب</button>
-      <button class="tab-btn" onclick="setSrc('السوق المفتوح',this)">السوق المفتوح</button>
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>المصدر</label>
+      <div class="filter-chips" id="sourceChips"></div>
     </div>
   </div>
-
-  <div class="filter-section">
-    <div class="filter-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span>فئة العقار (بدون المصايف)</span>
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>نوع العرض</label>
+      <div class="filter-chips" id="dealChips"></div>
     </div>
-    <div class="tabs-row" id="catTabs">
-      <button class="tab-btn active" onclick="setCat('الكل',this)">الكل</button>
-      <button class="tab-btn" onclick="setCat('شقق للبيع',this)">شقق للبيع</button>
-      <button class="tab-btn" onclick="setCat('شقق للإيجار',this)">شقق للإيجار</button>
-      <button class="tab-btn" onclick="setCat('فلل للبيع',this)">فلل للبيع</button>
-      <button class="tab-btn" onclick="setCat('فلل للإيجار',this)">فلل للإيجار</button>
-      <button class="tab-btn" onclick="setCat('عقار تجاري للبيع',this)">عقار تجاري للبيع</button>
-      <button class="tab-btn" onclick="setCat('عقار تجاري للإيجار',this)">عقار تجاري للإيجار</button>
-      <button class="tab-btn" onclick="setCat('مبانى و أراضى',this)">مبانى و أراضى</button>
+    <div class="filter-group">
+      <label>الفئة</label>
+      <select class="filter-select" id="categoryFilter" onchange="filterAds()">
+        <option value="">كل الفئات</option>
+      </select>
     </div>
-  </div>
-
-  <div class="filter-section">
-    <div class="filter-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-      <span>النوع الفرعي (مطابق لأيقونات دوبيزل وعقارماب والسوق المفتوح)</span>
-    </div>
-    <div class="tabs-row" id="subTabs">
-      <button class="tab-btn active" onclick="setSub('الكل',this)">كل الأنواع</button>
-      <button class="tab-btn" onclick="setSub('شقة',this)">شقة</button>
-      <button class="tab-btn" onclick="setSub('شقة مفروشة',this)">شقة مفروشة</button>
-      <button class="tab-btn" onclick="setSub('دوبلكس',this)">دوبلكس</button>
-      <button class="tab-btn" onclick="setSub('بنتهاوس',this)">بنتهاوس</button>
-      <button class="tab-btn" onclick="setSub('ستوديو',this)">ستوديو</button>
-      <button class="tab-btn" onclick="setSub('شقة فندقية',this)">شقة فندقية</button>
-      <button class="tab-btn" onclick="setSub('سطح',this)">سطح</button>
-      <button class="tab-btn" onclick="setSub('غرفة',this)">غرفة</button>
-      <button class="tab-btn" onclick="setSub('فيلا',this)">فيلا</button>
-      <button class="tab-btn" onclick="setSub('إداري',this)">إداري</button>
-      <button class="tab-btn" onclick="setSub('عقار تجاري',this)">تجاري</button>
-      <button class="tab-btn" onclick="setSub('طبي',this)">طبي</button>
-      <button class="tab-btn" onclick="setSub('أراض',this)">أراض</button>
-      <button class="tab-btn" onclick="setSub('مبنى',this)">مبنى</button>
+    <div class="filter-group">
+      <label>النوع</label>
+      <select class="filter-select" id="subtypeFilter" onchange="filterAds()">
+        <option value="">كل الأنواع</option>
+      </select>
     </div>
   </div>
-
-  <div class="filter-section">
-    <div class="filter-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>حالة المتابعة والفرز</span>
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>السعر (ج.م)</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="priceMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()">
+        <span style="color:var(--dim)">—</span>
+        <input type="number" id="priceMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()">
+      </div>
     </div>
-    <div class="tabs-row" id="stateTabs">
-      <button class="tab-btn active" onclick="setState('all',this)">كل الحالات</button>
-      <button class="tab-btn" onclick="setState('unopened',this)">لم يفتح بعد</button>
-      <button class="tab-btn" onclick="setState('uncontacted',this)">لم يتم التواصل</button>
-      <button class="tab-btn" onclick="setState('contacted',this)">تم التواصل</button>
+    <div class="filter-group">
+      <label>المساحة (م²)</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="areaMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()">
+        <span style="color:var(--dim)">—</span>
+        <input type="number" id="areaMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()">
+      </div>
+    </div>
+    <div class="filter-group">
+      <label>غرف النوم</label>
+      <select class="filter-select" id="bedsFilter" onchange="filterAds()">
+        <option value="">أي عدد</option>
+        <option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>الحداثة</label>
+      <div class="filter-chips" id="tierChips"></div>
     </div>
   </div>
-
-  <div class="controls-grid">
-    <input type="number" class="ctrl-input" id="maxPrice" placeholder="أقصى سعر (ج.م)" oninput="render()">
-    <select class="ctrl-input" id="sortBy" onchange="render()">
-      <option value="newest">الترتيب: الأحدث أولا</option>
-      <option value="low">السعر: الأقل أولا</option>
-      <option value="high">السعر: الأعلى أولا</option>
-    </select>
+  <div class="filters-row">
+    <button class="filter-reset" onclick="resetFilters()">↺ مسح كل الفلاتر</button>
   </div>
 </div>
 
-<div id="list" class="grid"></div>
+<div class="sort-bar">
+  <div class="count">عرض <span id="resultCount">0</span> إعلان</div>
+  <select class="sort-select" id="sortSelect" onchange="renderAds()">
+    <option value="fresh">الأحدث أولاً</option>
+    <option value="price-asc">السعر: الأقل للأعلى</option>
+    <option value="price-desc">السعر: الأعلى للأقل</option>
+    <option value="area-desc">المساحة: الأكبر للأصغر</option>
+    <option value="id-desc">أحدث ID</option>
+  </select>
+</div>
+
+<div class="ads-list" id="adsList"></div>
 
 <script>
-// ── FIX(H5/C8): الإعدادات الحساسة ────────────────────────────────
-// ⚠️ أي قيمة مكتوبة في ملف HTML هي قيمة «علنية» بحكم الطبيعة — أي حد يفتح
-//    الصفحة يقدر يقراها من الـ source. فـ«قفل الـ VIP» ده شكلي مش حماية حقيقية،
-//    وموضوعات ntfy العلنية بتسمح لأي حد يبعت/يمسح بياناتك.
-//    الحماية الحقيقية محتاجة خادم صغير (Cloudflare Worker) يتحقق من سرّ.
-//    أقل حاجة تعملها دلوقتي: غيّر القيم دي لأرقام/كلمات عشوائية طويلة (UUID)
-//    عشان محدش يقدر يخمّنها، وافصلها في ملف config.js خارج الـ git.
 const CFG = Object.assign({
-  ADMIN_PASS:    "2738",
-  USER_PASS:     "3399",
-  LOG_TOPIC:     "gamal_masyada_visitors_2738_v2",
-  BAN_TOPIC:     "gamal_masyada_bans_2738_v1",
-  CONTACT_TOPIC: "gamal_masyada_contacted_2738_v1",
-  // PERMANENT FIX: المالك = 1 إلى 49 إعلانات نشطة (broker ≥50)
-  //    كان 4 — بيظلم أي مالك معاه 5+ إعلانات. broker الحقيقي عنده 100+.
+  ADMIN_PASS: "2738",
+  USER_PASS: "3399",
   MAX_OWNER_ADS: 49,
-  REFRESH_MS:    120000      // FIX(H6): كل دقيقتين بدل 45 ثانية
+  REFRESH_MS: 120000
 }, window.__CFG || {});
-const ADMIN_PASS    = CFG.ADMIN_PASS;
-const USER_PASS     = CFG.USER_PASS;
-const LOG_TOPIC     = CFG.LOG_TOPIC;
-const BAN_TOPIC     = CFG.BAN_TOPIC;
-const CONTACT_TOPIC = CFG.CONTACT_TOPIC;
-
-// ── FIX(C7): أدوات تهريب النصوص ──────────────────────────────────
-// كل بيانات الإعلانات (العنوان/الوصف/اسم البائع/الرابط) نصوص جاية من مواقع
-// خارجية. كانت بتتحط في innerHTML زي ما هي ⇒ أي إعلان فيه <img onerror=...>
-// كان هيشغّل كود في متصفح كل الزوار ويسرق كلمة السر والموضوعات.
-function esc(v){
-  return String(v == null ? "" : v)
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-}
-function safeHref(v){
-  const t = String(v || "").trim();
-  if(/^(https?:)?\/\//i.test(t) || /^mailto:/i.test(t)) return esc(t);
-  return "#";                    // بيمنع javascript: و data:
-}
-function jsStr(v){               // نص جوه onclick='...'
-  return String(v == null ? "" : v)
-    .replace(/\\/g,"\\\\").replace(/'/g,"\\'")
-    .replace(/</g,"\\u003c").replace(/>/g,"\\u003e")
-    .replace(/\r?\n/g," ");
-}
-
-let ALL_ADS = [];
-let LAST_RUN_REPORT = null;
-let curSrc = "الكل";
-let curCat = "الكل";
-let curSub = "الكل";
-let curState = "all";
-
-let openedMap = JSON.parse(localStorage.getItem("gamal_opened_v2") || "{}");
-let contactedMap = JSON.parse(localStorage.getItem("gamal_contacted_v3") || "{}");
-let bannedIdsMap = JSON.parse(localStorage.getItem("gamal_banned_ids_v1") || "{}");
-let bannedSellersMap = JSON.parse(localStorage.getItem("gamal_banned_sellers_v1") || "{}");
-
-function getDeviceName(){
-  const ua = navigator.userAgent;
-  if(/android/i.test(ua)) return "موبايل أندرويد";
-  if(/iPhone|iPad/i.test(ua)) return "آيفون / آيباد";
-  if(/Windows/i.test(ua)) return "كمبيوتر ويندوز";
-  if(/Mac/i.test(ua)) return "ماك";
-  return "جهاز متصفح";
-}
-
-function isAdminUser(){
-  return localStorage.getItem("gamal_auth_pass_v3") === ADMIN_PASS;
-}
-
-function getCurrentUserName(){
-  return localStorage.getItem("gamal_auth_name_v3") || (isAdminUser() ? "جمال (أدمن)" : "مستخدم");
-}
-
-function applyRoleUI(passUsed){
-  const vBtn = document.getElementById("visitorBtn");
-  const rBtn = document.getElementById("reportBtn");
-  const sPill = document.getElementById("syncPill");
-  if(passUsed === ADMIN_PASS){
-    vBtn.style.display = "inline-flex";
-    rBtn.style.display = "inline-flex";
-    sPill.style.display = "inline-flex";
-  } else {
-    vBtn.style.display = "none";
-    rBtn.style.display = "none";
-    sPill.style.display = "none";
-    document.getElementById("visitorModal").style.display = "none";
-    document.getElementById("reportModal").style.display = "none";
-  }
-}
-
-function checkAuth(){
-  const savedPass = localStorage.getItem("gamal_auth_pass_v3");
-  if(savedPass === ADMIN_PASS || savedPass === USER_PASS){
-    document.getElementById("lockScreen").style.display = "none";
-    applyRoleUI(savedPass);
-  }
-}
-checkAuth();
-
-async function sendVisitorLog(entry){
-  let localLogs = JSON.parse(localStorage.getItem("gamal_visitors_log_v3") || "[]");
-  localLogs.unshift(entry);
-  localStorage.setItem("gamal_visitors_log_v3", JSON.stringify(localLogs.slice(0, 100)));
-  try{
-    await fetch("https://ntfy.sh/" + LOG_TOPIC, {
-      method: "POST",
-      body: JSON.stringify(entry)
-    });
-  }catch(e){}
-}
+const ADMIN_PASS = CFG.ADMIN_PASS;
+const USER_PASS = CFG.USER_PASS;
 
 function unlock(){
   const name = (document.getElementById("vName").value || "بدون اسم").trim();
@@ -596,594 +276,314 @@ function unlock(){
   if(pass === ADMIN_PASS || pass === USER_PASS){
     localStorage.setItem("gamal_auth_pass_v3", pass);
     localStorage.setItem("gamal_auth_name_v3", name);
-    const entry = {
-      id: Date.now() + "_" + Math.random().toString(36).slice(2,6),
-      name: name,
-      device: getDeviceName(),
-      role: pass === ADMIN_PASS ? "أدمن (2738)" : "مستخدم (3399)",
-      time: new Date().toLocaleString("ar-EG")
-    };
-    sendVisitorLog(entry);
-    applyRoleUI(pass);
     document.getElementById("lockScreen").style.display = "none";
     render();
   } else {
     document.getElementById("errMsg").style.display = "block";
   }
 }
-
 function lockApp(){
   localStorage.removeItem("gamal_auth_pass_v3");
   location.reload();
 }
-
-function showRunReport(){
-  if(!isAdminUser()) return;
-  const box = document.getElementById("reportContent");
-  document.getElementById("reportModal").style.display = "flex";
-  if(!LAST_RUN_REPORT){
-    const dubCnt = ALL_ADS.filter(a=>(a.source||"دوبيزل")==="دوبيزل").length;
-    const aqCnt = ALL_ADS.filter(a=>a.source==="عقارماب").length;
-    const osCnt = ALL_ADS.filter(a=>a.source==="السوق المفتوح").length;
-    box.innerHTML = `
-      <div class="rep-grid">
-        <div class="rep-item"><div class="r-lbl">إجمالي الملاك بالموقع</div><div class="r-val">${ALL_ADS.length}</div></div>
-        <div class="rep-item"><div class="r-lbl">ملاك دوبيزل</div><div class="r-val">${dubCnt}</div></div>
-        <div class="rep-item"><div class="r-lbl">ملاك عقارماب</div><div class="r-val">${aqCnt}</div></div>
-        <div class="rep-item"><div class="r-lbl">ملاك السوق المفتوح</div><div class="r-val">${osCnt}</div></div>
-      </div>
-      <div style="margin-top:12px;color:var(--text-muted);font-size:.8rem">سيظهر التقرير التفصيلي الكامل لعدد المفحوص والمحظور فور انتهاء دورة الرن الحالية.</div>
-    `;
-    return;
-  }
-  const r = LAST_RUN_REPORT;
-  box.innerHTML = `
-    <div style="color:var(--text-muted);font-size:.8rem;margin-bottom:8px">توقيت الرن: <b style="color:#fff">${r.run_time || ''}</b></div>
-    <div class="rep-grid">
-      <div class="rep-item"><div class="r-lbl">إجمالي الملاك بالموقع</div><div class="r-val">${r.total_saved_owners || ALL_ADS.length}</div></div>
-      <div class="rep-item"><div class="r-lbl">ملاك جدد بهذا الرن</div><div class="r-val" style="color:var(--emerald)">+${r.total_new_owners_this_run || 0}</div></div>
-      <div class="rep-item"><div class="r-lbl">إعلانات تم فحصها بالرن</div><div class="r-val">${r.total_inspected_this_run || 0}</div></div>
-      <div class="rep-item"><div class="r-lbl">سماسرة وشركات تم حظرهم بالرن</div><div class="r-val" style="color:#fca5a5">${r.total_brokers_banned_this_run || 0}</div></div>
-      <div class="rep-item"><div class="r-lbl">مستبعدة (قديمة / خارج التجمع)</div><div class="r-val">${r.total_excluded_this_run || 0}</div></div>
-      <div class="rep-item"><div class="r-lbl">إجمالي البلاك ليست المحظورين</div><div class="r-val" style="color:#fca5a5">${r.total_blacklisted_accounts || 0} حساب</div></div>
-      <div class="rep-item"><div class="r-lbl">دوبيزل / عقارماب / السوق</div><div class="r-val" style="font-size:1rem">${r.dubizzle_total||0} / ${r.aqarmap_total||0} / ${r.opensooq_total||0}</div></div>
-      <div class="rep-item"><div class="r-lbl">بيع / إيجار</div><div class="r-val" style="font-size:1rem">${r.sale_total||0} بيع • ${r.rent_total||0} إيجار</div></div>
-    </div>
-  `;
+function checkAuth(){
+  return localStorage.getItem("gamal_auth_pass_v3") === ADMIN_PASS || localStorage.getItem("gamal_auth_pass_v3") === USER_PASS;
+}
+if(!checkAuth()){
+  document.getElementById("lockScreen").style.display = "flex";
+} else {
+  document.getElementById("lockScreen").style.display = "none";
 }
 
-async function banSellerAndAd(adId, sellerName, accountId){
-  if(!isAdminUser()) return;
-  const label = sellerName || ("#" + adId);
-  if(!confirm("تأكيد حظر هذا الناشر (" + label + ") نهائيا ومسح إعلانه وعدم المراجعة عليه مرة أخرى؟")) return;
+let ALL_ADS = [];
+let notifications = [];
+let activeFilters = { source: [], deal: [], tier: [] };
 
-  bannedIdsMap[String(adId)] = true;
-  if(sellerName) bannedSellersMap["name:" + sellerName.toLowerCase().trim()] = true;
-  if(accountId) bannedSellersMap[String(accountId).toLowerCase().trim()] = true;
-
-  localStorage.setItem("gamal_banned_ids_v1", JSON.stringify(bannedIdsMap));
-  localStorage.setItem("gamal_banned_sellers_v1", JSON.stringify(bannedSellersMap));
-  render();
-
-  const banPacket = {
-    ad_id: Number(adId),
-    seller_name: sellerName || "",
-    account_id: accountId || (sellerName ? "name:" + sellerName.toLowerCase().trim() : ""),
-    time: new Date().toISOString()
-  };
-  try{
-    await fetch("https://ntfy.sh/" + BAN_TOPIC, {
-      method: "POST",
-      body: JSON.stringify(banPacket)
-    });
-  }catch(e){}
+function toggleNotif(){
+  document.getElementById("notifPanel").classList.toggle("show");
+  renderNotifs();
 }
-
-async function syncCloudBansAndContacts(){
-  try{
-    const res = await fetch("https://ntfy.sh/" + BAN_TOPIC + "/json?poll=1&since=all", {cache: "no-store"});
-    if(res.ok){
-      const txt = await res.text();
-      for(const line of txt.trim().split("\n")){
-        if(!line) continue;
-        try{
-          const pkt = JSON.parse(line);
-          if(pkt && pkt.message){
-            const b = JSON.parse(pkt.message);
-            if(b.ad_id) bannedIdsMap[String(b.ad_id)] = true;
-            if(b.seller_name) bannedSellersMap["name:" + String(b.seller_name).toLowerCase().trim()] = true;
-            if(b.account_id) bannedSellersMap[String(b.account_id).toLowerCase().trim()] = true;
-          }
-        }catch(e){}
-      }
-      localStorage.setItem("gamal_banned_ids_v1", JSON.stringify(bannedIdsMap));
-      localStorage.setItem("gamal_banned_sellers_v1", JSON.stringify(bannedSellersMap));
-    }
-  }catch(e){}
-
-  try{
-    const resC = await fetch("https://ntfy.sh/" + CONTACT_TOPIC + "/json?poll=1&since=all", {cache: "no-store"});
-    if(resC.ok){
-      const txtC = await resC.text();
-      for(const line of txtC.trim().split("\n")){
-        if(!line) continue;
-        try{
-          const pkt = JSON.parse(line);
-          if(pkt && pkt.message){
-            const c = JSON.parse(pkt.message);
-            if(c && c.ad_id){
-              if(c.active){
-                contactedMap[String(c.ad_id)] = c.by || "تم التواصل";
-              } else {
-                delete contactedMap[String(c.ad_id)];
-              }
-            }
-          }
-        }catch(e){}
-      }
-      localStorage.setItem("gamal_contacted_v3", JSON.stringify(contactedMap));
-    }
-  }catch(e){}
+function closeNotif(){
+  document.getElementById("notifPanel").classList.remove("show");
 }
-
-async function showVisitors(){
-  if(!isAdminUser()) return;
-  const box = document.getElementById("visitorList");
-  box.innerHTML = "<div>جاري تحميل سجل الزوار من جميع الأجهزة...</div>";
-  document.getElementById("visitorModal").style.display = "flex";
-
-  let mergedMap = {};
-  let localLogs = JSON.parse(localStorage.getItem("gamal_visitors_log_v3") || "[]");
-  for(const l of localLogs){
-    if(l && l.id) mergedMap[l.id] = l;
-  }
-
-  try{
-    const res = await fetch("https://ntfy.sh/" + LOG_TOPIC + "/json?poll=1&since=all", {cache: "no-store"});
-    if(res.ok){
-      const txt = await res.text();
-      const lines = txt.trim().split("\n");
-      for(const line of lines){
-        if(!line) continue;
-        try{
-          const pkt = JSON.parse(line);
-          if(pkt && pkt.message){
-            const entry = JSON.parse(pkt.message);
-            if(entry && entry.id){
-              mergedMap[entry.id] = entry;
-            }
-          }
-        }catch(e){}
-      }
-    }
-  }catch(e){}
-
-  const allLogs = Object.values(mergedMap).sort((a,b)=>String(b.id).localeCompare(String(a.id)));
-  localStorage.setItem("gamal_visitors_log_v3", JSON.stringify(allLogs.slice(0, 150)));
-
-  if(!allLogs.length){
-    box.innerHTML = "<div>لا توجد تسجيلات دخول بعد.</div>";
+function renderNotifs(){
+  const list = document.getElementById("notifList");
+  if(notifications.length === 0){
+    list.innerHTML = '<div class="notif-empty">لا توجد إشعارات جديدة</div>';
   } else {
-    box.innerHTML = allLogs.map((l,i)=>`
-      <div style="background:var(--surface);padding:12px;border-radius:12px;border:1px solid rgba(212,175,55,0.2)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <b>${i+1}. ${l.name}</b>
-          <span style="font-size:.74rem;padding:3px 9px;border-radius:6px;background:${String(l.role).includes('أدمن')?'#065f46':'#1e3a8a'};color:#fff;font-weight:700">${l.role || 'مستخدم'}</span>
-        </div>
-        <div style="color:var(--text-muted);font-size:.78rem;margin-top:4px">${l.device} • ${l.time}</div>
-      </div>
-    `).join("");
+    list.innerHTML = notifications.map(n => `
+      <div class="notif-item">
+        <div class="time">${n.time}</div>
+        <div class="msg">${n.msg}</div>
+      </div>`).join("");
   }
-}
-
-const STRICT_FORBIDDEN = [
-  "مصر الجديدة","مصر الجديده","مدينة نصر","مدينه نصر","زهراء مدينة نصر",
-  "الكوربة","أرض الجولف","ارض الجولف","ميدان الحجاز","روكسي","الماظة","ألماظة",
-  "شيراتون","النزهة","عباس العقاد","مكرم عبيد","مصطفى النحاس",
-  "الرحاب","مدينتي","الشروق","العاصمة الإدارية","مدينة المستقبل",
-  "بيت الوطن","بيت الوطنى","بيت الوطن الجديد"
-];
-
-function normalizeAdCategoryClient(ad){
-  if(!ad.source) ad.source = "دوبيزل";
-  const t = ((ad.title||"") + " " + decodeURIComponent(ad.url||"")).toLowerCase();
-  const deal = ad.deal || "بيع";
-
-  if(ad.subtype && ["شقة مفروشة","إداري","طبي","أراض","مبنى"].includes(ad.subtype)){
-    return ad;
-  }
-  if(t.includes("شقة مفروشة") || t.includes("شقه مفروشه") || t.includes("furnished-apartment")){
-    ad.subtype = "شقة مفروشة";
-    ad.category = "شقق للإيجار";
-    return ad;
-  }
-  if(t.includes("قطعة أرض") || t.includes("قطعه ارض") || t.includes("أرض للبيع") || t.includes("ارض للبيع") || t.includes("/land/")){
-    ad.subtype = "أراض";
-    ad.category = "مبانى و أراضى";
-    return ad;
-  }
-  if(t.includes("عمارة كاملة") || t.includes("عماره كامله") || t.includes("عمارة للبيع") || t.includes("/building/")){
-    ad.subtype = "مبنى";
-    ad.category = "مبانى و أراضى";
-    return ad;
-  }
-  if(t.includes("عيادة") || t.includes("عياده") || t.includes("صيدلية") || t.includes("/medical/")){
-    ad.subtype = "طبي";
-    ad.category = deal === "إيجار" ? "عقار تجاري للإيجار" : "عقار تجاري للبيع";
-    return ad;
-  }
-  if(t.includes("مكتب") || t.includes("مقر إداري") || t.includes("مقر اداري") || t.includes("/administrative/")){
-    ad.subtype = "إداري";
-    ad.category = deal === "إيجار" ? "عقار تجاري للإيجار" : "عقار تجاري للبيع";
-    return ad;
-  }
-  if(t.includes("محل ") || t.includes("/commercial/")){
-    ad.subtype = "عقار تجاري";
-    ad.category = deal === "إيجار" ? "عقار تجاري للإيجار" : "عقار تجاري للبيع";
-    return ad;
-  }
-  if(t.includes("ستوديو") || t.includes("استوديو") || t.includes("studio")){
-    ad.subtype = "ستوديو";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  if(t.includes("روف ") || t.includes("رووف") || t.includes("سطح") || t.startsWith("روف")){
-    ad.subtype = "سطح";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  if(t.includes("دوبلكس") || t.includes("دوبليكس") || t.includes("duplex")){
-    ad.subtype = "دوبلكس";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  if(t.includes("بنتهاوس") || t.includes("penthouse")){
-    ad.subtype = "بنتهاوس";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  if(t.includes("شقة فندقية") || t.includes("شقه فندقيه")){
-    ad.subtype = "شقة فندقية";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  // ✅ FIX(M3): "شقة" لازم تتفحص قبل "غرفة" — لأن "شقة 3 غرف" كانت بتتصنّف
-  //    "غرفة" (وإيجار إجباري) لمجرد إنها فيها كلمة "غرف".
-  if(t.includes("شقة") || t.includes("شقه") || t.includes("apartment")){
-    ad.subtype = "شقة";
-    ad.category = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
-    return ad;
-  }
-  if(t.includes("غرفة") || t.includes("غرفه")){
-    ad.subtype = "غرفة";
-    ad.category = "شقق للإيجار";
-    return ad;
-  }
-  return ad;
-}
-
-// ============================================================================
-//  🛡️ حماية من اللبس (طلب المالك 2026-11-09) — نفس منطق scraper.py بالظبط
-//    • «شقة تبعد عن بيت الوطن 5 دقايق» ⇒ مش في بيت الوطن ⇒ تظهر عادي
-//    • «بدون أقساط من المالك»          ⇒ كاش ⇒ تظهر عادي
-//    • «بدون مقدم وأقساط على 5 سنين»   ⇒ الواو فصلت النفي ⇒ تقسيط ⇒ تختفي
-// ============================================================================
-const INSTALLMENT_WORDS = [
-  "بالتقسيط","تقسيط","أقساط","اقساط","بالأقساط","بالاقساط","قسط",
-  "مقدم","بقدم","بمقدم","دفعة","دفعه","أقل مقدم","اقل مقدم",
-  "تسهيلات","تسهيل","نظام سداد","أنظمة سداد","انظمة سداد",
-  "خطة سداد","خطط سداد","سداد ميسر","سداد مرن",
-  "على سنوات","علي سنوات","على سنين","علي سنين","لسنوات","لسنين",
-  "خصم الكاش","سعر الشركة",
-  "installment","installments","down payment","payment plan"
-];
-const NEGATION_RE = new RegExp("(?:^|[\\s،,;.\\-–—(|«»\"])(?:بدون|بلا|لا|مش|ليس|غير|من\\s+غير|منغير|مفيش|خالي|خالٍ|مبقتش|no|not|without|zero)(?=$|[\\s،,;.\\-–—)|«»\"])","g");
-const AREA_HINT_RE = new RegExp("(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|خلفها|أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|على\\s+بعد|علي\\s+بعد|بعد|لسه\\s+موصل|(?:^|[\\s،,;.\\-–—(|])(?:مش|ليس|غير|بدون|بلا|لا)(?=$|[\\s،,;.\\-–—)|]))","g");
-const CONJUNCTION_MARKS = [" و","،",",","+","|"," أو "," او "," ثم ",";"," وكذلك "];
-const LOOKBACK_CHARS = 26;
-
-function governedBefore(text, start, re){
-  if(!text || start <= 0) return false;
-  const win = text.slice(Math.max(0, start - LOOKBACK_CHARS), start);
-  re.lastIndex = 0;
-  let m, best = null;
-  while((m = re.exec(win)) !== null){
-    best = m;
-    if(m.index === re.lastIndex) re.lastIndex++;
-  }
-  if(!best) return false;
-  const between = win.slice(best.index + best[0].length);
-  return !CONJUNCTION_MARKS.some(c => between.includes(c));
-}
-
-function areaIsTheLocation(text, area){
-  const t = text || "";
-  let idx = t.indexOf(area);
-  while(idx !== -1){
-    if(!governedBefore(t, idx, AREA_HINT_RE)) return true;
-    idx = t.indexOf(area, idx + 1);
-  }
-  return false;
-}
-
-function hasInstallmentOffer(text){
-  const t = (text || "").toLowerCase();
-  for(const w of INSTALLMENT_WORDS){
-    const wl = w.toLowerCase();
-    let idx = t.indexOf(wl);
-    while(idx !== -1){
-      if(!governedBefore(t, idx, NEGATION_RE)) return true;
-      idx = t.indexOf(wl, idx + 1);
-    }
-  }
-  return false;
-}
-
-function forbiddenAreaHit(text, list){
-  for(const bad of list){ if(areaIsTheLocation(text, bad)) return bad; }
-  return null;
-}
-
-function isCleanAd(ad){
-  if(bannedIdsMap[String(ad.ad_id)]) return false;
-  const sNameKey = "name:" + String(ad.seller_name || "").toLowerCase().trim();
-  const sAccKey = String(ad.account_id || "").toLowerCase().trim();
-  if(bannedSellersMap[sNameKey] || (sAccKey && bannedSellersMap[sAccKey])) return false;
-
-  const text = ((ad.title||"") + " " + (ad.description||"")).toLowerCase();
-  if(text.includes("عقارات مصايف") || text.includes("شاليه ")) return false;
-  // 🛡️ واعية بالسياق: «تبعد عن بيت الوطن» تظهر، «في بيت الوطن» تختفي
-  if(forbiddenAreaHit(text, STRICT_FORBIDDEN)) return false;
-  // 🛡️ مرفوض أي إعلان نفسه بالتقسيط — «بدون أقساط» بيعدي عادي
-  if(hasInstallmentOffer(text)) return false;
-  // ✅ FIX(M4): الجزء المهم من الإصلاح ده إن الإعلان اللي مفيش له عدد
-  //    (عقارماب والسوق المفتوح مالهمش seller_ads_count) ما يتخفيش.
-  //    القاعدة نفسها فضلت 1..4 زي ما هي — دي قاعدة المالك.
-  const cnt = Number(ad.seller_ads_count || 0);
-  if(!Number.isFinite(cnt) || cnt <= 0) return true;   // مفيش بيانات ⇒ ما نخفيش
-  return cnt <= CFG.MAX_OWNER_ADS;
-}
-
-function extractPhone(text){
-  if(!text) return null;
-  const s = text.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-  const m = s.match(/(?:\+?20|0)?(1[0125]\d{8})\b/);
-  return m ? "20" + m[1] : null;
-}
-
-function setSrc(s, btn){
-  curSrc = s;
-  document.querySelectorAll("#srcTabs .tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  render();
-}
-
-function setCat(c, btn){
-  curCat = c;
-  document.querySelectorAll("#catTabs .tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  render();
-}
-
-function setSub(s, btn){
-  curSub = s;
-  document.querySelectorAll("#subTabs .tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  render();
-}
-
-function setState(st, btn){
-  curState = st;
-  document.querySelectorAll("#stateTabs .tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  render();
-}
-
-function markOpened(id){
-  openedMap[id] = (openedMap[id] || 0) + 1;
-  localStorage.setItem("gamal_opened_v2", JSON.stringify(openedMap));
-  render();
-}
-
-async function toggleContacted(id){
-  const key = String(id);
-  const userName = getCurrentUserName();
-  let isNowActive = false;
-  if(contactedMap[key]){
-    delete contactedMap[key];
-    isNowActive = false;
+  const badge = document.getElementById("notifBadge");
+  if(notifications.length > 0){
+    badge.style.display = "block";
+    badge.textContent = notifications.length;
   } else {
-    contactedMap[key] = userName;
-    isNowActive = true;
+    badge.style.display = "none";
   }
-  localStorage.setItem("gamal_contacted_v3", JSON.stringify(contactedMap));
-  render();
-
-  try{
-    await fetch("https://ntfy.sh/" + CONTACT_TOPIC, {
-      method: "POST",
-      body: JSON.stringify({
-        ad_id: Number(id),
-        active: isNowActive,
-        by: userName,
-        time: new Date().toLocaleString("ar-EG")
-      })
-    });
-  }catch(e){}
+}
+function addNotification(msg){
+  const now = new Date();
+  const time = now.toLocaleTimeString("ar-EG", {hour: "2-digit", minute: "2-digit"});
+  notifications.unshift({ msg, time });
+  if(notifications.length > 50) notifications.pop();
+  renderNotifs();
 }
 
-function render(){
-  const q = (document.getElementById("qSearch").value || "").trim().toLowerCase();
-  const maxP = Number(document.getElementById("maxPrice").value || 0);
-  const sort = document.getElementById("sortBy").value;
-  const adminMode = isAdminUser();
+function setupFilters(){
+  const sources = [
+    { key: "دوبيزل", label: "دوبيزل" },
+    { key: "عقارماب", label: "عقارماب" },
+    { key: "السوق المفتوح", label: "السوق المفتوح" }
+  ];
+  document.getElementById("sourceChips").innerHTML = sources.map(s =>
+    `<div class="chip" data-filter="source" data-val="${s.key}" onclick="toggleChip(this,'source')">${s.label}</div>`
+  ).join("");
 
-  const cleanAds = ALL_ADS.map(normalizeAdCategoryClient).filter(isCleanAd);
-  document.getElementById("stTotal").textContent = cleanAds.length;
-  document.getElementById("stUnread").textContent = cleanAds.filter(a=>!openedMap[a.ad_id]).length;
-  document.getElementById("stSale").textContent = cleanAds.filter(a=>a.deal==="بيع").length;
-  document.getElementById("stRent").textContent = cleanAds.filter(a=>a.deal==="إيجار").length;
+  document.getElementById("dealChips").innerHTML = [
+    { key: "بيع", label: "للبيع" },
+    { key: "إيجار", label: "للإيجار" }
+  ].map(d =>
+    `<div class="chip" data-filter="deal" data-val="${d.key}" onclick="toggleChip(this,'deal')">${d.label}</div>`
+  ).join("");
 
-  let filtered = cleanAds.filter(a=>{
-    const src = a.source || "دوبيزل";
-    if(curSrc !== "الكل" && src !== curSrc) return false;
-    if(curCat !== "الكل" && a.category !== curCat) return false;
-    if(curSub !== "الكل" && a.subtype !== curSub) return false;
-    if(curState === "unopened" && openedMap[a.ad_id]) return false;
-    if(curState === "uncontacted" && contactedMap[String(a.ad_id)]) return false;
-    if(curState === "contacted" && !contactedMap[String(a.ad_id)]) return false;
-    if(maxP > 0 && a.price_num > 0 && a.price_num > maxP) return false;
-    if(q){
-      const hay = ((a.title||"")+" "+(a.description||"")+" "+(a.seller_name||"")+" "+src).toLowerCase();
-      if(!hay.includes(q)) return false;
+  document.getElementById("tierChips").innerHTML = [
+    { key: "3", label: "اليوم" },
+    { key: "2", label: "أمس" },
+    { key: "1", label: "هذا الأسبوع" }
+  ].map(t =>
+    `<div class="chip" data-filter="tier" data-val="${t.key}" onclick="toggleChip(this,'tier')">${t.label}</div>`
+  ).join("");
+
+  const cats = [...new Set(ALL_ADS.map(a => a.category).filter(Boolean))].sort();
+  document.getElementById("categoryFilter").innerHTML = '<option value="">كل الفئات</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+
+  const subs = [...new Set(ALL_ADS.map(a => a.subtype).filter(Boolean))].sort();
+  document.getElementById("subtypeFilter").innerHTML = '<option value="">كل الأنواع</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join("");
+}
+
+function toggleChip(el, filterType){
+  const val = el.dataset.val;
+  el.classList.toggle("active");
+  if(activeFilters[filterType].includes(val)){
+    activeFilters[filterType] = activeFilters[filterType].filter(v => v !== val);
+  } else {
+    activeFilters[filterType].push(val);
+  }
+  filterAds();
+}
+
+function resetFilters(){
+  document.querySelectorAll(".chip.active").forEach(c => c.classList.remove("active"));
+  activeFilters = { source: [], deal: [], tier: [] };
+  document.getElementById("categoryFilter").value = "";
+  document.getElementById("subtypeFilter").value = "";
+  document.getElementById("priceMin").value = "";
+  document.getElementById("priceMax").value = "";
+  document.getElementById("areaMin").value = "";
+  document.getElementById("areaMax").value = "";
+  document.getElementById("bedsFilter").value = "";
+  document.getElementById("searchInput").value = "";
+  filterAds();
+}
+
+function filterAds(){
+  renderAds();
+}
+
+function renderAds(){
+  const search = document.getElementById("searchInput").value.toLowerCase().trim();
+  const cat = document.getElementById("categoryFilter").value;
+  const sub = document.getElementById("subtypeFilter").value;
+  const pMin = parseInt(document.getElementById("priceMin").value) || 0;
+  const pMax = parseInt(document.getElementById("priceMax").value) || 0;
+  const aMin = parseInt(document.getElementById("areaMin").value) || 0;
+  const aMax = parseInt(document.getElementById("areaMax").value) || 0;
+  const beds = parseInt(document.getElementById("bedsFilter").value) || 0;
+  const sort = document.getElementById("sortSelect").value;
+
+  let filtered = ALL_ADS.filter(a => {
+    if(activeFilters.source.length > 0 && !activeFilters.source.includes(a.source)) return false;
+    if(activeFilters.deal.length > 0 && !activeFilters.deal.includes(a.deal)) return false;
+    if(activeFilters.tier.length > 0 && !activeFilters.tier.includes(String(a.fresh_tier))) return false;
+    if(cat && a.category !== cat) return false;
+    if(sub && a.subtype !== sub) return false;
+    const price = a.price_num || 0;
+    if(price < pMin || (pMax > 0 && price > pMax)) return false;
+    const area = parseInt(a.area) || 0;
+    if(area < aMin || (aMax > 0 && area > aMax)) return false;
+    if(beds > 0) {
+      const bedMatch = (a.beds || "").match(/\d+/);
+      const bedNum = bedMatch ? parseInt(bedMatch[0]) : 0;
+      if(bedNum < beds) return false;
+    }
+    if(search) {
+      const searchText = (a.title + " " + a.description + " " + a.seller_name + " " + a.area + " " + a.category).toLowerCase();
+      if(!searchText.includes(search)) return false;
     }
     return true;
   });
 
-  if(sort === "low") filtered.sort((a,b)=>(a.price_num||999999999)-(b.price_num||999999999));
-  else if(sort === "high") filtered.sort((a,b)=>(b.price_num||0)-(a.price_num||0));
-  else filtered.sort((a,b)=>String(b.scraped_at||b.ad_id).localeCompare(String(a.scraped_at||a.ad_id)));
+  if(sort === "price-asc") filtered.sort((a, b) => (a.price_num||0) - (b.price_num||0));
+  else if(sort === "price-desc") filtered.sort((a, b) => (b.price_num||0) - (a.price_num||0));
+  else if(sort === "area-desc") filtered.sort((a, b) => parseInt(b.area||0) - parseInt(a.area||0));
+  else if(sort === "id-desc") filtered.sort((a, b) => (b.ad_id||0) - (a.ad_id||0));
+  else filtered.sort((a, b) => (b.fresh_tier||0) - (a.fresh_tier||0));
 
-  const box = document.getElementById("list");
-  if(!filtered.length){
-    box.innerHTML = `<div class="empty">لا توجد وحدات مطابقة للفلتر المحدد حاليا.</div>`;
+  document.getElementById("resultCount").textContent = filtered.length;
+
+  const list = document.getElementById("adsList");
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <p>لا توجد إعلانات مطابقة للفلاتر</p>
+    </div>`;
     return;
   }
 
-  box.innerHTML = filtered.map(a=>{
-    const views = openedMap[a.ad_id] || 0;
-    const contactBy = contactedMap[String(a.ad_id)];
-    const isCont = !!contactBy;
-    const waPhone = extractPhone((a.title||"") + " " + (a.description||""));
-    const srcLabel = a.source || "دوبيزل";
-    const srcClass = srcLabel === "عقارماب" ? "b-src-aqar" : (srcLabel === "السوق المفتوح" ? "b-src-os" : "b-src-dub");
-    const catLabel = a.category || (a.deal==="إيجار" ? "شقق للإيجار" : "شقق للبيع");
-    const subLabel = a.subtype || "شقة";
-    const safeSeller = jsStr(a.seller_name || "المالك");
-    const safeAcc = jsStr(a.account_id || "");
-    const ownBadgeText = srcLabel === "دوبيزل" ? `المالك (${esc(a.seller_ads_count||1)} إعلان)` : `مالك العقار`;
-
+  list.innerHTML = filtered.map(a => {
+    const sourceColor = a.source === "دوبيزل" ? "#3b82f6" : a.source === "عقارماب" ? "#10b981" : "#d4af37";
+    const tierLabel = a.fresh_tier === 3 ? "اليوم" : a.fresh_tier === 2 ? "أمس" : "هذا الأسبوع";
+    const tierClass = a.fresh_tier === 3 ? "tier3" : a.fresh_tier === 2 ? "tier2" : "tier1";
+    const srcClass = a.source === "دوبيزل" ? "source-dubizzle" : a.source === "عقارماب" ? "source-aqarmap" : "source-opensooq";
+    const bedsMatch = (a.beds || "").match(/\d+/);
+    const areaNum = parseInt(a.area) || 0;
+    const isFresh = a.fresh_tier === 3;
     return `
-    <div class="card ${views?'opened':''} ${isCont?'contacted':''}">
-      <div>
-        <div class="badges">
-          <span class="badge ${srcClass}">${esc(srcLabel)}</span>
-          <span class="badge b-cat">${esc(catLabel)}</span>
-          <span class="badge b-sub">${esc(subLabel)}</span>
-          <span class="badge b-own">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>${ownBadgeText}</span>
-          </span>
-          <span class="badge b-state ${views?'':'unread'}">${views ? 'تم الفتح ('+views+')' : 'جديد'}</span>
+      <div class="ad-card" style="--source-color:${sourceColor}" onclick="window.open('${a.url||'#'}', '_blank')">
+        <div class="ad-top">
+          <div class="ad-title">${esc(a.title || "إعلان")}</div>
+          <div class="ad-badges">
+            <span class="badge-tag ${srcClass}">${a.source}</span>
+            ${isFresh ? '<span class="badge-tag fresh">★ حديث</span>' : ''}
+            <span class="badge-tag ${tierClass}">${tierLabel}</span>
+          </div>
         </div>
-
-        <div class="price-row">
-          <div class="price">${esc(a.price_text || 'مدرج بالإعلان')}</div>
-          <div class="deal-tag">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك مباشر'}</div>
+        <div class="ad-price">${esc(a.price_text || "مدرج بالإعلان")}</div>
+        <div class="ad-details">
+          ${a.category ? `<span>${esc(a.category)}</span>` : ''}
+          ${a.subtype ? `<span>${esc(a.subtype)}</span>` : ''}
+          ${a.deal ? `<span>${a.deal === "بيع" ? "للبيع" : "للإيجار"}</span>` : ''}
+          ${areaNum > 0 ? `<span>${areaNum} م²</span>` : ''}
+          ${bedsMatch ? `<span>${bedsMatch[0]} غرف</span>` : ''}
         </div>
-
-        <div class="title">${esc(a.title)}</div>
-
-        <div class="specs">
-          <span class="spec-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <span>${esc(a.area||'مدرج')}</span>
-          </span>
-          ${a.beds ? `<span class="spec-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
-            <span>${esc(a.beds)}</span>
-          </span>` : ''}
-          ${a.baths ? `<span class="spec-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-            <span>${esc(a.baths)}</span>
-          </span>` : ''}
-        </div>
-
-        <div class="desc">${esc(a.description || a.title)}</div>
-      </div>
-
-      <div>
-        <div class="seller-bar">
-          <span class="seller-name">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>${esc(a.seller_name||'المالك')}</span>
-          </span>
-          <span class="ad-id-pill">#${a.ad_id}</span>
-        </div>
-
-        <div class="actions">
-          <a class="btn btn-open" href="${safeHref(a.url)}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>فتح في ${srcLabel}</span>
+        <div class="ad-desc">${esc(a.description || "")}</div>
+        <div class="ad-bottom">
+          <div class="ad-seller">
+            <span class="dot"></span>
+            ${esc(a.seller_name || "المالك")}
+            <span class="ads-count">${a.seller_ads_count || 1} إعلان نشط</span>
+          </div>
+          <a href="${a.url||'#'}" target="_blank" onclick="event.stopPropagation()" class="ad-link">
+            فتح الإعلان ↗
           </a>
-          ${waPhone
-            ? `<a class="btn btn-wa" href="https://wa.me/${waPhone}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                <span>واتساب مباشر</span>
-              </a>`
-            : `<a class="btn btn-wa-in" href="${safeHref(a.url)}" target="_blank" rel="noopener" onclick="markOpened(${a.ad_id})">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <span>الرقم بالإعلان</span>
-              </a>`
-          }
-          <button class="btn btn-contact-toggle ${isCont?'active':''}" onclick="toggleContacted(${a.ad_id})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>${isCont ? 'تم التواصل (بواسطة: ' + contactBy + ') • اضغط للإلغاء' : 'تحديد كـ: تم التواصل مع المالك'}</span>
-          </button>
-          ${adminMode ? `
-          <button class="btn btn-ban-seller" onclick="banSellerAndAd(${a.ad_id}, '${safeSeller}', '${safeAcc}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-            <span>حظر هذا الناشر نهائيا من السيستم</span>
-          </button>` : ''}
         </div>
-      </div>
-    </div>`;
+      </div>`;
   }).join("");
 }
 
-async function fetchLiveJson(){
-  // ⚠️ FIX: الترتيب هنا مهم جداً — الموقع منشور على Vercel، و Vercel بيحط نسخة من
-  //    ads.json **جوه النشر نفسه**. فلو جرّبنا الملف المحلي الأول، الصفحة هتعرض
-  //    نسخة وقت النشر مش البيانات الحية — ولو Vercel وقف إعادة النشر لأي سبب
-  //    الصفحة هتتجمّد للأبد (وده بالظبط عرض «العداد واقف» اللي كنا بنصلحه).
-  //
-  //    الترتيب الصحيح:
-  //      1. raw.githubusercontent  → حي، CDN (كاش ~5 دقايق)، من غير حدود طلبات
-  //      2. api.github.com         → حي ومن غير كاش، بس حدّه 60 طلب/ساعة ⇒ احتياطي
-  //      3. ads.json المحلي        → آخر ملاذ لو النت واقع خالص
-  //    (إصلاح H6 الأصلي كان بيبدأ بـ api.github.com وده كان بيحرق الحد في 45 دقيقة.)
-  const urls = [
-    'https://raw.githubusercontent.com/gamallove217-glitch/dubizzle-from-gamal/main/ads.json?t=' + Date.now(),
-    'https://api.github.com/repos/gamallove217-glitch/dubizzle-from-gamal/contents/ads.json?t=' + Date.now(),
-    'ads.json?t=' + Date.now()
-  ];
-  for(const u of urls){
-    try{
-      const headers = u.includes('api.github.com') ? {'Accept': 'application/vnd.github.v3.raw'} : {};
-      const r = await fetch(u, {headers, cache: 'no-store'});
-      if(r.ok){
-        const d = await r.json();
-        if(d && Array.isArray(d.ads)) return d;
-      }
-    }catch(e){}
+function esc(s){
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function renderStats(){
+  const dub = ALL_ADS.filter(a => a.source === "دوبيزل").length;
+  const aqar = ALL_ADS.filter(a => a.source === "عقارماب").length;
+  const os = ALL_ADS.filter(a => a.source === "السوق المفتوح").length;
+  const sale = ALL_ADS.filter(a => a.deal === "بيع").length;
+  const rent = ALL_ADS.filter(a => a.deal === "إيجار").length;
+  const fresh = ALL_ADS.filter(a => a.fresh_tier === 3).length;
+  const lastReport = window.__REPORT || {};
+
+  document.getElementById("statsGrid").innerHTML = `
+    <div class="stat-card">
+      <div class="icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="num">${ALL_ADS.length}</div>
+      <div class="lbl">إعلان مالك مباشر</div>
+      <div class="sub">${sale} للبيع · ${rent} للإيجار</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="num">${fresh}</div>
+      <div class="lbl">إعلانات اليوم</div>
+      <div class="sub">حديثة التحقق</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div class="num">${dub}</div>
+      <div class="lbl">دوبيزل</div>
+      <div class="sub">${lastReport.dubizzle_inspected||0} مفحوص</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="num">${lastReport.total_brokers_banned_this_run||0}</div>
+      <div class="lbl">سماسرة محذوفين</div>
+      <div class="sub">من ${lastReport.total_inspected_this_run||0} مفحوص</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div>
+      <div class="num">${aqar}</div>
+      <div class="lbl">عقارماب</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="num">${os}</div>
+      <div class="lbl">السوق المفتوح</div>
+    </div>
+  `;
+
+  document.getElementById("headerStats").innerHTML = `
+    <div class="stat-pill"><span class="v">${ALL_ADS.length}</span><span class="l">إعلان</span></div>
+    <div class="stat-pill"><span class="v">${fresh}</span><span class="l">حديث</span></div>
+    <div class="stat-pill"><span class="v">${lastReport.total_new_owners_this_run||0}</span><span class="l">جديد</span></div>
+  `;
+}
+
+function render(){
+  renderStats();
+  setupFilters();
+  renderAds();
+  renderNotifs();
+
+  if(notifications.length === 0){
+    const lastReport = window.__REPORT || {};
+    if(lastReport.total_new_owners_this_run > 0){
+      addNotification(`✅ تم إضافة <strong>${lastReport.total_new_owners_this_run}</strong> مالك جديد في الرن الأخير`);
+    }
+    if(lastReport.total_brokers_banned_this_run > 0){
+      addNotification(`🚫 تم حذف <strong>${lastReport.total_brokers_banned_this_run}</strong> سمسار`);
+    }
+    addNotification(`📊 الرن الأخير: ${lastReport.total_inspected_this_run||0} مفحوص · ${ALL_ADS.length} مالك محفوظ`);
   }
-  return null;
 }
 
 async function load(){
-  await syncCloudBansAndContacts();
-  const data = await fetchLiveJson();
-  if(data){
+  try {
+    const resp = await fetch("ads.json");
+    const data = await resp.json();
     ALL_ADS = data.ads || [];
-    if(data.last_run_report) LAST_RUN_REPORT = data.last_run_report;
-    document.getElementById("syncTime").textContent = "آخر تحديث: " + (data.last_scrape || "الآن");
+    window.__REPORT = data.last_run_report || {};
+    const notifiedIds = new Set(data.notified_ids_v1 || []);
+    const newAds = ALL_ADS.filter(a => !notifiedIds.has(a.ad_id));
+    if(newAds.length > 0 && notifications.length === 0){
+      newAds.slice(0, 3).forEach(a => {
+        addNotification(`🎉 مالك جديد: ${a.seller_name} — ${a.title}`);
+      });
+    }
     render();
+  } catch(e){
+    console.error("Failed to load ads.json:", e);
   }
 }
-load();
-// ✅ FIX(H6): كل دقيقتين، وفقط لما التبويب مفتوح — عشان ما نحرقش حدّ GitHub
-//    وإحنا مش شايفين الصفحة أصلاً.
-setInterval(()=>{ if(!document.hidden) load(); }, CFG.REFRESH_MS);
+
+setInterval(() => {
+  if(!document.hidden) load();
+}, CFG.REFRESH_MS);
+
+if(checkAuth()) load();
 </script>
 </body>
 </html>
