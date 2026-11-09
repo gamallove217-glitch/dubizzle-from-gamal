@@ -64,8 +64,28 @@ jobs:
     steps:
       # ========================================================================
       #  🚦 البوابة — أول خطوة، قبل الـ checkout كمان (عشان الـ no-op يبقى رخيص)
-      #     بتشتغل على `schedule` بس. لو الـ API فشل ⇒ **beneshtaghel احتياطاً**
-      #     (fail-safe = run) — أحسن نجيب بيانات مرتين من إننا مانجيبهاش خالص.
+      #     بتشتغل على `schedule` بس.
+      #
+      #  ⚠️  العيب اللي اتصلح هنا (كان كارثي وصامت):
+      #     النسخة الأولى كانت بتسأل «آخر رَن **ناجح** كان من إمتى؟». بس رَن
+      #     الـ no-op نفسه بيخلص `success`! يبقى أول no-op بيعمل «إعادة ضبط»
+      #     للساعة، واللي بعده يشوفه ويقول «البيانات لسه جديدة»، وهكذا —
+      #     **السكرابر كان هيقف للأبد ولوحة التحكم خضراء ✅ طول الوقت.**
+      #
+      #  ✅  الحل: إشارتين **مستقلتين**، و no-op يحصل بس لو **الاتنين** قالوا جديد:
+      #     ١) آخر رَن نجح **واشتغل فعلاً** — المدة ≥ 300 ثانية
+      #        (الرَن الحقيقي ١٤–١٦ دقيقة، الـ no-op ~٢٠ ثانية).
+      #     ٢) آخر **commit فعلي في ads.json** — ده مقياس عمر البيانات الحقيقي.
+      #        محصّن تماماً ضد الـ no-op لأن الرَن الفاضي ما بيـcommitـش حاجة.
+      #        و`last_run_report.run_time` بيتغير كل رَن ⇒ ads.json بيتعمله
+      #        commit بعد كل رَن حقيقي، فالإشارة دي ما بتموتش.
+      #
+      #     ⇒ التوقف الدائم بقى **مستحيل رياضياً**: عشان age_data يفضل < 100
+      #       لازم ads.json يتعمله commit كل ≤ 100 دقيقة، وده ما بيحصلش إلا
+      #       من رَن حقيقي.
+      #
+      #     اتجاه الأمان: أي إشارة مفقودة/فاشلة ⇒ تُعتبر «قديمة» ⇒ **نشتغل**.
+      #     أحسن نجيب بيانات مرتين من إننا مانجيبهاش خالص.
       # ========================================================================
       - name: 🚦 بوابة التكرار (schedule فقط)
         id: gate
@@ -75,61 +95,132 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
-          THRESHOLD=100   # دقيقة — لو آخر نجاح أقل من كده، الرَن ده زيادة
+          THRESHOLD=100        # دقيقة — أقل من كده ⇒ البيانات لسه جديدة
+          MIN_REAL_SECONDS=300 # أقل مدة عشان الرَن يُعتبر «اشتغل فعلاً» مش no-op
           NOW=$(date +%s)
 
           echo "### 🚦 بوابة الجدولة" >> "$GITHUB_STEP_SUMMARY"
 
-          RESP=$(curl -sf --max-time 25 \
+          TMPD=$(mktemp -d)
+          trap 'rm -rf "$TMPD"' EXIT
+
+          # الإشارة ١: آخر ٢٠ رَن ناجح (منهم هنفلتر الـ no-ops بالمدة)
+          curl -sf --max-time 25 \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/scrape.yml/runs?status=success&per_page=10" || true)
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/scrape.yml/runs?status=success&per_page=20" \
+            > "$TMPD/runs.json" || true
 
-          if [ -z "$RESP" ]; then
-            echo "::warning::الاستعلام من API فشل — هنشتغل احتياطاً (fail-safe = run)"
-            echo "⚠️ الاستعلام فشل ⇒ هنشتغل احتياطاً" >> "$GITHUB_STEP_SUMMARY"
+          # الإشارة ٢: آخر commit مس ads.json
+          curl -sf --max-time 25 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits?path=ads.json&per_page=1" \
+            > "$TMPD/commits.json" || true
+
+          if [ ! -s "$TMPD/runs.json" ] && [ ! -s "$TMPD/commits.json" ]; then
+            echo "::warning::الاستعلام من الـ API فشل تماماً — هنشتغل احتياطاً (fail-safe = run)"
+            echo "⚠️ الـ API فشل تماماً ⇒ **هنشتغل** احتياطاً" >> "$GITHUB_STEP_SUMMARY"
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          LAST=$(printf '%s' "$RESP" | python3 -c '
-          import sys, json
+          DECIDE=$(NOW="$NOW" THRESHOLD="$THRESHOLD" MIN_REAL="$MIN_REAL_SECONDS" TMPD="$TMPD" python3 -c '
+          import os, json
           from datetime import datetime
-          try:
-              d = json.load(sys.stdin)
-          except Exception:
-              print(0); raise SystemExit
-          ts = []
-          for r in d.get("workflow_runs", []):
-              x = r.get("run_started_at") or r.get("created_at")
+
+          NOW       = int(os.environ.get("NOW", "0"))
+          THRESHOLD = int(os.environ.get("THRESHOLD", "100"))
+          MIN_REAL  = int(os.environ.get("MIN_REAL", "300"))
+          TMPD      = os.environ.get("TMPD", "")
+          STALE     = 10 ** 9   # إشارة مفقودة ⇒ «قديمة جداً» ⇒ نشتغل
+
+          def ts(x):
               if not x:
-                  continue
+                  return None
               try:
-                  ts.append(datetime.fromisoformat(x.replace("Z", "+00:00")).timestamp())
+                  return datetime.fromisoformat(str(x).replace("Z", "+00:00")).timestamp()
               except Exception:
-                  pass
-          print(int(max(ts)) if ts else 0)
+                  return None
+
+          def load(name):
+              try:
+                  with open(os.path.join(TMPD, name), encoding="utf-8") as f:
+                      s = f.read().strip()
+                  return json.loads(s) if s else None
+              except Exception:
+                  return None
+
+          # ── ١) آخر رَن نجح **واشتغل فعلاً** ─────────────────────────
+          age_run, n_real, n_noop = STALE, 0, 0
+          d = load("runs.json")
+          if isinstance(d, dict):
+              best = None
+              for r in d.get("workflow_runs", []):
+                  if r.get("conclusion") != "success":
+                      continue
+                  st = ts(r.get("run_started_at") or r.get("created_at"))
+                  en = ts(r.get("updated_at"))
+                  if st is None:
+                      continue
+                  dur = (en - st) if (en is not None and en >= st) else None
+                  if dur is not None and dur < MIN_REAL:
+                      n_noop += 1        # رَن فاضي — مش دليل إن البيانات جديدة
+                      continue
+                  n_real += 1
+                  best = st if best is None else max(best, st)
+              if best is not None:
+                  age_run = max(0, int((NOW - best) // 60))
+
+          # ── ٢) آخر commit فعلي في ads.json ──────────────────────────
+          age_data = STALE
+          c = load("commits.json")
+          if isinstance(c, list) and c:
+              t = ts((c[0].get("commit") or {}).get("committer", {}).get("date"))
+              if t is not None:
+                  age_data = max(0, int((NOW - t) // 60))
+
+          skip = (age_run < THRESHOLD) and (age_data < THRESHOLD)
+          print("%s|%d|%d|%d|%d" % ("true" if skip else "false", age_run, age_data, n_real, n_noop))
           ')
 
-          if [ "$LAST" -le 0 ]; then
-            echo "مفيش رَن ناجح مسجّل ⇒ هنشتغل"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          SKIP=$(printf '%s' "$DECIDE"     | cut -d'|' -f1)
+          AGE_RUN=$(printf '%s' "$DECIDE"  | cut -d'|' -f2)
+          AGE_DATA=$(printf '%s' "$DECIDE" | cut -d'|' -f3)
+          N_REAL=$(printf '%s' "$DECIDE"   | cut -d'|' -f4)
+          N_NOOP=$(printf '%s' "$DECIDE"   | cut -d'|' -f5)
 
-          AGE=$(( (NOW - LAST) / 60 ))
-          echo "آخر رَن ناجح من **$AGE دقيقة** (الحد $THRESHOLD دقيقة)" >> "$GITHUB_STEP_SUMMARY"
-          echo "آخر رَن ناجح من $AGE دقيقة · الحد $THRESHOLD دقيقة"
+          case "$SKIP" in true|false) ;; *)
+            echo "::warning::قرار غير مفهوم ($DECIDE) — هنشتغل احتياطاً"
+            SKIP=false ;;
+          esac
 
-          if [ "$AGE" -lt "$THRESHOLD" ]; then
-            echo "⏭️  البيانات لسه جديدة — الرَن ده هيخرج من غير شغل (no-op)"
-            echo "⏭️ **no-op** — البيانات لسه جديدة من $AGE دقيقة" >> "$GITHUB_STEP_SUMMARY"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+          human() { if [ "$1" -ge 99999999 ]; then echo "غير متاح ⚠️"; else echo "$1 دقيقة"; fi; }
+
+          echo "آخر رَن اشتغل فعلاً من : $(human "$AGE_RUN")   (من $N_REAL رَن حقيقي في آخر ٢٠)"
+          echo "آخر تحديث لـ ads.json من: $(human "$AGE_DATA")"
+          echo "الحد                    : $THRESHOLD دقيقة"
+          echo "رَنزات فاضية تم تجاهلها  : $N_NOOP"
+
+          {
+            echo "| الإشارة | العمر | الحد |"
+            echo "|---|---|---|"
+            echo "| آخر رَن **اشتغل فعلاً** (مدة ≥ ${MIN_REAL_SECONDS}ث) | $(human "$AGE_RUN") | $THRESHOLD دقيقة |"
+            echo "| آخر commit في **ads.json** | $(human "$AGE_DATA") | $THRESHOLD دقيقة |"
+            echo
+            echo "- رَنزات حقيقية في آخر ٢٠ نجاح: **$N_REAL**"
+            echo "- رَنزات فاضية (no-op) تم تجاهلها: **$N_NOOP**"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$SKIP" = "true" ]; then
+            echo "⏭️  البيانات لسه جديدة من الاتجاهين — الرَن ده no-op"
+            echo "⏭️ **no-op** — البيانات جديدة (رَن $(human "$AGE_RUN") · بيانات $(human "$AGE_DATA"))" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "▶️  البيانات قديمة $AGE دقيقة — هنشتغل"
-            echo "▶️ **هنشتغل** — البيانات قديمة $AGE دقيقة" >> "$GITHUB_STEP_SUMMARY"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "▶️  فيه إشارة قديمة — هنشتغل"
+            echo "▶️ **هنشتغل** (رَن $(human "$AGE_RUN") · بيانات $(human "$AGE_DATA"))" >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
         if: ${{ steps.gate.outputs.skip != 'true' }}
