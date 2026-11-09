@@ -1078,15 +1078,20 @@ function render(){
 }
 
 async function fetchLiveJson(){
-  // ✅ FIX(H6): الترتيب القديم كان بيبدأ بـ api.github.com — وده حدّه 60 طلب/ساعة
-  //    من غير توكن. مع التحديث كل 45 ثانية كان بيخلص الحد في ~45 دقيقة، وبعدها
-  //    الموقع يقع على نسخة CDN قديمة (raw بتتكاش ~5 دقائق).
-  //    الترتيب الجديد: الملف المحلي الأول (أحدث حاجة، من غير حدود)، وبعدين
-  //    الـ CDN، وapi.github.com آخر ملاذ.
+  // ⚠️ FIX: الترتيب هنا مهم جداً — الموقع منشور على Vercel، و Vercel بيحط نسخة من
+  //    ads.json **جوه النشر نفسه**. فلو جرّبنا الملف المحلي الأول، الصفحة هتعرض
+  //    نسخة وقت النشر مش البيانات الحية — ولو Vercel وقف إعادة النشر لأي سبب
+  //    الصفحة هتتجمّد للأبد (وده بالظبط عرض «العداد واقف» اللي كنا بنصلحه).
+  //
+  //    الترتيب الصحيح:
+  //      1. raw.githubusercontent  → حي، CDN (كاش ~5 دقايق)، من غير حدود طلبات
+  //      2. api.github.com         → حي ومن غير كاش، بس حدّه 60 طلب/ساعة ⇒ احتياطي
+  //      3. ads.json المحلي        → آخر ملاذ لو النت واقع خالص
+  //    (إصلاح H6 الأصلي كان بيبدأ بـ api.github.com وده كان بيحرق الحد في 45 دقيقة.)
   const urls = [
-    'ads.json?t=' + Date.now(),
     'https://raw.githubusercontent.com/gamallove217-glitch/dubizzle-from-gamal/main/ads.json?t=' + Date.now(),
-    'https://api.github.com/repos/gamallove217-glitch/dubizzle-from-gamal/contents/ads.json?t=' + Date.now()
+    'https://api.github.com/repos/gamallove217-glitch/dubizzle-from-gamal/contents/ads.json?t=' + Date.now(),
+    'ads.json?t=' + Date.now()
   ];
   for(const u of urls){
     try{

@@ -21,6 +21,10 @@ MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", str(25 * 60)) or
 # FIX(C8): اسم الموضوع بقى من GitHub Secrets. لو السر مش موجود، بيرجع للاسم القديم
 # عشان السكريبر مايوقعش — بس الاسم القديم مكشوف فلازم تحط السر.
 BAN_TOPIC = os.environ.get("NTFY_BAN_TOPIC", "gamal_masyada_bans_2738_v1")
+# FIX(C8): حمايات موضوع الحظر العلني — التفاصيل في fetch_manual_bans_from_cloud()
+BAN_SECRET = (os.environ.get("NTFY_BAN_SECRET") or "").strip()
+MAX_CLOUD_BANS = int(os.environ.get("MAX_CLOUD_BANS", "12") or 12)
+CLOUD_BAN_MAX_AGE_DAYS = int(os.environ.get("CLOUD_BAN_MAX_AGE_DAYS", "60") or 60)
 # FIX(M8): ميزانية زمن للاستكشاف لوحده، عشان ماياكلش وقت الطابور
 DISCOVERY_BUDGET_SECONDS = int(os.environ.get("DISCOVERY_BUDGET_SECONDS", str(4 * 60)) or 240)
 # ✅ FIX: اللوج الحي على GitHub أثبت المشكلة دي — الاكتشاف خد 277 ثانية من أصل
@@ -269,31 +273,80 @@ def classify_deal_category_subtype(url, title_clean, desc_clean, before_desc_cle
 
 
 def fetch_manual_bans_from_cloud():
+    """
+    ⚠️ FIX(C8) — موضوع ntfy ده **علني**، وأي حد يقرا مصدر الصفحة يعرف اسمه.
+       يعني أي حد كان يقدر يعمل:
+           curl -d '{"ad_id":504238147}' https://ntfy.sh/<الموضوع>
+       والإعلان ده يتمسح من ads.json **للأبد** (بيدخل hard_banned_ids + checked).
+       بل ويقدر يحظر اسم مالك فيمسح كل إعلاناته.
+
+       الحل الكامل محتاج خادم وسيط (Cloudflare Worker) — لأن أي سرّ مكتوب في صفحة
+       ثابتة هو سرّ علني بحكم الطبيعة. لحد ما تعمل كده، الحمايات دي بتحدّ الضرر:
+
+       1) BAN_SECRET — لو حطيت السر ده في GitHub Secrets، مفيش رسالة حظر هتتقبل
+          إلا لو فيها نفس السر. (زرار الحظر في الصفحة هيبطل يشتغل — هتحظر يدوي
+          بـ curl. ده مقصود: أمان على حساب راحة.)
+       2) MAX_CLOUD_BANS — سقف عدد الحظورات في الرَن الواحد؛ يمنع مسح جماعي.
+       3) CLOUD_BAN_MAX_AGE_DAYS — تجاهل الرسائل القديمة.
+       4) كل حاجة بتتطبع في اللوج — يبقى باين فوراً لو حد عبث.
+    """
     manual_ad_ids = set()
     manual_accounts = set()
+    rejected_unsigned = 0
+    rejected_old = 0
     try:
         r = std_requests.get(f"https://ntfy.sh/{BAN_TOPIC}/json?poll=1&since=all", timeout=10)
         if r.status_code == 200:
+            now_ts = time.time()
             for line in r.text.strip().split("\n"):
                 if not line:
                     continue
                 try:
                     pkt = json.loads(line)
                     msg = pkt.get("message")
-                    if msg:
-                        b = json.loads(msg)
-                        if b.get("ad_id"):
-                            manual_ad_ids.add(int(b["ad_id"]))
-                        sname = str(b.get("seller_name", "")).lower().strip()
-                        if sname and sname not in ("مالك", "المالك"):
-                            manual_accounts.add(f"name:{sname}")
-                        sacc = str(b.get("account_id", "")).lower().strip()
-                        if sacc and sacc not in ("name:مالك", "name:المالك"):
-                            manual_accounts.add(sacc)
+                    if not msg:
+                        continue
+
+                    ts = pkt.get("time") or 0
+                    if ts and (now_ts - float(ts)) > CLOUD_BAN_MAX_AGE_DAYS * 86400:
+                        rejected_old += 1
+                        continue
+
+                    b = json.loads(msg)
+
+                    if BAN_SECRET and str(b.get("secret", "")) != BAN_SECRET:
+                        rejected_unsigned += 1
+                        continue
+
+                    if b.get("ad_id"):
+                        manual_ad_ids.add(int(b["ad_id"]))
+                    sname = str(b.get("seller_name", "")).lower().strip()
+                    if sname and sname not in ("مالك", "المالك"):
+                        manual_accounts.add(f"name:{sname}")
+                    sacc = str(b.get("account_id", "")).lower().strip()
+                    if sacc and sacc not in ("name:مالك", "name:المالك"):
+                        manual_accounts.add(sacc)
                 except Exception:
                     pass
     except Exception:
         pass
+
+    total = len(manual_ad_ids) + len(manual_accounts)
+    if total > MAX_CLOUD_BANS:
+        print(f"🛑 تحذير أمني: جت {total} طلب حظر من السحابة — أكتر من السقف "
+              f"({MAX_CLOUD_BANS}). هيتنفّذ أول {MAX_CLOUD_BANS} بس. "
+              f"لو إنت ما عملتش كده يدوي، يبقى فيه حد بيعبث بالموضوع العلني.")
+        manual_ad_ids = set(sorted(manual_ad_ids)[:MAX_CLOUD_BANS])
+        room = max(0, MAX_CLOUD_BANS - len(manual_ad_ids))
+        manual_accounts = set(sorted(manual_accounts)[:room])
+
+    if manual_ad_ids or manual_accounts:
+        print(f"☁️  حظر سحابي: {len(manual_ad_ids)} إعلان | {len(manual_accounts)} حساب")
+    if rejected_unsigned:
+        print(f"🛑 اترفضت {rejected_unsigned} رسالة حظر من غير التوقيع الصحيح (BAN_SECRET)")
+    if rejected_old:
+        print(f"☁️  اترفضت {rejected_old} رسالة حظر قديمة (>{CLOUD_BAN_MAX_AGE_DAYS} يوم)")
+
     return manual_ad_ids, manual_accounts
 
 
