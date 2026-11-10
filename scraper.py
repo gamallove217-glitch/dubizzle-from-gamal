@@ -1382,22 +1382,23 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
     official_loc_and_title = f"{title_clean} {before_desc_clean} {loc_box_clean}"
     entire_ad_text = f"{official_loc_and_title} {desc_clean}"
 
-    # 🛡️ FIX(طلب المالك): المطابقة بقت واعية بالسياق.
+    # 🛡️ FIX(طلب المالك 2026-11-10): المطابقة بقت واعية بالسياق.
     #    «تبعد عن بيت الوطن 5 دقايق» ⇒ مش في بيت الوطن ⇒ الإعلان يعدي.
     #    «شقة في بيت الوطن»         ⇒ مرفوض.
-    bad_hit = forbidden_area_hit(official_loc_and_title, STRICT_FORBIDDEN_EVERYWHERE)
+    #    🆕 فحص بيشوف الوصف الكامل كمان، مش العنوان بس.
+    bad_hit = forbidden_area_hit(entire_ad_text, STRICT_FORBIDDEN_EVERYWHERE)
     if bad_hit:
         print(f"Skipped Excluded Area ({bad_hit}) in Ad {ad_id}")
         return None, True, "EXCLUDED_AREA", {}
 
-    bad_hit = forbidden_area_hit(official_loc_and_title, EXCLUDE_CITIES)
+    bad_hit = forbidden_area_hit(entire_ad_text, EXCLUDE_CITIES)
     if bad_hit:
         print(f"Skipped Excluded Location ({bad_hit}) in Ad {ad_id}")
         return None, True, "EXCLUDED_AREA", {}
 
     # 🛡️ FIX(طلب المالك): مرفوض أي إعلان نفسه بالتقسيط/الأقساط.
     #    «بدون أقساط» و«لا تقسيط» و«كاش فقط» ⇒ بيتقبلوا عادي.
-    if has_installment_offer(f"{official_loc_and_title} {desc_clean}"):
+    if has_installment_offer(entire_ad_text):
         print(f"Skipped Installment Ad (تقسيط/أقساط) in Ad {ad_id}")
         return None, True, "INSTALLMENT_AD", {}
 
@@ -1454,7 +1455,8 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
             title_clean = clean_markdown_to_text(bc_title)
 
     now_iso = datetime.now(CAIRO_TZ).isoformat()
-    safe_desc = sanitize_desc_for_frontend(desc_clean[:680] if desc_clean else title_clean)
+    # 🆕 الوصف الكامل من غير قص — المستخدم طلب "كل الوصف اللي في الإعلان الأصلي"
+    safe_desc = sanitize_desc_for_frontend(desc_clean if desc_clean else title_clean)
 
     return {
         "ad_id": ad_id,
@@ -1587,6 +1589,25 @@ def scrape_all():
     if ttl_pruned:
         print(f"PERMANENT FIX: حُذف {ttl_pruned} إعلان قديم (>{CHECKED_TTL_DAYS} أيام) من ads.json")
     final_ads = kept_after_ttl
+
+    # 🆕 تنظيف الإعلانات المحفوظة اللي فيها بيت الوطن أو تقسيط
+    #    (إعلانات قديمة موجودة قبل تطبيق الفلترning الذكي)
+    forbidden_cleaned = []
+    for a in final_ads:
+        text = f"{a.get('title','')} {a.get('description','')}"
+        bad_area = forbidden_area_hit(text, STRICT_FORBIDDEN_EVERYWHERE)
+        if bad_area:
+            print(f"CLEANUP: حُذف إعلان {a.get('ad_id')} (منطقة محظورة: {bad_area})")
+            continue
+        if has_installment_offer(text):
+            print(f"CLEANUP: حُذف إعلان {a.get('ad_id')} (إعلان تقسيط)")
+            continue
+        forbidden_cleaned.append(a)
+    if len(forbidden_cleaned) != len(final_ads):
+        removed = len(final_ads) - len(forbidden_cleaned)
+        print(f"🆕 تنظيف: حُذف {removed} إعلان (بيت الوطن أو تقسيط) من الإعلانات المحفوظة")
+    final_ads = forbidden_cleaned
+
     final_ads.sort(key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
 
     # ══ FIX(C10): scraper.py ماكانش بيكتب last_run_report خالص ══
