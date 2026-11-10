@@ -360,15 +360,13 @@ function updateSidebarUser(){if(currentUser){document.getElementById("sidebarAva
 // 🛡️ فلترning أمان في ال frontend — بيحذف أي إعلان فيه بيت الوطن أو تقسيط
 const FORBIDDEN_AREAS_FE=["بيت الوطن","بيت الوطنى","بيت الوطن الجديد"];
 const INSTALLMENT_WORDS_FE=["بالتقسيط","تقسيط","أقساط","اقساط","بالأقساط","بالاقساط","على سنوات","علي سنوات","على سنين","خطة سداد","نظام سداد","تسهيلات"];
-const NEGATION_RE_FE=/(?:^|[\s،,;.\-–—(|«»"])(?:بدون|بلا|لا|مش|ليس|غير|مفيش|خالي)(?=$|[\s،,;.\-–—)|«»"])/;
-const AREA_HINT_RE_FE=/(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|على\s+بعد|علي\s+بعد|بعد)(?=$|[\s،,;.\-–—(|])/;
-const CONJUNCTION_FE=[" و","،",",","+","|"," أو "," او "," ثم ",";"];
-function _feGoverned(text,start,re){if(!text||start<=0)return false;const win=text.slice(Math.max(0,start-26),start);const ms=[...re.exec(win)];if(!ms.length)return false;const last=ms[ms.length-1];const between=win.slice(last.index+last[0].length);if(CONJUNCTION_FE.some(c=>between.includes(c)))return false;return true;}
-function _feAreaHit(text,area){const t=text||"";for(const m of t.matchAll(new RegExp(area.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"g"))){if(!_feGoverned(t,m.index,AREA_HINT_RE_FE))return true;}return false;}
-function _feInstallment(text){const t=(text||"").toLowerCase();for(const w of INSTALLMENT_WORDS_FE){const wl=w.toLowerCase();for(const m of t.matchAll(new RegExp(wl.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"g"))){if(!_feGoverned(t,m.index,NEGATION_RE_FE))return true;}}return false;}
-function _feFilterAds(ads){return ads.filter(a=>{const txt=`${a.title||""} ${a.description||""}`;for(const area of FORBIDDEN_AREAS_FE){if(_feAreaHit(txt,area))return false;}if(_feInstallment(txt))return false;return true;});}
-
-async function load(){try{const r=await fetch("ads.json");const d=await r.json();ALL_ADS=_feFilterAds(d.ads||[]);ALL_REPORT=d.last_run_report||{};updateSidebarUser();updateBadges();showPage(currentPage||'dashboard');}catch(e){console.error("Failed:",e);}}
+const NEGATION_RE_FE=/(?:بدون|بلا|لا|مش|ليس|غير|مفيش|خالي)/;
+const AREA_HINT_RE_FE=/(?:يبعد|تبعد|بعاد|بعيد|بعيده|قريب|قريبه|قرب|بجوار|بجانب|جنب|خلف|أمام|امام|وراء|ورا|مقابل|خارج|ناحية|اتجاه|حوالي|تقريبا|تقريباً|على\s+بعد|علي\s+بعد|بعد)/;
+function _feGoverned(text,start,re){if(!text||start<=0)return false;const win=text.slice(Math.max(0,start-26),start);return re.test(win);}
+function _feAreaHit(text,area){const t=text||"";try{const re=new RegExp(area.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"g");for(const m of t.matchAll(re)){if(!_feGoverned(t,m.index,AREA_HINT_RE_FE))return true;}}catch(e){}return false;}
+function _feInstallment(text){const t=(text||"").toLowerCase();try{for(const w of INSTALLMENT_WORDS_FE){const wl=w.toLowerCase();const re=new RegExp(wl.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"g");for(const m of t.matchAll(re)){if(!_feGoverned(t,m.index,NEGATION_RE_FE))return true;}}}catch(e){}return false;}
+function _feFilterAds(ads){try{return ads.filter(a=>{const txt=`${a.title||""} ${a.description||""}`;for(const area of FORBIDDEN_AREAS_FE){if(_feAreaHit(txt,area))return false;}if(_feInstallment(txt))return false;return true;});}catch(e){console.error("Filter error:",e);return ads;}}
+async function load(){try{const r=await fetch("ads.json");const d=await r.json();ALL_ADS=_feFilterAds(d.ads||[]);ALL_REPORT=d.last_run_report||{};updateSidebarUser();updateBadges();showPage(currentPage||'dashboard');}catch(e){console.error("Load failed:",e);document.getElementById("pageContent").innerHTML='<div class="empty-state"><p>تعذر تحميل البيانات. يرجى المحاولة مرة أخرى.</p></div>';}}
 
 if(checkAuth())load();
 setInterval(()=>{if(!document.hidden&&document.getElementById("app").classList.contains("show"))load();},CFG.REFRESH_MS);
