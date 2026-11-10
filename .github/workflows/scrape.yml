@@ -1,283 +1,107 @@
-name: Scrape Dubizzle
+name: Scrape Dubizzle Hourly
 
 on:
   schedule:
-    # 📅 جدولة كل 4 ساعات (طلب المالك 2026-11-09)
-    # ----------
-    #  السبب: الرن كل 30 دقيقة كان ممكن يسبب بلوك من ديوبزل.
-    #  دلوقتي بيكون 4 رنّات في اليوم (11:07 AM, 3:07 PM, 7:07 PM, 11:07 PM).
-    #  كل رن بيشتغل كل الـ3 sources: دوبيزل + عقارماب + السوق المفتوح.
-    #
-    #  البوابة الذكية بقت بطيئة — لو آخر رن ناجح كان أقل من 4 ساعات
-    #  يعتبر البيانات جديدة وينصرف. ده فالبوابة مش هتعلق الرن العادي.
-    # ==========================================================================
-    - cron: '7 */3 * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'scraper.py'
       - 'extra_radar.py'
-      - 'requirements.txt'
       - '.github/workflows/scrape.yml'
 
-# ✅ FIX(H4): قبل كده كان cancel-in-progress مربوط بـ github.event_name != schedule
-#    مع group واحد ثابت. النتيجة المقيسة: 6 من آخر 12 رَن اتلغوا — ومنهم رَن الجدولة
-#    الوحيد (42519075880). كل push كان بيقتل الرَن الشغال، فالسكريبر ماكملش ولا مرة.
-#    دلوقتي: الرَن الجديد بيستنى اللي قبله يخلص (cancel-in-progress: false).
 concurrency:
-  group: dubizzle-radar
-  cancel-in-progress: false
+  group: dubizzle-continuous-loop
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
 
 permissions:
   contents: write
-  actions: read   # 🆕 للبوابة — عشان تسأل عن آخر رَن ناجح
 
 jobs:
-  radar:
+  radar_matrix_loop:
     runs-on: ubuntu-latest
-    # ✅ FIX(H4): كان 8 مراحل × max-parallel:1 + sleep 300 = دورة ~6 ساعات.
-    #    ده كان بيخلي الجدولة الساعية (cron) مستحيلة — الرَن ما بيخلصش قبل ما
-    #    يبدأ اللي بعده. بقى رَن واحد بميزانية زمن واضحة.
-    timeout-minutes: 45
+    timeout-minutes: 65
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        step_phase: [
+          "1_dubizzle", "1_extra",
+          "2_dubizzle", "2_extra",
+          "3_dubizzle", "3_extra",
+          "4_dubizzle", "4_extra",
+          "5_dubizzle", "5_extra",
+          "6_dubizzle", "6_extra"
+        ]
     steps:
-      # ========================================================================
-      #  🚦 البوابة — أول خطوة، قبل الـ checkout كمان (عشان الـ no-op يبقى رخيص)
-      #     بتشتغل على `schedule` بس.
-      #
-      #  ⚠️  العيب اللي اتصلح هنا (كان كارثي وصامت):
-      #     النسخة الأولى كانت بتسأل «آخر رَن **ناجح** كان من إمتى؟». بس رَن
-      #     الـ no-op نفسه بيخلص `success`! يبقى أول no-op بيعمل «إعادة ضبط»
-      #     للساعة، واللي بعده يشوفه ويقول «البيانات لسه جديدة»، وهكذا —
-      #     **السكرابر كان هيقف للأبد ولوحة التحكم خضراء ✅ طول الوقت.**
-      #
-      #  ✅  الحل: إشارتين **مستقلتين**، و no-op يحصل بس لو **الاتنين** قالوا جديد:
-      #     ١) آخر رَن نجح **واشتغل فعلاً** — المدة ≥ 300 ثانية
-      #        (الرَن الحقيقي ١٤–١٦ دقيقة، الـ no-op ~٢٠ ثانية).
-      #     ٢) آخر **commit فعلي في ads.json** — ده مقياس عمر البيانات الحقيقي.
-      #        محصّن تماماً ضد الـ no-op لأن الرَن الفاضي ما بيـcommitـش حاجة.
-      #        و`last_run_report.run_time` بيتغير كل رَن ⇒ ads.json بيتعمله
-      #        commit بعد كل رَن حقيقي، فالإشارة دي ما بتموتش.
-      #
-      #     ⇒ التوقف الدائم بقى **مستحيل رياضياً**: عشان age_data يفضل < 100
-      #       لازم ads.json يتعمله commit كل ≤ 100 دقيقة، وده ما بيحصلش إلا
-      #       من رَن حقيقي.
-      #
-      #     اتجاه الأمان: أي إشارة مفقودة/فاشلة ⇒ تُعتبر «قديمة» ⇒ **نشتغل**.
-      #     أحسن نجيب بيانات مرتين من إننا مانجيبهاش خالص.
-      # ========================================================================
-      - name: 🚦 بوابة التكرار (schedule فقط)
-        id: gate
-        if: ${{ github.event_name == 'schedule' }}
-        timeout-minutes: 2
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -uo pipefail
-          THRESHOLD=100        # دقيقة — أقل من كده ⇒ البيانات لسه جديدة
-          MIN_REAL_SECONDS=300 # أقل مدة عشان الرَن يُعتبر «اشتغل فعلاً» مش no-op
-          NOW=$(date +%s)
-
-          echo "### 🚦 بوابة الجدولة" >> "$GITHUB_STEP_SUMMARY"
-
-          TMPD=$(mktemp -d)
-          trap 'rm -rf "$TMPD"' EXIT
-
-          # الإشارة ١: آخر ٢٠ رَن ناجح (منهم هنفلتر الـ no-ops بالمدة)
-          curl -sf --max-time 25 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/scrape.yml/runs?status=success&per_page=20" \
-            > "$TMPD/runs.json" || true
-
-          # الإشارة ٢: آخر commit مس ads.json
-          curl -sf --max-time 25 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits?path=ads.json&per_page=1" \
-            > "$TMPD/commits.json" || true
-
-          if [ ! -s "$TMPD/runs.json" ] && [ ! -s "$TMPD/commits.json" ]; then
-            echo "::warning::الاستعلام من الـ API فشل تماماً — هنشتغل احتياطاً (fail-safe = run)"
-            echo "⚠️ الـ API فشل تماماً ⇒ **هنشتغل** احتياطاً" >> "$GITHUB_STEP_SUMMARY"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          DECIDE=$(NOW="$NOW" THRESHOLD="$THRESHOLD" MIN_REAL="$MIN_REAL_SECONDS" TMPD="$TMPD" python3 -c '
-          import os, json
-          from datetime import datetime
-
-          NOW       = int(os.environ.get("NOW", "0"))
-          THRESHOLD = int(os.environ.get("THRESHOLD", "100"))
-          MIN_REAL  = int(os.environ.get("MIN_REAL", "300"))
-          TMPD      = os.environ.get("TMPD", "")
-          STALE     = 10 ** 9   # إشارة مفقودة ⇒ «قديمة جداً» ⇒ نشتغل
-
-          def ts(x):
-              if not x:
-                  return None
-              try:
-                  return datetime.fromisoformat(str(x).replace("Z", "+00:00")).timestamp()
-              except Exception:
-                  return None
-
-          def load(name):
-              try:
-                  with open(os.path.join(TMPD, name), encoding="utf-8") as f:
-                      s = f.read().strip()
-                  return json.loads(s) if s else None
-              except Exception:
-                  return None
-
-          # ── ١) آخر رَن نجح **واشتغل فعلاً** ─────────────────────────
-          age_run, n_real, n_noop = STALE, 0, 0
-          d = load("runs.json")
-          if isinstance(d, dict):
-              best = None
-              for r in d.get("workflow_runs", []):
-                  if r.get("conclusion") != "success":
-                      continue
-                  st = ts(r.get("run_started_at") or r.get("created_at"))
-                  en = ts(r.get("updated_at"))
-                  if st is None:
-                      continue
-                  dur = (en - st) if (en is not None and en >= st) else None
-                  if dur is not None and dur < MIN_REAL:
-                      n_noop += 1        # رَن فاضي — مش دليل إن البيانات جديدة
-                      continue
-                  n_real += 1
-                  best = st if best is None else max(best, st)
-              if best is not None:
-                  age_run = max(0, int((NOW - best) // 60))
-
-          # ── ٢) آخر commit فعلي في ads.json ──────────────────────────
-          age_data = STALE
-          c = load("commits.json")
-          if isinstance(c, list) and c:
-              t = ts((c[0].get("commit") or {}).get("committer", {}).get("date"))
-              if t is not None:
-                  age_data = max(0, int((NOW - t) // 60))
-
-          skip = (age_run < THRESHOLD) and (age_data < THRESHOLD)
-          print("%s|%d|%d|%d|%d" % ("true" if skip else "false", age_run, age_data, n_real, n_noop))
-          ')
-
-          SKIP=$(printf '%s' "$DECIDE"     | cut -d'|' -f1)
-          AGE_RUN=$(printf '%s' "$DECIDE"  | cut -d'|' -f2)
-          AGE_DATA=$(printf '%s' "$DECIDE" | cut -d'|' -f3)
-          N_REAL=$(printf '%s' "$DECIDE"   | cut -d'|' -f4)
-          N_NOOP=$(printf '%s' "$DECIDE"   | cut -d'|' -f5)
-
-          case "$SKIP" in true|false) ;; *)
-            echo "::warning::قرار غير مفهوم ($DECIDE) — هنشتغل احتياطاً"
-            SKIP=false ;;
-          esac
-
-          human() { if [ "$1" -ge 99999999 ]; then echo "غير متاح ⚠️"; else echo "$1 دقيقة"; fi; }
-
-          echo "آخر رَن اشتغل فعلاً من : $(human "$AGE_RUN")   (من $N_REAL رَن حقيقي في آخر ٢٠)"
-          echo "آخر تحديث لـ ads.json من: $(human "$AGE_DATA")"
-          echo "الحد                    : $THRESHOLD دقيقة"
-          echo "رَنزات فاضية تم تجاهلها  : $N_NOOP"
-
-          {
-            echo "| الإشارة | العمر | الحد |"
-            echo "|---|---|---|"
-            echo "| آخر رَن **اشتغل فعلاً** (مدة ≥ ${MIN_REAL_SECONDS}ث) | $(human "$AGE_RUN") | $THRESHOLD دقيقة |"
-            echo "| آخر commit في **ads.json** | $(human "$AGE_DATA") | $THRESHOLD دقيقة |"
-            echo
-            echo "- رَنزات حقيقية في آخر ٢٠ نجاح: **$N_REAL**"
-            echo "- رَنزات فاضية (no-op) تم تجاهلها: **$N_NOOP**"
-            echo
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          if [ "$SKIP" = "true" ]; then
-            echo "⏭️  البيانات لسه جديدة من الاتجاهين — الرَن ده no-op"
-            echo "⏭️ **no-op** — البيانات جديدة (رَن $(human "$AGE_RUN") · بيانات $(human "$AGE_DATA"))" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "▶️  فيه إشارة قديمة — هنشتغل"
-            echo "▶️ **هنشتغل** (رَن $(human "$AGE_RUN") · بيانات $(human "$AGE_DATA"))" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
-
       - name: Checkout repository
-        if: ${{ steps.gate.outputs.skip != 'true' }}
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Set up Python
-        if: ${{ steps.gate.outputs.skip != 'true' }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: pip
 
       - name: Install dependencies
-        if: ${{ steps.gate.outputs.skip != 'true' }}
-        run: pip install -r requirements.txt
+        run: pip install requests beautifulsoup4 lxml curl_cffi
 
-      - name: Run Dubizzle radar
-        if: ${{ steps.gate.outputs.skip != 'true' }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          NTFY_BAN_TOPIC: ${{ secrets.NTFY_BAN_TOPIC }}
-          # ✅ كان `${{ fromJSON(inputs.max_runtime_minutes || '25') * 60 }}` — وده
-          #    كسر الرَن تماماً: سياق `inputs` متاح بس في workflow_dispatch، فلما
-          #    الرَن جاء من `push` GitHub رفض الملف ووقع الرَن من غير أي وظيفة.
-          #    القيمة دلوقتي ثابتة. لو عايز تغيّرها غيّر الرقم هنا (بالثواني).
-          MAX_RUNTIME_SECONDS: 1500
-          DISCOVERY_BUDGET_SECONDS: 300
-        # ✅ FIX(M7): `python -u` — من غيرها stdout بيتخزن في buffer وكل مرحلة
-        #    بتظهر بطابع زمني واحد، فـاللوجات كانت بتبقى مضلّلة تماماً في التشخيص.
-        # ✅ FIX(M6): شيلنا `|| true` — كان بيخفي أي فشل. لو السكريبر وقع،
-        #    الرَن لازم يظهر أحمر عشان تعرف إن فيه مشكلة.
-        # `tee` عشان extra_radar.py يقدر يقرا dubizzle_run.log — بس من غير
-        # التهريب القديم جوه ads.json (FIX L1). اللوج كمان بيترفع كـ artifact تحت.
-        run: python -u scraper.py 2>&1 | tee dubizzle_run.log
-
-      - name: Run extra sources radar (aqarmap + opensooq)
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-        if: ${{ !cancelled() && steps.gate.outputs.skip != 'true' }}
-        run: python -u extra_radar.py
-
-      - name: Upload run logs
-        if: ${{ always() && steps.gate.outputs.skip != 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: radar-logs-${{ github.run_number }}
-          path: '*.log'
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Commit ads.json
-        if: ${{ steps.gate.outputs.skip != 'true' }}
-        # ✅ FIX(L1): كان اللوج بيتخبّى جوه ads.json في `ads[0]["_dub_log"]`
-        #    (15 ألف حرف من اللوج جوه ملف البيانات!). اللوجات دلوقتي بتترفع
-        #    كـ artifact نظيف فوق، وملف البيانات بقى بيانات بس.
+      - name: Execute Anti-Ban Hourly Radar (${{ matrix.step_phase }})
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ads.json
-          if git diff --staged --quiet; then
-            echo "لا تغييرات في ads.json"
-            exit 0
-          fi
-          git commit -m "Auto-update ads.json (run ${{ github.run_number }})"
-          # ✅ FIX: الرَن 42558853056 فشل هنا بالظبط:
-          #    "CONFLICT (content): Merge conflict in ads.json"
-          #    لأن رَن تاني (من الـ workflow القديم) كان بيعدّل نفس الملف في نفس الوقت.
-          #    ads.json ملف **مولَّد** — فالنسخة بتاعتنا هي الأحدث والأصح.
-          #    -X theirs في rebase = رجّح commit بتاعنا (الترجمة معكوسة في rebase).
-          if ! git pull --rebase -X theirs origin main; then
-            echo "::warning::تعارض في ads.json — بنحاول merge بدل rebase"
-            git rebase --abort || true
-            git pull --no-rebase -X ours --no-edit origin main || true
-          fi
-          if ! git push origin HEAD:main; then
-            echo "::warning::الـ push فشل — الرَن الجاي هيحمل البيانات الأحدث"
-            git pull --rebase -X theirs origin main || true
-            git push origin HEAD:main
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main || true
+          git reset --hard origin/main || true
+
+          PHASE="${{ matrix.step_phase }}"
+          echo "=========================================="
+          echo "Running Phase: $PHASE on Fresh Server IP"
+          echo "=========================================="
+
+          if [[ "$PHASE" == *"_dubizzle" ]]; then
+            python scraper.py | tee dubizzle_run.log || true
+            python -c '
+          import json, os
+          if os.path.exists("ads.json") and os.path.exists("dubizzle_run.log"):
+              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
+              with open("dubizzle_run.log", "r", encoding="utf-8", errors="ignore") as f: log_txt = f.read()[-15000:]
+              if d.get("ads"): d["ads"][0]["_dub_log"] = log_txt
+              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
+          ' || true
+
+            git add ads.json
+            if ! git diff --staged --quiet; then
+              git commit -m "Auto-update Dubizzle ($PHASE)"
+              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+            fi
+
+            echo "Dubizzle finished. Waiting 10 minutes before starting Aqarmap and OpenSooq..."
+            sleep 600
+
+          else
+            python -c '
+          import json, os
+          if os.path.exists("ads.json"):
+              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
+              for a in d.get("ads", []):
+                  if "_dub_log" in a:
+                      with open("dubizzle_run.log", "w", encoding="utf-8") as lf: lf.write(a.pop("_dub_log"))
+                      break
+              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
+          ' || true
+
+            python extra_radar.py || true
+
+            git add ads.json
+            if ! git diff --staged --quiet; then
+              git commit -m "Auto-update Aqarmap & OpenSooq ($PHASE)"
+              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
+            fi
+
+            if [[ "$PHASE" != "6_extra" ]]; then
+              echo "Aqarmap & OpenSooq finished. Waiting 42 minutes to complete the 1-hour cycle..."
+              sleep 2520
+            fi
           fi
