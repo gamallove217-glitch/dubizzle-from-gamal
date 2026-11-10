@@ -1461,7 +1461,7 @@ def inspect_and_parse(req_sess, cffi_sess, ad_id, url, snippet, banned_accounts,
     return {
         "ad_id": ad_id,
         "source": "دوبيزل",
-        "title": title_clean[:130] if title_clean else "وحدة بالقاهرة الجديدة",
+        "title": title_clean[:60] if title_clean else "وحدة بالقاهرة الجديدة",
         "price_num": price_num,
         "price_text": price_text,
         "area": area,

@@ -702,7 +702,7 @@ def parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     title_clean = "وحدة من المالك بالقاهرة الجديدة"
     m_h1 = re.search(r"^#\s+(.+)$", raw, flags=re.M)
     if m_h1 and len(clean_card_title(m_h1.group(1))) > 5:
-        title_clean = clean_card_title(m_h1.group(1))
+        title_clean = clean_card_title(m_h1.group(1))[:60]
 
     header_only = f"{title_clean} {ad_core[:450]}"
     header_and_desc = f"{header_only} {desc_clean}"
@@ -832,7 +832,7 @@ def parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts):
     title_clean = "وحدة من المالك بالقاهرة الجديدة"
     m_h1 = re.search(r"^#\s+(.+)$", raw, flags=re.M)
     if m_h1 and len(clean_card_title(m_h1.group(1))) > 5:
-        title_clean = clean_card_title(m_h1.group(1)).split("|")[0].strip()[:130]
+        title_clean = clean_card_title(m_h1.group(1)).split("|")[0].strip()[:60]
 
     header_only = f"{title_clean} {ad_core[:400]}"
     header_and_desc = f"{title_clean} {ad_core.split('بلغ عن إساءة')[0]}"
