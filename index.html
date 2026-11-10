@@ -297,7 +297,7 @@ svg{width:20px;height:20px;flex-shrink:0}
 const CFG=Object.assign({ADMIN_PASS:"2738",USER_PASS:"3399",MAX_OWNER_ADS:49,REFRESH_MS:120000},window.__CFG||{});
 let ALL_ADS=[],ALL_REPORT={},currentUser=null,currentPage='dashboard',notifications=[];
 let activeFilters={source:[],deal:[],tier:[]};
-const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set(k,v){localStorage.setItem(k,JSON.stringify(v));}};
+const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set(k,v){localStorage.setItem(k,JSON.stringify(v));},remove(k){localStorage.removeItem(k);}};
 const getVisitorLog=()=>LS.get('vault_visitor_log',[]);
 const setVisitorLog=l=>LS.set('vault_visitor_log',l);
 const getContactLog=()=>LS.get('vault_contact_log',[]);
@@ -309,7 +309,7 @@ const setMyContacts=l=>LS.set('vault_my_contacts',l);
 
 function unlock(){const n=(document.getElementById("vName").value||"بدون اسم").trim();const p=document.getElementById("vPass").value.trim();if(p===CFG.ADMIN_PASS||p===CFG.USER_PASS){const r=p===CFG.ADMIN_PASS?'admin':'user';currentUser={name:n,role:r};LS.set('vault_auth',currentUser);logVisitor(n,r);document.getElementById("lockScreen").style.display="none";document.getElementById("app").classList.add("show");checkBlocked();load();}else{document.getElementById("errMsg").style.display="block";}}
 function lockApp(){LS.remove('vault_auth');currentUser=null;document.getElementById("app").classList.remove("show");document.getElementById("lockScreen").style.display="flex";}
-function logout(){LS.remove('vault_auth');currentUser=null;LS.set('vault_my_contacts',[]);LS.set('vault_visitor_log',[]);toast("تم تسجيل الخروج","success");document.getElementById("app").classList.remove("show");document.getElementById("lockScreen").style.display="flex";}
+function logout(){try{LS.remove('vault_auth');LS.remove('vault_my_contacts');LS.remove('vault_visitor_log');LS.remove('vault_contact_log');currentUser=null;toast("تم تسجيل الخروج","success");document.getElementById("app").classList.remove("show");document.getElementById("lockScreen").style.display="flex";document.getElementById("sidebarName").textContent='زائر';document.getElementById("sidebarRole").textContent='غير مسجل';document.getElementById("sidebarAvatar").textContent='?';}catch(e){console.error("Logout error:",e);document.getElementById("app").classList.remove("show");document.getElementById("lockScreen").style.display="flex";}}
 function checkAuth(){const a=LS.get('vault_auth',null);if(a&&a.name&&a.role){currentUser=a;document.getElementById("lockScreen").style.display="none";document.getElementById("app").classList.add("show");checkBlocked();return true;}return false;}
 function checkBlocked(){if(!currentUser)return;const b=getBlockedUsers();if(b.includes(currentUser.name)){document.getElementById("app").style.display="none";document.getElementById("blockedScreen").classList.add("show");}else{document.getElementById("app").style.display="";document.getElementById("blockedScreen").classList.remove("show");}}
 function logVisitor(name,role){const l=getVisitorLog();l.push({name,role,time:new Date().toLocaleString("ar-EG"),device:getDeviceName()});if(l.length>500)l.shift();setVisitorLog(l);}
