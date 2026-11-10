@@ -227,7 +227,7 @@ svg{width:20px;height:20px;flex-shrink:0}
 </head>
 <body>
 
-<div id="lockScreen" style="display:none">
+<div id="lockScreen">
   <div class="lock-box">
     <div class="lock-crest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
     <h2>الڤالت — VIP</h2>
@@ -247,7 +247,7 @@ svg{width:20px;height:20px;flex-shrink:0}
   </div>
 </div>
 
-<div id="app" class="show">
+<div id="app">
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
@@ -370,7 +370,7 @@ function _feFilterAds(ads){return ads.filter(a=>{const txt=`${a.title||""} ${a.d
 
 async function load(){try{const r=await fetch("ads.json");const d=await r.json();ALL_ADS=_feFilterAds(d.ads||[]);ALL_REPORT=d.last_run_report||{};updateSidebarUser();updateBadges();showPage(currentPage||'dashboard');}catch(e){console.error("Failed:",e);}}
 
-load();
+if(checkAuth())load();
 setInterval(()=>{if(!document.hidden&&document.getElementById("app").classList.contains("show"))load();},CFG.REFRESH_MS);
 </script>
 </body>
