@@ -3,134 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>مصيدة الملاك VIP | لوحة تحكم</title>
+<title>مصيدة الملاك VIP | الڤالت</title>
 <style>
 :root{
-  --bg:#0a0e1a; --card:#131a2e; --card2:#1a2240;
-  --border:rgba(212,175,55,.15); --border-hov:rgba(212,175,55,.4);
+  --bg:#060912; --bg2:#0a0f1e; --card:#111827; --card2:#1a2335; --card3:#232e44;
+  --border:rgba(16,185,129,.12); --border-hov:rgba(16,185,129,.35);
+  --emerald:#10b981; --emerald-l:#34d399; --emerald-d:#059669;
   --gold:#d4af37; --gold-l:#f3e5ab; --gold-d:#aa7c11;
-  --emerald:#10b981; --blue:#3b82f6; --red:#ef4444;
-  --text:#f8fafc; --muted:#94a3b8; --dim:#64748b;
+  --blue:#3b82f6; --red:#ef4444; --purple:#a78bfa;
+  --text:#f1f5f9; --muted:#94a3b8; --dim:#64748b;
+  --grad-emerald:linear-gradient(135deg,#34d399 0%,#10b981 50%,#059669 100%);
+  --grad-card:linear-gradient(145deg,rgba(26,35,53,.95),rgba(17,24,39,.98));
+  --shadow:0 12px 40px rgba(0,0,0,.5);
+  --radius:16px; --radius-sm:10px; --radius-lg:22px;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);min-height:100vh;padding:12px;max-width:1400px;margin:0 auto}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 10% 0%,rgba(16,185,129,.06),transparent 40%),radial-gradient(circle at 90% 100%,rgba(212,175,55,.04),transparent 40%);z-index:0;pointer-events:none}
 svg{width:20px;height:20px;flex-shrink:0}
 
-#lockScreen{position:fixed;inset:0;background:radial-gradient(circle at center,#0f172a 0%,#040710 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-.lock-box{background:var(--card);border:1px solid var(--border-hov);border-radius:20px;padding:30px 24px;width:100%;max-width:380px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.8)}
-.lock-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-l),var(--gold),var(--gold-d))}
-.lock-crest{width:56px;height:56px;margin:0 auto 14px;border-radius:14px;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(212,175,55,.3)}
-.lock-crest svg{width:30px;height:30px}
-.lock-box h2{background:linear-gradient(135deg,var(--gold-l),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.5rem;font-weight:800;margin-bottom:4px}
-.lock-box p{color:var(--muted);font-size:.85rem;margin-bottom:18px}
-.lock-input-wrap{margin-bottom:12px}
-.lock-input-wrap input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(6,9,19,.85);color:#fff;text-align:center;font-size:1rem;font-weight:700;transition:.25s}
-.lock-input-wrap input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 15px rgba(212,175,55,.2)}
-.lock-btn{width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 20px rgba(212,175,55,.3);transition:.2s}
+#lockScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden}
+#lockScreen::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(16,185,129,.08),transparent 60%)}
+.lock-box{background:var(--grad-card);border:1px solid var(--border-hov);border-radius:var(--radius-lg);padding:36px 28px;width:100%;max-width:380px;text-align:center;box-shadow:var(--shadow),0 0 60px rgba(16,185,129,.08);position:relative;z-index:1}
+.lock-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-emerald)}
+.lock-crest{width:60px;height:60px;margin:0 auto 16px;border-radius:18px;background:var(--grad-emerald);color:#050811;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(16,185,129,.3)}
+.lock-crest svg{width:32px;height:32px}
+.lock-box h2{font-size:1.5rem;font-weight:800;background:var(--grad-emerald);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.lock-box p{color:var(--muted);font-size:.85rem;margin-bottom:22px}
+.lock-input-wrap{margin-bottom:14px;position:relative}
+.lock-input-wrap input{width:100%;padding:13px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(6,9,19,.8);color:#fff;text-align:center;font-size:1rem;font-weight:700;transition:.25s}
+.lock-input-wrap input:focus{outline:none;border-color:var(--emerald);box-shadow:0 0 20px rgba(16,185,129,.2)}
+.lock-btn{width:100%;padding:13px;border-radius:14px;border:none;background:var(--grad-emerald);color:#050811;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 25px rgba(16,185,129,.25);transition:.2s}
 .lock-btn:active{transform:scale(.98)}
-.err-msg{color:var(--red);font-size:.82rem;font-weight:700;margin-top:10px;display:none}
+.err-msg{color:var(--red);font-size:.82rem;font-weight:700;margin-top:12px;display:none}
 
-header{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:relative;overflow:hidden}
-header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo-badge{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(212,175,55,.3)}
-.logo-badge svg{width:26px;height:26px}
-.brand-text h1{font-size:1.3rem;font-weight:800}
-.brand-text p{font-size:.78rem;color:var(--muted)}
-.header-stats{display:flex;gap:8px;flex-wrap:wrap}
-.stat-pill{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700}
-.stat-pill .v{color:var(--gold);font-size:1rem}
-.stat-pill .l{color:var(--muted);font-size:.72rem}
-.icon-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--muted);transition:.2s;position:relative}
-.icon-btn:hover{border-color:var(--border-hov);color:var(--gold)}
-.badge{position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:8px;font-size:.65rem;font-weight:800;padding:1px 5px;min-width:16px;text-align:center}
+#app{display:none;position:relative;z-index:1;min-height:100vh}
+#app.show{display:block}
+.sidebar{position:fixed;top:0;right:0;bottom:0;width:260px;background:var(--grad-card);border-left:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:.3s;box-shadow:-5px 0 30px rgba(0,0,0,.3)}
+.sidebar.open{transform:translateX(0)}
+.sidebar.closed{transform:translateX(100%)}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-logo{width:40px;height:40px;border-radius:12px;background:var(--grad-emerald);color:#050811;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-logo svg{width:22px;height:22px}
+.sidebar-title h3{font-size:1rem;font-weight:800}
+.sidebar-title p{font-size:.7rem;color:var(--muted)}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;cursor:pointer;transition:.2s;font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+.nav-item:hover{background:rgba(16,185,129,.08);color:var(--text)}
+.nav-item.active{background:rgba(16,185,129,.15);color:var(--emerald-l);border:1px solid var(--border)}
+.nav-item.admin-only{display:none}
+.nav-item.admin-only.show{display:flex}
+.nav-item .badge{margin-left:auto;background:var(--red);color:#fff;border-radius:8px;font-size:.65rem;font-weight:800;padding:1px 6px;min-width:18px;text-align:center}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(16,185,129,.06);border-radius:12px}
+.user-avatar{width:36px;height:36px;border-radius:10px;background:var(--card3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:var(--emerald-l);flex-shrink:0}
+.user-info .name{font-size:.85rem;font-weight:700}
+.user-info .role{font-size:.7rem;color:var(--muted)}
 
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden}
-.stat-card::before{content:"";position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(212,175,55,.08),transparent)}
-.stat-card .icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-.stat-card .icon.gold{background:rgba(212,175,55,.15);color:var(--gold)}
+.main{margin-right:260px;transition:.3s;min-height:100vh}
+.menu-toggle{display:none;position:fixed;top:16px;right:16px;z-index:101;width:44px;height:44px;border-radius:12px;background:var(--card);border:1px solid var(--border);cursor:pointer;align-items:center;justify-content:center;color:var(--emerald);box-shadow:var(--shadow)}
+
+.topbar{background:var(--grad-card);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:38px;height:38px;border-radius:10px;background:var(--grad-emerald);color:#050811;display:flex;align-items:center;justify-content:center}
+.topbar-logo svg{width:20px;height:20px}
+.topbar-title h2{font-size:1.15rem;font-weight:800}
+.topbar-title p{font-size:.72rem;color:var(--muted)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-pill{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:.78rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.topbar-pill .v{color:var(--emerald-l);font-size:.95rem}
+.icon-btn{width:40px;height:40px;border-radius:10px;background:var(--card2);border:1px solid var(--border);cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:.2s;position:relative}
+.icon-btn:hover{border-color:var(--border-hov);color:var(--emerald)}
+.icon-btn .badge{position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:8px;font-size:.65rem;font-weight:800;padding:1px 5px;min-width:16px;text-align:center}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;padding:20px}
+.stat-card{background:var(--grad-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;transition:.25s}
+.stat-card:hover{border-color:var(--border-hov);transform:translateY(-2px)}
+.stat-card::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad-emerald);opacity:.5}
+.stat-card .icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
 .stat-card .icon.emerald{background:rgba(16,185,129,.15);color:var(--emerald)}
+.stat-card .icon.gold{background:rgba(212,175,55,.15);color:var(--gold)}
 .stat-card .icon.blue{background:rgba(59,130,246,.15);color:var(--blue)}
 .stat-card .icon.red{background:rgba(239,68,68,.15);color:var(--red)}
-.stat-card .num{font-size:1.8rem;font-weight:800;line-height:1}
+.stat-card .icon.purple{background:rgba(167,139,250,.15);color:var(--purple)}
+.stat-card .num{font-size:1.7rem;font-weight:800;line-height:1}
 .stat-card .lbl{font-size:.78rem;color:var(--muted);margin-top:4px}
 .stat-card .sub{font-size:.7rem;color:var(--dim);margin-top:2px}
 
-.search-bar{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;transition:.2s}
-.search-bar:focus-within{border-color:var(--border-hov);box-shadow:0 0 15px rgba(212,175,55,.1)}
+.search-wrap{padding:0 20px 14px}
+.search-bar{background:var(--grad-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;display:flex;gap:10px;align-items:center;transition:.2s}
+.search-bar:focus-within{border-color:var(--border-hov);box-shadow:0 0 20px rgba(16,185,129,.1)}
 .search-bar svg{color:var(--muted);flex-shrink:0}
 .search-bar input{flex:1;background:transparent;border:none;color:var(--text);font-size:1rem;font-weight:600;outline:none}
 .search-bar input::placeholder{color:var(--dim)}
 
-.filters-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
-.filters-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.filters-wrap{padding:0 20px 14px}
+.filters-panel{background:var(--grad-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.filters-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end}
 .filters-row:last-child{margin-bottom:0}
 .filter-group{display:flex;flex-direction:column;gap:4px}
-.filter-group label{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.filter-select{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--text);font-size:.85rem;font-weight:600;cursor:pointer;outline:none;transition:.2s;min-width:120px}
+.filter-group label{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.filter-select{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;color:var(--text);font-size:.85rem;font-weight:600;cursor:pointer;outline:none;transition:.2s;min-width:120px}
 .filter-select:focus{border-color:var(--border-hov)}
 .filter-select option{background:var(--card2)}
 .filter-chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;color:var(--muted)}
+.chip{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;color:var(--muted)}
 .chip:hover{border-color:var(--border-hov);color:var(--text)}
-.chip.active{background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));color:#050811;border-color:transparent;font-weight:800}
-.filter-reset{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:.2s}
+.chip.active{background:var(--grad-emerald);color:#050811;border-color:transparent;font-weight:800}
+.filter-reset{background:transparent;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:.2s}
 .filter-reset:hover{border-color:var(--red);color:var(--red)}
 
-.sort-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.sort-bar{padding:0 20px 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .sort-bar .count{font-size:.85rem;color:var(--muted);font-weight:600}
-.sort-bar .count span{color:var(--gold);font-weight:800;font-size:1rem}
-.sort-select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;outline:none}
+.sort-bar .count span{color:var(--emerald-l);font-weight:800;font-size:1.1rem}
+.sort-select{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;outline:none}
 
-.ads-list{display:flex;flex-direction:column;gap:10px}
-.ad-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;transition:.25s;position:relative;overflow:hidden;cursor:pointer}
-.ad-card:hover{border-color:var(--border-hov);transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.4)}
-.ad-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--source-color,var(--gold))}
+.ads-list{padding:0 20px 40px;display:flex;flex-direction:column;gap:12px}
+.ad-card{background:var(--grad-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:.25s;position:relative;overflow:hidden}
+.ad-card:hover{border-color:var(--border-hov);transform:translateY(-2px);box-shadow:var(--shadow)}
+.ad-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--source-color,var(--emerald));opacity:.7}
 .ad-top{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:10px}
-.ad-title{font-size:1.05rem;font-weight:700;flex:1;line-height:1.4}
-.ad-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.badge-tag{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
-.badge-tag.source-dubizzle{background:rgba(59,130,246,.15);color:#60a5fa}
-.badge-tag.source-aqarmap{background:rgba(16,185,129,.15);color:#34d399}
-.badge-tag.source-opensooq{background:rgba(212,175,55,.15);color:var(--gold)}
+.ad-title{font-size:1.1rem;font-weight:700;flex:1;line-height:1.4}
+.ad-badges{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.badge-tag{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap}
+.badge-tag.src-dub{background:rgba(59,130,246,.15);color:#60a5fa}
+.badge-tag.src-aqar{background:rgba(16,185,129,.15);color:#34d399}
+.badge-tag.src-os{background:rgba(212,175,55,.15);color:var(--gold)}
 .badge-tag.fresh{background:rgba(239,68,68,.15);color:var(--red)}
-.badge-tag.tier3{background:rgba(16,185,129,.2);color:var(--emerald)}
-.badge-tag.tier2{background:rgba(59,130,246,.15);color:#60a5fa}
-.badge-tag.tier1{background:rgba(148,163,184,.15);color:var(--muted)}
-.ad-price{font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:8px}
+.badge-tag.t3{background:rgba(16,185,129,.2);color:var(--emerald-l)}
+.badge-tag.t2{background:rgba(59,130,246,.15);color:#60a5fa}
+.badge-tag.t1{background:rgba(148,163,184,.15);color:var(--muted)}
+.badge-tag.contacted{background:rgba(167,139,250,.2);color:var(--purple)}
+.ad-price{font-size:1.4rem;font-weight:800;color:var(--emerald-l);margin-bottom:8px}
 .ad-details{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;font-size:.82rem;color:var(--muted)}
 .ad-details span{display:flex;align-items:center;gap:4px}
-.ad-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.ad-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border)}
-.ad-seller{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--text)}
+.ad-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ad-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
+.ad-seller{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600}
 .ad-seller .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald)}
 .ad-seller .ads-count{color:var(--muted);font-size:.72rem}
-.ad-link{font-size:.75rem;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;transition:.2s}
+.contact-btn{background:var(--grad-emerald);color:#050811;border:none;border-radius:10px;padding:8px 16px;font-size:.82rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s}
+.contact-btn:hover{box-shadow:0 6px 20px rgba(16,185,129,.3)}
+.contact-btn.contacted{background:var(--card3);color:var(--purple);border:1px solid var(--purple)}
+.ad-link{font-size:.78rem;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:4px;transition:.2s}
 .ad-link:hover{color:#93c5fd}
 
-#notifPanel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px}
-#notifPanel.show{display:flex}
-.notif-box{background:var(--card);border:1px solid var(--border-hov);border-radius:18px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.8)}
-.notif-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.notif-header h3{font-size:1.1rem;font-weight:800}
-.notif-close{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--muted);font-size:1.2rem;font-weight:700;transition:.2s}
-.notif-close:hover{border-color:var(--red);color:var(--red)}
-.notif-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.notif-item{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s}
-.notif-item:hover{border-color:var(--border-hov)}
-.notif-item .time{font-size:.7rem;color:var(--dim);margin-bottom:4px}
-.notif-item .msg{font-size:.85rem;line-height:1.4}
-.notif-item .msg strong{color:var(--gold)}
-.notif-empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--grad-card);border:1px solid var(--border-hov);border-radius:var(--radius-lg);width:100%;max-width:500px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:1.1rem;font-weight:800}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--card2);border:1px solid var(--border);cursor:pointer;color:var(--muted);font-size:1.1rem;font-weight:700;transition:.2s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal-body{flex:1;overflow-y:auto;padding:18px 22px}
+.modal-body h4{font-size:.85rem;font-weight:700;color:var(--emerald-l);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.modal-body h4:not(:first-child){margin-top:20px}
+
+.contact-form{display:flex;flex-direction:column;gap:12px}
+.contact-form input{padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:.9rem;font-weight:600;outline:none;transition:.2s}
+.contact-form input:focus{border-color:var(--border-hov)}
+.contact-form button{padding:13px;border-radius:12px;border:none;background:var(--grad-emerald);color:#050811;font-weight:800;font-size:.9rem;cursor:pointer;transition:.2s}
+.contact-form button:hover{box-shadow:0 6px 20px rgba(16,185,129,.3)}
+.contact-success{text-align:center;padding:20px}
+.contact-success .icon{width:56px;height:56px;border-radius:16px;background:rgba(16,185,129,.15);color:var(--emerald);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.contact-success .icon svg{width:32px;height:32px}
+.contact-success h3{font-size:1.1rem;font-weight:800;margin-bottom:6px}
+.contact-success p{color:var(--muted);font-size:.85rem}
+
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{text-align:right;padding:8px 10px;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.admin-table td{padding:8px 10px;font-size:.8rem;border-bottom:1px solid var(--border)}
+.admin-table tr:hover td{background:rgba(16,185,129,.04)}
+.role-badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:6px}
+.role-badge.admin{background:rgba(212,175,55,.15);color:var(--gold)}
+.role-badge.user{background:rgba(16,185,129,.15);color:var(--emerald)}
+.role-badge.visitor{background:rgba(148,163,184,.15);color:var(--muted)}
+.block-btn{background:transparent;border:1px solid var(--red);border-radius:8px;padding:4px 10px;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--red);transition:.2s}
+.block-btn:hover{background:var(--red);color:#fff}
+.block-btn.blocked{background:var(--red);color:#fff;border-color:var(--red)}
 
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-state svg{width:48px;height:48px;margin-bottom:16px;opacity:.3}
 .empty-state p{font-size:.9rem}
 
-@media(max-width:640px){
-  body{padding:8px}
-  .header-stats{display:none}
+.notif-item{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s;margin-bottom:8px}
+.notif-item:hover{border-color:var(--border-hov)}
+.notif-item .time{font-size:.7rem;color:var(--dim);margin-bottom:4px}
+.notif-item .msg{font-size:.85rem;line-height:1.4}
+.notif-item .msg strong{color:var(--emerald-l)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);border:1px solid var(--border-hov);border-radius:14px;padding:14px 24px;box-shadow:var(--shadow);z-index:9999;transition:.3s;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:600}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--emerald);color:var(--emerald-l)}
+.toast.error{border-color:var(--red);color:var(--red)}
+
+.blocked-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.blocked-screen.show{display:flex}
+.blocked-box{text-align:center;max-width:400px}
+.blocked-box .icon{width:64px;height:64px;border-radius:18px;background:rgba(239,68,68,.15);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.blocked-box .icon svg{width:36px;height:36px}
+.blocked-box h2{font-size:1.3rem;font-weight:800;margin-bottom:8px}
+.blocked-box p{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-right:0}
+  .menu-toggle{display:flex}
+  .topbar{padding-right:64px}
+}
+@media(max-width:600px){
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .filter-select{min-width:100px}
   .ad-price{font-size:1.1rem}
@@ -141,449 +223,136 @@ header::after{content:"";position:absolute;top:0;right:0;left:0;height:2px;backg
 
 <div id="lockScreen">
   <div class="lock-box">
-    <div class="lock-crest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-    <h2>مصيدة الملاك VIP</h2>
-    <p>منظومة رصد الملاك المباشرين بالقاهرة الجديدة</p>
-    <div class="lock-input-wrap"><input type="text" id="vName" placeholder="الاسم بالكامل"></div>
-    <div class="lock-input-wrap"><input type="password" id="vPass" placeholder="كود المرور السري"></div>
-    <button class="lock-btn" onclick="unlock()">تسجيل الدخول للمنظومة</button>
+    <div class="lock-crest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <h2>الڤالت — VIP</h2>
+    <p>مصيدة الملاك المباشرين</p>
+    <div class="lock-input-wrap"><input type="text" id="vName" placeholder="الاسم بالكامل" autocomplete="off"></div>
+    <div class="lock-input-wrap"><input type="password" id="vPass" placeholder="كود المرور السري" onkeydown="if(event.key==='Enter')unlock()"></div>
+    <button class="lock-btn" onclick="unlock()">فتح الڤالت</button>
     <div class="err-msg" id="errMsg">كود المرور غير صحيح</div>
   </div>
 </div>
 
-<div id="notifPanel" onclick="if(event.target===this)closeNotif()">
-  <div class="notif-box">
-    <div class="notif-header">
-      <h3>🔔 الإشعارات</h3>
-      <button class="notif-close" onclick="closeNotif()">✕</button>
-    </div>
-    <div class="notif-list" id="notifList"></div>
+<div class="blocked-screen" id="blockedScreen">
+  <div class="blocked-box">
+    <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+    <h2>تم حظر هذا المستخدم</h2>
+    <p>تواصل مع المالك لاستعادة الوصول</p>
   </div>
 </div>
 
-<header>
-  <div class="brand">
-    <div class="logo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-    <div class="brand-text">
-      <h1>مصيدة الملاك VIP</h1>
-      <p>لوحة تحكم — رصد الملاك المباشرين</p>
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="sidebar-title"><h3>الڤالت</h3><p>مصيدة الملاك VIP</p></div>
     </div>
-  </div>
-  <div class="header-stats" id="headerStats"></div>
-  <div style="display:flex;gap:8px">
-    <button class="icon-btn" onclick="toggleNotif()" title="الإشعارات">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="badge" id="notifBadge" style="display:none">0</span>
-    </button>
-    <button class="icon-btn" onclick="lockApp()" title="قفل">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    </button>
-  </div>
-</header>
-
-<div class="stats-grid" id="statsGrid"></div>
-
-<div class="search-bar">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-  <input type="text" id="searchInput" placeholder="ابحث بعنوان الإعلان أو المالك أو المنطقة..." oninput="filterAds()">
-</div>
-
-<div class="filters-panel">
-  <div class="filters-row">
-    <div class="filter-group">
-      <label>المصدر</label>
-      <div class="filter-chips" id="sourceChips"></div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> لوحة العرض</div>
+      <div class="nav-item" onclick="showPage('ads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> الإعلانات</div>
+      <div class="nav-item" onclick="showPage('contacts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> تواصلي <span class="badge" id="navContactBadge" style="display:none">0</span></div>
+      <div class="nav-item admin-only" id="navAdmin" onclick="showPage('admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg> لوحة الأدمن <span class="badge" id="navAdminBadge" style="display:none">0</span></div>
+      <div class="nav-item" onclick="showPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> الإعدادات</div>
     </div>
-  </div>
-  <div class="filters-row">
-    <div class="filter-group">
-      <label>نوع العرض</label>
-      <div class="filter-chips" id="dealChips"></div>
-    </div>
-    <div class="filter-group">
-      <label>الفئة</label>
-      <select class="filter-select" id="categoryFilter" onchange="filterAds()">
-        <option value="">كل الفئات</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>النوع</label>
-      <select class="filter-select" id="subtypeFilter" onchange="filterAds()">
-        <option value="">كل الأنواع</option>
-      </select>
-    </div>
-  </div>
-  <div class="filters-row">
-    <div class="filter-group">
-      <label>السعر (ج.م)</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="number" id="priceMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()">
-        <span style="color:var(--dim)">—</span>
-        <input type="number" id="priceMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()">
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info"><div class="name" id="sidebarName">—</div><div class="role" id="sidebarRole">—</div></div>
       </div>
     </div>
-    <div class="filter-group">
-      <label>المساحة (م²)</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="number" id="areaMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()">
-        <span style="color:var(--dim)">—</span>
-        <input type="number" id="areaMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()">
+  </div>
+
+  <button class="menu-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="topbar-title"><h2 id="pageTitle">لوحة العرض</h2><p id="pageSubtitle">إحصائيات المنظومة</p></div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="v" id="topbarAdCount">0</span> إعلان</div>
+        <button class="icon-btn" onclick="toggleNotif()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge" id="notifBadge" style="display:none">0</span></button>
+        <button class="icon-btn" onclick="lockApp()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
       </div>
     </div>
-    <div class="filter-group">
-      <label>غرف النوم</label>
-      <select class="filter-select" id="bedsFilter" onchange="filterAds()">
-        <option value="">أي عدد</option>
-        <option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>الحداثة</label>
-      <div class="filter-chips" id="tierChips"></div>
-    </div>
-  </div>
-  <div class="filters-row">
-    <button class="filter-reset" onclick="resetFilters()">↺ مسح كل الفلاتر</button>
+    <div id="pageContent"></div>
   </div>
 </div>
 
-<div class="sort-bar">
-  <div class="count">عرض <span id="resultCount">0</span> إعلان</div>
-  <select class="sort-select" id="sortSelect" onchange="renderAds()">
-    <option value="fresh">الأحدث أولاً</option>
-    <option value="price-asc">السعر: الأقل للأعلى</option>
-    <option value="price-desc">السعر: الأعلى للأقل</option>
-    <option value="area-desc">المساحة: الأكبر للأصغر</option>
-    <option value="id-desc">أحدث ID</option>
-  </select>
-</div>
+<div class="modal-overlay" id="contactModal"><div class="modal-box"><div class="modal-header"><h3 id="contactModalTitle">تواصل مع المالك</h3><button class="modal-close" onclick="closeModal('contactModal')">✕</button></div><div class="modal-body" id="contactModalBody"></div></div></div>
 
-<div class="ads-list" id="adsList"></div>
+<div class="modal-overlay" id="notifModal"><div class="modal-box"><div class="modal-header"><h3>🔔 الإشعارات</h3><button class="modal-close" onclick="closeModal('notifModal')">✕</button></div><div class="modal-body" id="notifList"></div></div></div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const CFG = Object.assign({
-  ADMIN_PASS: "2738",
-  USER_PASS: "3399",
-  MAX_OWNER_ADS: 49,
-  REFRESH_MS: 120000
-}, window.__CFG || {});
-const ADMIN_PASS = CFG.ADMIN_PASS;
-const USER_PASS = CFG.USER_PASS;
+const CFG=Object.assign({ADMIN_PASS:"2738",USER_PASS:"3399",MAX_OWNER_ADS:49,REFRESH_MS:120000},window.__CFG||{});
+let ALL_ADS=[],ALL_REPORT={},currentUser=null,currentPage='dashboard',notifications=[];
+let activeFilters={source:[],deal:[],tier:[]};
+const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set(k,v){localStorage.setItem(k,JSON.stringify(v));}};
+const getVisitorLog=()=>LS.get('vault_visitor_log',[]);
+const setVisitorLog=l=>LS.set('vault_visitor_log',l);
+const getContactLog=()=>LS.get('vault_contact_log',[]);
+const setContactLog=l=>LS.set('vault_contact_log',l);
+const getBlockedUsers=()=>LS.get('vault_blocked_users',[]);
+const setBlockedUsers=l=>LS.set('vault_blocked_users',l);
+const getMyContacts=()=>LS.get('vault_my_contacts',[]);
+const setMyContacts=l=>LS.set('vault_my_contacts',l);
 
-function unlock(){
-  const name = (document.getElementById("vName").value || "بدون اسم").trim();
-  const pass = document.getElementById("vPass").value.trim();
-  if(pass === ADMIN_PASS || pass === USER_PASS){
-    localStorage.setItem("gamal_auth_pass_v3", pass);
-    localStorage.setItem("gamal_auth_name_v3", name);
-    document.getElementById("lockScreen").style.display = "none";
-    render();
-  } else {
-    document.getElementById("errMsg").style.display = "block";
-  }
-}
-function lockApp(){
-  localStorage.removeItem("gamal_auth_pass_v3");
-  location.reload();
-}
-function checkAuth(){
-  return localStorage.getItem("gamal_auth_pass_v3") === ADMIN_PASS || localStorage.getItem("gamal_auth_pass_v3") === USER_PASS;
-}
-if(!checkAuth()){
-  document.getElementById("lockScreen").style.display = "flex";
-} else {
-  document.getElementById("lockScreen").style.display = "none";
-}
+function unlock(){const n=(document.getElementById("vName").value||"بدون اسم").trim();const p=document.getElementById("vPass").value.trim();if(p===CFG.ADMIN_PASS||p===CFG.USER_PASS){const r=p===CFG.ADMIN_PASS?'admin':'user';currentUser={name:n,role:r};LS.set('vault_auth',currentUser);logVisitor(n,r);document.getElementById("lockScreen").style.display="none";document.getElementById("app").classList.add("show");checkBlocked();load();}else{document.getElementById("errMsg").style.display="block";}}
+function lockApp(){LS.remove('vault_auth');currentUser=null;document.getElementById("app").classList.remove("show");document.getElementById("lockScreen").style.display="flex";}
+function checkAuth(){const a=LS.get('vault_auth',null);if(a&&a.name&&a.role){currentUser=a;document.getElementById("lockScreen").style.display="none";document.getElementById("app").classList.add("show");checkBlocked();return true;}return false;}
+function checkBlocked(){if(!currentUser)return;const b=getBlockedUsers();if(b.includes(currentUser.name)){document.getElementById("app").style.display="none";document.getElementById("blockedScreen").classList.add("show");}else{document.getElementById("app").style.display="";document.getElementById("blockedScreen").classList.remove("show");}}
+function logVisitor(name,role){const l=getVisitorLog();l.push({name,role,time:new Date().toLocaleString("ar-EG"),device:getDeviceName()});if(l.length>500)l.shift();setVisitorLog(l);}
+function getDeviceName(){const u=navigator.userAgent;if(u.includes("iPhone"))return"iPhone";if(u.includes("iPad"))return"iPad";if(u.includes("Android"))return"Android";if(u.includes("Windows"))return"Windows PC";if(u.includes("Mac"))return"Mac";if(u.includes("Linux"))return"Linux";return"جهاز مجهول";}
 
-let ALL_ADS = [];
-let notifications = [];
-let activeFilters = { source: [], deal: [], tier: [] };
+function showPage(page){currentPage=page;document.querySelectorAll(".nav-item").forEach(el=>el.classList.remove("active"));const nm={dashboard:0,ads:1,contacts:2,admin:3,settings:4};const ne=document.querySelectorAll(".nav-item");if(nm[page]!==undefined&&ne[nm[page]])ne[nm[page]].classList.add("active");const ti={dashboard:["لوحة العرض","إحصائيات المنظومة"],ads:["الإعلانات","مالك مباشر"],contacts:["تواصلي","سجل تواصلك"],admin:["لوحة الأدمن","بيانات خاصة"],settings:["الإعدادات","تخصيص التطبيق"]};if(ti[page]){document.getElementById("pageTitle").textContent=ti[page][0];document.getElementById("pageSubtitle").textContent=ti[page][1];}if(page==='dashboard')renderDashboard();else if(page==='ads')renderAdsPage();else if(page==='contacts')renderContactsPage();else if(page==='admin')renderAdminPage();else if(page==='settings')renderSettingsPage();if(window.innerWidth<900)toggleSidebar();}
+function toggleSidebar(){document.getElementById("sidebar").classList.toggle("open");}
 
-function toggleNotif(){
-  document.getElementById("notifPanel").classList.toggle("show");
-  renderNotifs();
-}
-function closeNotif(){
-  document.getElementById("notifPanel").classList.remove("show");
-}
-function renderNotifs(){
-  const list = document.getElementById("notifList");
-  if(notifications.length === 0){
-    list.innerHTML = '<div class="notif-empty">لا توجد إشعارات جديدة</div>';
-  } else {
-    list.innerHTML = notifications.map(n => `
-      <div class="notif-item">
-        <div class="time">${n.time}</div>
-        <div class="msg">${n.msg}</div>
-      </div>`).join("");
-  }
-  const badge = document.getElementById("notifBadge");
-  if(notifications.length > 0){
-    badge.style.display = "block";
-    badge.textContent = notifications.length;
-  } else {
-    badge.style.display = "none";
-  }
-}
-function addNotification(msg){
-  const now = new Date();
-  const time = now.toLocaleTimeString("ar-EG", {hour: "2-digit", minute: "2-digit"});
-  notifications.unshift({ msg, time });
-  if(notifications.length > 50) notifications.pop();
-  renderNotifs();
-}
+function renderDashboard(){const d=ALL_ADS.filter(a=>a.source==="دوبيزل").length,aq=ALL_ADS.filter(a=>a.source==="عقارماب").length,os=ALL_ADS.filter(a=>a.source==="السوق المفتوح").length,sl=ALL_ADS.filter(a=>a.deal==="بيع").length,rt=ALL_ADS.filter(a=>a.deal==="إيجار").length,fr=ALL_ADS.filter(a=>a.fresh_tier===3).length,rp=ALL_REPORT;let h=`<div class="stats-grid">`;h+=statCard('emerald','<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',ALL_ADS.length,'إعلان مالك مباشر',`${sl} للبيع · ${rt} للإيجار`);h+=statCard('emerald','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',fr,'إعلانات اليوم','حديثة التحقق');h+=statCard('blue','<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',d,'دوبيزل',`${rp.dubizzle_inspected||0} مفحوص`);h+=statCard('gold','<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>',rp.total_brokers_banned_this_run||0,'سماسرة محذوفين',`من ${rp.total_inspected_this_run||0} مفحوص`);h+=statCard('emerald','<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',aq,'عقارماب','');h+=statCard('purple','<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',os,'السوق المفتوح','');h+=`</div>`;h+=`<div class="search-wrap"><div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="searchInput" placeholder="ابحث بعنوان الإعلان أو المالك أو المنطقة..." oninput="filterAds()"></div></div>`;h+=renderFiltersHTML();h+=`<div class="sort-bar"><div class="count">عرض <span id="resultCount">0</span> إعلان</div><select class="sort-select" id="sortSelect" onchange="renderAdsList()"><option value="fresh">الأحدث أولاً</option><option value="price-asc">السعر: الأقل للأعلى</option><option value="price-desc">السعر: الأعلى للأقل</option><option value="area-desc">المساحة: الأكبر للأصغر</option><option value="id-desc">أحدث ID</option></select></div>`;h+=`<div class="ads-list" id="adsList"></div>`;document.getElementById("pageContent").innerHTML=h;setupFilters();filterAds();document.getElementById("topbarAdCount").textContent=ALL_ADS.length;}
 
-function setupFilters(){
-  const sources = [
-    { key: "دوبيزل", label: "دوبيزل" },
-    { key: "عقارماب", label: "عقارماب" },
-    { key: "السوق المفتوح", label: "السوق المفتوح" }
-  ];
-  document.getElementById("sourceChips").innerHTML = sources.map(s =>
-    `<div class="chip" data-filter="source" data-val="${s.key}" onclick="toggleChip(this,'source')">${s.label}</div>`
-  ).join("");
+function statCard(c,i,n,l,s){return`<div class="stat-card"><div class="icon ${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${i}</svg></div><div class="num">${n}</div><div class="lbl">${l}</div>${s?`<div class="sub">${s}</div>`:''}</div>`;}
 
-  document.getElementById("dealChips").innerHTML = [
-    { key: "بيع", label: "للبيع" },
-    { key: "إيجار", label: "للإيجار" }
-  ].map(d =>
-    `<div class="chip" data-filter="deal" data-val="${d.key}" onclick="toggleChip(this,'deal')">${d.label}</div>`
-  ).join("");
+function renderAdsPage(){let h=`<div class="search-wrap"><div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="searchInput" placeholder="ابحث بعنوان الإعلان أو المالك أو المنطقة..." oninput="filterAds()"></div></div>`;h+=renderFiltersHTML();h+=`<div class="sort-bar"><div class="count">عرض <span id="resultCount">0</span> إعلان</div><select class="sort-select" id="sortSelect" onchange="renderAdsList()"><option value="fresh">الأحدث أولاً</option><option value="price-asc">السعر: الأقل للأعلى</option><option value="price-desc">السعر: الأعلى للأقل</option><option value="area-desc">المساحة: الأكبر للأصغر</option><option value="id-desc">أحدث ID</option></select></div>`;h+=`<div class="ads-list" id="adsList"></div>`;document.getElementById("pageContent").innerHTML=h;setupFilters();filterAds();}
 
-  document.getElementById("tierChips").innerHTML = [
-    { key: "3", label: "اليوم" },
-    { key: "2", label: "أمس" },
-    { key: "1", label: "هذا الأسبوع" }
-  ].map(t =>
-    `<div class="chip" data-filter="tier" data-val="${t.key}" onclick="toggleChip(this,'tier')">${t.label}</div>`
-  ).join("");
+function renderFiltersHTML(){return`<div class="filters-wrap"><div class="filters-panel"><div class="filters-row"><div class="filter-group"><label>المصدر</label><div class="filter-chips" id="sourceChips"></div></div></div><div class="filters-row"><div class="filter-group"><label>نوع العرض</label><div class="filter-chips" id="dealChips"></div></div><div class="filter-group"><label>الفئة</label><select class="filter-select" id="categoryFilter" onchange="filterAds()"><option value="">كل الفئات</option></select></div><div class="filter-group"><label>النوع</label><select class="filter-select" id="subtypeFilter" onchange="filterAds()"><option value="">كل الأنواع</option></select></div></div><div class="filters-row"><div class="filter-group"><label>السعر (ج.م)</label><div style="display:flex;gap:8px;align-items:center"><input type="number" id="priceMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()"><span style="color:var(--dim)">—</span><input type="number" id="priceMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--text);font-size:.85rem;width:100px;outline:none" oninput="filterAds()"></div></div><div class="filter-group"><label>المساحة (م²)</label><div style="display:flex;gap:8px;align-items:center"><input type="number" id="areaMin" placeholder="من" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()"><span style="color:var(--dim)">—</span><input type="number" id="areaMax" placeholder="إلى" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:.85rem;width:80px;outline:none" oninput="filterAds()"></div></div><div class="filter-group"><label>غرف النوم</label><select class="filter-select" id="bedsFilter" onchange="filterAds()"><option value="">أي عدد</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div><div class="filter-group"><label>الحداثة</label><div class="filter-chips" id="tierChips"></div></div></div><div class="filters-row"><button class="filter-reset" onclick="resetFilters()">↺ مسح كل الفلاتر</button></div></div></div>`;}
 
-  const cats = [...new Set(ALL_ADS.map(a => a.category).filter(Boolean))].sort();
-  document.getElementById("categoryFilter").innerHTML = '<option value="">كل الفئات</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+function setupFilters(){document.getElementById("sourceChips").innerHTML=[{key:"دوبيزل",label:"دوبيزل"},{key:"عقارماب",label:"عقارماب"},{key:"السوق المفتوح",label:"السوق المفتوح"}].map(s=>`<div class="chip" data-filter="source" data-val="${s.key}" onclick="toggleChip(this,'source')">${s.label}</div>`).join("");document.getElementById("dealChips").innerHTML=[{key:"بيع",label:"للبيع"},{key:"إيجار",label:"للإيجار"}].map(d=>`<div class="chip" data-filter="deal" data-val="${d.key}" onclick="toggleChip(this,'deal')">${d.label}</div>`).join("");document.getElementById("tierChips").innerHTML=[{key:"3",label:"اليوم"},{key:"2",label:"أمس"},{key:"1",label:"هذا الأسبوع"}].map(t=>`<div class="chip" data-filter="tier" data-val="${t.key}" onclick="toggleChip(this,'tier')">${t.label}</div>`).join("");const cats=[...new Set(ALL_ADS.map(a=>a.category).filter(Boolean))].sort();document.getElementById("categoryFilter").innerHTML='<option value="">كل الفئات</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");const subs=[...new Set(ALL_ADS.map(a=>a.subtype).filter(Boolean))].sort();document.getElementById("subtypeFilter").innerHTML='<option value="">كل الأنواع</option>'+subs.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");}
 
-  const subs = [...new Set(ALL_ADS.map(a => a.subtype).filter(Boolean))].sort();
-  document.getElementById("subtypeFilter").innerHTML = '<option value="">كل الأنواع</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join("");
-}
+function toggleChip(el,ft){const v=el.dataset.val;el.classList.toggle("active");if(activeFilters[ft].includes(v))activeFilters[ft]=activeFilters[ft].filter(x=>x!==v);else activeFilters[ft].push(v);filterAds();}
+function resetFilters(){document.querySelectorAll(".chip.active").forEach(c=>c.classList.remove("active"));activeFilters={source:[],deal:[],tier:[]};document.getElementById("categoryFilter").value="";document.getElementById("subtypeFilter").value="";document.getElementById("priceMin").value="";document.getElementById("priceMax").value="";document.getElementById("areaMin").value="";document.getElementById("areaMax").value="";document.getElementById("bedsFilter").value="";document.getElementById("searchInput").value="";filterAds();}
+function filterAds(){renderAdsList();}
 
-function toggleChip(el, filterType){
-  const val = el.dataset.val;
-  el.classList.toggle("active");
-  if(activeFilters[filterType].includes(val)){
-    activeFilters[filterType] = activeFilters[filterType].filter(v => v !== val);
-  } else {
-    activeFilters[filterType].push(val);
-  }
-  filterAds();
-}
+function renderAdsList(){const s=document.getElementById("searchInput")?.value?.toLowerCase().trim()||"";const cat=document.getElementById("categoryFilter")?.value||"";const sub=document.getElementById("subtypeFilter")?.value||"";const pM=parseInt(document.getElementById("priceMin")?.value)||0;const pX=parseInt(document.getElementById("priceMax")?.value)||0;const aM=parseInt(document.getElementById("areaMin")?.value)||0;const aX=parseInt(document.getElementById("areaMax")?.value)||0;const bd=parseInt(document.getElementById("bedsFilter")?.value)||0;const sort=document.getElementById("sortSelect")?.value||"fresh";let f=ALL_ADS.filter(a=>{if(activeFilters.source.length>0&&!activeFilters.source.includes(a.source))return false;if(activeFilters.deal.length>0&&!activeFilters.deal.includes(a.deal))return false;if(activeFilters.tier.length>0&&!activeFilters.tier.includes(String(a.fresh_tier)))return false;if(cat&&a.category!==cat)return false;if(sub&&a.subtype!==sub)return false;const p=a.price_num||0;if(p<pM||(pX>0&&p>pX))return false;const ar=parseInt(a.area)||0;if(ar<aM||(aX>0&&ar>aX))return false;if(bd>0){const bm=(a.beds||"").match(/\d+/);if(bm&&parseInt(bm[0])<bd)return false;}if(s){const st=(a.title+" "+a.description+" "+a.seller_name+" "+a.area+" "+a.category).toLowerCase();if(!st.includes(s))return false;}return true;});if(sort==="price-asc")f.sort((a,b)=>(a.price_num||0)-(b.price_num||0));else if(sort==="price-desc")f.sort((a,b)=>(b.price_num||0)-(a.price_num||0));else if(sort==="area-desc")f.sort((a,b)=>parseInt(b.area||0)-parseInt(a.area||0));else if(sort==="id-desc")f.sort((a,b)=>(b.ad_id||0)-(a.ad_id||0));else f.sort((a,b)=>(b.fresh_tier||0)-(a.fresh_tier||0));document.getElementById("resultCount").textContent=f.length;document.getElementById("topbarAdCount").textContent=f.length;const list=document.getElementById("adsList");if(f.length===0){list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><p>لا توجد إعلانات مطابقة للفلاتر</p></div>`;return;}const mc=getMyContacts();const ci=new Set(mc.map(c=>c.ad_id));list.innerHTML=f.map(a=>{const sc=a.source==="دوبيزل"?"#3b82f6":a.source==="عقارماب"?"#10b981":"#d4af37";const tl=a.fresh_tier===3?"اليوم":a.fresh_tier===2?"أمس":"هذا الأسبوع";const tc=a.fresh_tier===3?"t3":a.fresh_tier===2?"t2":"t1";const scl=a.source==="دوبيزل"?"src-dub":a.source==="عقارماب"?"src-aqar":"src-os";const bm=(a.beds||"").match(/\d+/);const an=parseInt(a.area)||0;const isF=a.fresh_tier===3;const isC=ci.has(a.ad_id);return`<div class="ad-card" style="--source-color:${sc}"><div class="ad-top"><div class="ad-title">${esc(a.title||"إعلان")}</div><div class="ad-badges"><span class="badge-tag ${scl}">${a.source}</span>${isF?'<span class="badge-tag fresh">★ حديث</span>':''}<span class="badge-tag ${tc}">${tl}</span>${isC?'<span class="badge-tag contacted">✓ تم التواصل</span>':''}</div></div><div class="ad-price">${esc(a.price_text||"مدرج بالإعلان")}</div><div class="ad-details">${a.category?`<span>${esc(a.category)}</span>`:''}${a.subtype?`<span>${esc(a.subtype)}</span>`:''}${a.deal?`<span>${a.deal==="بيع"?"للبيع":"للإيجار"}</span>`:''}${an>0?`<span>${an} م²</span>`:''}${bm?`<span>${bm[0]} غرف</span>`:''}</div><div class="ad-desc">${esc(a.description||"")}</div><div class="ad-bottom"><div class="ad-seller"><span class="dot"></span>${esc(a.seller_name||"المالك")}<span class="ads-count">${a.seller_ads_count||1} إعلان نشط</span></div><div style="display:flex;gap:8px;align-items:center">${isC?`<button class="contact-btn contacted" onclick="event.stopPropagation();openContact(${a.ad_id},'${esc(a.title||"")}')">✓ تم التواصل</button>`:`<button class="contact-btn" onclick="event.stopPropagation();openContact(${a.ad_id},'${esc(a.title||"")}')">تم التواصل مع المالك</button>`}<a href="${a.url||'#'}" target="_blank" class="ad-link">↗</a></div></div>`;}).join("");}
 
-function resetFilters(){
-  document.querySelectorAll(".chip.active").forEach(c => c.classList.remove("active"));
-  activeFilters = { source: [], deal: [], tier: [] };
-  document.getElementById("categoryFilter").value = "";
-  document.getElementById("subtypeFilter").value = "";
-  document.getElementById("priceMin").value = "";
-  document.getElementById("priceMax").value = "";
-  document.getElementById("areaMin").value = "";
-  document.getElementById("areaMax").value = "";
-  document.getElementById("bedsFilter").value = "";
-  document.getElementById("searchInput").value = "";
-  filterAds();
-}
+function openContact(adId,adTitle){const mc=getMyContacts();const isC=mc.some(c=>c.ad_id===adId);if(isC){document.getElementById("contactModalTitle").textContent="تم التواصل بالفعل";document.getElementById("contactModalBody").innerHTML=`<div class="contact-success"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><h3>تم التواصل مع المالك</h3><p>${esc(adTitle)}</p><p style="margin-top:8px;font-size:.8rem;color:var(--dim)">سجل التواصل محفوظ في قسم "تواصلي"</p></div>`;}else{document.getElementById("contactModalTitle").textContent="تواصل مع المالك";const ni=currentUser?`<input type="text" value="${esc(currentUser.name)}" readonly style="background:rgba(16,185,129,.08);border-color:var(--border-hov)">`:`<input type="text" id="contactName" placeholder="اكتب اسمك للتواصل" autofocus>`;document.getElementById("contactModalBody").innerHTML=`<div class="contact-form"><div><label style="font-size:.75rem;color:var(--muted);font-weight:700;display:block;margin-bottom:6px">الإعلان</label><div style="background:var(--card2);border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:600">${esc(adTitle)}</div></div>${ni}<button onclick="confirmContact(${adId},'${esc(adTitle)}')">تأكيد التواصل</button></div>`;}document.getElementById("contactModal").classList.add("show");}
 
-function filterAds(){
-  renderAds();
-}
+function confirmContact(adId,adTitle){let name=currentUser?currentUser.name:(document.getElementById("contactName")?.value||"").trim();if(!name){toast("اكتب اسمك أولاً","error");return;}const cl=getContactLog();cl.push({name,ad_id:adId,ad_title:adTitle,time:new Date().toLocaleString("ar-EG"),role:currentUser?currentUser.role:'visitor'});if(cl.length>1000)cl.shift();setContactLog(cl);if(currentUser){const mc=getMyContacts();if(!mc.some(c=>c.ad_id===adId&&c.name===name)){mc.push({name,ad_id:adId,ad_title:adTitle,time:new Date().toLocaleString("ar-EG"),role:currentUser.role});setMyContacts(mc);}}document.getElementById("contactModalTitle").textContent="تم التواصل مع المالك";document.getElementById("contactModalBody").innerHTML=`<div class="contact-success"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><h3>تم التواصل مع المالك</h3><p>${esc(adTitle)}</p><p style="margin-top:8px;font-size:.8rem;color:var(--dim)">سجل التواصل محفوظ</p></div>`;toast("تم التواصل مع المالك بنجاح","success");updateBadges();if(document.getElementById("adsList"))renderAdsList();}
 
-function renderAds(){
-  const search = document.getElementById("searchInput").value.toLowerCase().trim();
-  const cat = document.getElementById("categoryFilter").value;
-  const sub = document.getElementById("subtypeFilter").value;
-  const pMin = parseInt(document.getElementById("priceMin").value) || 0;
-  const pMax = parseInt(document.getElementById("priceMax").value) || 0;
-  const aMin = parseInt(document.getElementById("areaMin").value) || 0;
-  const aMax = parseInt(document.getElementById("areaMax").value) || 0;
-  const beds = parseInt(document.getElementById("bedsFilter").value) || 0;
-  const sort = document.getElementById("sortSelect").value;
+function renderContactsPage(){const mc=getMyContacts();let h=`<div class="stats-grid" style="grid-template-columns:1fr"><div class="stat-card"><div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="num">${mc.length}</div><div class="lbl">إعلان تواصلت معه</div><div class="sub">سجل تواصلك الشخصي</div></div></div>`;if(mc.length===0){h+=`<div class="empty-state" style="padding:40px 20px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><p>لم تتواصل مع أي مالك بعد</p><p style="font-size:.8rem;color:var(--dim);margin-top:6px">اضغط على "تم التواصل مع المالك" في أي إعلان</p></div>`;}else{h+=`<div class="ads-list" style="padding-top:0">`;h+=mc.map(c=>{const a=ALL_ADS.find(x=>x.ad_id===c.ad_id);const sc=a?(a.source==="دوبيزل"?"#3b82f6":a.source==="عقارماب"?"#10b981":"#d4af37"):"#10b981";return`<div class="ad-card" style="--source-color:${sc}"><div class="ad-top"><div class="ad-title">${esc(c.ad_title)}</div><div class="ad-badges"><span class="badge-tag contacted">✓ تم التواصل</span></div></div>${a?`<div class="ad-price">${esc(a.price_text||"")}</div><div class="ad-details">${a.category?`<span>${esc(a.category)}</span>`:''}${a.deal?`<span>${a.deal==="بيع"?"للبيع":"للإيجار"}</span>`:''}${parseInt(a.area)?`<span>${a.area} م²</span>`:''}</div><div class="ad-desc">${esc(a.description||"")}</div>`:''}<div class="ad-bottom"><div class="ad-seller"><span class="dot"></span>${esc(c.name)} · ${c.time}</div>${a?`<a href="${a.url||'#'}" target="_blank" class="ad-link">↗ فتح الإعلان</a>`:''}</div></div>`;}).join("");h+=`</div>`;}document.getElementById("pageContent").innerHTML=h;}
 
-  let filtered = ALL_ADS.filter(a => {
-    if(activeFilters.source.length > 0 && !activeFilters.source.includes(a.source)) return false;
-    if(activeFilters.deal.length > 0 && !activeFilters.deal.includes(a.deal)) return false;
-    if(activeFilters.tier.length > 0 && !activeFilters.tier.includes(String(a.fresh_tier))) return false;
-    if(cat && a.category !== cat) return false;
-    if(sub && a.subtype !== sub) return false;
-    const price = a.price_num || 0;
-    if(price < pMin || (pMax > 0 && price > pMax)) return false;
-    const area = parseInt(a.area) || 0;
-    if(area < aMin || (aMax > 0 && area > aMax)) return false;
-    if(beds > 0) {
-      const bedMatch = (a.beds || "").match(/\d+/);
-      const bedNum = bedMatch ? parseInt(bedMatch[0]) : 0;
-      if(bedNum < beds) return false;
-    }
-    if(search) {
-      const searchText = (a.title + " " + a.description + " " + a.seller_name + " " + a.area + " " + a.category).toLowerCase();
-      if(!searchText.includes(search)) return false;
-    }
-    return true;
-  });
+function renderAdminPage(){if(!currentUser||currentUser.role!=='admin'){document.getElementById("pageContent").innerHTML=`<div class="empty-state"><p>هذا القسم خاص بالمالك فقط</p></div>`;return;}const vl=getVisitorLog(),cl=getContactLog(),bd=getBlockedUsers(),rp=ALL_REPORT;let h=`<div class="stats-grid">${statCard('gold','<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>',vl.length,'زائر دخل التطبيق',`${vl.filter(v=>v.role==='admin').length} أدمن · ${vl.filter(v=>v.role==='user').length} مستخدم`)}${statCard('purple','<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',cl.length,'تواصل مع مالك',`${cl.filter(c=>c.role==='visitor').length} زائر · ${cl.filter(c=>c.role==='user').length} مستخدم`)}${statCard('red','<path d="M18 6L6 18M6 6l12 12"/>',bd.length,'مستخدم محجوز','')}${statCard('emerald','<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',rp.total_brokers_banned_this_run||0,'سماسرة محذوفين',`من ${rp.total_inspected_this_run||0} مفحوص`)}</div>`;h+=`<div class="modal-body" style="padding:18px 20px"><h4>📱 إشعارات تليجرام</h4>`;if(rp.total_new_owners_this_run>0)h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">✅ تم إضافة <strong>${rp.total_new_owners_this_run}</strong> مالك جديد</div></div>`;if(rp.total_brokers_banned_this_run>0)h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">🚫 تم حذف <strong>${rp.total_brokers_banned_this_run}</strong> سمسار</div></div>`;h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">📊 ${rp.total_inspected_this_run||0} مفحوص · ${ALL_ADS.length} مالك محفوظ</div></div>`;h+=`</div>`;h+=`<div class="modal-body" style="padding:18px 20px"><h4>👥 سجل الزوار</h4>`;if(vl.length===0)h+=`<p style="color:var(--muted);font-size:.85rem;padding:10px 0">لا يوجد زائر بعد</p>`;else{h+=`<table class="admin-table"><thead><tr><th>الاسم</th><th>ال role</th><th>الجهاز</th><th>الوقت</th><th></th></tr></thead><tbody>`;h+=vl.slice().reverse().map(v=>`<tr><td style="font-weight:600">${esc(v.name)}</td><td><span class="role-badge ${v.role}">${v.role==='admin'?'أدمن':v.role==='user'?'مستخدم':'زائر'}</span></td><td>${esc(v.device)}</td><td style="font-size:.75rem;color:var(--muted)">${esc(v.time)}</td><td><button class="block-btn ${bd.includes(v.name)?'blocked':''}" onclick="toggleBlock('${esc(v.name)}')">${bd.includes(v.name)?'محظور':'حظر'}</button></td></tr>`).join("");h+=`</tbody></table>`;}h+=`</div>`;h+=`<div class="modal-body" style="padding:18px 20px"><h4>📞 سجل التواصل مع الملاك</h4>`;if(cl.length===0)h+=`<p style="color:var(--muted);font-size:.85rem;padding:10px 0">لم يتم أي تواصل بعد</p>`;else{h+=`<table class="admin-table"><thead><tr><th>الاسم</th><th>الإعلان</th><th>ال role</th><th>الوقت</th><th></th></tr></thead><tbody>`;h+=cl.slice().reverse().map(c=>`<tr><td style="font-weight:600">${esc(c.name)}</td><td>${esc(c.ad_title)}</td><td><span class="role-badge ${c.role}">${c.role==='admin'?'أدمن':c.role==='user'?'مستخدم':'زائر'}</span></td><td style="font-size:.75rem;color:var(--muted)">${esc(c.time)}</td><td><button class="block-btn ${bd.includes(c.name)?'blocked':''}" onclick="toggleBlock('${esc(c.name)}')">${bd.includes(c.name)?'محظور':'حظر'}</button></td></tr>`).join("");h+=`</tbody></table>`;}h+=`</div>`;h+=`<div class="modal-body" style="padding:18px 20px"><h4>🚫 المستخدمون المحجوزون</h4>`;if(bd.length===0)h+=`<p style="color:var(--muted);font-size:.85rem;padding:10px 0">لا يوجد مستخدم محجوز</p>`;else h+=bd.map(n=>`<div class="notif-item" style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">${esc(n)}</span><button class="block-btn blocked" onclick="toggleBlock('${esc(n)}')">إلغاء الحظر</button></div>`).join("");h+=`</div>`;document.getElementById("pageContent").innerHTML=h;}
 
-  if(sort === "price-asc") filtered.sort((a, b) => (a.price_num||0) - (b.price_num||0));
-  else if(sort === "price-desc") filtered.sort((a, b) => (b.price_num||0) - (a.price_num||0));
-  else if(sort === "area-desc") filtered.sort((a, b) => parseInt(b.area||0) - parseInt(a.area||0));
-  else if(sort === "id-desc") filtered.sort((a, b) => (b.ad_id||0) - (a.ad_id||0));
-  else filtered.sort((a, b) => (b.fresh_tier||0) - (a.fresh_tier||0));
+function toggleBlock(name){const b=getBlockedUsers();if(b.includes(name)){setBlockedUsers(b.filter(n=>n!==name));toast(`تم إلغاء حظر: ${name}`,"success");}else{setBlockedUsers([...b,name]);toast(`تم حظر: ${name}`,"success");}renderAdminPage();updateBadges();}
 
-  document.getElementById("resultCount").textContent = filtered.length;
+function renderSettingsPage(){let h=`<div class="stats-grid" style="grid-template-columns:1fr"><div class="stat-card"><div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="num" style="font-size:1.2rem">${currentUser?esc(currentUser.name):'زائر'}</div><div class="lbl">${currentUser?(currentUser.role==='admin'?'أدمن (المالك)':'مستخدم'):'زائر غير مسجل'}</div><div class="sub">${getDeviceName()}</div></div></div>`;h+=`<div class="modal-body" style="padding:18px 20px"><h4>⚙️ الإعدادات</h4><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card2);border-radius:10px"><span style="font-size:.85rem;font-weight:600">تحديث تلقائي للبيانات</span><span style="font-size:.8rem;color:var(--emerald-l)">${CFG.REFRESH_MS/1000} ثانية</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card2);border-radius:10px"><span style="font-size:.85rem;font-weight:600">Maximum مالك إعلانات</span><span style="font-size:.8rem;color:var(--emerald-l)">${CFG.MAX_OWNER_ADS} إعلان</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card2);border-radius:10px"><span style="font-size:.85rem;font-weight:600">TTL الإعلانات</span><span style="font-size:.8rem;color:var(--emerald-l)">7 أيام</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card2);border-radius:10px"><span style="font-size:.85rem;font-weight:600">Cron</span><span style="font-size:.8rem;color:var(--emerald-l)">كل 3 ساعات</span></div></div>`;if(currentUser&&currentUser.role==='admin')h+=`<div style="margin-top:16px"><button class="contact-btn" onclick="exportData()" style="width:100%;justify-content:center">تصدير البيانات (JSON)</button></div>`;h+=`</div>`;const vl=getVisitorLog(),cl=getContactLog(),bd=getBlockedUsers();h+=`<div class="modal-body" style="padding:18px 20px"><h4>📦 بيانات التطبيق</h4><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;padding:8px 14px;background:var(--card2);border-radius:8px"><span style="font-size:.8rem;color:var(--muted)">الإعلانات</span><span style="font-weight:700">${ALL_ADS.length}</span></div><div style="display:flex;justify-content:space-between;padding:8px 14px;background:var(--card2);border-radius:8px"><span style="font-size:.8rem;color:var(--muted)">سجل الزوار</span><span style="font-weight:700">${vl.length}</span></div><div style="display:flex;justify-content:space-between;padding:8px 14px;background:var(--card2);border-radius:8px"><span style="font-size:.8rem;color:var(--muted)">سجل التواصل</span><span style="font-weight:700">${cl.length}</span></div><div style="display:flex;justify-content:space-between;padding:8px 14px;background:var(--card2);border-radius:8px"><span style="font-size:.8rem;color:var(--muted)">المحجوزون</span><span style="font-weight:700">${bd.length}</span></div></div></div>`;document.getElementById("pageContent").innerHTML=h;}
 
-  const list = document.getElementById("adsList");
-  if(filtered.length === 0){
-    list.innerHTML = `<div class="empty-state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <p>لا توجد إعلانات مطابقة للفلاتر</p>
-    </div>`;
-    return;
-  }
+function exportData(){const d={exported_at:new Date().toISOString(),ads_count:ALL_ADS.length,visitor_log:getVisitorLog(),contact_log:getContactLog(),blocked_users:getBlockedUsers(),last_run_report:ALL_REPORT};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`vault-export-${Date.now()}.json`;a.click();URL.revokeObjectURL(u);toast("تم تصدير البيانات","success");}
 
-  list.innerHTML = filtered.map(a => {
-    const sourceColor = a.source === "دوبيزل" ? "#3b82f6" : a.source === "عقارماب" ? "#10b981" : "#d4af37";
-    const tierLabel = a.fresh_tier === 3 ? "اليوم" : a.fresh_tier === 2 ? "أمس" : "هذا الأسبوع";
-    const tierClass = a.fresh_tier === 3 ? "tier3" : a.fresh_tier === 2 ? "tier2" : "tier1";
-    const srcClass = a.source === "دوبيزل" ? "source-dubizzle" : a.source === "عقارماب" ? "source-aqarmap" : "source-opensooq";
-    const bedsMatch = (a.beds || "").match(/\d+/);
-    const areaNum = parseInt(a.area) || 0;
-    const isFresh = a.fresh_tier === 3;
-    return `
-      <div class="ad-card" style="--source-color:${sourceColor}" onclick="window.open('${a.url||'#'}', '_blank')">
-        <div class="ad-top">
-          <div class="ad-title">${esc(a.title || "إعلان")}</div>
-          <div class="ad-badges">
-            <span class="badge-tag ${srcClass}">${a.source}</span>
-            ${isFresh ? '<span class="badge-tag fresh">★ حديث</span>' : ''}
-            <span class="badge-tag ${tierClass}">${tierLabel}</span>
-          </div>
-        </div>
-        <div class="ad-price">${esc(a.price_text || "مدرج بالإعلان")}</div>
-        <div class="ad-details">
-          ${a.category ? `<span>${esc(a.category)}</span>` : ''}
-          ${a.subtype ? `<span>${esc(a.subtype)}</span>` : ''}
-          ${a.deal ? `<span>${a.deal === "بيع" ? "للبيع" : "للإيجار"}</span>` : ''}
-          ${areaNum > 0 ? `<span>${areaNum} م²</span>` : ''}
-          ${bedsMatch ? `<span>${bedsMatch[0]} غرف</span>` : ''}
-        </div>
-        <div class="ad-desc">${esc(a.description || "")}</div>
-        <div class="ad-bottom">
-          <div class="ad-seller">
-            <span class="dot"></span>
-            ${esc(a.seller_name || "المالك")}
-            <span class="ads-count">${a.seller_ads_count || 1} إعلان نشط</span>
-          </div>
-          <a href="${a.url||'#'}" target="_blank" onclick="event.stopPropagation()" class="ad-link">
-            فتح الإعلان ↗
-          </a>
-        </div>
-      </div>`;
-  }).join("");
-}
+function toggleNotif(){document.getElementById("notifModal").classList.toggle("show");renderNotifs();}
+function renderNotifs(){const l=document.getElementById("notifList");if(notifications.length===0){const r=ALL_REPORT;let h='';if(r.total_new_owners_this_run>0)h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">✅ تم إضافة <strong>${r.total_new_owners_this_run}</strong> مالك جديد</div></div>`;if(r.total_brokers_banned_this_run>0)h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">🚫 تم حذف <strong>${r.total_brokers_banned_this_run}</strong> سمسار</div></div>`;h+=`<div class="notif-item"><div class="time">من الرن الأخير</div><div class="msg">📊 ${r.total_inspected_this_run||0} مفحوص · ${ALL_ADS.length} مالك محفوظ</div></div>`;if(h==='')h='<div class="notif-empty">لا توجد إشعارات جديدة</div>';l.innerHTML=h;}else{l.innerHTML=notifications.map(n=>`<div class="notif-item"><div class="time">${n.time}</div><div class="msg">${n.msg}</div></div>`).join("");}const b=document.getElementById("notifBadge");if(notifications.length>0){b.style.display="block";b.textContent=notifications.length;}else b.style.display="none";}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
+function toast(msg,type){const t=document.getElementById("toast");t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.classList.remove("show"),3000);}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
-function esc(s){
-  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+function updateBadges(){const mc=getMyContacts();const nc=document.getElementById("navContacts");const ncb=document.getElementById("navContactBadge");if(nc&&(currentUser||mc.length>0)){ncb.textContent=mc.length;ncb.style.display=mc.length>0?"block":"none";}else if(nc)nc.style.display="none";const na=document.getElementById("navAdmin");const nab=document.getElementById("navAdminBadge");if(currentUser&&currentUser.role==='admin'){na.classList.add("show");const vl=getVisitorLog(),cl=getContactLog();const t=vl.length+cl.length;nab.textContent=t;nab.style.display=t>0?"block":"none";}}
+function updateSidebarUser(){if(currentUser){document.getElementById("sidebarAvatar").textContent=currentUser.name.charAt(0).toUpperCase();document.getElementById("sidebarName").textContent=currentUser.name;document.getElementById("sidebarRole").textContent=currentUser.role==='admin'?'أدمن — المالك':'مستخدم';}else{document.getElementById("sidebarAvatar").textContent='?';document.getElementById("sidebarName").textContent='زائر';document.getElementById("sidebarRole").textContent='غير مسجل';}}
 
-function renderStats(){
-  const dub = ALL_ADS.filter(a => a.source === "دوبيزل").length;
-  const aqar = ALL_ADS.filter(a => a.source === "عقارماب").length;
-  const os = ALL_ADS.filter(a => a.source === "السوق المفتوح").length;
-  const sale = ALL_ADS.filter(a => a.deal === "بيع").length;
-  const rent = ALL_ADS.filter(a => a.deal === "إيجار").length;
-  const fresh = ALL_ADS.filter(a => a.fresh_tier === 3).length;
-  const lastReport = window.__REPORT || {};
+async function load(){try{const r=await fetch("ads.json");const d=await r.json();ALL_ADS=d.ads||[];ALL_REPORT=d.last_run_report||{};updateSidebarUser();updateBadges();showPage(currentPage||'dashboard');}catch(e){console.error("Failed:",e);}}
 
-  document.getElementById("statsGrid").innerHTML = `
-    <div class="stat-card">
-      <div class="icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="num">${ALL_ADS.length}</div>
-      <div class="lbl">إعلان مالك مباشر</div>
-      <div class="sub">${sale} للبيع · ${rent} للإيجار</div>
-    </div>
-    <div class="stat-card">
-      <div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-      <div class="num">${fresh}</div>
-      <div class="lbl">إعلانات اليوم</div>
-      <div class="sub">حديثة التحقق</div>
-    </div>
-    <div class="stat-card">
-      <div class="icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-      <div class="num">${dub}</div>
-      <div class="lbl">دوبيزل</div>
-      <div class="sub">${lastReport.dubizzle_inspected||0} مفحوص</div>
-    </div>
-    <div class="stat-card">
-      <div class="icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-      <div class="num">${lastReport.total_brokers_banned_this_run||0}</div>
-      <div class="lbl">سماسرة محذوفين</div>
-      <div class="sub">من ${lastReport.total_inspected_this_run||0} مفحوص</div>
-    </div>
-    <div class="stat-card">
-      <div class="icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div>
-      <div class="num">${aqar}</div>
-      <div class="lbl">عقارماب</div>
-    </div>
-    <div class="stat-card">
-      <div class="icon emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-      <div class="num">${os}</div>
-      <div class="lbl">السوق المفتوح</div>
-    </div>
-  `;
-
-  document.getElementById("headerStats").innerHTML = `
-    <div class="stat-pill"><span class="v">${ALL_ADS.length}</span><span class="l">إعلان</span></div>
-    <div class="stat-pill"><span class="v">${fresh}</span><span class="l">حديث</span></div>
-    <div class="stat-pill"><span class="v">${lastReport.total_new_owners_this_run||0}</span><span class="l">جديد</span></div>
-  `;
-}
-
-function render(){
-  renderStats();
-  setupFilters();
-  renderAds();
-  renderNotifs();
-
-  if(notifications.length === 0){
-    const lastReport = window.__REPORT || {};
-    if(lastReport.total_new_owners_this_run > 0){
-      addNotification(`✅ تم إضافة <strong>${lastReport.total_new_owners_this_run}</strong> مالك جديد في الرن الأخير`);
-    }
-    if(lastReport.total_brokers_banned_this_run > 0){
-      addNotification(`🚫 تم حذف <strong>${lastReport.total_brokers_banned_this_run}</strong> سمسار`);
-    }
-    addNotification(`📊 الرن الأخير: ${lastReport.total_inspected_this_run||0} مفحوص · ${ALL_ADS.length} مالك محفوظ`);
-  }
-}
-
-async function load(){
-  try {
-    const resp = await fetch("ads.json");
-    const data = await resp.json();
-    ALL_ADS = data.ads || [];
-    window.__REPORT = data.last_run_report || {};
-    const notifiedIds = new Set(data.notified_ids_v1 || []);
-    const newAds = ALL_ADS.filter(a => !notifiedIds.has(a.ad_id));
-    if(newAds.length > 0 && notifications.length === 0){
-      newAds.slice(0, 3).forEach(a => {
-        addNotification(`🎉 مالك جديد: ${a.seller_name} — ${a.title}`);
-      });
-    }
-    render();
-  } catch(e){
-    console.error("Failed to load ads.json:", e);
-  }
-}
-
-setInterval(() => {
-  if(!document.hidden) load();
-}, CFG.REFRESH_MS);
-
-if(checkAuth()) load();
+if(checkAuth())load();
+setInterval(()=>{if(!document.hidden&&document.getElementById("app").classList.contains("show"))load();},CFG.REFRESH_MS);
 </script>
 </body>
 </html>
