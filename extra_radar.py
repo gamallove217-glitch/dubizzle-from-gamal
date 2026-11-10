@@ -6,30 +6,83 @@ from curl_cffi import requests as cffi_requests
 
 CAIRO_TZ = timezone(timedelta(hours=2))
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
-TG_B64_LIST = ["OTE4NTkwNjUyNzpBQUhSZ3FsOEJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ==", "OTE4NTkwNjUyNzpBQUhSZ3FJOFJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ=="]
+TG_CONFIG_TOPIC = "gamal_masyada_tgcfg_2738_v1"
+TG_B64_LIST = [
+    "OTE4NTkwNjUyNzpBQUhSZ3FsOEJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ==",
+    "OTE4NTkwNjUyNzpBQUhSZ3FJOFJfay1ZNGZCN0NyQWpqYVFYaHZvNlJ6N3hGVQ=="
+]
 
-STRICT_NEW_CAIRO_HEADER = ["القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول", "التجمع الثالث", "التجمع السادس", "القطامية", "القطاميه", "new cairo", "5th settlement", "fifth settlement", "katameya"]
+STRICT_NEW_CAIRO_HEADER = [
+    "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول",
+    "التجمع الثالث", "التجمع السادس", "القطامية", "القطاميه", "new cairo", "5th settlement",
+    "fifth settlement", "katameya"
+]
 
 NEW_CAIRO_WORDS = [
-    "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول", "التجمع الثالث", "التجمع السادس", "التجمع",
-    "الحي الأول", "الحي الاول", "الحي الثاني", "الحي التاني", "الحي الثالث", "الحي التالت", "الحي الرابع", "الحي الخامس",
-    "النرجس", "اللوتس", "الأندلس", "الاندلس", "الياسمين", "البنفسج", "جنوب الأكاديمية", "جنوب الاكاديمية", "الاكاديمية",
-    "شرق الأكاديمية", "شرق الاكاديمية", "المستثمرين", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة", "ابو الهول", "أبو الهول",
-    "جاردينيا هايتس", "غرب الجولف", "غرب أرابيلا", "غرب ارابيلا", "أرابيلا", "ارابيلا", "الشويفات", "الداون تاون", "التسعين",
-    "القطامية", "القطاميه", "كايرو فيستيفال", "كايرو فستيفال", "ميفيدا", "ماونتن فيو", "هايد بارك", "بالم هيلز", "سوديك",
-    "فيليت", "ايست تاون", "ايستاون", "زيد ايست", "تريو", "ازار", "دار مصر", "سكن مصر", "جنة", "الجامعة الأمريكية",
-    "الجامعه الامريكيه", "الجولدن سكوير", "الدبلوماسيين", "لافيستا", "الباتيو", "مون فالي", "ذا سكوير", "فيفث سكوير", "سراي",
+    "القاهرة الجديدة", "القاهره الجديده", "التجمع الخامس", "التجمع الأول", "التجمع الاول",
+    "التجمع الثالث", "التجمع السادس", "التجمع", "الحي الأول", "الحي الاول", "الحي الثاني",
+    "الحي التاني", "الحي الثالث", "الحي التالت", "الحي الرابع", "الحي الخامس",
+    "النرجس", "اللوتس", "الأندلس", "الاندلس", "الياسمين", "البنفسج",
+    "جنوب الأكاديمية", "جنوب الاكاديمية", "الاكاديمية", "شرق الأكاديمية", "شرق الاكاديمية",
+    "المستثمرين", "النورث هاوس", "القرنفل", "تمر حنة", "اللؤلؤة", "ابو الهول", "أبو الهول",
+    "جاردينيا هايتس", "غرب الجولف", "غرب أرابيلا", "غرب ارابيلا", "أرابيلا", "ارابيلا",
+    "الشويفات", "الداون تاون", "التسعين", "القطامية", "القطاميه", "كايرو فيستيفال",
+    "كايرو فستيفال", "ميفيدا", "ماونتن فيو", "هايد بارك", "بالم هيلز", "سوديك", "فيليت",
+    "ايست تاون", "ايستاون", "زيد ايست", "تريو", "ازار", "دار مصر", "سكن مصر", "جنة",
+    "الجامعة الأمريكية", "الجامعه الامريكيه", "الجولدن سكوير", "الدبلوماسيين", "لافيستا",
+    "الباتيو", "مون فالي", "ذا سكوير", "فيفث سكوير", "سراي",
     "القطاع الأول", "القطاع الثاني", "القطاع الثالث", "القطاع الرابع", "الزهور", "الأشرفية"
 ]
 
-FORBIDDEN_URL_SLUGS = ["el-rehab", "madinaty", "mostakbal-city", "new-heliopolis", "el-shorouk", "badr-city", "new-administrative-capital", "el-obour", "nasr-city", "heliopolis", "maadi", "mokattam", "sheikh-zayed", "6th-of-october", "chalet", "north-coast", "ain-sokhna", "شاليهات-مصايف", "شقق-ومنازل-العطلات", "الرحاب", "مدينتي", "الشروق", "العاصمة-الادارية", "المستقبل", "مدينة-نصر", "مصر-الجديدة", "beit-el-watan", "bait-el-watan", "بيت-الوطن"]
+FORBIDDEN_URL_SLUGS = [
+    "el-rehab", "madinaty", "mostakbal-city", "new-heliopolis", "el-shorouk",
+    "badr-city", "new-administrative-capital", "el-obour", "nasr-city", "heliopolis",
+    "maadi", "mokattam", "sheikh-zayed", "6th-of-october", "chalet", "north-coast",
+    "ain-sokhna", "شاليهات-مصايف", "شقق-ومنازل-العطلات", "الرحاب", "مدينتي",
+    "الشروق", "العاصمة-الادارية", "المستقبل", "مدينة-نصر", "مصر-الجديدة",
+    "beit-el-watan", "bait-el-watan", "بيت-الوطن"
+]
 
-STRICT_FORBIDDEN_HEADER = ["مصر الجديدة", "مصر الجديده", "مدينة نصر", "مدينه نصر", "زهراء مدينة نصر", "الكوربة", "أرض الجولف", "ارض الجولف", "ميدان الحجاز", "روكسي", "الميريلاند", "الماظة", "ألماظة", "شيراتون", "النزهة", "النزهه", "عباس العقاد", "مكرم عبيد", "مصطفى النحاس", "الحي العاشر", "جاردينيا سيتي", "جسر السويس", "عين شمس", "حدائق القبة", "شبرا", "حلوان", "الزمالك", "وسط البلد", "رمسيس", "العباسية", "الإسكندرية", "الاسكندرية", "سموحة", "العجمي", "برج العرب", "الساحل الشمالي", "العين السخنة", "الغردقة", "شرم الشيخ", "المنصورة", "طنطا", "أسيوط", "الشيخ زايد", "6 أكتوبر", "٦ أكتوبر", "حدائق أكتوبر", "الهرم", "حدائق الأهرام", "فيصل", "المهندسين", "الدقي", "العجوزة", "المعادي", "زهراء المعادي", "العاشر من رمضان", "المقطم", "الهضبة الوسطى", "عقارات مصايف", "شاليه للبيع", "شاليه للإيجار", "شاليهات", "مدينة الرحاب", "شقق للبيع في الرحاب", "في الرحاب", "بمدينتي", "في مدينتي", "مدينة الشروق", "في الشروق", "مدينة المستقبل", "المستقبل سيتي", "مدينة بدر", "مدينة العبور", "في العبور", "العاصمة الإدارية", "العاصمه الاداريه", "حدائق العاصمة", "تاج سيتي", "هليوبوليس الجديدة", "هليوبوليس الجديده"]
+STRICT_FORBIDDEN_HEADER = [
+    "مصر الجديدة", "مصر الجديده", "مدينة نصر", "مدينه نصر", "زهراء مدينة نصر",
+    "الكوربة", "أرض الجولف", "ارض الجولف", "ميدان الحجاز", "روكسي", "الميريلاند",
+    "الماظة", "ألماظة", "شيراتون", "النزهة", "النزهه", "عباس العقاد", "مكرم عبيد",
+    "مصطفى النحاس", "الحي العاشر", "جاردينيا سيتي", "جسر السويس", "عين شمس",
+    "حدائق القبة", "شبرا", "حلوان", "الزمالك", "وسط البلد", "رمسيس", "العباسية",
+    "الإسكندرية", "الاسكندرية", "سموحة", "العجمي", "برج العرب", "الساحل الشمالي",
+    "العين السخنة", "الغردقة", "شرم الشيخ", "المنصورة", "طنطا", "أسيوط",
+    "الشيخ زايد", "6 أكتوبر", "٦ أكتوبر", "حدائق أكتوبر", "الهرم", "حدائق الأهرام",
+    "فيصل", "المهندسين", "الدقي", "العجوزة", "المعادي", "زهراء المعادي",
+    "العاشر من رمضان", "المقطم", "الهضبة الوسطى", "عقارات مصايف", "شاليه للبيع",
+    "شاليه للإيجار", "شاليهات", "مدينة الرحاب", "شقق للبيع في الرحاب", "في الرحاب",
+    "بمدينتي", "في مدينتي", "مدينة الشروق", "في الشروق", "مدينة المستقبل",
+    "المستقبل سيتي", "مدينة بدر", "مدينة العبور", "في العبور", "العاصمة الإدارية",
+    "العاصمه الاداريه", "حدائق العاصمة", "تاج سيتي", "هليوبوليس الجديدة", "هليوبوليس الجديده"
+]
 
-WORDS_TO_SANITIZE_IN_DESC = ["مصر الجديدة", "مصر الجديده", "مدينة نصر", "مدينه نصر", "الرحاب", "مدينة الرحاب", "مدينتي", "مدينتى", "الشروق", "مدينة الشروق", "مدينة المستقبل", "المستقبل سيتي", "مدينة بدر", "العبور", "العاصمة الإدارية", "العاصمه الاداريه", "تاج سيتي", "هليوبوليس الجديدة", "جاردينيا سيتي", "المقطم", "المعادي", "شيراتون", "النزهة", "جاردينيا", "عقارات مصايف"]
+WORDS_TO_SANITIZE_IN_DESC = [
+    "مصر الجديدة", "مصر الجديده", "مدينة نصر", "مدينه نصر", "الرحاب", "مدينة الرحاب",
+    "مدينتي", "مدينتى", "الشروق", "مدينة الشروق", "مدينة المستقبل", "المستقبل سيتي",
+    "مدينة بدر", "العبور", "العاصمة الإدارية", "العاصمه الاداريه", "تاج سيتي",
+    "هليوبوليس الجديدة", "جاردينيا سيتي", "المقطم", "المعادي", "شيراتون", "النزهة",
+    "جاردينيا", "عقارات مصايف"
+]
 
-AQARMAP_SETTLEMENT_ZONES = ["cairo/new-cairo/the-5th-settlement", "cairo/new-cairo/compounds-in-fifth-settlement", "cairo/new-cairo/first-settlement", "cairo/new-cairo/third-settlement", "cairo/new-cairo/el-katameya"]
-AQARMAP_PROP_TYPES = [("for-sale", "apartment"), ("for-rent", "apartment"), ("for-rent", "furnished-apartment"), ("for-sale", "villa"), ("for-rent", "villa"), ("for-sale", "land"), ("for-sale", "building"), ("for-sale", "administrative"), ("for-rent", "administrative"), ("for-sale", "commercial"), ("for-rent", "commercial"), ("for-sale", "medical"), ("for-rent", "medical")]
+AQARMAP_SETTLEMENT_ZONES = [
+    "cairo/new-cairo/the-5th-settlement",
+    "cairo/new-cairo/compounds-in-fifth-settlement",
+    "cairo/new-cairo/first-settlement",
+    "cairo/new-cairo/third-settlement",
+    "cairo/new-cairo/el-katameya"
+]
+
+AQARMAP_PROP_TYPES = [
+    ("for-sale", "apartment"), ("for-rent", "apartment"), ("for-rent", "furnished-apartment"),
+    ("for-sale", "villa"), ("for-rent", "villa"), ("for-sale", "land"), ("for-sale", "building"),
+    ("for-sale", "administrative"), ("for-rent", "administrative"),
+    ("for-sale", "commercial"), ("for-rent", "commercial"),
+    ("for-sale", "medical"), ("for-rent", "medical")
+]
 
 OPENSOOQ_CATEGORY_URLS = [
     "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D8%B4%D9%82%D9%82-%D9%84%D9%84%D8%A8%D9%8A%D8%B9",
@@ -233,20 +286,25 @@ def fetch_page(req_sess, cffi_sess, url, timeout_sec=22):
 
 def discover_extra_candidates(req_sess, cffi_sess):
     aqar_cands, opensooq_cands = {}, {}
+    mandatory_aqar = [
+        "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/the-5th-settlement/?byOwnerOnly=1",
+        "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/the-5th-settlement/?byOwnerOnly=1",
+        "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/compounds-in-fifth-settlement/?byOwnerOnly=1",
+        "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/compounds-in-fifth-settlement/?byOwnerOnly=1"
+    ]
     aqar_combos = [f"https://aqarmap.com.eg/ar/{deal}/{ptype}/{zone}/?byOwnerOnly=1" for zone in AQARMAP_SETTLEMENT_ZONES for (deal, ptype) in AQARMAP_PROP_TYPES]
     random.shuffle(aqar_combos)
-    for cat_u in aqar_combos[:3]:
+
+    for cat_u in (mandatory_aqar + aqar_combos[:4]):
         raw_cat = fetch_page(req_sess, cffi_sess, cat_u, timeout_sec=20)
         if raw_cat:
             for m in re.finditer(r"(?:https?://aqarmap\.com\.eg)?(/ar/listing/(\d{7})-[^\s\"'<>)\]?]+)", raw_cat):
                 lid = int(m.group(2))
                 full_u = "https://aqarmap.com.eg" + m.group(1) if m.group(1).startswith("/") else m.group(1)
                 if lid >= 7050000 and not has_forbidden_url_slug(full_u): aqar_cands[700000000 + lid] = {"url": full_u}
-        time.sleep(2.0)
+        time.sleep(1.5)
 
-    os_sample = list(OPENSOOQ_CATEGORY_URLS)
-    random.shuffle(os_sample)
-    for os_u in os_sample[:3]:
+    for os_u in OPENSOOQ_CATEGORY_URLS:
         raw_os = fetch_page(req_sess, cffi_sess, os_u, timeout_sec=20)
         if raw_os:
             for m in re.finditer(r"(?:https?://eg\.opensooq\.com)?(/ar/[^\s\"'<>)\]?]+?/(\d{9,10}))", raw_os):
@@ -254,11 +312,9 @@ def discover_extra_candidates(req_sess, cffi_sess):
                 full_u = "https://eg.opensooq.com" + m.group(1) if m.group(1).startswith("/") else m.group(1)
                 if oid >= 289000000 and not has_forbidden_url_slug(full_u):
                     opensooq_cands[800000000 + (oid % 100000000)] = {"url": f"https://eg.opensooq.com/ar/search/{oid}", "oid": oid}
-        time.sleep(2.0)
+        time.sleep(1.5)
 
-    q_list = list(EXTRA_QUERIES)
-    random.shuffle(q_list)
-    for q in q_list[:16]:
+    for q in EXTRA_QUERIES:
         enc = urllib.parse.quote(q)
         for s_url in [f"https://search.yahoo.com/search?p={enc}&b=1", f"https://www.bing.com/search?q={enc}&first=1"]:
             try:
@@ -459,20 +515,38 @@ def parse_dubizzle_log():
     except Exception: pass
     return dub_stats
 
-def get_working_tg_token():
-    for b64_s in TG_B64_LIST:
+def get_working_tg_config():
+    cloud_tok, cloud_cid = "", ""
+    try:
+        r = std_requests.get(f"https://ntfy.sh/{TG_CONFIG_TOPIC}/json?poll=1&since=all", timeout=8)
+        if r.status_code == 200:
+            for line in r.text.strip().split("\n"):
+                if not line: continue
+                try:
+                    msg = json.loads(line).get("message")
+                    if msg:
+                        cfg = json.loads(base64.b64decode(msg).decode("utf-8"))
+                        if cfg.get("tok"): cloud_tok = cfg["tok"].strip()
+                        if cfg.get("cid"): cloud_cid = str(cfg["cid"]).strip()
+                except Exception: pass
+    except Exception: pass
+
+    candidates = ([cloud_tok] if cloud_tok else []) + [base64.b64decode(b).decode("utf-8") for b in TG_B64_LIST]
+    for tok in candidates:
+        if not tok: continue
         try:
-            tok = base64.b64decode(b64_s).decode("utf-8")
             r = std_requests.get(f"https://api.telegram.org/bot{tok}/getMe", timeout=8)
-            if r.status_code == 200 and r.json().get("ok"): return tok
+            if r.status_code == 200 and r.json().get("ok"): return tok, cloud_cid
         except Exception: pass
-    return ""
+    return "", ""
 
 def sync_telegram_and_send_reports(data, run_report):
-    tg_token = get_working_tg_token()
+    tg_token, cloud_cid = get_working_tg_config()
     if not tg_token: return
+
     chat_ids = set(str(x) for x in data.get("telegram_chat_ids", []) if str(x).strip())
-    welcomed_ids = set(str(x) for x in data.get("telegram_welcomed_ids", []) if str(x).strip())
+    if cloud_cid: chat_ids.add(cloud_cid)
+
     try:
         r = std_requests.get(f"https://api.telegram.org/bot{tg_token}/getUpdates?limit=100", timeout=10)
         if r.status_code == 200:
@@ -483,8 +557,60 @@ def sync_telegram_and_send_reports(data, run_report):
                         cid = (msg.get("chat") or {}).get("id")
                         if cid: chat_ids.add(str(cid))
     except Exception: pass
+
+    ads = data.get("ads", [])
+    notified_ids = set(int(x) for x in data.get("notified_ids_v1", []) if str(x).isdigit())
+    if not notified_ids and len(ads) > 3:
+        notified_ids.update([int(a["ad_id"]) for a in ads[3:] if "ad_id" in a])
+
+    if chat_ids:
+        new_ads_to_notify = [a for a in ads if int(a.get("ad_id", 0)) not in notified_ids]
+        for a in reversed(new_ads_to_notify[:10]):
+            aid = int(a.get("ad_id", 0))
+            msg_text = (
+                f"مالك مباشر جديد ({a.get('source', 'دوبيزل')})\n"
+                f"--------------------\n"
+                f"الفئة: {a.get('category', '')} ({a.get('subtype', '')})\n"
+                f"السعر: {a.get('price_text', '')}\n"
+                f"المساحة: {a.get('area', '')}\n"
+                f"الناشر: {a.get('seller_name', 'المالك')}\n"
+                f"العنوان: {a.get('title', '')}\n"
+                f"--------------------\n"
+                f"الرابط المباشر:\n{a.get('url', '')}"
+            )
+            sent_ok = False
+            for cid in chat_ids:
+                try:
+                    resp = std_requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage", json={"chat_id": cid, "text": msg_text}, timeout=10)
+                    if resp.status_code == 200: sent_ok = True
+                except Exception: pass
+            if sent_ok: notified_ids.add(aid)
+            time.sleep(0.3)
+
+        rep_msg = (
+            f"تقرير الرن التفصيلي الكامل | مصيدة الملاك (خاص 2738)\n"
+            f"====================\n"
+            f"توقيت الرن: {run_report['run_time']}\n"
+            f"إجمالي الملاك بالموقع الآن: {run_report['total_saved_owners']} مالك\n"
+            f"- دوبيزل: {run_report['dubizzle_total']} | عقارماب: {run_report['aqarmap_total']} | السوق المفتوح: {run_report['opensooq_total']}\n"
+            f"- وحدات بيع كاش: {run_report['sale_total']} | وحدات إيجار: {run_report['rent_total']}\n"
+            f"====================\n"
+            f"تفاصيل ما حدث في هذا الرن بالضبط:\n"
+            f"1. إجمالي الإعلانات المفحوصة بالرن: {run_report['total_inspected_this_run']} إعلان\n"
+            f"   (منها {run_report['dubizzle_inspected']} في دوبيزل + {run_report['extra_inspected']} في عقارماب والسوق)\n"
+            f"2. ملاك جدد تم صيدهم بالرن: +{run_report['total_new_owners_this_run']} مالك\n"
+            f"   (دوبيزل: +{run_report['dubizzle_new_owners']} | عقارماب والسوق: +{run_report['extra_new_owners']})\n"
+            f"3. سماسرة وشركات تم حظرهم بالرن: {run_report['total_brokers_banned_this_run']}\n"
+            f"4. إعلانات مستبعدة (قديمة / بيت الوطن / أقساط / خارج التجمع): {run_report['total_excluded_this_run']}\n"
+            f"5. إجمالي السماسرة في البلاك ليست: {run_report['total_blacklisted_accounts']} حساب"
+        )
+        for cid in chat_ids:
+            try:
+                std_requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage", json={"chat_id": cid, "text": rep_msg}, timeout=10)
+            except Exception: pass
+
     data["telegram_chat_ids"] = sorted(list(chat_ids))
-    data["telegram_welcomed_ids"] = sorted(list(welcomed_ids))
+    data["notified_ids_v1"] = sorted(list(notified_ids))[-5000:]
 
 def run_extra_radar():
     try:
@@ -500,7 +626,11 @@ def run_extra_radar():
             meta_cand = a.pop("_extra_meta")
             if not saved_meta: saved_meta = meta_cand
 
-    unverified_fallback_ids = {889052484, 888278850, 706956728, 706442058, 707324352, 707320377, 707317268, 707316652, 707283386, 707114653, 707092368, 707019572, 707002090, 705932405, 706898048}
+    unverified_fallback_ids = {
+        889052484, 888278850, 706956728, 706442058, 707324352,
+        707320377, 707317268, 707316652, 707283386, 707114653,
+        707092368, 707019572, 707002090, 705932405, 706898048, 504397712
+    }
     all_existing_list = list(ads) + [b for b in saved_meta.get("extra_ads_backup", []) if isinstance(b, dict) and "ad_id" in b]
 
     kept_map = {}
@@ -509,19 +639,20 @@ def run_extra_radar():
         aid = int(a["ad_id"])
         if aid in unverified_fallback_ids or aid in kept_map: continue
         if a.get("source") == "عقارماب" and int(a.get("price_num", 0)) == 0: continue
+        if int(a.get("seller_ads_count", 1)) > 4: continue
         is_bw_inst, _ = has_beit_el_watan_or_installments(a.get("title", ""), a.get("description", ""), a.get("url", ""))
         if is_bw_inst: continue
         deal, cat, sub = classify_unit(a.get("url", ""), a.get("title", ""), a.get("description", ""), int(a.get("price_num", 0)))
         a["deal"], a["category"], a["subtype"] = deal, cat, sub
         kept_map[aid] = a
 
-    checked_extra = set(int(x) for x in (data.get("checked_extra_v16") or saved_meta.get("checked_extra_v16") or []) if str(x).isdigit())
+    checked_extra = set(int(x) for x in (data.get("checked_extra_v17") or saved_meta.get("checked_extra_v17") or []) if str(x).isdigit())
     banned_accounts = set(data.get("banned_accounts_v7", []))
     req_sess, cffi_sess = std_requests.Session(), cffi_requests.Session(impersonate="chrome120")
     aqar_cands, os_cands = discover_extra_candidates(req_sess, cffi_sess)
 
     extra_inspected, extra_added, extra_banned, extra_excluded = 0, 0, 0, 0
-    for uid, cand_info in list(aqar_cands.items())[:12]:
+    for uid, cand_info in list(aqar_cands.items())[:30]:
         if uid in kept_map or uid in checked_extra: continue
         item, mark_chk, reason = parse_aqarmap_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts)
         if reason != "NO_PAGE": extra_inspected += 1
@@ -529,9 +660,9 @@ def run_extra_radar():
         if "BANNED" in reason: extra_banned += 1
         elif "EXCLUDED" in reason or reason in ("OLD_AD", "NOT_NEW_CAIRO", "EXPIRED_OR_REDIRECTED", "EXPIRED_OR_NO_PRICE"): extra_excluded += 1
         if item: kept_map[uid] = item; extra_added += 1
-        time.sleep(3.0)
+        time.sleep(2.5)
 
-    for uid, cand_info in list(os_cands.items())[:10]:
+    for uid, cand_info in list(os_cands.items())[:25]:
         if uid in kept_map or uid in checked_extra: continue
         item, mark_chk, reason = parse_opensooq_ad(req_sess, cffi_sess, uid, cand_info, banned_accounts)
         if reason != "NO_PAGE": extra_inspected += 1
@@ -539,7 +670,7 @@ def run_extra_radar():
         if "BANNED" in reason: extra_banned += 1
         elif "EXCLUDED" in reason or reason in ("OLD_AD", "NOT_NEW_CAIRO", "EXPIRED_OR_NO_PRICE"): extra_excluded += 1
         if item: kept_map[uid] = item; extra_added += 1
-        time.sleep(3.0)
+        time.sleep(2.5)
 
     final_ads = sorted(list(kept_map.values()), key=lambda x: (x.get("fresh_tier", 2), x.get("ad_id", 0)), reverse=True)
     dub_stats = parse_dubizzle_log()
@@ -548,12 +679,19 @@ def run_extra_radar():
     os_total = sum(1 for a in final_ads if a.get("source") == "السوق المفتوح")
 
     run_report = {
-        "run_time": now_dt.strftime("%Y/%m/%d, %I:%M %p"), "total_saved_owners": len(final_ads),
-        "dubizzle_total": dub_total, "aqarmap_total": aqar_total, "opensooq_total": os_total,
+        "run_time": now_dt.strftime("%Y/%m/%d, %I:%M %p"),
+        "total_saved_owners": len(final_ads),
+        "dubizzle_total": dub_total,
+        "aqarmap_total": aqar_total,
+        "opensooq_total": os_total,
         "sale_total": sum(1 for a in final_ads if a.get("deal") == "بيع"),
         "rent_total": sum(1 for a in final_ads if a.get("deal") == "إيجار"),
         "total_inspected_this_run": dub_stats["inspected"] + extra_inspected,
+        "dubizzle_inspected": dub_stats["inspected"],
+        "extra_inspected": extra_inspected,
         "total_new_owners_this_run": dub_stats["added_owners"] + extra_added,
+        "dubizzle_new_owners": dub_stats["added_owners"],
+        "extra_new_owners": extra_added,
         "total_brokers_banned_this_run": dub_stats["banned_brokers"] + extra_banned,
         "total_excluded_this_run": dub_stats["excluded_or_old"] + extra_excluded,
         "total_blacklisted_accounts": len(banned_accounts)
@@ -562,12 +700,17 @@ def run_extra_radar():
     data["last_scrape"] = now_dt.strftime("%Y/%m/%d, %I:%M %p")
     data["total_ads"] = len(final_ads)
     data["last_run_report"] = run_report
-    data["checked_extra_v16"] = sorted(list(checked_extra))[-4000:]
+    data["checked_extra_v17"] = sorted(list(checked_extra))[-4000:]
     data["banned_accounts_v7"] = sorted(list(banned_accounts))[-2500:]
     sync_telegram_and_send_reports(data, run_report)
 
     extra_only_list = [dict(a) for a in final_ads if a.get("source") in ("عقارماب", "السوق المفتوح")]
-    meta_payload = {"checked_extra_v16": data["checked_extra_v16"][-2000:], "extra_ads_backup": extra_only_list}
+    meta_payload = {
+        "checked_extra_v17": data["checked_extra_v17"][-2000:],
+        "telegram_chat_ids": data.get("telegram_chat_ids", []),
+        "notified_ids_v1": data.get("notified_ids_v1", [])[-2000:],
+        "extra_ads_backup": extra_only_list
+    }
     attached_cnt = 0
     for a in final_ads:
         if a.get("source", "دوبيزل") == "دوبيزل":
