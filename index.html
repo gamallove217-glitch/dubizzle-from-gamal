@@ -265,8 +265,8 @@
       <h2 class="modal-title">إعدادات وإشعارات رادار التليجرام (خاص بالأونر 2738)</h2>
       <p class="modal-sub">هذه اللوحة مخفية تماما عن جميع المستخدمين ولا تظهر إلا لحامل الرمز 2738</p>
       <div class="log-list" id="tg-status-box"></div>
-      <input type="text" id="custom-tg-token" class="login-input" placeholder="ضع توكن بوت تليجرام الجديد هنا (اختياري)" />
-      <input type="text" id="custom-tg-chatid" class="login-input" placeholder="ضع الـ Chat ID الخاص بك (اختياري)" />
+      <input type="text" id="custom-tg-token" class="login-input" placeholder="ضع توكن بوت تليجرام الجديد هنا" />
+      <input type="text" id="custom-tg-chatid" class="login-input" placeholder="ضع الـ Chat ID الخاص بك هنا" />
       <button class="login-btn" style="margin-bottom:8px;" onclick="saveAndTestTelegram()">حفظ وإرسال إشعار تجريبي فوري لتليجرامك</button>
       <button class="btn-action" style="width:100%;justify-content:center;" onclick="document.getElementById('telegram-modal').style.display='none'">إغلاق</button>
     </div>
@@ -277,6 +277,7 @@
     const USER_CODES = ["1234", "vip2026", "vip"];
     const BAN_TOPIC = "gamal_masyada_bans_2738_v1";
     const ACTIVITY_TOPIC = "gamal_masyada_activity_2738_v1";
+    const TG_CONFIG_TOPIC = "gamal_masyada_tgcfg_2738_v1";
 
     let currentUserRole = localStorage.getItem("masyada_role_v2") || "";
     let currentUserName = localStorage.getItem("masyada_username_v2") || "";
@@ -405,7 +406,7 @@
       let cat = ad.category || "شقق للبيع";
       let sub = ad.subtype || "شقة";
 
-      const isExplicitApt = /(شقة|شقه|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف)/i.test(title);
+      const isExplicitApt = /(شقة|شقه|دور كامل|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف)/i.test(title);
       if (sub === "غرفة" && (isExplicitApt || priceNum >= 150000)) {
         deal = priceNum >= 150000 ? "بيع" : deal;
         cat = deal === "إيجار" ? "شقق للإيجار" : "شقق للبيع";
@@ -422,6 +423,7 @@
       if (!ad || !ad.ad_id) return false;
       const id = Number(ad.ad_id);
       if (localBannedIds.includes(id)) return false;
+      if (Number(ad.seller_ads_count || 1) > 4) return false;
 
       const sname = (ad.seller_name || "").trim().toLowerCase();
       if (sname && !["مالك", "المالك", "مالك عقار", "مالك العقار"].includes(sname) && localBannedSellers.includes(sname)) {
@@ -800,7 +802,7 @@
       document.getElementById("tg-status-box").innerHTML = `
         <div class="log-entry">
           <strong>حالة إشعارات التليجرام الخاصة بالأونر (2738):</strong><br>
-          الحسابات المتصلة بالسيرفر حاليا: ${chatIds.length ? chatIds.join(", ") : "لا يوجد (أدخل التوكن والـ Chat ID بالأسفل للتفعيل المباشر)"}
+          الحسابات المتصلة بالسيرفر حاليا: ${chatIds.length ? chatIds.join(", ") : "أدخل التوكن والـ Chat ID بالأسفل واضغط حفظ للتفعيل الفوري"}
         </div>
       `;
       document.getElementById("telegram-modal").style.display = "flex";
@@ -817,16 +819,21 @@
       localStorage.setItem("owner_tg_token_2738", tok);
       localStorage.setItem("owner_tg_chat_2738", cid);
       try {
+        const encodedCfg = btoa(unescape(encodeURIComponent(JSON.stringify({ tok, cid }))));
+        await fetch("https://ntfy.sh/" + TG_CONFIG_TOPIC, {
+          method: "POST",
+          body: encodedCfg
+        });
         const r = await fetch(`https://api.telegram.org/bot${tok}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: cid,
-            text: `تم ربط إشعارات مصيدة الملاك VIP بحساب الأونر (2738) بنجاح.\nإجمالي الملاك بالموقع الآن: ${allAds.length} مالك.`
+            text: `تم ربط إشعارات مصيدة الملاك VIP بالسيرفر لحساب الأونر (2738) بنجاح.\nسيصلك هنا التقرير التفصيلي الكامل بعد كل رن.\nإجمالي الملاك بالموقع الآن: ${allAds.length} مالك.`
           })
         });
         if (r.ok) {
-          alert("تم إرسال الإشعار التجريبي إلى تليجرامك بنجاح!");
+          alert("تم حفظ الإعدادات في السيرفر وإرسال الإشعار التجريبي لتليجرامك بنجاح!");
         } else {
           alert("تأكد من صحة التوكن والـ Chat ID وأنك ضغطت Start داخل البوت.");
         }
