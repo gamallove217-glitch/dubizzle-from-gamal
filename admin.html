@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم المدير | إدارة الاشتراكات والحماية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#07090e; --card:#0f131d; --surface:#131824; --gold:#d4af37; --text:#f8fafc; --muted:#94a3b8; --red:#ef4444; --green:#10b981; }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:'Cairo',sans-serif; }
+    body { background:var(--bg); color:var(--text); padding:18px; min-height:100vh; }
+    .container { max-width:1180px; margin:0 auto; }
+    .panel { background:var(--card); border:1px solid rgba(212,175,55,0.35); border-radius:14px; padding:18px; margin-bottom:18px; }
+    h3 { color:var(--gold); margin-bottom:12px; font-size:17px; }
+    .row { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; margin-bottom:10px; }
+    .inp { width:100%; padding:11px 13px; background:var(--surface); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:var(--text); font-weight:700; outline:none; }
+    .inp:focus { border-color:var(--gold); }
+    .btn { padding:11px 16px; background:var(--gold); color:#000; font-weight:900; border:none; border-radius:8px; cursor:pointer; font-size:13.5px; }
+    .btn-red { background:rgba(239,68,68,0.18); color:var(--red); border:1px solid rgba(239,68,68,0.4); }
+    .code-result { display:none; margin-top:12px; padding:12px; background:rgba(16,185,129,0.12); border:1px solid var(--green); border-radius:10px; color:var(--green); font-weight:900; font-size:17px; text-align:center; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; min-width:820px; }
+    th, td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:right; }
+    th { color:var(--gold); background:var(--surface); font-weight:800; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel" id="auth-box" style="max-width:440px;margin:70px auto;text-align:center;">
+      <h3>بوابة المدير السرية</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">أدخل كلمة مرور المدير للتحكم في الاشتراكات والأكواد</p>
+      <input type="password" id="adm-pass" class="inp" style="text-align:center;margin-bottom:12px;" placeholder="كلمة مرور المدير (2738)" />
+      <button class="btn" style="width:100%;" onclick="loadAdminPanel()">فتح لوحة الإدارة</button>
+    </div>
+
+    <div id="admin-content" style="display:none;">
+      <div class="panel" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3 style="margin:0;">لوحة تحكم المدير | نظام الاشتراكات المضاد للمشاركة</h3>
+          <small style="color:var(--muted);">جميع الأكواد صالحة لجهاز واحد فقط وتحظر تلقائيا عند المشاركة</small>
+        </div>
+        <button class="btn" onclick="loadAdminPanel()">تحديث القائمة الآن</button>
+      </div>
+
+      <div class="panel">
+        <h3>1. توليد كود اشتراك جديد (يستخدم لمرة واحدة فقط)</h3>
+        <div class="row">
+          <input type="text" id="sub-name" class="inp" placeholder="اسم السمسار أو المكتب" />
+          <input type="number" id="sub-days" class="inp" value="30" placeholder="مدة الصلاحية بالأيام (مثلا 30)" />
+          <button class="btn" onclick="generateSubCode()">توليد كود اشتراك جديد</button>
+        </div>
+        <div id="generated-code-box" class="code-result"></div>
+      </div>
+
+      <div class="row">
+        <div class="panel" style="margin:0;">
+          <h3>2. حظر إعلان أو ناشر فورا</h3>
+          <input type="number" id="ban-id" class="inp" style="margin-bottom:8px;" placeholder="رقم الإعلان (ID)" />
+          <input type="text" id="ban-seller" class="inp" style="margin-bottom:8px;" placeholder="اسم الناشر (اختياري)" />
+          <button class="btn btn-red" style="width:100%;" onclick="banAdNow()">حظر نهائي من قاعدة البيانات والرادار</button>
+        </div>
+
+        <div class="panel" style="margin:0;">
+          <h3>3. إعدادات إشعارات التليجرام</h3>
+          <input type="text" id="tg-tok" class="inp" style="margin-bottom:8px;" placeholder="Bot Token" />
+          <input type="text" id="tg-cid" class="inp" style="margin-bottom:8px;" placeholder="Chat ID" />
+          <button class="btn" style="width:100%;" onclick="saveTelegramCfg()">حفظ وتفعيل التليجرام</button>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:18px;">
+        <h3>4. جدول مراقبة المشتركين وبصمات الأجهزة</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>كود الاشتراك</th>
+                <th>اسم السمسار</th>
+                <th>الحالة</th>
+                <th>عنوان الـ IP المرتبط</th>
+                <th>بصمة الجهاز</th>
+                <th>تاريخ الانتهاء</th>
+                <th>إجراءات المدير</th>
+              </tr>
+            </thead>
+            <tbody id="subs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminPass = "";
+
+    document.getElementById("adm-pass").addEventListener("keydown", e => {
+      if (e.key === "Enter") loadAdminPanel();
+    });
+
+    async function loadAdminPanel() {
+      adminPass = document.getElementById("adm-pass").value.trim() || adminPass;
+      if (!adminPass) return;
+      const res = await fetch("/api/admin", { headers: { "x-admin-password": adminPass } });
+      if (!res.ok) {
+        alert("كلمة مرور المدير غير صحيحة أو تأكد من إعدادات Firebase في Vercel");
+        return;
+      }
+      const data = await res.json();
+      document.getElementById("auth-box").style.display = "none";
+      document.getElementById("admin-content").style.display = "block";
+
+      if (data.telegram) {
+        document.getElementById("tg-tok").value = data.telegram.botToken || "";
+        document.getElementById("tg-cid").value = data.telegram.chatId || "";
+      }
+      renderSubs(data.subscriptions || []);
+    }
+
+    function renderSubs(subs) {
+      const tbody = document.getElementById("subs-tbody");
+      if (!subs.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">لا توجد أكواد مصدرة حتى الآن</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = subs.map(s => {
+        const statusColor = s.status === "banned" ? "var(--red)" : (s.status === "used" ? "var(--green)" : "var(--muted)");
+        const statusLabel = s.status === "banned" ? "محظور" : (s.status === "used" ? "مفعل ومربوط بجهاز" : "جديد (لم يستخدم)");
+        return `
+          <tr>
+            <td style="font-weight:900;color:var(--gold);direction:ltr;text-align:right;">${s.code}</td>
+            <td>${s.brokerName} (${s.durationDays} يوم)</td>
+            <td style="color:${statusColor};font-weight:800;">
+              ${statusLabel}
+              ${s.banReason ? `<br><small style="color:var(--red);">${s.banReason}</small>` : ''}
+            </td>
+            <td>${s.boundIp || '-'}</td>
+            <td title="${s.boundUa || ''}">${s.boundHw ? s.boundHw.slice(0, 12) + '...' : '-'}</td>
+            <td>${s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : 'يبدأ عند أول دخول'}</td>
+            <td>
+              <button class="btn" style="padding:4px 9px;font-size:11.5px;margin-left:4px;" onclick="updateSub('${s.code}','RESET')">فك ارتباط الجهاز</button>
+              <button class="btn btn-red" style="padding:4px 9px;font-size:11.5px;margin-left:4px;" onclick="updateSub('${s.code}','banned')">حظر</button>
+              <button class="btn btn-red" style="padding:4px 9px;font-size:11.5px;" onclick="updateSub('${s.code}','DELETE')">حذف</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function generateSubCode() {
+      const brokerName = document.getElementById("sub-name").value.trim() || "سمسار مشترك";
+      const durationDays = document.getElementById("sub-days").value || 30;
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
+        body: JSON.stringify({ action: "GENERATE_CODE", brokerName, durationDays })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        const box = document.getElementById("generated-code-box");
+        box.style.display = "block";
+        box.textContent = `تم توليد الكود بنجاح: ${data.code}`;
+        navigator.clipboard.writeText(data.code).catch(() => {});
+        loadAdminPanel();
+      }
+    }
+
+    async function updateSub(code, newStatus) {
+      if (newStatus === "DELETE" && !confirm("تأكيد حذف هذا الاشتراك نهائيا؟")) return;
+      await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
+        body: JSON.stringify({ action: "UPDATE_SUB", code, newStatus })
+      });
+      loadAdminPanel();
+    }
+
+    async function banAdNow() {
+      const adId = document.getElementById("ban-id").value.trim();
+      const sellerName = document.getElementById("ban-seller").value.trim();
+      if (!adId && !sellerName) return alert("أدخل رقم الإعلان أو اسم الناشر");
+      await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
+        body: JSON.stringify({ action: "BAN_AD", adId, sellerName })
+      });
+      document.getElementById("ban-id").value = "";
+      document.getElementById("ban-seller").value = "";
+      alert("تم حظر الإعلان/الناشر بنجاح");
+    }
+
+    async function saveTelegramCfg() {
+      const botToken = document.getElementById("tg-tok").value.trim();
+      const chatId = document.getElementById("tg-cid").value.trim();
+      if (!botToken || !chatId) return alert("أدخل التوكن والـ Chat ID");
+      await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
+        body: JSON.stringify({ action: "SAVE_TELEGRAM", botToken, chatId })
+      });
+      alert("تم حفظ إعدادات التليجرام وربطها بالسيرفر");
+    }
+  </script>
+</body>
+</html>
