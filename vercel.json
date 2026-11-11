@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "ads.json"
+    }
+  },
+  "rewrites": [
+    { "source": "/ads.json", "destination": "/api/data" }
+  ]
+}
