@@ -20,17 +20,6 @@ function parseCookies(cookieHeader) {
   return list;
 }
 
-async function readAdsSource() {
-  try {
-    const adsPath = path.join(process.cwd(), "ads.json");
-    if (fs.existsSync(adsPath)) {
-      return JSON.parse(fs.readFileSync(adsPath, "utf-8"));
-    }
-  } catch (e) {}
-  const r = await fetch("https://raw.githubusercontent.com/gamallove217-glitch/dubizzle-from-gamal/main/ads.json?t=" + Date.now());
-  return await r.json();
-}
-
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   if (req.method !== "GET") {
@@ -90,7 +79,10 @@ module.exports = async (req, res) => {
     const bannedAdIds = bansDoc.exists ? (bansDoc.data().adIds || []) : [];
     const bannedSellers = bansDoc.exists ? (bansDoc.data().sellers || []) : [];
 
-    const parsed = await readAdsSource();
+    // قراءة الداتا الموثوقة من ملف السيرفر مباشرة
+    const adsPath = path.join(process.cwd(), "ads.json");
+    const parsed = JSON.parse(fs.readFileSync(adsPath, "utf-8"));
+
     const cleanAds = (parsed.ads || [])
       .filter(ad => {
         if (!ad || !ad.ad_id) return false;
