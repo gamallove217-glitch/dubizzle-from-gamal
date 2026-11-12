@@ -1,40 +1,21 @@
-name: Scrape Dubizzle Hourly
+name: Scrape Hourly
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'scraper.py'
-      - 'extra_radar.py'
-      - '.github/workflows/scrape.yml'
 
 concurrency:
-  group: dubizzle-continuous-loop
-  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+  group: radar-scraping
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
-  radar_matrix_loop:
+  run_radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 65
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        step_phase: [
-          "1_dubizzle", "1_extra",
-          "2_dubizzle", "2_extra",
-          "3_dubizzle", "3_extra",
-          "4_dubizzle", "4_extra",
-          "5_dubizzle", "5_extra",
-          "6_dubizzle", "6_extra"
-        ]
+    timeout-minutes: 40
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,61 +28,22 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4 lxml curl_cffi
 
-      - name: Execute Anti-Ban Hourly Radar (${{ matrix.step_phase }})
+      - name: Run Dubizzle Scraper
+        run: python scraper.py | tee dubizzle_run.log || true
+
+      - name: Wait 3 minutes to avoid IP Ban
+        run: sleep 180
+
+      - name: Run Aqarmap & OpenSooq
+        run: python extra_radar.py || true
+
+      - name: Commit and Push Data Once
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git fetch origin main || true
-          git reset --hard origin/main || true
-
-          PHASE="${{ matrix.step_phase }}"
-          echo "=========================================="
-          echo "Running Phase: $PHASE on Fresh Server IP"
-          echo "=========================================="
-
-          if [[ "$PHASE" == *"_dubizzle" ]]; then
-            python scraper.py | tee dubizzle_run.log || true
-            python -c '
-          import json, os
-          if os.path.exists("ads.json") and os.path.exists("dubizzle_run.log"):
-              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
-              with open("dubizzle_run.log", "r", encoding="utf-8", errors="ignore") as f: log_txt = f.read()[-15000:]
-              if d.get("ads"): d["ads"][0]["_dub_log"] = log_txt
-              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
-          ' || true
-
-            git add ads.json
-            if ! git diff --staged --quiet; then
-              git commit -m "Auto-update Dubizzle ($PHASE)"
-              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
-            fi
-
-            echo "Dubizzle finished. Waiting 10 minutes before starting Aqarmap and OpenSooq..."
-            sleep 600
-
-          else
-            python -c '
-          import json, os
-          if os.path.exists("ads.json"):
-              with open("ads.json", "r", encoding="utf-8") as f: d = json.load(f)
-              for a in d.get("ads", []):
-                  if "_dub_log" in a:
-                      with open("dubizzle_run.log", "w", encoding="utf-8") as lf: lf.write(a.pop("_dub_log"))
-                      break
-              with open("ads.json", "w", encoding="utf-8") as f: json.dump(d, f, ensure_ascii=False, indent=2)
-          ' || true
-
-            python extra_radar.py || true
-
-            git add ads.json
-            if ! git diff --staged --quiet; then
-              git commit -m "Auto-update Aqarmap & OpenSooq ($PHASE)"
-              git push origin HEAD:main || (git pull --rebase origin main && git push origin HEAD:main) || true
-            fi
-
-            if [[ "$PHASE" != "6_extra" ]]; then
-              echo "Aqarmap & OpenSooq finished. Waiting 42 minutes to complete the 1-hour cycle..."
-              sleep 2520
-            fi
+          git add ads.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update Radar Data"
+            git pull --rebase origin main || true
+            git push origin HEAD:main
           fi
