@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/12, 05:24 PM",
+  "last_scrape": "2026/11/12, 09:30 PM",
   "total_ads": 78,
   "checked_ids_v7": [
     186447351,
@@ -10332,21 +10332,21 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/12, 05:24 PM",
+    "run_time": "2026/11/12, 09:30 PM",
     "total_saved_owners": 78,
     "dubizzle_total": 49,
     "aqarmap_total": 15,
     "opensooq_total": 14,
     "sale_total": 50,
     "rent_total": 28,
-    "total_inspected_this_run": 5,
+    "total_inspected_this_run": 0,
     "dubizzle_inspected": 0,
-    "extra_inspected": 5,
+    "extra_inspected": 0,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
     "total_brokers_banned_this_run": 0,
-    "total_excluded_this_run": 5,
+    "total_excluded_this_run": 0,
     "total_blacklisted_accounts": 216
   },
   "checked_extra_v15": [
