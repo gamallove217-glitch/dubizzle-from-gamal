@@ -3,266 +3,401 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة تحكم المدير | إدارة الاشتراكات والرادار</title>
+  <title>لوحة تحكم المدير | رادار مصيدة الملاك VIP</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#07090e; --card:#0f131d; --surface:#131824; --border:rgba(255,255,255,0.08); --gold:#d4af37; --text:#f8fafc; --muted:#94a3b8; --red:#ef4444; --green:#10b981; }
-    * { box-sizing:border-box; margin:0; padding:0; font-family:'Cairo',sans-serif; }
-    body { background:var(--bg); color:var(--text); padding:16px; min-height:100vh; }
-    .container { max-width:1240px; margin:0 auto; }
-    .panel { background:var(--card); border:1px solid rgba(212,175,55,0.35); border-radius:14px; padding:18px; margin-bottom:16px; }
-    h3 { color:var(--gold); margin-bottom:12px; font-size:17px; }
-    .row { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; margin-bottom:10px; }
-    .inp { width:100%; padding:11px 13px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-weight:700; outline:none; }
-    .inp:focus { border-color:var(--gold); }
-    .btn { padding:11px 16px; background:var(--gold); color:#000; font-weight:900; border:none; border-radius:8px; cursor:pointer; font-size:13.5px; }
-    .btn-red { background:rgba(239,68,68,0.18); color:var(--red); border:1px solid rgba(239,68,68,0.4); }
-    .code-result { display:none; margin-top:12px; padding:12px; background:rgba(16,185,129,0.12); border:1px solid var(--green); border-radius:10px; color:var(--green); font-weight:900; font-size:17px; text-align:center; }
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin-bottom:16px; }
-    .stat-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
-    .stat-val { font-size:21px; font-weight:900; color:var(--gold); margin-top:4px; }
-    .table-wrap { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; min-width:820px; }
-    th, td { padding:10px 12px; border-bottom:1px solid var(--border); text-align:right; }
-    th { color:var(--gold); background:var(--surface); font-weight:800; }
-    .ads-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px; margin-top:12px; }
-    .ad-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; }
-    .badge { padding:3px 8px; border-radius:6px; font-size:11px; font-weight:800; background:rgba(212,175,55,0.15); color:var(--gold); display:inline-block; margin-left:4px; }
+    :root {
+      --bg: #070a12;
+      --card: #111827;
+      --border: #1f2937;
+      --gold: #f59e0b;
+      --emerald: #10b981;
+      --danger: #ef4444;
+      --blue: #3b82f6;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+
+    #authGate {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .gate-box {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 32px; border-radius: 18px; width: 100%; max-width: 400px; text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .gate-box h2 { color: var(--gold); margin-bottom: 8px; font-weight: 900; }
+    .gate-box p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+    #adminPanel { display: none; }
+    header {
+      background: var(--card); border-bottom: 1px solid var(--border);
+      padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    header h1 { font-size: 20px; font-weight: 900; color: var(--gold); }
+    .container { max-width: 1320px; margin: 28px auto; padding: 0 16px; display: grid; gap: 24px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px 20px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-card .lbl { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .stat-card .val { font-size: 24px; font-weight: 900; color: var(--gold); }
+    .stat-card .sub { font-size: 11px; color: var(--emerald); font-weight: 700; }
+
+    .box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .box h3 { font-size: 17px; font-weight: 800; margin-bottom: 16px; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+
+    .form-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;
+    }
+    .input {
+      width: 100%; padding: 11px 14px; border-radius: 10px;
+      border: 1px solid var(--border); background: #090d16; color: #fff;
+      font-size: 14px; outline: none;
+    }
+    .input:focus { border-color: var(--gold); }
+    .btn {
+      padding: 11px 20px; border-radius: 10px; border: none;
+      font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s;
+    }
+    .btn-gold { background: var(--gold); color: #000; }
+    .btn-emerald { background: var(--emerald); color: #000; }
+    .btn-danger { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); }
+    .btn-success { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.4); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: right; }
+    th { color: var(--muted); font-weight: 700; background: rgba(255,255,255,0.02); }
+    .code-pill {
+      font-family: monospace; font-size: 15px; font-weight: 900;
+      color: var(--gold); background: rgba(245,158,11,0.12);
+      padding: 4px 10px; border-radius: 6px; letter-spacing: 1px;
+    }
+    .status-active { color: var(--emerald); font-weight: 800; }
+    .status-unused { color: var(--blue); font-weight: 800; }
+    .status-banned { color: var(--danger); font-weight: 800; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="panel" id="auth-box" style="max-width:420px;margin:80px auto;text-align:center;">
-      <h3>بوابة المدير السرية</h3>
-      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">منطقة محظورة لغير مدير النظام</p>
-      <input type="password" id="adm-pass" class="inp" style="text-align:center;margin-bottom:12px;" placeholder="أدخل كود المرور السري" autocomplete="off" />
-      <button class="btn" style="width:100%;" onclick="loadAdminPanel()">دخول</button>
+
+  <div id="authGate">
+    <div class="gate-box">
+      <h2>بوابة المدير السرية</h2>
+      <p>أدخل كلمة مرور الإدارة للتحكم في الاشتراكات والرادار</p>
+      <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
+      <button class="btn btn-gold" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة التحكم</button>
+      <div id="authErr" style="color:#f87171;font-size:13px;font-weight:700;margin-top:12px;display:none;"></div>
     </div>
+  </div>
 
-    <div id="admin-content" style="display:none;">
-      <div class="panel" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div>
-          <h3 style="margin:0;">لوحة تحكم الأونر | إدارة الاشتراكات والرادار</h3>
-          <small id="last-run-txt" style="color:var(--muted);"></small>
+  <div id="adminPanel">
+    <header>
+      <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-gold btn-sm" onclick="refreshAll()">تحديث البيانات الآن</button>
+        <a href="/" target="_blank" class="btn btn-sm" style="background:#1f2937;color:#fff;text-decoration:none;">فتح واجهة المشتركين</a>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="lbl">إجمالي عقارات الملاك بالموقع</span>
+          <span class="val" id="stTotalAds">-</span>
+          <span class="sub" id="stLastUpdate">آخر تحديث: -</span>
         </div>
-        <button class="btn" onclick="loadAdminPanel()">تحديث اللوحة الآن</button>
+        <div class="stat-card">
+          <span class="lbl">توزيع المنصات الحية</span>
+          <span class="val" id="stPlatforms" style="font-size:16px;margin-top:6px;">-</span>
+          <span class="sub">ملاك مباشرين فقط</span>
+        </div>
+        <div class="stat-card">
+          <span class="lbl">إجمالي أكواد المشتركين</span>
+          <span class="val" id="stTotalSubs">0</span>
+          <span class="sub" id="stActiveSubs">نشط: 0</span>
+        </div>
       </div>
 
-      <!-- إحصائيات الرن والسماسرة المحظورين الخاصة بالأونر -->
-      <div class="stats-grid" id="owner-stats"></div>
-
-      <!-- 1. توليد أكواد الاشتراك -->
-      <div class="panel">
-        <h3>1. توليد كود اشتراك فردي جديد (صالح لجهاز واحد فقط)</h3>
-        <div class="row">
-          <input type="text" id="sub-name" class="inp" placeholder="اسم السمسار أو المكتب" />
-          <input type="number" id="sub-days" class="inp" value="30" placeholder="مدة الصلاحية بالأيام" />
-          <button class="btn" onclick="generateSubCode()">توليد ونسخ الكود</button>
+      <div class="box">
+        <h3>توليد كود اشتراك جديد لسمسار (جهاز واحد فقط)</h3>
+        <div class="form-row">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">اسم السمسار أو المكتب</label>
+            <input type="text" id="newClientName" class="input" placeholder="مثال: أستاذ أحمد" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">رقم الموبايل أو واتساب</label>
+            <input type="text" id="newClientPhone" class="input" placeholder="010XXXXXXXX" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">مدة الاشتراك (بالأيام)</label>
+            <input type="number" id="newDuration" class="input" value="30" />
+          </div>
+          <button class="btn btn-gold" onclick="createNewCode()">توليد كود VIP الآن</button>
         </div>
-        <div id="generated-code-box" class="code-result"></div>
+        <div id="generatedCodeBox" style="margin-top:16px;display:none;padding:14px;background:rgba(16,185,129,0.12);border:1px solid var(--emerald);border-radius:12px;">
+          تم توليد الكود بنجاح: <span class="code-pill" id="newCodeText"></span>
+          <button class="btn btn-sm btn-gold" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
+        </div>
       </div>
 
-      <!-- 2. جدول مراقبة المشتركين -->
-      <div class="panel">
-        <h3>2. مراقبة المشتركين وبصمات الأجهزة والـ IP</h3>
-        <div class="table-wrap">
+      <div class="box">
+        <h3>إدارة الاشتراكات والأجهزة المربوطة</h3>
+        <div style="overflow-x:auto;">
           <table>
             <thead>
               <tr>
                 <th>الكود</th>
-                <th>اسم السمسار</th>
+                <th>العميل</th>
                 <th>الحالة</th>
-                <th>عنوان الـ IP</th>
-                <th>بصمة الجهاز</th>
                 <th>تاريخ الانتهاء</th>
-                <th>تحكم</th>
+                <th>الجهاز المربوط</th>
+                <th>إجراءات</th>
               </tr>
             </thead>
-            <tbody id="subs-tbody"></tbody>
+            <tbody id="subsTableBody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- 3. الحظر اليدوي وإعدادات التليجرام -->
-      <div class="row">
-        <div class="panel" style="margin:0;">
-          <h3>3. حظر إعلان أو ناشر بالـ ID</h3>
-          <input type="number" id="ban-id" class="inp" style="margin-bottom:8px;" placeholder="رقم الإعلان (ID)" />
-          <input type="text" id="ban-seller" class="inp" style="margin-bottom:8px;" placeholder="اسم الناشر (اختياري)" />
-          <button class="btn btn-red" style="width:100%;" onclick="banAdNow()">تنفيذ الحظر النهائي</button>
-        </div>
-
-        <div class="panel" style="margin:0;">
-          <h3>4. إعدادات إشعارات التليجرام السرية</h3>
-          <input type="text" id="tg-tok" class="inp" style="margin-bottom:8px;" placeholder="Bot Token" />
-          <input type="text" id="tg-cid" class="inp" style="margin-bottom:8px;" placeholder="Chat ID" />
-          <button class="btn" style="width:100%;" onclick="saveTelegramCfg()">حفظ وتفعيل التليجرام</button>
+      <div class="box">
+        <h3>إعدادات إشعارات تليجرام السرية (للمدير فقط)</h3>
+        <div class="form-row">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Telegram Bot Token</label>
+            <input type="text" id="tgBotToken" class="input" placeholder="123456789:ABCdef..." />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Admin Chat ID</label>
+            <input type="text" id="tgChatId" class="input" placeholder="مثال: 987654321" />
+          </div>
+          <button class="btn btn-emerald" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
         </div>
       </div>
 
-      <!-- 5. معاينة وحظر الإعلانات مباشرة -->
-      <div class="panel" style="margin-top:16px;">
-        <h3>5. إعلانات الملاك الحالية (مع زر الحظر الفوري للمدير)</h3>
-        <input type="text" id="adm-search" class="inp" placeholder="ابحث في الإعلانات أو اسم الناشر..." oninput="renderAdminAds()" />
-        <div id="adm-ads-grid" class="ads-grid"></div>
+      <div class="box">
+        <h3>معاينة أحدث الإعلانات وحظر السماسرة الفوري</h3>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>المنصة</th>
+                <th>العنوان</th>
+                <th>المنطقة</th>
+                <th>السعر</th>
+                <th>الناشر</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="adsPreviewBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    let adminPass = "";
-    let adminAds = [];
+    let savedAdminPass = "";
+    const MASTER_HASH = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
 
-    document.getElementById("adm-pass").addEventListener("keydown", e => {
-      if (e.key === "Enter") loadAdminPanel();
-    });
-
-    async function loadAdminPanel() {
-      adminPass = document.getElementById("adm-pass").value.trim() || adminPass;
-      if (!adminPass) return;
-      const res = await fetch("/api/admin", { headers: { "x-admin-password": adminPass } });
-      if (!res.ok) {
-        alert("كود المرور غير صحيح");
-        return;
-      }
-      const data = await res.json();
-      document.getElementById("auth-box").style.display = "none";
-      document.getElementById("admin-content").style.display = "block";
-
-      if (data.telegram) {
-        document.getElementById("tg-tok").value = data.telegram.botToken || "";
-        document.getElementById("tg-cid").value = data.telegram.chatId || "";
-      }
-
-      const rep = data.lastRunReport || {};
-      adminAds = data.ads || [];
-      document.getElementById("last-run-txt").textContent = "آخر رن: " + (rep.run_time || data.lastScrape || "--");
-
-      document.getElementById("owner-stats").innerHTML = `
-        <div class="stat-box"><small>إجمالي الملاك</small><div class="stat-val">${adminAds.length}</div></div>
-        <div class="stat-box"><small>ملاك جدد بآخر رن</small><div class="stat-val" style="color:var(--green)">+${rep.total_new_owners_this_run || 0}</div></div>
-        <div class="stat-box"><small>سماسرة محظورين بالرن</small><div class="stat-val" style="color:var(--red)">${rep.total_brokers_banned_this_run || 0}</div></div>
-        <div class="stat-box"><small>إجمالي البلاك ليست</small><div class="stat-val" style="color:var(--red)">${data.totalBlacklisted || rep.total_blacklisted_accounts || 0}</div></div>
-        <div class="stat-box"><small>تم فحصه بالرن</small><div class="stat-val">${rep.total_inspected_this_run || 0}</div></div>
-      `;
-
-      renderSubs(data.subscriptions || []);
-      renderAdminAds();
+    async function sha256Hex(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    function renderSubs(subs) {
-      const tbody = document.getElementById("subs-tbody");
-      if (!subs.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">لا توجد أكواد مصدرة حتى الآن</td></tr>`;
+    async function verifyAdmin() {
+      const pass = document.getElementById("adminPassInput").value.trim();
+      const err = document.getElementById("authErr");
+      const btn = document.getElementById("authBtn");
+      err.style.display = "none";
+
+      if (!pass) {
+        err.textContent = "يرجى إدخال كلمة المرور";
+        err.style.display = "block";
         return;
       }
-      tbody.innerHTML = subs.map(s => {
-        const statusColor = s.status === "banned" ? "var(--red)" : (s.status === "used" ? "var(--green)" : "var(--muted)");
-        const statusLabel = s.status === "banned" ? "محظور" : (s.status === "used" ? "مفعل ومربوط بجهاز" : "جديد (غير مستخدم)");
+
+      const hash = await sha256Hex(pass);
+      if (hash !== MASTER_HASH && pass !== "292004") {
+        err.textContent = "كلمة المرور غير صحيحة!";
+        err.style.display = "block";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "جاري الدخول...";
+      savedAdminPass = pass;
+
+      const ok = await loadCodes();
+      btn.disabled = false;
+      btn.textContent = "دخول للوحة التحكم";
+
+      if (ok) {
+        document.getElementById("authGate").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else {
+        err.textContent = "فشل التحقق من الخادم، تأكد من تحديث ملف api/admin.js";
+        err.style.display = "block";
+      }
+    }
+
+    function refreshAll() {
+      loadCodes();
+    }
+
+    async function apiAdmin(bodyObj) {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": savedAdminPass
+        },
+        body: JSON.stringify(bodyObj)
+      });
+      return res;
+    }
+
+    async function loadCodes() {
+      try {
+        const res = await apiAdmin({ action: "list" });
+        if (!res.ok) return false;
+        const data = await res.json();
+
+        const subs = data.subscriptions || [];
+        document.getElementById("stTotalSubs").textContent = subs.length;
+        document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
+
+        const adsList = data.adsList || [];
+        document.getElementById("stTotalAds").textContent = data.adsCount || adsList.length || 0;
+        document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
+
+        const dubCnt = adsList.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
+        const aqCnt = adsList.filter(a => a.source === "عقارماب").length;
+        const osCnt = adsList.filter(a => a.source === "السوق المفتوح").length;
+        document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | السوق: ${osCnt}`;
+
+        const tbody = document.getElementById("subsTableBody");
+        tbody.innerHTML = subs.map(s => {
+          let stBadge = `<span class="status-unused">غير مفعل</span>`;
+          if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
+          if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
+          if (s.status === "expired") stBadge = `<span style="color:var(--muted)">منتهي</span>`;
+
+          const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
+          const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
+          const hasLock = Boolean(lockedDev || s.status === "banned");
+
+          return `
+            <tr>
+              <td><span class="code-pill">${s.code}</span></td>
+              <td><b>${s.clientName || "-"}</b><br><span style="color:var(--muted);font-size:11px">${s.clientPhone || ""}</span></td>
+              <td>${stBadge}${s.banReason ? `<div style="font-size:11px;color:#fca5a5;margin-top:4px">${s.banReason}</div>` : ""}</td>
+              <td>${expDate}</td>
+              <td style="font-size:11px;color:var(--muted)">
+                ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
+                IP: ${s.boundIp || "-"}
+              </td>
+              <td>
+                <div class="action-btns">
+                  ${hasLock ? `<button class="btn btn-sm btn-success" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
+                  <button class="btn btn-sm btn-danger" onclick="deleteCode('${s.code}')">حذف</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        renderAdsPreview(adsList);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function renderAdsPreview(ads) {
+      const tbody = document.getElementById("adsPreviewBody");
+      tbody.innerHTML = (ads || []).slice(0, 50).map(a => {
+        const safePub = (a.publisher || "").replace(/'/g, "\\'");
         return `
           <tr>
-            <td style="font-weight:900;color:var(--gold);direction:ltr;text-align:right;">${s.code}</td>
-            <td>${s.brokerName} (${s.durationDays} يوم)</td>
-            <td style="color:${statusColor};font-weight:800;">
-              ${statusLabel}
-              ${s.banReason ? `<br><small style="color:var(--red);">${s.banReason}</small>` : ''}
-            </td>
-            <td>${s.boundIp || '-'}</td>
-            <td title="${s.boundUa || ''}">${s.boundHw ? s.boundHw.slice(0, 12) + '...' : '-'}</td>
-            <td>${s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : 'عند أول دخول'}</td>
+            <td>${a.source || "دوبيزل"}</td>
+            <td><a href="${a.url}" target="_blank" style="color:#fff;font-weight:700;text-decoration:none;">${a.title}</a></td>
+            <td>${a.zone || "-"}</td>
+            <td style="color:var(--gold);font-weight:800;">${a.price || "-"}</td>
+            <td>${a.publisher || "مالك"} (${a.pub_ads || 1})</td>
             <td>
-              <button class="btn" style="padding:4px 8px;font-size:11px;margin-left:4px;" onclick="updateSub('${s.code}','RESET')">فك الجهاز</button>
-              <button class="btn btn-red" style="padding:4px 8px;font-size:11px;margin-left:4px;" onclick="updateSub('${s.code}','banned')">حظر</button>
-              <button class="btn btn-red" style="padding:4px 8px;font-size:11px;" onclick="updateSub('${s.code}','DELETE')">حذف</button>
+              <button class="btn btn-sm btn-danger" onclick="banAdAndPublisher(${a.ad_id}, '${safePub}')">حظر الناشر</button>
             </td>
           </tr>
         `;
       }).join("");
     }
 
-    function renderAdminAds() {
-      const q = (document.getElementById("adm-search").value || "").trim().toLowerCase();
-      const filtered = adminAds.filter(a => !q || `${a.title} ${a.seller_name} ${a.ad_id} ${a.category}`.toLowerCase().includes(q));
-      const grid = document.getElementById("adm-ads-grid");
-      grid.innerHTML = filtered.slice(0, 60).map(a => `
-        <div class="ad-card">
-          <div>
-            <span class="badge">${a.source || 'دوبيزل'}</span>
-            <span class="badge">${a.category || ''}</span>
-            <strong style="display:block;color:var(--gold);margin:6px 0;">${a.price_text || ''}</strong>
-            <div style="font-size:13.5px;font-weight:800;margin-bottom:6px;">${a.title || ''}</div>
-            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">الناشر: ${a.seller_name || 'المالك'} | #${a.ad_id}</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <a href="${a.url}" target="_blank" class="btn" style="text-align:center;text-decoration:none;font-size:12px;padding:7px;">فتح الإعلان</a>
-            <button class="btn btn-red" style="font-size:12px;padding:7px;" onclick="quickBanAd(${a.ad_id}, '${(a.seller_name||'').replace(/'/g,'')}')">حظر الناشر نهائيا</button>
-          </div>
-        </div>
-      `).join("");
-    }
+    async function createNewCode() {
+      const clientName = document.getElementById("newClientName").value.trim();
+      const clientPhone = document.getElementById("newClientPhone").value.trim();
+      const durationDays = document.getElementById("newDuration").value;
 
-    async function quickBanAd(adId, sellerName) {
-      if (!confirm("تأكيد حظر هذا الإعلان والناشر نهائيا؟")) return;
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
-        body: JSON.stringify({ action: "BAN_AD", adId, sellerName })
-      });
-      loadAdminPanel();
-    }
-
-    async function generateSubCode() {
-      const brokerName = document.getElementById("sub-name").value.trim() || "سمسار مشترك";
-      const durationDays = document.getElementById("sub-days").value || 30;
-      const res = await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
-        body: JSON.stringify({ action: "GENERATE_CODE", brokerName, durationDays })
-      });
+      const res = await apiAdmin({ action: "create", clientName, clientPhone, durationDays });
       const data = await res.json();
       if (data.ok) {
-        const box = document.getElementById("generated-code-box");
-        box.style.display = "block";
-        box.textContent = `تم توليد الكود ونسخه: ${data.code}`;
-        navigator.clipboard.writeText(data.code).catch(() => {});
-        loadAdminPanel();
+        document.getElementById("newCodeText").textContent = data.code;
+        document.getElementById("generatedCodeBox").style.display = "block";
+        document.getElementById("newClientName").value = "";
+        document.getElementById("newClientPhone").value = "";
+        loadCodes();
       }
     }
 
-    async function updateSub(code, newStatus) {
-      if (newStatus === "DELETE" && !confirm("تأكيد حذف هذا الاشتراك؟")) return;
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
-        body: JSON.stringify({ action: "UPDATE_SUB", code, newStatus })
-      });
-      loadAdminPanel();
+    function copyNewCode() {
+      const code = document.getElementById("newCodeText").textContent;
+      navigator.clipboard.writeText(code);
+      alert("تم نسخ الكود: " + code);
     }
 
-    async function banAdNow() {
-      const adId = document.getElementById("ban-id").value.trim();
-      const sellerName = document.getElementById("ban-seller").value.trim();
-      if (!adId && !sellerName) return alert("أدخل رقم الإعلان أو اسم الناشر");
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
-        body: JSON.stringify({ action: "BAN_AD", adId, sellerName })
-      });
-      document.getElementById("ban-id").value = "";
-      document.getElementById("ban-seller").value = "";
-      loadAdminPanel();
+    async function unbanCode(code) {
+      if (!confirm("هل تريد تصفير الجهاز المربوط بهذا الكود ليتمكن السمسار من الدخول على جهاز جديد؟")) return;
+      await apiAdmin({ action: "unban", code });
+      loadCodes();
     }
 
-    async function saveTelegramCfg() {
-      const botToken = document.getElementById("tg-tok").value.trim();
-      const chatId = document.getElementById("tg-cid").value.trim();
-      if (!botToken || !chatId) return alert("أدخل التوكن والـ Chat ID");
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-password": adminPass },
-        body: JSON.stringify({ action: "SAVE_TELEGRAM", botToken, chatId })
-      });
-      alert("تم حفظ وتفعيل التليجرام بنجاح");
+    async function deleteCode(code) {
+      if (!confirm("تأكيد حذف الكود نهائيا؟")) return;
+      await apiAdmin({ action: "delete_code", code });
+      loadCodes();
+    }
+
+    async function banAdAndPublisher(adId, publisher) {
+      if (!confirm("حظر هذا الإعلان والناشر نهائيا من الرادار؟")) return;
+      await apiAdmin({ action: "ban_ad", adId, publisher });
+      loadCodes();
+    }
+
+    async function saveTelegramConfig() {
+      const botToken = document.getElementById("tgBotToken").value.trim();
+      const chatId = document.getElementById("tgChatId").value.trim();
+      if (!botToken || !chatId) {
+        alert("يرجى إدخال التوكن والـ Chat ID");
+        return;
+      }
+      const res = await apiAdmin({ action: "save_telegram", botToken, chatId });
+      if (res.ok) {
+        alert("تم حفظ إعدادات تليجرام وإرسال رسالة تأكيد لبوتك بنجاح!");
+      } else {
+        alert("حدث خطأ أثناء الحفظ");
+      }
     }
   </script>
 </body>
