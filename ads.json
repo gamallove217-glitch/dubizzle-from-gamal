@@ -1,5 +1,5 @@
 {
-  "last_scrape": "2026/11/12, 09:30 PM",
+  "last_scrape": "2026/11/13, 02:58 AM",
   "total_ads": 78,
   "checked_ids_v7": [
     186447351,
@@ -7036,7 +7036,8 @@
           707402446,
           707403457,
           707405762,
-          707406048
+          707406048,
+          707408439
         ],
         "telegram_chat_ids": [
           "5812887819"
@@ -7823,7 +7824,8 @@
           707402446,
           707403457,
           707405762,
-          707406048
+          707406048,
+          707408439
         ],
         "telegram_chat_ids": [
           "5812887819"
@@ -8610,7 +8612,8 @@
           707402446,
           707403457,
           707405762,
-          707406048
+          707406048,
+          707408439
         ],
         "telegram_chat_ids": [
           "5812887819"
@@ -10332,21 +10335,21 @@
     }
   ],
   "last_run_report": {
-    "run_time": "2026/11/12, 09:30 PM",
+    "run_time": "2026/11/13, 02:58 AM",
     "total_saved_owners": 78,
     "dubizzle_total": 49,
     "aqarmap_total": 15,
     "opensooq_total": 14,
     "sale_total": 50,
     "rent_total": 28,
-    "total_inspected_this_run": 0,
+    "total_inspected_this_run": 1,
     "dubizzle_inspected": 0,
-    "extra_inspected": 0,
+    "extra_inspected": 1,
     "total_new_owners_this_run": 0,
     "dubizzle_new_owners": 0,
     "extra_new_owners": 0,
     "total_brokers_banned_this_run": 0,
-    "total_excluded_this_run": 0,
+    "total_excluded_this_run": 1,
     "total_blacklisted_accounts": 216
   },
   "checked_extra_v15": [
@@ -10980,7 +10983,8 @@
     707402446,
     707403457,
     707405762,
-    707406048
+    707406048,
+    707408439
   ],
   "telegram_chat_ids": [
     "5812887819"
