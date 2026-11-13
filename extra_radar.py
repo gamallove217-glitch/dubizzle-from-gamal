@@ -7,13 +7,13 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 DATA_FILE = "ads.json"
 TG_CONFIG_TOPIC = "gamal_vip_tg_9941_sec"
 MAX_AD_AGE_SECONDS = 7 * 86400
+MIN_CASH_SALE_PRICE = 1400000
 
 ZONES = [
     ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement"]),
     ("التجمع الأول", ["التجمع الأول", "التجمع الاول", "first settlement", "1st settlement"]),
     ("التجمع الثالث", ["التجمع الثالث", "third settlement", "3rd settlement"]),
     ("التجمع السادس", ["التجمع السادس", "sixth settlement"]),
-    ("بيت الوطن", ["بيت الوطن", "beit al watan", "bayt al watan"]),
     ("اللوتس", ["اللوتس", "lotus"]),
     ("النرجس", ["النرجس", "narges", "narjis"]),
     ("الياسمين", ["الياسمين", "yasmeen", "jasmine"]),
@@ -35,6 +35,7 @@ ZONES = [
 ]
 
 EXCLUDED_CITIES = [
+    "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب",
     "العبور", "الشروق", "بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
     "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي",
     "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس",
@@ -52,10 +53,11 @@ BROKER_WORDS = [
 ]
 
 INSTALLMENT_PATTERNS = [
-    "تقسيط", "بالتقسيط", "أقساط", "اقساط", "قسط", "مقدم", "دفعة", "دفعه", "دفعات",
-    "تسهيلات", "سداد", "سنوات", "سنين", "على اطول فترة", "فترة سداد", "بدون فوائد",
-    "استلام فوري بمقدم", "بمقدم", "ادفع", "تعاقد ب", "تعاقد بمقدم", "متبقي", "المتبقي",
-    "أوفر", "اوفر", "أوفر برايس", "اوفر برايس", "شامل الأوفر", "شامل الاوفر"
+    "تقسيط", "بالتقسيط", "لتقسيط", "أقساط", "اقساط", "باقساط", "بأقساط", "قسط", "مقدم", "بمقدم",
+    "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "سنوات", "سنين", "فترة سداد", "بدون فوائد",
+    "ادفع", "تعاقد", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "اوفر برايس", "امكانية التقسيط",
+    "متاح تقسيط", "ويوجد تقسيط", "كاش او تقسيط", "كاش أو تقسيط", "كاش وتقسيط",
+    "down payment", "downpayment", "installment", "installments", "payment plan"
 ]
 
 SAFE_CASH_NEGATIONS = [
@@ -83,44 +85,52 @@ OPENSOOQ_SOURCES = [
     {"cat": "تجاري", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للايجار/محلات-وتجاري-للايجار"},
 ]
 
-def is_clean_direct_ad(title, desc_text="", deal="تمليك"):
-    full = f"{title} {desc_text}".lower()
-    full_clean = re.sub(r'\s+', ' ', full)
-    if re.search(r'(بيت\s*الوطن|beit\s*al\s*watan|bayt\s*al\s*watan)', full_clean):
-        if not re.search(r'(امام|أمام|قريب\s*من|بجوار|فيو|تطل\s*على|خطوات\s*من)\s*بيت\s*الوطن', full_clean):
+def normalize_ar(text):
+    t = (text or "").lower()
+    t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
+    return re.sub(r'\s+', ' ', t).strip()
+
+def is_clean_direct_ad(title, desc_text="", deal="تمليك", price_num=0):
+    full_clean = normalize_ar(f"{title} {desc_text}")
+    for bad_loc in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب"]:
+        if bad_loc in full_clean:
             return False
+
     if deal == "تمليك":
+        if 0 < price_num < MIN_CASH_SALE_PRICE:
+            return False
+        if any(x in full_clean for x in ["كاش او", "كاش أو", "متاح تقسيط", "يوجد تقسيط", "امكانيه التقسيط", "إمكانية التقسيط"]):
+            return False
         cleaned_for_check = full_clean
         for neg in SAFE_CASH_NEGATIONS:
-            cleaned_for_check = cleaned_for_check.replace(neg, " ")
+            cleaned_for_check = cleaned_for_check.replace(normalize_ar(neg), " ")
         for pat in INSTALLMENT_PATTERNS:
-            if re.search(r'(^|\s|،|\.|/|-|\()' + re.escape(pat) + r'(\s|$|،|\.|/|-|\))', cleaned_for_check):
+            p_norm = normalize_ar(pat)
+            if re.search(r'(^|\s|،|\.|/|-|\(|\[)' + re.escape(p_norm) + r'(\s|$|،|\.|/|-|\)|\])', cleaned_for_check):
                 return False
-        if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه)', cleaned_for_check):
+        if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه|down)', cleaned_for_check):
             return False
     return True
 
 def detect_zone(text):
-    t = text.lower()
+    t = normalize_ar(text)
     for city in EXCLUDED_CITIES:
-        if city.lower() in t:
+        if normalize_ar(city) in t:
             return None
     for z_name, keywords in ZONES:
         for kw in keywords:
-            if kw in t:
-                if z_name == "بيت الوطن":
-                    return None
+            if normalize_ar(kw) in t:
                 return z_name
     if any(k in t for k in ["القاهرة الجديدة", "القاهره الجديده", "تجمع", "new cairo", "settlement"]):
         return "القاهرة الجديدة"
     return None
 
 def is_broker_text(name, text=""):
-    n = (name or "").lower().strip()
+    n = normalize_ar(name)
     for w in BROKER_WORDS:
-        if w in n:
+        if normalize_ar(w) in n:
             return True
-    t = (text or "").lower()
+    t = normalize_ar(text)
     if any(p in t for p in ["شركة عقارات", "مكتب عقارات", "للتسويق العقاري", "للاستشارات العقارية", "عمولة المكتب", "عموله المكتب", "متاح لدينا وحدات", "متوفر لدينا شقق"]):
         return True
     return False
@@ -156,7 +166,11 @@ def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
             stats["aq_rejected_zone"] += 1
             return None
 
-        if not is_clean_direct_ad(title, html[:12000], deal):
+        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
+        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالتفاصيل"
+        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
+
+        if not is_clean_direct_ad(title, html[:14000], deal, price_num):
             stats["aq_rejected_installments"] += 1
             return None
 
@@ -164,16 +178,13 @@ def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
             stats["aq_rejected_broker"] += 1
             return None
 
-        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
-        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالداخل"
-        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
-
         area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', html)
         area_val = int(area_m.group(1)) if area_m else None
 
         rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', html)
         rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
+        now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
         return {
             "ad_id": ad_id,
             "source": "عقارماب",
@@ -187,12 +198,12 @@ def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
             "rooms": rooms_val,
             "publisher": "مالك (عقارماب)",
             "pub_ads": 1,
-            "age": "حديث",
+            "age": "اليوم",
             "fresh_tier": 3,
             "first_seen_ts": int(time.time()),
             "url": url,
             "verified_v12": True,
-            "scraped_at": datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+            "scraped_at": now_cairo
         }
     except Exception:
         return None
@@ -210,7 +221,7 @@ def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
         if not title or len(title) < 5:
             return None
 
-        if any(x in html[:8000] for x in ["الوسيط", "مكتب عقاري", "شركة عقارية"]):
+        if any(x in html[:9000] for x in ["الوسيط", "مكتب عقاري", "شركة عقارية"]):
             stats["os_rejected_broker"] += 1
             return None
 
@@ -219,7 +230,11 @@ def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
             stats["os_rejected_zone"] += 1
             return None
 
-        if not is_clean_direct_ad(title, html[:12000], deal):
+        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
+        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالتفاصيل"
+        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
+
+        if not is_clean_direct_ad(title, html[:14000], deal, price_num):
             stats["os_rejected_installments"] += 1
             return None
 
@@ -227,16 +242,13 @@ def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
             stats["os_rejected_broker"] += 1
             return None
 
-        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
-        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالداخل"
-        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
-
         area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', html)
         area_val = int(area_m.group(1)) if area_m else None
 
         rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', html)
         rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
+        now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
         return {
             "ad_id": ad_id,
             "source": "السوق المفتوح",
@@ -250,17 +262,17 @@ def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
             "rooms": rooms_val,
             "publisher": "مالك (السوق المفتوح)",
             "pub_ads": 1,
-            "age": "حديث",
+            "age": "اليوم",
             "fresh_tier": 3,
             "first_seen_ts": int(time.time()),
             "url": url,
             "verified_v12": True,
-            "scraped_at": datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+            "scraped_at": now_cairo
         }
     except Exception:
         return None
 
-def send_admin_telegram_reports(data, final_ads, stats, run_new_extra_count):
+def send_admin_telegram_reports(data, final_ads, stats):
     tg_cfg = data.get("telegram_config") or {}
     tg_token = os.environ.get("TELEGRAM_BOT_TOKEN") or tg_cfg.get("tok", "")
     admin_cid = os.environ.get("TELEGRAM_CHAT_ID") or tg_cfg.get("cid", "")
@@ -294,10 +306,7 @@ def send_admin_telegram_reports(data, final_ads, stats, run_new_extra_count):
             new_cards_to_send.append(ad)
             notified_ids.add(aid)
 
-    if is_first_notify:
-        new_cards_to_send = new_cards_to_send[:5]
-    else:
-        new_cards_to_send = new_cards_to_send[:15]
+    new_cards_to_send = new_cards_to_send[:5] if is_first_notify else new_cards_to_send[:15]
 
     dub_total = sum(1 for a in final_ads if a.get("source", "دوبيزل") == "دوبيزل")
     aq_total = sum(1 for a in final_ads if a.get("source") == "عقارماب")
@@ -367,9 +376,12 @@ def run_extra_radar():
         pub = a.get("publisher", "")
         if not aid or aid in banned_ids or pub in banned_pubs:
             continue
-        if not is_clean_direct_ad(a.get("title", ""), "", a.get("deal", "تمليك")):
+        p_num = a.get("price_num", 0)
+        if not is_clean_direct_ad(a.get("title", ""), "", a.get("deal", "تمليك"), p_num):
             continue
-        first_ts = a.get("first_seen_ts") or now_ts
+        if not detect_zone(a.get("title", "") + " " + a.get("zone", "")):
+            continue
+        first_ts = a.get("first_seen_ts") or (now_ts - 3600)
         if (now_ts - first_ts) > MAX_AD_AGE_SECONDS:
             continue
         a.pop("_extra_meta", None)
@@ -383,59 +395,91 @@ def run_extra_radar():
     }
 
     session = requests.Session(impersonate="chrome120")
+    session.headers.update({"Accept-Language": "ar-EG,ar;q=0.9"})
     new_extra = []
 
     for src in AQARMAP_SOURCES:
-        try:
-            r = session.get(src["url"], timeout=18)
-            if r.status_code == 200:
-                links = list(set(re.findall(r'href="(/ar/listing/(\d+)[^"]*)"', r.text)))
-                for rel, lid in links[:8]:
+        for page in [1, 2]:
+            page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
+            try:
+                r = session.get(page_url, timeout=18)
+                print(f"[Aqarmap] {src['cat']} ({src['deal']}) p.{page} -> HTTP {r.status_code}")
+                if r.status_code != 200:
+                    break
+                matches = re.findall(r'((?:https?://aqarmap\.com\.eg)?/ar/listing/(\d+)[^"\'\s<>\\]*)', r.text)
+                unseen_Batch = []
+                seen_in_page = set()
+                for raw_path, lid in matches:
                     ad_id = 700000000 + int(lid)
-                    if ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
+                    if ad_id in seen_in_page or ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
                         continue
+                    seen_in_page.add(ad_id)
+                    clean_path = re.sub(r'^https?://aqarmap\.com\.eg', '', raw_path)
+                    unseen_Batch.append((ad_id, "https://aqarmap.com.eg" + clean_path))
+
+                for ad_id, full_url in unseen_Batch[:10]:
                     extra_checked.add(ad_id)
-                    full_url = "https://aqarmap.com.eg" + rel
                     ad_obj = parse_aqarmap_ad(session, full_url, ad_id, src["cat"], src["deal"], stats)
                     if ad_obj:
                         new_extra.append(ad_obj)
                         kept_map[ad_id] = ad_obj
-                    time.sleep(random.uniform(0.8, 1.4))
-        except Exception:
-            continue
+                    time.sleep(random.uniform(0.8, 1.3))
+            except Exception as e:
+                print(f"[Aqarmap Error] {e}")
+                break
 
     for src in OPENSOOQ_SOURCES:
-        try:
-            r = session.get(src["url"], timeout=18)
-            if r.status_code == 200:
-                links = list(set(re.findall(r'href="(/ar/search/(\d+)/[^"]*)"', r.text)))
-                for rel, lid in links[:8]:
+        for page in [1, 2]:
+            page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
+            try:
+                r = session.get(page_url, timeout=18)
+                print(f"[OpenSooq] {src['cat']} ({src['deal']}) p.{page} -> HTTP {r.status_code}")
+                if r.status_code != 200:
+                    break
+                matches = re.findall(r'((?:https?://eg\.opensooq\.com)?/ar/search/(\d{8,10})(?:/[^"\'\s<>\\]*)?)', r.text)
+                unseen_Batch = []
+                seen_in_page = set()
+                for raw_path, lid in matches:
                     ad_id = 800000000 + int(lid[-8:])
-                    if ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
+                    if ad_id in seen_in_page or ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
                         continue
+                    seen_in_page.add(ad_id)
+                    clean_path = re.sub(r'^https?://eg\.opensooq\.com', '', raw_path)
+                    unseen_Batch.append((ad_id, "https://eg.opensooq.com" + clean_path))
+
+                for ad_id, full_url in unseen_Batch[:10]:
                     extra_checked.add(ad_id)
-                    full_url = "https://eg.opensooq.com" + rel
                     ad_obj = parse_opensooq_ad(session, full_url, ad_id, src["cat"], src["deal"], stats)
                     if ad_obj:
                         new_extra.append(ad_obj)
                         kept_map[ad_id] = ad_obj
-                    time.sleep(random.uniform(0.8, 1.4))
-        except Exception:
-            continue
+                    time.sleep(random.uniform(0.8, 1.3))
+            except Exception as e:
+                print(f"[OpenSooq Error] {e}")
+                break
 
     final_ads = sorted(
         list(kept_map.values()),
-        key=lambda x: (x.get("fresh_tier", 1), x.get("first_seen_ts", 0)),
+        key=lambda x: (x.get("first_seen_ts", 0), x.get("ad_id", 0)),
         reverse=True
     )
 
-    send_admin_telegram_reports(data, final_ads, stats, len(new_extra))
+    send_admin_telegram_reports(data, final_ads, stats)
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
+    rep = data.get("last_run_report") or {}
+    rep.update({
+        "last_run_at": now_str,
+        "aq_checked": stats["aq_checked"],
+        "os_checked": stats["os_checked"],
+        "extra_added": len(new_extra)
+    })
+
     data["updated_at"] = now_str
     data["total"] = len(final_ads)
+    data["last_run_report"] = rep
     data["ads"] = final_ads
-    data["extra_checked_ids"] = list(extra_checked)[-5000:]
+    data["extra_checked_ids"] = list(extra_checked)[-3500:]
 
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
