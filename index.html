@@ -52,11 +52,16 @@
     .error-msg {
       margin-top: 16px; padding: 12px; border-radius: 10px;
       background: rgba(239,68,68,0.15); border: 1px solid var(--danger);
-      color: #fca5a5; font-size: 13px; font-weight: 700; display: none;
+      color: #fca5a5; font-size: 13px; font-weight: 700; display: none; line-height: 1.6;
+    }
+    .inapp-warning {
+      margin-bottom: 18px; padding: 14px; border-radius: 12px;
+      background: rgba(245,158,11,0.15); border: 2px solid var(--gold);
+      color: #fde68a; font-size: 13px; font-weight: 800; display: none; line-height: 1.7;
     }
     .warning-note {
       margin-top: 20px; font-size: 12px; color: var(--muted);
-      background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;
+      background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; line-height: 1.6;
     }
 
     #appScreen { display: none; padding-bottom: 60px; }
@@ -114,14 +119,13 @@
     .card-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; line-height: 1.5; color: #fff; }
     .card-price { font-size: 20px; font-weight: 900; color: var(--gold); margin-bottom: 12px; }
     .meta-list { font-size: 13px; color: var(--muted); display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; }
-    .card-actions { display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+    .card-actions { display: flex; gap: 8px; margin-top: auto; }
     .btn-card {
       flex: 1; text-align: center; padding: 10px; border-radius: 10px;
       font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; border: none;
     }
     .btn-card.primary { background: var(--gold); color: #000; }
     .btn-card.done-btn { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
-    .btn-card.report-btn { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); flex: 0 0 auto; padding: 10px 12px; }
   </style>
 </head>
 <body>
@@ -131,11 +135,17 @@
       <div class="login-badge">نظام محمي لمشتركي VIP فقط</div>
       <div class="login-title">رادار مصيدة الملاك</div>
       <div class="login-sub">إعلانات الملاك المباشرين فقط في القاهرة الجديدة والتجمعات بدون سماسرة وبدون تقسيط</div>
+
+      <div class="inapp-warning" id="inAppWarning">
+        تنبيه هام جدا: أنت تفتح الموقع الآن من داخل متصفح المحادثة المؤقت (واتساب أو فيسبوك).<br>
+        اضغط على النقاط الثلاث أعلى الشاشة واختر <b>"فتح في متصفح Chrome أو Safari"</b> قبل إدخال الكود حتى لا يقفل الكود على المتصفح المؤقت!
+      </div>
+
       <input type="text" id="subCodeInput" class="code-input" placeholder="VIP-XXXXXX" autocomplete="off" />
       <button class="login-btn" id="loginBtn" onclick="activateSubscription()">تفعيل والدخول للرادار</button>
       <div class="error-msg" id="loginError"></div>
       <div class="warning-note">
-        تنبيه أمني: الكود يعمل على أقصى حد جهازين فقط (موبايل ولابتوب). أي محاولة لتوزيع الكود ستؤدي لحظر الاشتراك فورا.
+        تنبيه أمني صارم: كود الاشتراك يقفل تلقائيا على أول جهاز ومتصفح يتم تفعيله عليه فقط، ولا يقبل العمل على أي جهاز آخر.
       </div>
     </div>
   </div>
@@ -194,14 +204,28 @@
   <script>
     let allAds = [];
     let contactedMap = JSON.parse(localStorage.getItem("vip_contacted_ads") || "{}");
-    let reportedMap = JSON.parse(localStorage.getItem("vip_reported_ads") || "{}");
+
+    function isInAppBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera || "";
+      return /FBAN|FBAV|Instagram|WhatsApp|Messenger|Telegram/i.test(ua);
+    }
+
+    if (isInAppBrowser()) {
+      document.getElementById("inAppWarning").style.display = "block";
+    }
+
+    function getCookieVal(name) {
+      const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
 
     function getDeviceId() {
-      let devId = localStorage.getItem("vip_device_id");
+      let devId = localStorage.getItem("vip_device_id") || getCookieVal("vip_dev_id");
       if (!devId) {
         devId = "dev_" + Math.random().toString(36).substring(2) + "_" + Date.now().toString(36);
-        localStorage.setItem("vip_device_id", devId);
       }
+      localStorage.setItem("vip_device_id", devId);
+      document.cookie = `vip_dev_id=${encodeURIComponent(devId)}; path=/; max-age=31536000; SameSite=Strict; Secure`;
       return devId;
     }
 
@@ -210,6 +234,12 @@
       const errBox = document.getElementById("loginError");
       const btn = document.getElementById("loginBtn");
       errBox.style.display = "none";
+
+      if (isInAppBrowser()) {
+        errBox.textContent = "يرجى فتح الموقع في متصفح Chrome أو Safari الأساسي أولا (من النقاط الثلاث أعلى الشاشة) لتفعيل الكود.";
+        errBox.style.display = "block";
+        return;
+      }
 
       if (!code) {
         errBox.textContent = "يرجى كتابة كود الاشتراك أولا";
@@ -289,20 +319,6 @@
       renderCards();
     }
 
-    async function reportBroker(adId, publisher) {
-      if (!confirm("هل أنت متأكد أن ناشر هذا الإعلان سمسار وليس مالكا؟ سيتم إخفاؤه فورا ومراجعته لحذفه نهائيا.")) return;
-      reportedMap[adId] = true;
-      localStorage.setItem("vip_reported_ads", JSON.stringify(reportedMap));
-      renderCards();
-      try {
-        await fetch("/api/data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-device-id": getDeviceId() },
-          body: JSON.stringify({ action: "report_broker", adId, publisher })
-        });
-      } catch (e) {}
-    }
-
     function renderCards() {
       const q = document.getElementById("searchInput").value.trim().toLowerCase();
       const deal = document.getElementById("dealFilter").value;
@@ -312,7 +328,6 @@
       const sort = document.getElementById("sortFilter").value;
 
       let list = allAds.filter(a => {
-        if (reportedMap[a.ad_id]) return false;
         if (deal !== "ALL" && a.deal !== deal) return false;
         if (cat !== "ALL" && a.cat !== cat) return false;
         if (zone !== "ALL" && a.zone !== zone) return false;
@@ -339,7 +354,6 @@
       const grid = document.getElementById("adsGrid");
       grid.innerHTML = list.map(a => {
         const isDone = !!contactedMap[a.ad_id];
-        const safePub = (a.publisher || "مالك").replace(/'/g, "\\'");
         return `
           <div class="card ${isDone ? 'contacted' : ''}">
             <div>
@@ -358,11 +372,10 @@
               </div>
             </div>
             <div class="card-actions">
-              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان والتواصل</a>
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان</a>
               <button class="btn-card done-btn" onclick="toggleContacted(${a.ad_id})">
                 ${isDone ? 'تم التواصل' : 'تحديد كـ تم'}
               </button>
-              <button class="btn-card report-btn" onclick="reportBroker(${a.ad_id}, '${safePub}')">إبلاغ: سمسار</button>
             </div>
           </div>
         `;
