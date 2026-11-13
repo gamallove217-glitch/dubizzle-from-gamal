@@ -6,18 +6,19 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 DATA_FILE = "ads.json"
 NTFY_BAN_TOPIC = "gamal_vip_ban_9941_sec"
 
-PAGES_PER_CATEGORY = int(os.environ.get("PAGES_PER_CATEGORY", "5"))
+PAGES_PER_CATEGORY = int(os.environ.get("PAGES_PER_CATEGORY", "4"))
 MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", "600"))
 MAX_AD_AGE_SECONDS = 7 * 86400
+MIN_CASH_SALE_PRICE = 1400000
 
 CATEGORIES = [
-    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "فلل", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/villas-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/villas-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "تجاري", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "تجاري", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "أراضي", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/vacation-homes-and-land-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "فلل", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "تجاري", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "تجاري", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "أراضي", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/vacation-homes-and-land-for-sale/new-cairo-fifth-settlement/"},
 ]
 
 ZONES = [
@@ -25,7 +26,6 @@ ZONES = [
     ("التجمع الأول", ["التجمع الأول", "التجمع الاول", "first settlement", "1st settlement"]),
     ("التجمع الثالث", ["التجمع الثالث", "third settlement", "3rd settlement"]),
     ("التجمع السادس", ["التجمع السادس", "sixth settlement"]),
-    ("بيت الوطن", ["بيت الوطن", "beit al watan", "bayt al watan"]),
     ("اللوتس", ["اللوتس", "lotus"]),
     ("النرجس", ["النرجس", "narges", "narjis"]),
     ("الياسمين", ["الياسمين", "yasmeen", "jasmine"]),
@@ -47,6 +47,7 @@ ZONES = [
 ]
 
 EXCLUDED_CITIES = [
+    "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب",
     "العبور", "الشروق", "بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
     "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي",
     "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس",
@@ -64,11 +65,11 @@ BROKER_WORDS = [
 ]
 
 INSTALLMENT_PATTERNS = [
-    "تقسيط", "بالتقسيط", "أقساط", "اقساط", "قسط", "مقدم", "دفعة", "دفعه", "دفعات",
-    "تسهيلات", "سداد", "سنوات", "سنين", "على اطول فترة", "فترة سداد", "بدون فوائد",
-    "استلام فوري بمقدم", "بمقدم", "ادفع", "تعاقد ب", "تعاقد بمقدم", "متبقي", "المتبقي",
-    "أوفر", "اوفر", "أوفر برايس", "اوفر برايس", "شامل الأوفر", "شامل الاوفر",
-    "down payment", "installment", "installments", "payment plan"
+    "تقسيط", "بالتقسيط", "لتقسيط", "أقساط", "اقساط", "باقساط", "بأقساط", "قسط", "مقدم", "بمقدم",
+    "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "سنوات", "سنين", "فترة سداد", "بدون فوائد",
+    "ادفع", "تعاقد", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "اوفر برايس", "امكانية التقسيط",
+    "متاح تقسيط", "ويوجد تقسيط", "كاش او تقسيط", "كاش أو تقسيط", "كاش وتقسيط",
+    "down payment", "downpayment", "installment", "installments", "payment plan", "years"
 ]
 
 SAFE_CASH_NEGATIONS = [
@@ -77,51 +78,58 @@ SAFE_CASH_NEGATIONS = [
     "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل"
 ]
 
-def is_clean_direct_ad(title, desc_text="", deal="تمليك"):
-    full = f"{title} {desc_text}".lower()
-    full_clean = re.sub(r'\s+', ' ', full)
-    if re.search(r'(بيت\s*الوطن|beit\s*al\s*watan|bayt\s*al\s*watan)', full_clean):
-        if not re.search(r'(امام|أمام|قريب\s*من|بجوار|فيو|تطل\s*على|خطوات\s*من)\s*بيت\s*الوطن', full_clean):
+def normalize_ar(text):
+    t = (text or "").lower()
+    t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
+    return re.sub(r'\s+', ' ', t).strip()
+
+def is_clean_direct_ad(title, desc_text="", deal="تمليك", price_num=0):
+    full_clean = normalize_ar(f"{title} {desc_text}")
+    for bad_loc in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب"]:
+        if bad_loc in full_clean:
             return False
+
     if deal == "تمليك":
+        if 0 < price_num < MIN_CASH_SALE_PRICE:
+            return False
+        if any(x in full_clean for x in ["كاش او", "كاش أو", "متاح تقسيط", "يوجد تقسيط", "امكانيه التقسيط", "إمكانية التقسيط"]):
+            return False
         cleaned_for_check = full_clean
         for neg in SAFE_CASH_NEGATIONS:
-            cleaned_for_check = cleaned_for_check.replace(neg, " ")
+            cleaned_for_check = cleaned_for_check.replace(normalize_ar(neg), " ")
         for pat in INSTALLMENT_PATTERNS:
-            if re.search(r'(^|\s|،|\.|/|-|\()' + re.escape(pat) + r'(\s|$|،|\.|/|-|\))', cleaned_for_check):
+            p_norm = normalize_ar(pat)
+            if re.search(r'(^|\s|،|\.|/|-|\(|\[)' + re.escape(p_norm) + r'(\s|$|،|\.|/|-|\)|\])', cleaned_for_check):
                 return False
         if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه|down)', cleaned_for_check):
             return False
     return True
 
 def detect_zone(text):
-    t = text.lower()
+    t = normalize_ar(text)
     for city in EXCLUDED_CITIES:
-        if city.lower() in t:
+        if normalize_ar(city) in t:
             return None
     for z_name, keywords in ZONES:
         for kw in keywords:
-            if kw in t:
-                if z_name == "بيت الوطن":
-                    return None
+            if normalize_ar(kw) in t:
                 return z_name
     if any(k in t for k in ["القاهرة الجديدة", "القاهره الجديده", "تجمع", "new cairo", "settlement"]):
         return "القاهرة الجديدة"
     return None
 
 def is_broker_text(name, text=""):
-    n = (name or "").lower().strip()
+    n = normalize_ar(name)
     for w in BROKER_WORDS:
-        if w in n:
+        if normalize_ar(w) in n:
             return True
-    t = (text or "").lower()
+    t = normalize_ar(text)
     if any(p in t for p in ["شركة عقارات", "مكتب عقارات", "للتسويق العقاري", "للاستشارات العقارية", "عمولة المكتب", "عموله المكتب", "متاح لدينا وحدات", "متوفر لدينا شقق"]):
         return True
     return False
 
 def parse_age_and_tier(page_text):
-    norm_text = re.sub(r'[\u064B-\u065F\u0640]', '', page_text)
-
+    norm_text = normalize_ar(page_text)
     en_m = re.search(r'(\d+)\s*(minute|minutes|hour|hours|day|days|week|weeks|month|months)\s+ago', norm_text, re.I)
     if en_m:
         num = int(en_m.group(1))
@@ -138,7 +146,7 @@ def parse_age_and_tier(page_text):
     if not m:
         if "اليوم" in norm_text or "منذ لحظات" in norm_text or "الآن" in norm_text:
             return ("اليوم", 3, True)
-        if "أمس" in norm_text or "امس" in norm_text or "yesterday" in norm_text.lower():
+        if "أمس" in norm_text or "امس" in norm_text or "yesterday" in norm_text:
             return ("منذ يوم", 2, True)
         return ("حديث", 2, True)
 
@@ -215,9 +223,12 @@ def run_scraper():
         pub = a.get("publisher", "")
         if not aid or aid in banned_ids or pub in banned_pubs:
             continue
-        if not is_clean_direct_ad(a.get("title", ""), "", a.get("deal", "تمليك")):
+        p_num = a.get("price_num", 0)
+        if not is_clean_direct_ad(a.get("title", ""), "", a.get("deal", "تمليك"), p_num):
             continue
-        first_ts = a.get("first_seen_ts") or now_ts
+        if not detect_zone(a.get("title", "") + " " + a.get("zone", "")):
+            continue
+        first_ts = a.get("first_seen_ts") or (now_ts - 3600)
         if (now_ts - first_ts) > MAX_AD_AGE_SECONDS:
             continue
         a["first_seen_ts"] = first_ts
@@ -226,12 +237,13 @@ def run_scraper():
             kept.append(a)
             seen_ids.add(aid)
 
-    session = requests.Session(impersonate="chrome")
+    session = requests.Session(impersonate="chrome120")
     session.headers.update({
         "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
-        "Referer": "https://www.dubizzle.com.eg/ar/"
+        "Referer": "https://www.dubizzle.com.eg/"
     })
     candidates = []
+    pages_fetched = 0
 
     for cat in CATEGORIES:
         if time.time() - start_ts > MAX_RUNTIME_SECONDS * 0.45:
@@ -240,36 +252,41 @@ def run_scraper():
             url = cat["url"] if page == 1 else f"{cat['url']}?page={page}"
             try:
                 resp = session.get(url, timeout=20)
+                pages_fetched += 1
                 print(f"[Dubizzle] {cat['name']} ({cat['deal']}) p.{page} -> HTTP {resp.status_code}")
                 if resp.status_code != 200:
                     break
-                matches = re.findall(r'href="((?:/ar|/en)?/ad/[^"]+-ID(\d+)\.html)"', resp.text)
+                matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/ar|/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', resp.text)
                 if not matches:
                     break
-                for rel_url, id_str in matches:
+                for raw_path, id_str in matches:
                     ad_id = int(id_str)
                     if ad_id in seen_ids or ad_id in checked_ids or ad_id in banned_ids:
                         continue
-                    clean_rel = rel_url if rel_url.startswith("/ar/") else "/ar" + re.sub(r'^/en', '', rel_url)
+                    clean_path = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', raw_path)
+                    clean_path = re.sub(r'^/(?:ar|en)/', '/', clean_path)
                     candidates.append({
                         "ad_id": ad_id,
-                        "url": "https://www.dubizzle.com.eg" + clean_rel,
+                        "url": "https://www.dubizzle.com.eg" + clean_path,
                         "cat": cat["name"],
                         "deal": cat["deal"]
                     })
                     seen_ids.add(ad_id)
-                time.sleep(random.uniform(1.0, 1.8))
+                time.sleep(random.uniform(0.9, 1.5))
             except Exception as e:
                 print(f"[Dubizzle Error] {e}")
                 break
 
     print(f"[Dubizzle] Total new candidates to inspect: {len(candidates)}")
     new_verified = []
+    inspected_cnt = 0
+
     for item in candidates:
         if time.time() - start_ts > MAX_RUNTIME_SECONDS:
             break
         ad_id = item["ad_id"]
         checked_ids.add(ad_id)
+        inspected_cnt += 1
         try:
             r = session.get(item["url"], timeout=20)
             if r.status_code != 200:
@@ -302,13 +319,22 @@ def run_scraper():
                 banned_pubs.add(pub_name)
                 continue
 
-            if not is_clean_direct_ad(title, html[:12000], item["deal"]):
+            p_m = re.search(r'([\d,]{4,15})\s*ج\.م', html) or re.search(r'EGP\s*([\d,]{4,15})', html)
+            if p_m:
+                price_num = int(p_m.group(1).replace(",", ""))
+                price_str = f"{p_m.group(1)} ج.م"
+            else:
+                price_num = 0
+                price_str = "السعر بالتفاصيل"
+
+            if not is_clean_direct_ad(title, html[:14000], item["deal"], price_num):
                 continue
 
             pub_ads_count = 1
             if pub_id:
                 try:
-                    pr = session.get("https://www.dubizzle.com.eg" + pub_id, timeout=15)
+                    clean_prof = re.sub(r'^/(?:ar|en)/', '/', pub_id)
+                    pr = session.get("https://www.dubizzle.com.eg" + clean_prof, timeout=15)
                     if pr.status_code == 200:
                         counts = [int(x) for x in re.findall(r'(\d+)\s+(?:إعلان|اعلان|إعلانات|اعلانات|ads|Ads|ad|Ad)', pr.text)]
                         profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr.text)))
@@ -321,14 +347,6 @@ def run_scraper():
                     banned_pubs.add(pub_name)
                 continue
 
-            p_m = re.search(r'([\d,]+)\s*ج\.م', html) or re.search(r'EGP\s*([\d,]+)', html)
-            if p_m:
-                price_num = int(p_m.group(1).replace(",", ""))
-                price_str = f"{p_m.group(1)} ج.م"
-            else:
-                price_num = 0
-                price_str = "السعر بالداخل"
-
             area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', html, re.I)
             area_val = int(area_m.group(1)) if area_m else None
 
@@ -336,6 +354,7 @@ def run_scraper():
             rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
             ad_ts = int(time.time())
+            now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             new_verified.append({
                 "ad_id": ad_id,
                 "source": "دوبيزل",
@@ -354,22 +373,31 @@ def run_scraper():
                 "first_seen_ts": ad_ts,
                 "url": item["url"],
                 "verified_v12": True,
-                "scraped_at": datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+                "scraped_at": now_cairo
             })
-            time.sleep(random.uniform(1.2, 2.2))
+            time.sleep(random.uniform(1.0, 1.8))
         except Exception:
             continue
 
     print(f"[Dubizzle] New verified direct owners added: {len(new_verified)}")
     final_ads = [a for a in (new_verified + kept) if a.get("publisher") not in banned_pubs and a.get("ad_id") not in banned_ids]
-    final_ads.sort(key=lambda x: (x.get("fresh_tier", 1), x.get("first_seen_ts", 0)), reverse=True)
+    final_ads.sort(key=lambda x: (x.get("first_seen_ts", 0), x.get("ad_id", 0)), reverse=True)
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
+    run_report = {
+        "last_run_at": now_str,
+        "dub_pages": pages_fetched,
+        "dub_candidates": len(candidates),
+        "dub_inspected": inspected_cnt,
+        "dub_added": len(new_verified)
+    }
+
     out = {
         "updated_at": now_str,
         "total": len(final_ads),
+        "last_run_report": run_report,
         "ads": final_ads,
-        "checked_ids": list(checked_ids)[-12000:],
+        "checked_ids": list(checked_ids)[-6000:],
         "extra_checked_ids": raw_data.get("extra_checked_ids", []),
         "banned_publishers": list(banned_pubs),
         "banned_ad_ids": list(banned_ids),
