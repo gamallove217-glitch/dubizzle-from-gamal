@@ -1,3 +1,9 @@
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://3b5256edded0be9600bd289dcf4b66c6@o4512424824799232.ingest.de.sentry.io/4512425074425936",
+    traces_sample_rate=1.0,
+)
 import json, re, time, random, os
 from datetime import datetime, timezone, timedelta
 from curl_cffi import requests
