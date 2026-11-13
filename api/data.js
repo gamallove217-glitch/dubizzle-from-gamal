@@ -42,6 +42,10 @@ function parseCookies(cookieHeader) {
 }
 
 export default async function handler(req, res) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     const cookies = parseCookies(req.headers.cookie);
     const sessionToken = cookies.vip_session;
@@ -55,7 +59,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "جلسة غير صالحة، أعد تسجيل الدخول" });
     }
 
-    const currentDevice = String(req.headers["x-device-id"] || payload.deviceId || "default_dev").slice(0, 120);
+    const currentDevice = String(req.headers["x-device-id"] || payload.deviceId || "").trim().slice(0, 120);
     const db = initFirebase();
     const subDoc = await db.collection("subscriptions").doc(payload.code).get();
 
@@ -68,7 +72,7 @@ export default async function handler(req, res) {
 
     if (sub.status === "banned") {
       return res.status(403).json({
-        error: "تم إيقاف الكود بسبب مشاركة الحساب على أكثر من جهازين."
+        error: "هذا الكود موقوف من قبل الإدارة."
       });
     }
 
@@ -76,65 +80,19 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "انتهت صلاحية الاشتراك" });
     }
 
-    let boundDevices = Array.isArray(sub.boundDevices) ? sub.boundDevices : [];
-    const maxDevices = sub.maxDevices || 2;
+    const boundDevices = Array.isArray(sub.boundDevices) ? sub.boundDevices : [];
+    const primaryDevice = boundDevices[0] || sub.boundHw || null;
 
-    if (boundDevices.length === 0) {
-      boundDevices = [currentDevice];
-      await subDoc.ref.update({ boundDevices });
-    } else if (!boundDevices.includes(currentDevice)) {
-      if (boundDevices.length < maxDevices) {
-        boundDevices.push(currentDevice);
-        await subDoc.ref.update({ boundDevices });
-      } else {
-        await subDoc.ref.update({
-          status: "banned",
-          bannedAt: now,
-          banReason: `مشاركة الكود مع جهاز إضافي غير مصرح به`
-        });
-        res.setHeader("Set-Cookie", "vip_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
-        return res.status(403).json({
-          error: "تم حظر الاشتراك نهائيا! تم رصد فتح الحساب من جهاز ثالث غير مصرح به."
-        });
-      }
-    }
-
-    if (req.method === "POST") {
-      const { action, adId, publisher } = req.body || {};
-      if (action === "report_broker" && adId) {
-        const repRef = db.collection("broker_reports").doc(String(adId));
-        const repSnap = await repRef.get();
-        let reporters = repSnap.exists ? (repSnap.data().reporters || []) : [];
-        if (!reporters.includes(payload.code)) {
-          reporters.push(payload.code);
-          await repRef.set({
-            adId: Number(adId),
-            publisher: publisher || "",
-            reporters: reporters,
-            updatedAt: now
-          }, { merge: true });
-        }
-        if (reporters.length >= 2) {
-          await db.collection("banned_ads").doc(String(adId)).set({
-            adId: Number(adId),
-            publisher: publisher || "",
-            bannedAt: now,
-            reason: "بلاغات متكررة من المشتركين (سمسار)"
-          });
-          if (publisher && publisher !== "مالك") {
-            await db.collection("banned_publishers").doc(publisher).set({
-              publisher: publisher,
-              bannedAt: now
-            });
-          }
-          await fetch("https://ntfy.sh/gamal_vip_ban_9941_sec", {
-            method: "POST",
-            body: `BAN_AD:${adId}|${publisher || ""}`
-          }).catch(() => {});
-        }
-        return res.status(200).json({ ok: true, count: reporters.length });
-      }
-      return res.status(400).json({ error: "طلب غير معروف" });
+    if (!primaryDevice) {
+      await subDoc.ref.update({
+        boundDevices: [currentDevice],
+        boundHw: currentDevice
+      });
+    } else if (primaryDevice !== currentDevice) {
+      res.setHeader("Set-Cookie", "vip_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
+      return res.status(403).json({
+        error: "هذا الكود مقفول على جهاز آخر بالفعل ولا يمكن فتحه على هذا الجهاز."
+      });
     }
 
     let adsData = { ads: [] };
