@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-11-13 04:24 AM",
+  "updated_at": "2026-11-13 05:07 PM",
   "total": 45,
   "last_run_report": {
-    "last_run_at": "2026-11-13 04:24 AM",
-    "dub_pages": 7,
+    "last_run_at": "2026-11-13 05:07 PM",
+    "dub_pages": 40,
     "dub_candidates": 0,
     "dub_inspected": 0,
     "dub_added": 0,
@@ -27,13 +27,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • حديث (السوق المفتوح)] لو بتدور على استثمار ذكي أو مكان تعيش فيه بمستوى مختلف، وفي نفس الوقت تكون قريب من أهم المناطق والمحاور في شرق القاهرة، يبقى لازم تعرف أكتر عن المشروع ده في التجمع السادس! إحنا بنتكلم عن كومباوند على مساحة حوالي 14 فدان، في موقع استراتيجي بين أهم المحاور، طريق العين السخنة والطريق الدائري الأوسطي، وكمان الجديدة وراك، يعني إنت قريب من القاهرة الجديدة و ، وسهل تتحرك لأي مكان من غير ما تضيع وقتك في المشاوير. والأهم إنك مش بتشتري مجرد وحدة سكنية، إنت بتختار أسلوب حياة متكامل! المشروع معمول بفكر الـ Smart Living، يعني كومباوند سمارت بالكامل، بداية من الـ Smart Gate و",
       "url": "https://eg.opensooq.com/ar/search/289747572",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T20:51:45.964054+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889582982,
@@ -50,13 +51,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • حديث (السوق المفتوح)] للبيع شقة 140م – التجمع الخامس – إمتداد قطاع الأندلس – كمبوند التجاريين ريزيدنس– أمام دار مصر الأندلس – دور أرضى مرتفع – بحرى شرقى –ريشبسن 2 قطعة – 3 غرف مقفولين – تراس- 2 حمام – حديقة خاصة 40 م – نصف تشطيب- فيرفورجيه لجميع الشبابيك والبلكونات – حصة بالجراج – شامل وديعة صيانة – دخلة الغاز – شبكة التليفون الأرضى – تسليم فورى شاهد المزيد",
       "url": "https://eg.opensooq.com/ar/search/289582982",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T23:01:20.707149+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889551978,
@@ -73,13 +75,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • 03-11-2026] للبيع شقة فاخرة في الياسمين 4 فيو مباشر ومفتوح على حديقة تشطيب سوبر لوكس جاهزة للسكن الفوري",
       "url": "https://eg.opensooq.com/ar/search/289551978",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-07T18:22:16.042168+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889526108,
@@ -96,13 +99,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • 02-11-2026] من المالك مباشر ة شقة للبيع تشطيب سوبر لوكس التجمع الاول الياسمين ( 1 )مساحه 206 متر الدور الاول دبل فيو الفيلا على شارع رئيسى محور انور السادات مكونة من 4 غرف منهم غرفة نوم كبيرة ماستر بحمام به جاكوزى وغرفتين نوم شباب والاخرى ليفينج بالاضافة الى حمام للضيوف وحمام اخر لخدمه الغرف رسيبشن 3 قطع ارضيات بورسلين كما يوجد مطبخ خشب سعر البيع شامل المطبخ واجهة امامى بحرى وخلفى ويوجد شبابيك حديد على الواجهه وباب الشقة للحماية حصة فى الارض ممكن البدل بشقة اخرى نفس المواصفات فى البنفسج فيلات",
       "url": "https://eg.opensooq.com/ar/search/289526108",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-07T17:36:26.546270+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889182366,
@@ -119,13 +123,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • حديث (السوق المفتوح)] دوبلكس 300 شرق الأكاديمية التجمع الخامس فيو جاردن بمدخل خاص100م من المالك موقع مميز: - دقائق من شارع التسعين، طريق السويس، والطريق الدائري - خطوات من كايرو فيستيفال سيتي و خاصة L-Shape ممتازة فيو جاردن تفاصيل الدوبلكس : الارضي المرتفع سوبر لوكس - 3 غرف نوم - 2 حمام - مطبخ - ريسبشن قطعتين - بلكونه - الارضي المنخفض - نصف تشطيب - 3غرف - حمام - ريسبشن قطعتين - ريسبشن واسع بإطلالة بانورامية على الجاردن -بسعر 15مليون للاستفسار اضغط لإظهار رقم الهاتف 2011088387XX اضغط لإظهار رقم الهاتف 2012730764XX شاهد المزيد",
       "url": "https://eg.opensooq.com/ar/search/289182366",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-10T19:17:32.515053+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889180522,
@@ -142,13 +147,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • حديث (السوق المفتوح)] شقة متشطبة بالكامل للبيع في التجمع الخامس بكمبنود سكني كامل الخدمات 4 مليون و 500 ألف بالقرب من AUC تفاصيل الشقة: • مساحة 145 م • عدد الغرف 3 غرف نوم • عدد الحمامات 2 • بلكونة بإطلالة مفتوحة • الدور الأول • متشطبة بالكامل شقة في مجتمع سكني متكامل و موقع هاديء و آمن و قريب جداً من الطرق و المحاور الرئيسية و الخدامات : • دقايق من المحاور الرئيسية • سهل الوصول لكافة المدارس و الجامعات. • دقايق من الجامعة الأمريكية AUC • دقايق من مطار القاهرة الدولي كمبوند راقي و هادئ مناسب للسكن و الاستثمار مميز : • أمن و حراسة 24 ساعة • مساحات خضراء • مناطق و خدمات تجارية و ترفيهية • جراجات • بيئة سكنية راقية شق",
       "url": "https://eg.opensooq.com/ar/search/289180522",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-10T19:17:06.661726+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 889110172,
@@ -165,13 +171,14 @@
       "seller_name": "مالك العقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[السوق المفتوح • حديث (السوق المفتوح)] شقه للبيع جاهزه للسكن استلام فورري في التجمع الخامس 90 Avenue (معاه جاردن خاص 61متر ) متشطب بالكامل Full finished على شارع التسعين امام الجامعه الامريكيه مطلوب [ 3,800,000 ] الف فقط متاح خصم على الكاش 25% متبقي تساهيل سنوات طويلة للمعاينه وفديو الشقه ابعتلي وتساب لإظهار رقم الهاتف 2011179787XX اضغط لإظهار رقم الهاتف 2011179787XX call شاهد المزيد",
       "url": "https://eg.opensooq.com/ar/search/289110172",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T21:54:53.629824+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707396653,
@@ -188,13 +195,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 8 نوفمبر 2026] 🏡 شقة للإيجار – دور أرضى بمدخل خاص و جنينه الحي الخامس التجمع الخامس فرصة مميزة للسكن في موقع حيوي ومميز، بجوار جميع الخدمات. ✨ تفاصيل الشقة: المساحة:140 متر الدور: أرضي بمدخل خاص حديقة خاصة (جنينة) 3 غرف نوم 2 حمام مطبخ كبير تشطيب ألترا سوبر لوكس مدخل خاص يوفر الخصوصية والراحة 📍 الموقع: الحي الخامس – التجمع الخامس، بجوار الخدمات. 💰 المطلوب: 25,000 جنيه شهريًا",
       "url": "https://aqarmap.com.eg/ar/listing/7396653-for-rent-cairo-new-cairo-compounds-royal-tulip/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T19:35:53.195788+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707379188,
@@ -211,13 +219,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 31 أكتوبر 2026] ",
       "url": "https://aqarmap.com.eg/ar/listing/7379188-for-sale-cairo-new-cairo-gharb-el-golf-alaa-elsaadany-st/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T18:54:48.262048+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707376185,
@@ -234,13 +243,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 31 أكتوبر 2026] � الموقع: التجمع الثالث – إسكان الشباب – المحلية الثانية – المنطقة الأولى 📐 المساحة: 70 متر مربع 🏢 الدور: أول علوي 🛏️ التقسيم: غرفتين وصالة 🔌 المرافق: عداد كهرباء، عداد مياه، وعداد غاز 🏡 التشطيب: متوسط 📍 الموقع قريب من مستشفى القاهرة الجديدة",
       "url": "https://aqarmap.com.eg/ar/listing/7376185-for-sale-cairo-new-cairo-third-settlement-second-neighborhood/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T21:31:58.361781+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707354519,
@@ -257,13 +267,14 @@
       "seller_name": "cairo aqar",
       "account_id": "name:cairo aqar",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 23 أكتوبر 2026] ",
       "url": "https://aqarmap.com.eg/ar/listing/7354519-for-sale-cairo-new-cairo-third-settlement-sakan-masr/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T21:31:52.585837+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707351218,
@@ -280,13 +291,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 25 أكتوبر 2026] شقة 150 متر للإيجار من المالك مباشرة في اللوتس الشمالية، المنطقة الأولى، التجمع الخامس. المكان هادي وقريب من كل الخدمات والطرق الرئيسية في التجمع، وبيسهل عليك توصل لأي مكان بسرعة. الشقة مناسبة لأي حد بيدور على مكان مريح وفي منطقة معروفة في القاهرة الجديدة. المساحة: 150 متر الموقع: اللوتس الشمالية، المنطقة الأولى – التجمع الخامس الإيجار: 20,000 جنيه من المالك مباشرة لو محتاج تعرف تفاصيل أكتر أو عايز تشوف الشقة، كلم المالك ممنوع الوسطاء.",
       "url": "https://aqarmap.com.eg/ar/listing/7351218-for-rent-cairo-new-cairo-el-lotus-lotus-north-lmntq-lwl-llwts-lshmly/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T19:36:49.399395+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707350157,
@@ -303,13 +315,14 @@
       "seller_name": "Future square",
       "account_id": "name:future square",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 19 أكتوبر 2026] ",
       "url": "https://aqarmap.com.eg/ar/listing/7350157-for-rent-cairo-new-cairo-first-settlement-mhwr-mstfy-kml/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-09T01:29:21.874071+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707332834,
@@ -326,13 +339,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 11 أكتوبر 2026] شقة متشطبة لوكس للبيع من المالك مباشرة في قلب التجمع الأول، علي محور السادات مباشرة المساحة 75 متر مربع، موجودة في الدور الارضي، وبتتكون من: ريسبشن قطعتين 2 غرفة نوم مطبخ حمام حمام واحد تشطيب لوكس سنة البناء 2000 المكان هادي وقريب من كل الخدمات والطرق الرئيسية، وبيوفرلك كل اللي محتاجه لحياة عملية ومريحة في القاهرة الجديدة. السعر: 2,000,000 جنيه للتواصل والمعاينة، كلم المالك مباشرة.",
       "url": "https://aqarmap.com.eg/ar/listing/7332834-for-sale-cairo-new-cairo-first-settlement-neighbourhood-9-qnswa-el-ghory-st/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T20:50:58.268414+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707320195,
@@ -349,13 +363,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 26 أكتوبر 2026] عيادة متشطبة سوبر لوكس للبيع من المالك مباشرة في الياسمين 5 على محور أحمد شوقي في التجمع الخامس، القاهرة الجديدة. المساحة 41 متر، والعيادة موجودة في الدور التاني من عمارة 3 أدوار. التقسيمة عملية وبتضم: غرفتين حمام واحد تشطيب سوبر لوكس بيدّي إحساس بالراحة والعصرية المكان مناسب لأي دكتور أو أخصائي عايز يفتح عيادة في منطقة هادية وقريبة من الطرق الرئيسية والخدمات في الياسمين 5. الاستلام سنة 2028 السعر كاش: 2,931,500 جنيه للتواصل مع المالك لأي استفسار أو تفاصيل إضافية. 01119780852",
       "url": "https://aqarmap.com.eg/ar/listing/7320195-for-sale-cairo-new-cairo-el-yassamin-el-yasmeen-5-ahmed-shawqii-axis/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-09T00:17:57.984003+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707236209,
@@ -372,13 +387,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 18 أكتوبر 2026] ",
       "url": "https://aqarmap.com.eg/ar/listing/7236209-for-sale-cairo-new-cairo-compounds-palm-hills-kattameya/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T19:18:26.899666+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707153383,
@@ -395,13 +411,14 @@
       "seller_name": "مالك عقار",
       "account_id": "",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 18 أكتوبر 2026] فرصة بيزمنت بحديقة خاصة المساحة 215 متر في المجاورة 11 12، التجمع الأول، القاهرة الجديدة. الشقة من المالك مباشرة. متصالح و معاه نموذج 10 مواصفات الشقة: المساحة الاجمالية 215 متر 3 غرف نوم و2 حمام تشطيب سوبر لوكس في منطقة هادية وقريبة من الخدمات والطرق الرئيسية في التجمع المكان مناسب جداً لأي أسرة عايزة تعيش في شقة بحديقة خاصة في موقع مميز بالقاهرة الجديدة. للاستفسار أو المعاينة، التواصل على رقم",
       "url": "https://aqarmap.com.eg/ar/listing/7153383-for-sale-cairo-new-cairo-first-settlement-neighborhood-12-ismael-yassin-st/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T20:51:03.815485+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 707128669,
@@ -418,13 +435,14 @@
       "seller_name": "عنه Horizon",
       "account_id": "name:عنه horizon",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[عقارماب • 17 أكتوبر 2026] ",
       "url": "https://aqarmap.com.eg/ar/listing/7128669-for-rent-cairo-new-cairo-compounds-wzwn-ltby-ktlyst-llttwyr/",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T22:19:35.412206+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209473912,
@@ -441,13 +459,14 @@
       "seller_name": "Aya Mahmoud Ghonam",
       "account_id": "d4aeaca1-1084-47dd-beac-3fced04efedf",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 43 دقائق] شقه مميزه للبيع في كمباوند النخيل التجمع الاول امام اكاديمية الشرطه فيو جاردن (بحري) و مش مجروحه تاني بلكونه نص تشطيب مساحتها 209 متر 3 غرف نوم منهم واحده ماستر و 3 حمامات و مطبخ كبييير أوي و ريسيبشن ( 3 ) و اتنين بلكونه و ليها حصه في الجراچ الخاص بالفيلا للمعاينه التواصل:(عرض رقم الهاتف) الاتجاهات والمؤشرات",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%85%D9%85%D9%8A%D8%B2%D9%87-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81-%D9%83%D9%85%D8%A8%D8%A7%D9%88%D9%86%D8%AF-%D8%A7%D9%84%D9%86%D8%AE%D9%8A%D9%84-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%A7%D9%88%D9%84-ID209473912.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-12T16:05:02.877083+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209473785,
@@ -464,13 +483,14 @@
       "seller_name": "Aya Ashraf",
       "account_id": "90fe597f-570f-47aa-b205-f4c559355c7d",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 15 دقائق] شقة للبيع في كمبوند المصراوية موقع مميز بالقرب من شارع التسعين والخدمات الرئيسية.",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D9%83%D9%85%D8%A8%D9%88%D9%86%D8%AF-%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D8%A7%D9%88%D9%8A%D8%A9-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209473785.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-12T16:05:59.880413+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209471376,
@@ -487,13 +507,14 @@
       "seller_name": "B.Eskander",
       "account_id": "66f788b0-5f18-424b-b1bc-7f47b100d3d7",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 3 ساعات] شقة 285 م2 بجاردينيا هايتس 3 , الدور الثانى بالكامل وعلى بعد خطوات من محور محمد نجيب ونادى Life sport club , العمارة ساكنة بالكامل وبها اسانسير, مدخل فندقى , عداد كهرباء ومياه ,شرفات واجهتها مفتوحة , عدد ثلاث غرف نوم و اثنين حمام ومطبخ كبير وريسبشن ثلاث قطع ( يمكن تقسيمها شقتين للاستثمار )",
       "url": "https://www.dubizzle.com.eg/ad/%D9%81%D8%B1%D8%B5%D8%A9-%D9%84%D9%84%D8%AC%D8%A7%D8%AF%D9%8A%D9%86-%D9%81%D9%82%D8%B7-%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1-%D8%A7%D9%88-%D8%A7%D9%84%D8%B3%D9%83%D9%86-%D8%B4%D9%82%D8%A9-285-%D9%85-%D8%A8%D8%AC%D8%A7%D8%B1%D8%AF%D9%8A%D9%86%D9%8A%D8%A7-%D9%87%D8%A7%D9%8A%D8%AA%D8%B3-3-ID209471376.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-12T11:26:24.534877+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209469356,
@@ -510,13 +531,14 @@
       "seller_name": "Dr Y. Mohamed",
       "account_id": "742035a8-0cef-4b4a-82fd-274c6128c65f",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 ساعات] للبيع فقط للمشتري وبدون وسيط شقة 181م دور 4 بالمصعد شخصي خاصي بشقتين فقط عمارة 4 ادوار فقط، إجمالي 10 شقق 3 غرف نوم 3 بلكونة 2 حمام اطلالة بحري من جهة وقبلي من جهة اخري (double face) بها عدادات كهرباء نظام قديم، غاز وتليفون أرضي بالنت فيبر الشقة تشطيب شخصي اول ساكن بعد التشطيب شاملة وديعة صيانة ومستندات ملكية بدون أي توكيلات للتفاصيل التواصل مع المالك وبدون أي وسيط واتس اب (عرض رقم الهاتف)",
       "url": "https://www.dubizzle.com.eg/ad/%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%A8%D8%AD%D9%8A-%D9%85%D8%B5%D8%B1%D8%A7%D9%88%D9%8A%D8%A9-%D8%AA%D8%AC%D9%85%D8%B9-%D8%AE%D8%A7%D9%85%D8%B3-%D9%A1%D9%A8%D9%A1%D9%85-%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8-%D8%AC%D8%AF%D9%8A%D8%AF-%D8%A7%D9%84%D8%AA%D8%B1%D8%A7%D8%B3%D9%88%D8%A8%D8%B1-%D9%84%D9%88%D9%83%D8%B3-ID209469356.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-12T01:15:52.050314+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209461766,
@@ -533,13 +555,14 @@
       "seller_name": "Ahmed Khaled",
       "account_id": "a92fb5bd-6257-4236-8284-086312a2554f",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 1 ساعة] شقه 100 م للايجار كامله التشطيب بالتجمع الثالث المحليه الخامسه بجوار مسجد السويدي و ميجا مول",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A8%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AB%D8%A7%D9%84%D8%AB-ID209461766.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-11T11:29:10.622945+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209461395,
@@ -556,13 +579,14 @@
       "seller_name": "Mohamed Elmarakby",
       "account_id": "e8c12889-10c1-4ad6-88bf-afca99689368",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 ساعات] شقة 150م2 للبيع بالنرجس عمارات امام مدرسة و مسجد و دقائق مشيا من مول اوزون الطبي. غرفتين - حمام - صالة 3 قطع - بلكونة - مطبخ راكب شامل البوتجاز و الفرن غاز طبيعي للتواصل: (عرض رقم الهاتف) واتساب فقط: (عرض رقم الهاتف)",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%A1%D9%A5%D9%A0%D9%85-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A8%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-ID209461395.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-12T03:13:01.449938+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209456018,
@@ -579,13 +603,14 @@
       "seller_name": "Dr. Hesham Safwat",
       "account_id": "8e343eaa-0ac7-43a1-8aee-0bedf7f29b66",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 4 ساعات] شقة للبيع عمارات بنك الإسكان بالتجمع الخامس خلف القطامية جولف",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-%D8%A8%D9%86%D9%83-%D8%A7%D9%84%D8%A5%D8%B3%D9%83%D8%A7%D9%86-%D8%A8%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D8%AE%D9%84%D9%81-%D8%A7%D9%84%D9%82%D8%B7%D8%A7%D9%85%D9%8A%D8%A9-%D8%AC%D9%88%D9%84%D9%81-ID209456018.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-10T19:07:52.840031+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209441606,
@@ -602,13 +627,14 @@
       "seller_name": "Marwan Sherif",
       "account_id": "0031a5c9-da80-4e76-80a4-f471ed54cd27",
       "seller_ads_count": 2,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 1 ساعة] فرصة مميزة للسكن أو الاستثمار من المالك مباشرة في واحد من أهدى وأرقى الكمبوندات في القاهرة الجديدة المساحة: 140 متر الدور الأول 2 بلكونة تشطيب سوبر لوكس بالكامل وجاهزة للسكن الشقة موجودة داخل Stone Residence Compound في موقع مميز جدا بالتجمع الخامس، قريب من الطريق الدائري والمحاور الرئيسية، والكمبوند بيتميز بمساحات خضراء ولاندسكيب واسع، حمامات سباحة وبحيرات، Clubhouse، ملاعب ومناطق للأطفال، سوبر ماركت، وأمن وحراسة 24 ساعة. الميزة الاستثمارية الكبيرة: المنطقة حوالين الكمبوند بتشهد تطوير قوي جدا حاليا، ومن ضمن المشروعات الجديدة القريبة Citystars Park St. ومشروع Do New Cairo بالتعاون مع عمرو دياب واللي بيضم تجربة فندقية وتجارية وترفيهية جديدة. 140 م² الدور الأول 2 بلكونة تشط",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-stone-residence-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209441606.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-11T19:52:27.204767+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209437359,
@@ -625,13 +651,14 @@
       "seller_name": "اسلام",
       "account_id": "210a8fed-577d-4fc8-83d7-4b57fbe80dc7",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 4 ساعات] شقه لقطع للبيع في التجمع الحي الخامس أقي من سعر السوق بمليون جنيه",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%84%D9%82%D8%B7%D8%B9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AD%D9%8A-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D8%A3%D9%82%D9%8A-%D9%85%D9%86-%D8%B3%D8%B9%D8%B1-%D8%A7%D9%84%D8%B3%D9%88%D9%82-%D8%A8%D9%85%D9%84%D9%8A%D9%88%D9%86-%D8%AC%D9%86%D9%8A%D9%87-ID209437359.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T11:39:16.367872+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209436022,
@@ -648,13 +675,14 @@
       "seller_name": "محمود",
       "account_id": "7ee3b29c-f404-4534-8ca3-9a430028b60e",
       "seller_ads_count": 2,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 35 دقائق] استوديو مفروش بالكامل للإيجار الشهري – جنوب الأكاديمية، التجمع الخامس",
       "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D8%B3%D8%AA%D9%88%D8%AF%D9%8A%D9%88-%D9%85%D9%81%D8%B1%D9%88%D8%B4-%D8%A8%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A7%D9%84%D8%B4%D9%87%D8%B1%D9%8A-%D8%AC%D9%86%D9%88%D8%A8-%D8%A7%D9%84%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209436022.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T01:07:06.023147+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209435294,
@@ -671,13 +699,14 @@
       "seller_name": "Abdoooo",
       "account_id": "d1a504b7-5236-40b6-8fc9-0024105da9cf",
       "seller_ads_count": 3,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 1 ساعة] شقة إيجار كمبوند زيزينيا التجمع الخامس الجامعة الأمريكية",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1-%D9%83%D9%85%D8%A8%D9%88%D9%86%D8%AF-%D8%B2%D9%8A%D8%B2%D9%8A%D9%86%D9%8A%D8%A7-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D8%A7%D9%84%D8%AC%D8%A7%D9%85%D8%B9%D8%A9-%D8%A7%D9%84%D8%A3%D9%85%D8%B1%D9%8A%D9%83%D9%8A%D8%A9-ID209435294.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T00:11:24.071690+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209432944,
@@ -694,13 +723,14 @@
       "seller_name": "دكتور حمدي خفاجي",
       "account_id": "ebcf7d01-77c3-4b39-81f8-8083eb4dfe6b",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 5 ساعات] شقة ارضي منخفض علي شارع التسعين مباشرة مساحة داخلية 180m داخلي و130m خارجي (جاردن). رسيبشن 4 قطع، 3 غرف ، 2 حمام، مطبخ واسع ( يحتوي على غرفة للغسالة)، + مساحة تخزين، مفروش او بدون.",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D8%A7%D8%B1%D8%B6%D9%8A-%D9%85%D9%86%D8%AE%D9%81%D8%B6-%D8%B9%D9%84%D9%89-%D8%A7%D9%84%D8%AA%D8%B3%D8%B9%D9%8A%D9%86-%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A-%D9%85%D8%A8%D8%A7%D8%B4%D8%B1%D8%A9-ID209432944.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T00:12:28.752395+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209432587,
@@ -717,13 +747,14 @@
       "seller_name": "Ahmed",
       "account_id": "651984ef-05b0-4639-99d0-4915205b36e0",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 7 ساعات] التجمع الخامس الحي الثالث",
       "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D8%A7%D9%84%D8%AD%D9%8A-%D8%A7%D9%84%D8%AB%D8%A7%D9%84%D8%AB-ID209432587.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T01:07:34.964057+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209429733,
@@ -740,13 +771,14 @@
       "seller_name": "اسامه",
       "account_id": "ac1baa11-cde5-4d89-b7cd-1f2b0fdbfeba",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 10 دقائق] شقه 190 متر . 3 نوم. ريسبشن 3 قطع . 2 حمام. دواليب مطبخ. مجدده حديثا. الدور الثانى بفيلا. الحى الاول المنطقه الرابعه بالقرب من الشويفات والتسعين الجنوبى. للعائلات فقط. الوسطاء يمتنعون. 21 الف شهريا.",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209429733.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-11T12:57:16.790513+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209429732,
@@ -763,13 +795,14 @@
       "seller_name": "Mohamed Ghanima",
       "account_id": "f841144f-e9e7-43db-8231-3795b688b110",
       "seller_ads_count": 2,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 42 دقائق] شقة للبيع بمنطقة النرجس عمارات - التجمع الخامس",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%A8%D9%85%D9%86%D8%B7%D9%82%D8%A9-%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209429732.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T12:51:42.442423+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209425396,
@@ -786,13 +819,14 @@
       "seller_name": "User 3624Rn",
       "account_id": "name:user 3624rn",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 ساعات] Duplex for Sale – El Yasmeen 7 | New Cairo Prime Location – El Yasmeen 7 Duplex 450 SQM + 120 SQM Private Garden Fully Finished – Super Lux Ground Floor + Basement 4 Bedrooms • 1 Master Bedroom and 1 nany room Spacious Reception Fully Equipped Kitchen Guest Bathroom in Basement Private Entrance to the Garden Excellent layout & privacy All windows are with shutters Private parking Asking Price: 18,000,000 Negotiable (عرض رقم الهاتف) (عرض رقم الهاتف)",
       "url": "https://www.dubizzle.com.eg/ad/%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%AF%D9%88%D8%A8%D9%84%D9%8A%D9%83%D9%8A-%D9%81%D9%8A-%D8%A7%D9%84%D9%8A%D8%A7%D8%B3%D9%85%D9%8A%D9%86-%D8%B3%D8%A8%D8%B9%D8%A9-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D9%85%D8%A8%D8%A7%D8%B4%D8%B1%D8%A9-ID209425396.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-09T23:45:46.633301+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209422796,
@@ -808,14 +842,15 @@
       "seller_name": "Nada Gamal",
       "account_id": "76af2cad-5b08-4afa-84dd-1067c98da1ec",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 33 دقائق] شقة للبيع في النرجس عمارات امام مدرسة MASE",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-%D8%A7%D9%85%D8%A7%D9%85-%D9%85%D8%AF%D8%B1%D8%B3%D8%A9-mase-ID209422796.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-06T16:52:40.470348+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209422660,
@@ -832,13 +867,14 @@
       "seller_name": "Mohamed elmasry",
       "account_id": "e5c0e0bb-fc87-44ff-82ea-230aac514530",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 42 دقائق] بأرقي مواقع التجمع الخامس كومباوند المصراوية شقة موقع ممتاااز 195m",
       "url": "https://www.dubizzle.com.eg/ad/%D8%A8%D8%A3%D8%B1%D9%82%D9%8A-%D9%85%D9%88%D8%A7%D9%82%D8%B9-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D9%83%D9%88%D9%85%D8%A8%D8%A7%D9%88%D9%86%D8%AF-%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D8%A7%D9%88%D9%8A%D8%A9-%D8%B4%D9%82%D8%A9-%D9%85%D9%88%D9%82%D8%B9-%D9%85%D9%85%D8%AA%D8%A7%D8%A7%D8%A7%D8%B2-195m-ID209422660.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-07T21:27:07.351470+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209422246,
@@ -854,14 +890,15 @@
       "seller_name": "Mohamed",
       "account_id": "5532313c-1d17-4988-8513-26f3860ea6b5",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 4 دقائق] شقة 260 متر للبيع بالتجمع الاول",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%A2%D9%A6%D9%A0-%D9%85%D8%AA%D8%B1-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D8%A8%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%A7%D9%88%D9%84-ID209422246.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-06T14:23:38.700498+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209417259,
@@ -876,14 +913,15 @@
       "subtype": "شقة",
       "seller_name": "Sherif saleh",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 ساعات] For Rent La Vie Compound AUC Avenue, New Cairo Rent: EGP 23,000/month (Negotiable)",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D9%84%D8%A7%DA%A4%D9%8A-145%D9%85-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D8%A8%D8%AF%D9%88%D9%86-%D9%88%D8%B3%D9%8A%D8%B7-ID209417259.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-05T22:59:38.071629+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209414242,
@@ -899,14 +937,15 @@
       "seller_name": "Sherif Ahmed",
       "account_id": "c10464d2-c074-4e94-bb0e-1f17b2bce57d",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 14 دقائق] الاتجاهات والمؤشرات",
       "url": "https://www.dubizzle.com.eg/ad/54-sqm-retail-shop-for-sale-iv-business-park-new-cairo-ID209414242.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-06T14:23:55.893334+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209396889,
@@ -921,14 +960,15 @@
       "subtype": "شقة",
       "seller_name": "ضياء",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 4 ساعات] شقة سكنية مميزة دور متكرر كمبوند لاميزون الاندلس التجمع الخامس نصف تشطيب كمبوند صغير وهادئ وراقي وجدة جراج لاند اسكيب امن 24 ساعة الشقة كاملة المرافق كهرباء مياه غاز تليفون الكمبوند خاص بمستشاري قضايا الدولة بالقاهرة",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D8%B3%D9%83%D9%86%D9%8A%D8%A9-%D9%83%D9%85%D8%A8%D9%88%D9%86%D8%AF-%D9%84%D8%A7%D9%85%D9%8A%D8%B2%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D9%86%D8%AF%D9%84%D8%B3-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-ID209396889.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-05T18:00:06.875330+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209375862,
@@ -943,14 +983,15 @@
       "subtype": "شقة",
       "seller_name": "عمر",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 16 دقائق] شقه 210 متر ب اميز موقع في التجمع الاول خطوات ل و محور نجيب وشارع التسعين و المنوريل فيلات البنفسج 11 الدور التالت متشطبه الترا لوكس فيو رائع و بحري من المالك وصاحب الأرض مباشره اسانسير و انتركم و جهات حجر هاشمه عدادات غاز و كهرباء و خزان مياه جاهزه للسكن مطلوب 7,500,000 قابل للتفاوض",
       "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%84%D8%A8%D9%86%D9%81%D8%B3%D8%AC-%D9%A1%D9%A1-ID209375862.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-05T16:57:24.494653+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209371578,
@@ -965,14 +1006,15 @@
       "subtype": "شقة",
       "seller_name": "Ahmed Ibrahim",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 أيام] شقه تشطيب سوبر لوكس للبيع في الأندلس الدور الثاني من المالك مباشراً جاهزه للسكن اول مالك لم تسكن من قبل - مساحه : 180 متر - المكان : دقيقتين من التسعين الجنوبي - عدد غرف النوم : 3 (منهم غرفه ماستر بحمام و دريسنج) - عدد الحمام : 2 - ريسبشن كبير - تاسيس بمواصفات خاصه كهرباء و سباكه + عداد مياه و كهرباء - جبسن بورد بليد - اسنسير - حصه في الارض",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D9%87-%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8-%D8%B3%D9%88%D8%A8%D8%B1-%D9%84%D9%88%D9%83%D8%B3-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D9%8A-%D8%A7%D9%84%D8%A3%D9%86%D8%AF%D9%84%D8%B3-%D8%AF%D9%82%D9%8A%D9%82%D8%AA%D9%8A%D9%86-%D9%85%D9%86-%D8%A7%D9%84%D8%AA%D8%B3%D8%B9%D9%8A%D9%86-%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A-ID209371578.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-06T00:22:39.289600+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209270450,
@@ -988,14 +1030,15 @@
       "seller_name": "User 4Nz0HA",
       "account_id": "59f10cc6-46be-45bb-8e88-386b1532ae0a",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 3 أيام] دوبليكس للبيع فالنرجس امام فندق الدوسيت",
       "url": "https://www.dubizzle.com.eg/ad/%D8%AF%D9%88%D8%A8%D9%84%D9%8A%D9%83%D8%B3-%D9%84%D9%84%D8%A8%D9%8A%D8%B9-%D9%81%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%A7%D9%85%D8%A7%D9%85-%D9%81%D9%86%D8%AF%D9%82-%D8%A7%D9%84%D8%AF%D9%88%D8%B3%D9%8A%D8%AA-ID209270450.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-06T17:25:11.571008+02:00",
       "source": "دوبيزل",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 209153163,
@@ -1012,13 +1055,14 @@
       "seller_name": "Al Taher Hassan",
       "account_id": "1182608b-54b7-41f1-866a-7012d1b1940f",
       "seller_ads_count": 1,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 1 ساعة] شقة من المالك مباشرة بدون عمولات بسعر حرق لسرعة البيع علي الشارع الريسي امام مسجد فاطمة الشربتلي مباشرة الدور الاخير تصالح تلاتة نوم ريسشبن كبير تشطيب حديث اتنين حمام للتواصل ممنوع تواصل الوسطاء واتس اب (عرض رقم الهاتف) (عرض رقم الهاتف) ((عرض رقم الهاتف) ((عرض رقم الهاتف) ((عرض رقم الهاتف)(عرض رقم الهاتف) (عرض رقم الهاتف) ((عرض رقم الهاتف) ((عرض رقم الهاتف) ((عرض رقم الهاتف)",
       "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%85%D8%A7%D9%85-%D9%85%D8%B3%D8%AC%D8%AF-%D9%81%D8%A7%D8%B7%D9%85%D8%A9-%D8%A7%D9%84%D8%B4%D8%B1%D8%A8%D8%AA%D9%84%D9%8A-%D8%A7%D9%84%D9%86%D8%B1%D8%AC%D8%B3-%D8%B9%D9%85%D8%A7%D8%B1%D8%A7%D8%AA-ID209153163.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-11T19:52:33.396475+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     },
     {
       "ad_id": 208049206,
@@ -1035,17 +1079,83 @@
       "seller_name": "User 2v28NN",
       "account_id": "051fbb91-680c-4e4e-ac27-91d105b8f93a",
       "seller_ads_count": 2,
-      "fresh_tier": 3,
+      "fresh_tier": 2,
       "description": "[منذ 2 ساعات] شقة للايجار المفروش في التجمع الخامس - من المالك - المستثمرين الجنوبيه",
       "url": "https://www.dubizzle.com.eg/ad/%D8%B4%D9%82%D8%A9-%D9%84%D9%84%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%A7%D9%84%D9%85%D9%81%D8%B1%D9%88%D8%B4-%D9%81%D9%8A-%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3-%D9%85%D9%86-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%83-%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%AB%D9%85%D8%B1%D9%8A%D9%86-%D8%A7%D9%84%D8%AC%D9%86%D9%88%D8%A8%D9%8A%D9%87-ID208049206.html",
       "today_verified": true,
       "verified_v12": true,
       "scraped_at": "2026-11-08T14:17:11.287809+02:00",
-      "first_seen_ts": 1794532599
+      "first_seen_ts": 1794532599,
+      "desc_verified_v2": true
     }
   ],
-  "checked_ids": [],
-  "extra_checked_ids": [],
+  "checked_ids": [
+    707320195,
+    889582982,
+    209461766,
+    209432587,
+    209153163,
+    707350157,
+    209471376,
+    209456018,
+    209461395,
+    707354519,
+    209396889,
+    889110172,
+    889182366,
+    209435294,
+    209422246,
+    209417259,
+    209469356,
+    707396653,
+    209437359,
+    707351218,
+    209270450,
+    208049206,
+    707376185,
+    209371578,
+    209422660,
+    209441606,
+    209422796,
+    889526108,
+    707128669,
+    707332834,
+    209414242,
+    209429732,
+    209429733,
+    707153383,
+    889551978,
+    889180522,
+    209432944,
+    707236209,
+    889747572,
+    707379188,
+    209436022,
+    209425396,
+    209473912,
+    209473785,
+    209375862
+  ],
+  "extra_checked_ids": [
+    889110172,
+    707332834,
+    707320195,
+    889582982,
+    707153383,
+    889551978,
+    889180522,
+    707396653,
+    707350157,
+    707236209,
+    707351218,
+    889747572,
+    707379188,
+    707354519,
+    707376185,
+    889526108,
+    707128669,
+    889182366
+  ],
   "banned_publishers": [],
   "banned_ad_ids": [],
   "telegram_config": {},
