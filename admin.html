@@ -3,125 +3,201 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة تحكم المدير | رادار مصيدة الملاك VIP</title>
+  <title>لوحة القيادة والإدارة | رادار مصيدة الملاك VIP</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #070a12;
-      --card: #111827;
-      --border: #1f2937;
-      --gold: #f59e0b;
-      --emerald: #10b981;
-      --danger: #ef4444;
-      --blue: #3b82f6;
-      --text: #f9fafb;
-      --muted: #9ca3af;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+    body {
+      background-color: #060911;
+      background-image:
+        radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
+        radial-gradient(at 90% 20%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
+      color: #f8fafc;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
 
     #authGate {
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
     }
     .gate-box {
-      background: var(--card); border: 1px solid var(--border);
-      padding: 32px; border-radius: 18px; width: 100%; max-width: 400px; text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      background: linear-gradient(180deg, #131b2e 0%, #0b0f19 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 38px 30px; border-radius: 22px; width: 100%; max-width: 420px; text-align: center;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75);
     }
-    .gate-box h2 { color: var(--gold); margin-bottom: 8px; font-weight: 900; }
-    .gate-box p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .gate-box h2 { color: #fbbf24; margin-bottom: 8px; font-weight: 900; font-size: 24px; }
+    .gate-box p { color: #94a3b8; font-size: 13px; margin-bottom: 22px; }
 
     #adminPanel { display: none; }
     header {
-      background: var(--card); border-bottom: 1px solid var(--border);
-      padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 18px 28px; position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
     }
-    header h1 { font-size: 20px; font-weight: 900; color: var(--gold); }
-    .container { max-width: 1320px; margin: 28px auto; padding: 0 16px; display: grid; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 15px;
+    }
+    header h1 { font-size: 20px; font-weight: 900; color: #fbbf24; }
+    .container { max-width: 1400px; margin: 28px auto; padding: 0 18px; display: grid; gap: 24px; }
 
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;
     }
     .stat-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px 20px; display: flex; flex-direction: column; gap: 4px;
+      background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
+      border: 1px solid #1e293b; border-radius: 16px;
+      padding: 18px 22px; display: flex; flex-direction: column; gap: 4px;
     }
-    .stat-card .lbl { font-size: 12px; color: var(--muted); font-weight: 700; }
-    .stat-card .val { font-size: 24px; font-weight: 900; color: var(--gold); }
-    .stat-card .sub { font-size: 11px; color: var(--emerald); font-weight: 700; }
+    .stat-card .lbl { font-size: 12px; color: #94a3b8; font-weight: 700; }
+    .stat-card .val { font-size: 26px; font-weight: 900; color: #fbbf24; }
+    .stat-card .sub { font-size: 11.5px; color: #34d399; font-weight: 700; }
 
     .box {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 22px;
+      background: rgba(17, 24, 39, 0.92); border: 1px solid #1e293b;
+      border-radius: 20px; padding: 24px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
     }
-    .box h3 { font-size: 17px; font-weight: 800; margin-bottom: 16px; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+    .box h3 {
+      font-size: 18px; font-weight: 900; margin-bottom: 18px; color: #fbbf24;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
 
     .form-row {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end;
     }
     .input {
-      width: 100%; padding: 11px 14px; border-radius: 10px;
-      border: 1px solid var(--border); background: #090d16; color: #fff;
-      font-size: 14px; outline: none;
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid #1e293b; background: #060911; color: #fff;
+      font-size: 14px; font-weight: 700; outline: none; transition: 0.2s;
     }
-    .input:focus { border-color: var(--gold); }
+    .input:focus { border-color: #f59e0b; }
     .btn {
-      padding: 11px 20px; border-radius: 10px; border: none;
-      font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s;
+      padding: 12px 20px; border-radius: 12px; border: none;
+      font-size: 14px; font-weight: 900; cursor: pointer; transition: 0.2s;
     }
-    .btn-gold { background: var(--gold); color: #000; }
-    .btn-emerald { background: var(--emerald); color: #000; }
-    .btn-danger { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); }
-    .btn-success { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.4); }
-    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+    .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
+    .btn-emerald { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #060911; }
+    .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-success { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .btn-sm { padding: 7px 13px; font-size: 12px; border-radius: 9px; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: right; }
-    th { color: var(--muted); font-weight: 700; background: rgba(255,255,255,0.02); }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+    th, td { padding: 13px 10px; border-bottom: 1px solid #1e293b; text-align: right; }
+    th { color: #94a3b8; font-weight: 800; background: rgba(255, 255, 255, 0.02); }
     .code-pill {
       font-family: monospace; font-size: 15px; font-weight: 900;
-      color: var(--gold); background: rgba(245,158,11,0.12);
-      padding: 4px 10px; border-radius: 6px; letter-spacing: 1px;
+      color: #fbbf24; background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 12px; border-radius: 8px; letter-spacing: 1px;
     }
-    .status-active { color: var(--emerald); font-weight: 800; }
-    .status-unused { color: var(--blue); font-weight: 800; }
-    .status-banned { color: var(--danger); font-weight: 800; }
-    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-active { color: #34d399; font-weight: 800; }
+    .status-unused { color: #60a5fa; font-weight: 800; }
+    .status-banned { color: #f87171; font-weight: 800; }
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .filters-bar {
+      background: #0b101e; border: 1px solid #1e293b;
+      border-radius: 16px; padding: 16px; margin-bottom: 22px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
+    .filter-control {
+      background: #060911; border: 1px solid #1e293b; color: #f8fafc;
+      padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none;
+    }
+    .filter-control:focus { border-color: #f59e0b; }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;
+    }
+    .card {
+      background: linear-gradient(165deg, #131c31 0%, #0b101e 100%);
+      border: 1px solid #1e293b; border-radius: 18px;
+      padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: 0.25s; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+    }
+    .card:hover { border-color: rgba(245, 158, 11, 0.55); transform: translateY(-3px); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; flex-wrap: wrap; }
+    .badges-wrap { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 7px;
+      background: rgba(255, 255, 255, 0.06); color: #e2e8f0;
+    }
+    .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
+    .tag.src-aq { background: rgba(59, 130, 246, 0.14); color: #93c5fd; }
+    .tag.src-os { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; }
+    .time-badge { font-size: 11px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 9px; border-radius: 7px; }
+    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; line-height: 1.5; color: #fff; }
+    .price-box {
+      background: rgba(6, 9, 17, 0.65); border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 11px; padding: 9px 13px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .price-lbl { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
+    .card-price { font-size: 19px; font-weight: 900; color: #fbbf24; }
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 16px; background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 11px; padding: 11px;
+      font-size: 12px; color: #94a3b8;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-item span { font-size: 10.5px; color: #64748b; font-weight: 700; }
+    .meta-item b { color: #f1f5f9; font-size: 12.5px; font-weight: 800; }
+    .card-actions { display: flex; gap: 8px; margin-top: auto; }
+    .btn-card {
+      flex: 1; text-align: center; padding: 11px; border-radius: 10px;
+      font-size: 13px; font-weight: 900; text-decoration: none; cursor: pointer; border: none;
+    }
+    .btn-card.primary { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
+    .btn-card.ban { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
   </style>
 </head>
 <body>
 
   <div id="authGate">
     <div class="gate-box">
-      <h2>بوابة المدير السرية</h2>
-      <p>أدخل كلمة مرور الإدارة للتحكم في الاشتراكات والرادار</p>
-      <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
-      <button class="btn btn-gold" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة التحكم</button>
+      <h2>بوابة القيادة السرية</h2>
+      <p>أدخل كلمة مرور المدير للتحكم الكامل في الاشتراكات والرادار</p>
+      <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;font-size:18px;letter-spacing:2px;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
+      <button class="btn btn-gold" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة القيادة</button>
       <div id="authErr" style="color:#f87171;font-size:13px;font-weight:700;margin-top:12px;display:none;"></div>
     </div>
   </div>
 
   <div id="adminPanel">
     <header>
-      <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
+      <div class="brand">
+        <div class="brand-logo">VIP</div>
+        <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
+      </div>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-gold btn-sm" onclick="refreshAll()">تحديث البيانات الآن</button>
-        <a href="/" target="_blank" class="btn btn-sm" style="background:#1f2937;color:#fff;text-decoration:none;">فتح واجهة المشتركين</a>
+        <a href="/" target="_blank" class="btn btn-sm" style="background:#1e293b;color:#fff;text-decoration:none;">فتح واجهة السماسرة</a>
       </div>
     </header>
 
     <div class="container">
       <div class="stats-grid">
         <div class="stat-card">
-          <span class="lbl">إجمالي عقارات الملاك بالموقع</span>
-          <span class="val" id="stTotalAds">-</span>
+          <span class="lbl">إجمالي إعلانات الملاك الحية</span>
+          <span class="val" id="stTotalAds">0</span>
           <span class="sub" id="stLastUpdate">آخر تحديث: -</span>
         </div>
         <div class="stat-card">
-          <span class="lbl">توزيع المنصات الحية</span>
+          <span class="lbl">توزيع المنصات العقارية</span>
           <span class="val" id="stPlatforms" style="font-size:16px;margin-top:6px;">-</span>
-          <span class="sub">ملاك مباشرين فقط</span>
+          <span class="sub">ملاك مباشرين بدون تقسيط أو بيت وطن</span>
         </div>
         <div class="stat-card">
           <span class="lbl">إجمالي أكواد المشتركين</span>
@@ -131,30 +207,30 @@
       </div>
 
       <div class="box">
-        <h3>توليد كود اشتراك جديد لسمسار (جهاز واحد فقط)</h3>
+        <h3>توليد كود اشتراك VIP جديد لسمسار (جهاز واحد فقط)</h3>
         <div class="form-row">
           <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">اسم السمسار أو المكتب</label>
+            <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">اسم السمسار أو الشركة</label>
             <input type="text" id="newClientName" class="input" placeholder="مثال: أستاذ أحمد" />
           </div>
           <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">رقم الموبايل أو واتساب</label>
+            <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">رقم الموبايل أو واتساب</label>
             <input type="text" id="newClientPhone" class="input" placeholder="010XXXXXXXX" />
           </div>
           <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">مدة الاشتراك (بالأيام)</label>
+            <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">مدة الاشتراك (بالأيام)</label>
             <input type="number" id="newDuration" class="input" value="30" />
           </div>
           <button class="btn btn-gold" onclick="createNewCode()">توليد كود VIP الآن</button>
         </div>
-        <div id="generatedCodeBox" style="margin-top:16px;display:none;padding:14px;background:rgba(16,185,129,0.12);border:1px solid var(--emerald);border-radius:12px;">
+        <div id="generatedCodeBox" style="margin-top:16px;display:none;padding:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;border-radius:12px;">
           تم توليد الكود بنجاح: <span class="code-pill" id="newCodeText"></span>
           <button class="btn btn-sm btn-gold" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
         </div>
       </div>
 
       <div class="box">
-        <h3>إدارة الاشتراكات والأجهزة المربوطة</h3>
+        <h3>إدارة المشتركين والأجهزة المربوطة</h3>
         <div style="overflow-x:auto;">
           <table>
             <thead>
@@ -164,7 +240,7 @@
                 <th>الحالة</th>
                 <th>تاريخ الانتهاء</th>
                 <th>الجهاز المربوط</th>
-                <th>إجراءات</th>
+                <th>إجراءات التحكم</th>
               </tr>
             </thead>
             <tbody id="subsTableBody"></tbody>
@@ -176,11 +252,11 @@
         <h3>إعدادات إشعارات تليجرام السرية (للمدير فقط)</h3>
         <div class="form-row">
           <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Telegram Bot Token</label>
+            <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">Telegram Bot Token</label>
             <input type="text" id="tgBotToken" class="input" placeholder="123456789:ABCdef..." />
           </div>
           <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Admin Chat ID</label>
+            <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">Admin Chat ID</label>
             <input type="text" id="tgChatId" class="input" placeholder="مثال: 987654321" />
           </div>
           <button class="btn btn-emerald" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
@@ -188,28 +264,67 @@
       </div>
 
       <div class="box">
-        <h3>معاينة أحدث الإعلانات وحظر السماسرة الفوري</h3>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>المنصة</th>
-                <th>العنوان</th>
-                <th>المنطقة</th>
-                <th>السعر</th>
-                <th>الناشر</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody id="adsPreviewBody"></tbody>
-          </table>
+        <h3>
+          <span>جميع إعلانات الرادار الحية (نفس عرض السماسرة + تحكم الحظر الفوري)</span>
+          <span style="font-size:14px;color:#34d399;">المعروض حاليا: <b id="adminShownCount">0</b> إعلان</span>
+        </h3>
+
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label>بحث بالعنوان أو المنطقة أو الناشر</label>
+            <input type="text" id="admSearch" class="filter-control" placeholder="ابحث هنا..." oninput="renderAdminCards()" />
+          </div>
+          <div class="filter-group">
+            <label>نوع المعاملة</label>
+            <select id="admDeal" class="filter-control" onchange="renderAdminCards()">
+              <option value="ALL">كل المعاملات</option>
+              <option value="تمليك">تمليك كاش فقط</option>
+              <option value="إيجار">إيجار مباشر فقط</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>نوع العقار</label>
+            <select id="admCat" class="filter-control" onchange="renderAdminCards()">
+              <option value="ALL">كل العقارات</option>
+              <option value="شقق">شقق ودوبلكس</option>
+              <option value="فلل">فلل وتاون وتوين</option>
+              <option value="تجاري">تجاري وإداري وطبي</option>
+              <option value="أراضي">أراضي ومباني</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>المنطقة</label>
+            <select id="admZone" class="filter-control" onchange="renderAdminCards()">
+              <option value="ALL">كل المناطق</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>المنصة</label>
+            <select id="admSource" class="filter-control" onchange="renderAdminCards()">
+              <option value="ALL">كل المنصات</option>
+              <option value="دوبيزل">دوبيزل</option>
+              <option value="عقارماب">عقارماب</option>
+              <option value="السوق المفتوح">السوق المفتوح</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>الترتيب</label>
+            <select id="admSort" class="filter-control" onchange="renderAdminCards()">
+              <option value="NEWEST">الأحدث إضافة للرادار أولا</option>
+              <option value="PRICE_ASC">السعر: الأقل أولا</option>
+              <option value="PRICE_DESC">السعر: الأعلى أولا</option>
+            </select>
+          </div>
         </div>
+
+        <div class="grid" id="adminAdsGrid"></div>
       </div>
     </div>
   </div>
 
   <script>
     let savedAdminPass = "";
+    let adminAllAds = [];
     const MASTER_HASH = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
 
     async function sha256Hex(str) {
@@ -242,13 +357,13 @@
 
       const ok = await loadCodes();
       btn.disabled = false;
-      btn.textContent = "دخول للوحة التحكم";
+      btn.textContent = "دخول للوحة القيادة";
 
       if (ok) {
         document.getElementById("authGate").style.display = "none";
         document.getElementById("adminPanel").style.display = "block";
       } else {
-        err.textContent = "فشل التحقق من الخادم، تأكد من تحديث ملف api/admin.js";
+        err.textContent = "فشل الاتصال بالخادم";
         err.style.display = "block";
       }
     }
@@ -258,7 +373,7 @@
     }
 
     async function apiAdmin(bodyObj) {
-      const res = await fetch("/api/admin", {
+      return await fetch("/api/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -266,7 +381,22 @@
         },
         body: JSON.stringify(bodyObj)
       });
-      return res;
+    }
+
+    function formatAddedTime(ad) {
+      if (ad.first_seen_ts) {
+        const diffSec = Math.max(0, Math.floor(Date.now() / 1000) - Number(ad.first_seen_ts));
+        if (diffSec < 3600) return `أضيف منذ ${Math.max(1, Math.floor(diffSec / 60))} دقيقة`;
+        if (diffSec < 86400) return `أضيف منذ ${Math.floor(diffSec / 3600)} ساعة`;
+        return `أضيف منذ ${Math.floor(diffSec / 86400)} يوم`;
+      }
+      return ad.age || "حديث";
+    }
+
+    function getSourceBadgeClass(src) {
+      if (src === "عقارماب") return "src-aq";
+      if (src === "السوق المفتوح") return "src-os";
+      return "src-dub";
     }
 
     async function loadCodes() {
@@ -279,13 +409,15 @@
         document.getElementById("stTotalSubs").textContent = subs.length;
         document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
 
-        const adsList = data.adsList || [];
-        document.getElementById("stTotalAds").textContent = data.adsCount || adsList.length || 0;
+        const bannedIds = new Set((data.bannedAds || []).map(b => Number(b.adId)));
+        adminAllAds = (data.adsList || []).filter(a => !bannedIds.has(Number(a.ad_id)));
+
+        document.getElementById("stTotalAds").textContent = adminAllAds.length;
         document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
 
-        const dubCnt = adsList.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
-        const aqCnt = adsList.filter(a => a.source === "عقارماب").length;
-        const osCnt = adsList.filter(a => a.source === "السوق المفتوح").length;
+        const dubCnt = adminAllAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
+        const aqCnt = adminAllAds.filter(a => a.source === "عقارماب").length;
+        const osCnt = adminAllAds.filter(a => a.source === "السوق المفتوح").length;
         document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | السوق: ${osCnt}`;
 
         const tbody = document.getElementById("subsTableBody");
@@ -293,7 +425,7 @@
           let stBadge = `<span class="status-unused">غير مفعل</span>`;
           if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
           if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
-          if (s.status === "expired") stBadge = `<span style="color:var(--muted)">منتهي</span>`;
+          if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
 
           const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
           const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
@@ -302,45 +434,105 @@
           return `
             <tr>
               <td><span class="code-pill">${s.code}</span></td>
-              <td><b>${s.clientName || "-"}</b><br><span style="color:var(--muted);font-size:11px">${s.clientPhone || ""}</span></td>
-              <td>${stBadge}${s.banReason ? `<div style="font-size:11px;color:#fca5a5;margin-top:4px">${s.banReason}</div>` : ""}</td>
+              <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
+              <td>${stBadge}</td>
               <td>${expDate}</td>
-              <td style="font-size:11px;color:var(--muted)">
+              <td style="font-size:11.5px;color:#94a3b8">
                 ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
                 IP: ${s.boundIp || "-"}
               </td>
               <td>
                 <div class="action-btns">
                   ${hasLock ? `<button class="btn btn-sm btn-success" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
-                  <button class="btn btn-sm btn-danger" onclick="deleteCode('${s.code}')">حذف</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteCode('${s.code}')">حذف الكود</button>
                 </div>
               </td>
             </tr>
           `;
         }).join("");
 
-        renderAdsPreview(adsList);
+        populateAdminZones();
+        renderAdminCards();
         return true;
       } catch (e) {
         return false;
       }
     }
 
-    function renderAdsPreview(ads) {
-      const tbody = document.getElementById("adsPreviewBody");
-      tbody.innerHTML = (ads || []).slice(0, 50).map(a => {
-        const safePub = (a.publisher || "").replace(/'/g, "\\'");
+    function populateAdminZones() {
+      const sel = document.getElementById("admZone");
+      const current = sel.value;
+      const zones = [...new Set(adminAllAds.map(a => a.zone).filter(Boolean))].sort();
+      sel.innerHTML = `<option value="ALL">كل المناطق (${adminAllAds.length})</option>` +
+        zones.map(z => `<option value="${z}">${z}</option>`).join("");
+      if (zones.includes(current)) sel.value = current;
+    }
+
+    function renderAdminCards() {
+      const q = document.getElementById("admSearch").value.trim().toLowerCase();
+      const deal = document.getElementById("admDeal").value;
+      const cat = document.getElementById("admCat").value;
+      const zone = document.getElementById("admZone").value;
+      const src = document.getElementById("admSource").value;
+      const sort = document.getElementById("admSort").value;
+
+      let list = adminAllAds.filter(a => {
+        if (deal !== "ALL" && a.deal !== deal) return false;
+        if (cat !== "ALL" && a.cat !== cat) return false;
+        if (zone !== "ALL" && a.zone !== zone) return false;
+        if (src !== "ALL" && (a.source || "دوبيزل") !== src) return false;
+        if (q) {
+          const hay = `${a.title || ""} ${a.zone || ""} ${a.publisher || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if (sort === "NEWEST") {
+        list.sort((a, b) => {
+          const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+          if (tsDiff !== 0) return tsDiff;
+          return (b.ad_id || 0) - (a.ad_id || 0);
+        });
+      } else if (sort === "PRICE_ASC") {
+        list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
+      } else if (sort === "PRICE_DESC") {
+        list.sort((a, b) => (b.price_num || 0) - (a.price_num || 0));
+      }
+
+      document.getElementById("adminShownCount").textContent = list.length;
+      const grid = document.getElementById("adminAdsGrid");
+
+      grid.innerHTML = list.map(a => {
+        const srcName = a.source || "دوبيزل";
+        const safePub = (a.publisher || "مالك").replace(/'/g, "\\'");
         return `
-          <tr>
-            <td>${a.source || "دوبيزل"}</td>
-            <td><a href="${a.url}" target="_blank" style="color:#fff;font-weight:700;text-decoration:none;">${a.title}</a></td>
-            <td>${a.zone || "-"}</td>
-            <td style="color:var(--gold);font-weight:800;">${a.price || "-"}</td>
-            <td>${a.publisher || "مالك"} (${a.pub_ads || 1})</td>
-            <td>
-              <button class="btn btn-sm btn-danger" onclick="banAdAndPublisher(${a.ad_id}, '${safePub}')">حظر الناشر</button>
-            </td>
-          </tr>
+          <div class="card" id="adm-card-${a.ad_id}">
+            <div>
+              <div class="card-top">
+                <div class="badges-wrap">
+                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
+                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
+                </div>
+                <span class="time-badge">${formatAddedTime(a)}</span>
+              </div>
+              <div class="card-title">${a.title}</div>
+              <div class="price-box">
+                <span class="price-lbl">السعر المطلوب</span>
+                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
+                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
+                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
+                <div class="meta-item"><span>الناشر</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان الأصلي</a>
+              <button class="btn-card ban" onclick="banAdAndPublisher(${a.ad_id}, '${safePub}')">حظر الإعلان والناشر</button>
+            </div>
+          </div>
         `;
       }).join("");
     }
@@ -380,9 +572,10 @@
     }
 
     async function banAdAndPublisher(adId, publisher) {
-      if (!confirm("حظر هذا الإعلان والناشر نهائيا من الرادار؟")) return;
+      if (!confirm("تأكيد حظر هذا الإعلان وناشره نهائيا من الرادار؟")) return;
+      adminAllAds = adminAllAds.filter(a => Number(a.ad_id) !== Number(adId));
+      renderAdminCards();
       await apiAdmin({ action: "ban_ad", adId, publisher });
-      loadCodes();
     }
 
     async function saveTelegramConfig() {
