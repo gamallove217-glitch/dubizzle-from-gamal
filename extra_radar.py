@@ -45,13 +45,6 @@ EXCLUDED_CITIES = [
     "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المنصورة", "طنطا", "دمياط", "بورسعيد"
 ]
 
-BROKER_WORDS = [
-    "شركة", "شركه", "مكتب", "للعقارات", "للاستثمار", "للتسويق", "للتطوير", "بروكر", "سمسار",
-    "وسيط", "عمولة", "عموله", "أوفر", "اوفر", "تاجر", "استشاري عقاري", "مستشار عقاري",
-    "real estate", "property", "properties", "broker", "agency", "consultancy", "investment",
-    "development", "group", "homes", "house", "capital"
-]
-
 INSTALLMENT_PATTERNS = [
     "تقسيط", "بالتقسيط", "لتقسيط", "أقساط", "اقساط", "باقساط", "بأقساط", "قسط", "مقدم", "بمقدم",
     "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "بدون فوائد",
@@ -141,16 +134,6 @@ def detect_zone(text):
         return "القاهرة الجديدة"
     return None
 
-def is_broker_text(name, text=""):
-    n = normalize_ar(name)
-    for w in BROKER_WORDS:
-        if normalize_ar(w) in n:
-            return True
-    t = normalize_ar(text)
-    if any(p in t for p in ["شركة عقارات", "مكتب عقارات", "للتسويق العقاري", "للاستشارات العقارية", "عمولة المكتب", "عموله المكتب", "متاح لدينا وحدات", "متوفر لدينا شقق"]):
-        return True
-    return False
-
 def compute_tier_from_ts(ts):
     age_sec = int(time.time()) - int(ts)
     if age_sec <= 12 * 3600:
@@ -158,6 +141,29 @@ def compute_tier_from_ts(ts):
     if age_sec <= 36 * 3600:
         return 2
     return 1
+
+# --- دالة الذكاء الاصطناعي للاتصال بخادمك الخاص لفحص عقارماب والسوق المفتوح ---
+def analyze_with_ai(ad_text, source_name):
+    url = "https://gamal216.pythonanywhere.com/analyze"
+    # نرسل 1 كعدد إعلانات لأن هذه المواقع لا تظهر عدد الإعلانات بسهولة، 
+    # فيعتمد الخادم بنسبة 100% على التحليل اللغوي الصارم للنص لاكتشاف السمسار.
+    payload = {
+        "text": ad_text,
+        "active_ads_count": 1 
+    }
+    try:
+        response = std_requests.post(url, json=payload, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            if result.get("status") == "success":
+                analysis = result.get("analysis", "")
+                if "سمسار" in analysis and "مالك حقيقي" not in analysis:
+                    return False # سمسار
+                return True # مالك
+    except Exception as e:
+        print(f"[{source_name} AI Error] {e}")
+        return True # في حالة سقوط الخادم نمرره ليتم فحصه يدويا
+    return False
 
 def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
     try:
@@ -191,8 +197,11 @@ def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
             stats["aq_rejected_installments"] += 1
             return None
 
-        if is_broker_text("", visible_text):
+        # --- الفحص القاطع بالذكاء الاصطناعي ---
+        is_owner = analyze_with_ai(title + " " + visible_text, "Aqarmap")
+        if not is_owner:
             stats["aq_rejected_broker"] += 1
+            print(f"[Aqarmap] Rejected by AI: {title[:30]}")
             return None
 
         area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', visible_text)
@@ -257,8 +266,11 @@ def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
             stats["os_rejected_installments"] += 1
             return None
 
-        if is_broker_text("", visible_text):
+        # --- الفحص القاطع بالذكاء الاصطناعي ---
+        is_owner = analyze_with_ai(title + " " + visible_text, "OpenSooq")
+        if not is_owner:
             stats["os_rejected_broker"] += 1
+            print(f"[OpenSooq] Rejected by AI: {title[:30]}")
             return None
 
         area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', visible_text)
@@ -343,8 +355,8 @@ def send_admin_telegram_reports(data, final_ads, stats):
         f"- السوق المفتوح: {os_total} إعلان\n"
         f"--------------------------------\n"
         f"تفاصيل الفحص في هذه الجولة:\n"
-        f"- عقارماب: فحص ({stats['aq_checked']}) | استبعاد سمسار ({stats['aq_rejected_broker']}) | استبعاد تقسيط/بيت وطن ({stats['aq_rejected_installments']})\n"
-        f"- السوق المفتوح: فحص ({stats['os_checked']}) | استبعاد سمسار ({stats['os_rejected_broker']}) | استبعاد تقسيط/بيت وطن ({stats['os_rejected_installments']})\n"
+        f"- عقارماب: فحص ({stats['aq_checked']}) | استبعاد سمسار ({stats['aq_rejected_broker']}) | استبعاد تقسيط ({stats['aq_rejected_installments']})\n"
+        f"- السوق المفتوح: فحص ({stats['os_checked']}) | استبعاد سمسار ({stats['os_rejected_broker']}) | استبعاد تقسيط ({stats['os_rejected_installments']})\n"
         f"- صافي الملاك الجدد المضافين الآن: {len(new_cards_to_send)} إعلان"
     )
 
@@ -416,21 +428,7 @@ def run_extra_radar():
         if (now_ts - orig_ts) > MAX_AD_AGE_SECONDS:
             continue
 
-        if a.get("source") in ("عقارماب", "السوق المفتوح") and not a.get("desc_verified_v2"):
-            try:
-                r_chk = session.get(a.get("url", ""), timeout=15)
-                if r_chk.status_code == 200:
-                    vis_txt = extract_visible_text(r_chk.text)
-                    if not is_clean_direct_ad(a.get("title", ""), vis_txt, deal_type, p_num):
-                        print(f"[Purged Old Extra Installment Ad] {aid}")
-                        continue
-                a["desc_verified_v2"] = True
-                time.sleep(0.4)
-            except Exception:
-                pass
-        else:
-            a["desc_verified_v2"] = True
-
+        a["desc_verified_v2"] = True
         a.pop("_extra_meta", None)
         a["first_seen_ts"] = orig_ts
         a["fresh_tier"] = compute_tier_from_ts(orig_ts)
