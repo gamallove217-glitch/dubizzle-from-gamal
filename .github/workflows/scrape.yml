@@ -1,24 +1,26 @@
-name: Scrape Hourly
+name: Update Direct Owner Ads
 
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
 
-concurrency:
-  group: radar-scraping
-  cancel-in-progress: true
-
 permissions:
   contents: write
 
+concurrency:
+  group: dubizzle-scraper-group
+  cancel-in-progress: false
+
 jobs:
-  run_radar:
+  scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 25
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,24 +28,29 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml curl_cffi
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Run Dubizzle Scraper
-        run: python scraper.py | tee dubizzle_run.log || true
+        env:
+          PAGES_PER_CATEGORY: "5"
+          MAX_RUNTIME_SECONDS: "600"
+        run: python scraper.py
 
-      - name: Wait 3 minutes to avoid IP Ban
-        run: sleep 180
+      - name: Run Extra Radar (Aqarmap & OpenSooq)
+        run: python extra_radar.py
 
-      - name: Run Aqarmap & OpenSooq
-        run: python extra_radar.py || true
-
-      - name: Commit and Push Data Once
+      - name: Commit and push updated ads
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ads.json
-          if ! git diff --staged --quiet; then
-            git commit -m "Auto-update Radar Data"
+          if git diff --staged --quiet; then
+            echo "No changes in ads.json"
+          else
             git pull --rebase origin main || true
-            git push origin HEAD:main
+            git add ads.json
+            git commit -m "Auto-update direct owner ads" || true
+            git push origin main || true
           fi
