@@ -120,9 +120,9 @@ export default async function handler(req, res) {
     });
 
     filteredAds.sort((a, b) => {
-      const tierDiff = (b.fresh_tier || 1) - (a.fresh_tier || 1);
-      if (tierDiff !== 0) return tierDiff;
-      return (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+      const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+      if (tsDiff !== 0) return tsDiff;
+      return (b.ad_id || 0) - (a.ad_id || 0);
     });
 
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
