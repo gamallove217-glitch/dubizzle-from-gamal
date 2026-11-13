@@ -1,5 +1,4 @@
 import sentry_sdk
-
 sentry_sdk.init(
     dsn="https://3b5256edded0be9600bd289dcf4b66c6@o4512424824799232.ingest.de.sentry.io/4512425074425936",
     traces_sample_rate=1.0,
@@ -66,28 +65,6 @@ EXCLUDED_CITIES = [
     "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المنصورة", "طنطا", "دمياط", "بورسعيد"
 ]
 
-BROKER_WORDS = [
-    "شركة", "شركه", "مكتب", "للعقارات", "للاستثمار", "للتسويق", "للتطوير", "بروكر", "سمسار",
-    "وسيط", "عمولة", "عموله", "أوفر", "اوفر", "تاجر", "استشاري عقاري", "مستشار عقاري",
-    "real estate", "property", "properties", "broker", "agency", "consultancy", "investment",
-    "development", "group", "homes", "house", "capital", "egypt", "new cairo"
-]
-
-INSTALLMENT_PATTERNS = [
-    "تقسيط", "بالتقسيط", "لتقسيط", "أقساط", "اقساط", "باقساط", "بأقساط", "قسط", "مقدم", "بمقدم",
-    "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "بدون فوائد",
-    "ادفع", "تعاقد", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "اوفر برايس", "امكانية التقسيط",
-    "متاح تقسيط", "ويوجد تقسيط", "استلام فوري بمقدم",
-    "down payment", "downpayment", "installment", "installments", "payment plan"
-]
-
-SAFE_CASH_NEGATIONS = [
-    "بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط",
-    "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن",
-    "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط",
-    "مسدد بالكامل", "مسددة بالكامل", "غير متاح تقسيط"
-]
-
 def normalize_ar(text):
     t = (text or "").lower()
     t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
@@ -98,37 +75,6 @@ def extract_visible_text(html):
     desc_matches = re.findall(r'"description"\s*:\s*"([^"]+)"', html)
     tags_stripped = re.sub(r'<[^>]+>', ' ', cleaned)
     return tags_stripped + " " + " ".join(desc_matches)
-
-def parse_scraped_at_ts(s, fallback_ts):
-    if not s or not isinstance(s, str):
-        return fallback_ts
-    for fmt in ("%Y-%m-%d %I:%M %p", "%Y-%m-%d %H:%M"):
-        try:
-            dt = datetime.strptime(s.strip(), fmt).replace(tzinfo=CAIRO_TZ)
-            return int(dt.timestamp())
-        except Exception:
-            pass
-    return fallback_ts
-
-def is_clean_direct_ad(title, desc_text="", deal="تمليك", price_num=0):
-    full_clean = normalize_ar(f"{title} {desc_text}")
-    for bad_loc in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب"]:
-        if bad_loc in full_clean:
-            return False
-
-    if deal == "تمليك":
-        if 0 < price_num < MIN_CASH_SALE_PRICE:
-            return False
-        cleaned_for_check = full_clean
-        for neg in SAFE_CASH_NEGATIONS:
-            cleaned_for_check = cleaned_for_check.replace(normalize_ar(neg), " ")
-        for pat in INSTALLMENT_PATTERNS:
-            p_norm = normalize_ar(pat)
-            if re.search(r'(^|\s|،|\.|/|-|\(|\[|\*)' + re.escape(p_norm) + r'(\s|$|،|\.|/|-|\)|\]|\*)', cleaned_for_check):
-                return False
-        if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه|down)', cleaned_for_check):
-            return False
-    return True
 
 def detect_zone(text):
     t = normalize_ar(text)
@@ -142,16 +88,6 @@ def detect_zone(text):
     if any(k in t for k in ["القاهرة الجديدة", "القاهره الجديده", "تجمع", "new cairo", "settlement"]):
         return "القاهرة الجديدة"
     return None
-
-def is_broker_text(name, text=""):
-    n = normalize_ar(name)
-    for w in BROKER_WORDS:
-        if normalize_ar(w) in n:
-            return True
-    t = normalize_ar(text)
-    if any(p in t for p in ["شركة عقارات", "مكتب عقارات", "للتسويق العقاري", "للاستشارات العقارية", "عمولة المكتب", "عموله المكتب", "متاح لدينا وحدات", "متوفر لدينا شقق"]):
-        return True
-    return False
 
 def parse_age_and_tier(page_text):
     norm_text = normalize_ar(page_text)
@@ -235,6 +171,32 @@ def load_existing():
     except Exception:
         return {}, [], set(), set(), set()
 
+# --- دالة الذكاء الاصطناعي الجديدة للاتصال بخادم PythonAnywhere ---
+def analyze_with_ai(ad_text, active_ads_count):
+    url = "https://gamal216.pythonanywhere.com/analyze"
+    payload = {
+        "text": ad_text,
+        "active_ads_count": active_ads_count
+    }
+    try:
+        # استخدام requests القياسي للاتصال بالـ API
+        import requests as std_requests 
+        response = std_requests.post(url, json=payload, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            if result.get("status") == "success":
+                analysis = result.get("analysis", "")
+                if "سمسار" in analysis and "مالك حقيقي" not in analysis:
+                    return False # سمسار
+                return True # مالك
+    except Exception as e:
+        print(f"[AI Server Error] {e}")
+        # في حالة فشل الخادم لأي سبب، نعتمد على الفلتر الآمن (من 1 لـ 4 إعلانات)
+        if 1 <= active_ads_count <= 4:
+            return True
+        return False
+    return False
+
 def run_scraper():
     start_ts = time.time()
     now_ts = int(start_ts)
@@ -249,6 +211,8 @@ def run_scraper():
 
     kept = []
     seen_ids = set()
+    
+    # تنظيف الإعلانات القديمة والاحتفاظ بالصالحة
     for a in existing_ads:
         aid = a.get("ad_id")
         if not aid:
@@ -258,37 +222,9 @@ def run_scraper():
         if aid in banned_ids or pub in banned_pubs or aid in seen_ids:
             continue
 
-        p_num = a.get("price_num", 0)
-        deal_type = a.get("deal", "تمليك")
-        if not is_clean_direct_ad(a.get("title", ""), "", deal_type, p_num):
-            continue
-        if not detect_zone(a.get("title", "") + " " + a.get("zone", "")):
-            continue
-
-        orig_ts = a.get("first_seen_ts")
-        if not orig_ts:
-            orig_ts = parse_scraped_at_ts(a.get("scraped_at"), now_ts - 86400)
+        orig_ts = a.get("first_seen_ts") or (now_ts - 86400)
         if (now_ts - orig_ts) > MAX_AD_AGE_SECONDS:
             continue
-
-        if a.get("source", "دوبيزل") == "دوبيزل" and not a.get("desc_verified_v2"):
-            if pub == "مالك":
-                continue
-            try:
-                r_chk = session.get(a.get("url", ""), timeout=15)
-                if r_chk.status_code == 200:
-                    vis_txt = extract_visible_text(r_chk.text)
-                    if not is_clean_direct_ad(a.get("title", ""), vis_txt, deal_type, p_num):
-                        print(f"[Purged Old Installment Ad] {aid}")
-                        continue
-                    if is_broker_text(pub, vis_txt) or "/companies/" in r_chk.text:
-                        continue
-                a["desc_verified_v2"] = True
-                time.sleep(0.5)
-            except Exception:
-                pass
-        else:
-            a["desc_verified_v2"] = True
 
         a["first_seen_ts"] = orig_ts
         a["fresh_tier"] = compute_tier_from_ts(orig_ts)
@@ -298,6 +234,7 @@ def run_scraper():
     candidates = []
     pages_fetched = 0
 
+    # مرحلة سحب الروابط
     for page in range(1, PAGES_PER_CATEGORY + 1):
         if time.time() - start_ts > MAX_RUNTIME_SECONDS * 0.40:
             break
@@ -332,6 +269,7 @@ def run_scraper():
     new_verified = []
     inspected_cnt = 0
 
+    # مرحلة الفحص العميق بالذكاء الاصطناعي
     for item in candidates:
         if time.time() - start_ts > MAX_RUNTIME_SECONDS:
             break
@@ -373,10 +311,6 @@ def run_scraper():
                 pub_id = pub_m.group(1)
                 pub_name = pub_m.group(2).strip()
 
-            if pub_name in banned_pubs or is_broker_text(pub_name, visible_text):
-                banned_pubs.add(pub_name)
-                continue
-
             p_m = re.search(r'([\d,]{4,15})\s*ج\.م', html) or re.search(r'EGP\s*([\d,]{4,15})', html)
             if p_m:
                 price_num = int(p_m.group(1).replace(",", ""))
@@ -384,9 +318,6 @@ def run_scraper():
             else:
                 price_num = 0
                 price_str = "السعر بالتفاصيل"
-
-            if not is_clean_direct_ad(title, visible_text, item["deal"], price_num):
-                continue
 
             pub_ads_count = 1
             try:
@@ -399,9 +330,12 @@ def run_scraper():
             except Exception:
                 pub_ads_count = 1
 
-            if pub_ads_count < 1 or pub_ads_count > 4:
-                if pub_name not in ("مالك", "مالك مباشر"):
-                    banned_pubs.add(pub_name)
+            # إرسال البيانات لخادم الذكاء الاصطناعي للفحص القاطع
+            is_direct_owner = analyze_with_ai(title + " " + visible_text, pub_ads_count)
+            
+            if not is_direct_owner:
+                banned_pubs.add(pub_name)
+                print(f"[Rejected by AI] {pub_name} | Ads: {pub_ads_count}")
                 continue
 
             area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', visible_text, re.I)
@@ -433,7 +367,7 @@ def run_scraper():
                 "verified_v12": True,
                 "scraped_at": now_cairo
             })
-            print(f"[+ Dubizzle Owner] {item['deal']} | {zone} | {title[:40]}")
+            print(f"[+ Approved by AI] {item['deal']} | {zone} | {title[:40]}")
             time.sleep(random.uniform(0.9, 1.5))
         except Exception:
             continue
@@ -469,3 +403,4 @@ def run_scraper():
 
 if __name__ == "__main__":
     run_scraper()
+        
