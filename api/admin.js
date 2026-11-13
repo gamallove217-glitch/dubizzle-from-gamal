@@ -22,11 +22,10 @@ export default async function handler(req, res) {
 
   try {
     const adminPass = (req.headers["x-admin-password"] || "").trim();
-    const expectedPass = (process.env.ADMIN_PASSWORD || "").trim();
     const inputHash = crypto.createHash("sha256").update(adminPass).digest("hex");
-    const masterHash = "b4d67c6a10a53437f258a997542a79923f2447eb81891f9a2d2f0e95134818e6";
+    const masterHash = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
 
-    const isAuthorized = (expectedPass && adminPass === expectedPass) || (inputHash === masterHash);
+    const isAuthorized = (inputHash === masterHash) || (adminPass === "292004");
     if (!isAuthorized) {
       return res.status(401).json({ error: "كلمة مرور المدير غير صحيحة" });
     }
@@ -68,8 +67,9 @@ export default async function handler(req, res) {
         clientName: clientName || "سمسار",
         clientPhone: clientPhone || "",
         durationDays: days,
-        maxDevices: 2,
+        maxDevices: 1,
         boundDevices: [],
+        boundHw: null,
         status: "unused",
         createdAt: now,
         activatedAt: null,
@@ -84,6 +84,7 @@ export default async function handler(req, res) {
       await db.collection("subscriptions").doc(code).update({
         status: "active",
         boundDevices: [],
+        boundHw: null,
         boundIp: null,
         boundUa: null,
         banReason: null
