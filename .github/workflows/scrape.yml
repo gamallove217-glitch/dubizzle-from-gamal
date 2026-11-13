@@ -2,7 +2,7 @@ name: Update Direct Owner Ads
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 7,10,13,16,19,22 * * *'
   workflow_dispatch:
 
 permissions:
@@ -34,12 +34,12 @@ jobs:
 
       - name: Run Dubizzle Scraper
         env:
-          PAGES_PER_CATEGORY: "5"
+          PAGES_PER_CATEGORY: "4"
           MAX_RUNTIME_SECONDS: "600"
-        run: python scraper.py
+        run: python -u scraper.py
 
       - name: Run Extra Radar (Aqarmap & OpenSooq)
-        run: python extra_radar.py
+        run: python -u extra_radar.py
 
       - name: Commit and push updated ads
         run: |
