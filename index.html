@@ -3,149 +3,234 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>رادار مصيدة الملاك VIP | القاهرة الجديدة</title>
+  <title>رادار مصيدة الملاك VIP | القاهرة الجديدة والتجمعات</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0f19;
-      --card: #131b2e;
-      --border: #1e293b;
-      --gold: #f59e0b;
-      --emerald: #10b981;
-      --danger: #ef4444;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+    body {
+      background-color: #060911;
+      background-image:
+        radial-gradient(at 15% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
+        radial-gradient(at 85% 20%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
 
     #loginScreen {
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
-      background: radial-gradient(circle at top, #1e293b 0%, #0b0f19 70%);
     }
     .login-box {
-      background: var(--card); border: 1px solid rgba(245,158,11,0.3);
-      border-radius: 20px; padding: 36px 28px; width: 100%; max-width: 440px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center;
+      background: linear-gradient(180deg, rgba(19, 27, 46, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 24px; padding: 42px 32px; width: 100%; max-width: 460px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.75), 0 0 40px rgba(245, 158, 11, 0.08);
+      text-align: center;
     }
     .login-badge {
-      display: inline-block; background: rgba(245,158,11,0.15); color: var(--gold);
-      border: 1px solid rgba(245,158,11,0.4); padding: 4px 14px; border-radius: 99px;
-      font-size: 13px; font-weight: 700; margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245, 158, 11, 0.12); color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4); padding: 6px 18px; border-radius: 99px;
+      font-size: 13px; font-weight: 800; margin-bottom: 18px;
     }
-    .login-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-    .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+    .login-title { font-size: 28px; font-weight: 900; margin-bottom: 10px; color: #fff; letter-spacing: 0.3px; }
+    .login-sub { font-size: 13.5px; color: #94a3b8; margin-bottom: 28px; line-height: 1.7; }
     .code-input {
-      width: 100%; padding: 14px 16px; border-radius: 12px;
-      border: 2px solid var(--border); background: #090d16; color: #fff;
-      font-size: 18px; font-weight: 800; text-align: center; letter-spacing: 2px;
-      margin-bottom: 16px; outline: none; transition: 0.2s;
+      width: 100%; padding: 16px; border-radius: 14px;
+      border: 2px solid #1e293b; background: #060911; color: #fbbf24;
+      font-size: 20px; font-weight: 900; text-align: center; letter-spacing: 3px;
+      margin-bottom: 18px; outline: none; transition: 0.25s;
     }
-    .code-input:focus { border-color: var(--gold); }
+    .code-input:focus { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
     .login-btn {
-      width: 100%; padding: 14px; border-radius: 12px; border: none;
-      background: linear-gradient(135deg, #f59e0b, #d97706); color: #000;
-      font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.2s;
+      width: 100%; padding: 15px; border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911;
+      font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.25s;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
     }
-    .login-btn:hover { opacity: 0.95; transform: translateY(-1px); }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(245, 158, 11, 0.4); }
     .error-msg {
-      margin-top: 16px; padding: 12px; border-radius: 10px;
-      background: rgba(239,68,68,0.15); border: 1px solid var(--danger);
-      color: #fca5a5; font-size: 13px; font-weight: 700; display: none; line-height: 1.6;
+      margin-top: 16px; padding: 14px; border-radius: 12px;
+      background: rgba(239, 68, 68, 0.14); border: 1px solid #ef4444;
+      color: #fca5a5; font-size: 13px; font-weight: 800; display: none; line-height: 1.6;
     }
     .inapp-warning {
       margin-bottom: 18px; padding: 14px; border-radius: 12px;
-      background: rgba(245,158,11,0.15); border: 2px solid var(--gold);
+      background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b;
       color: #fde68a; font-size: 13px; font-weight: 800; display: none; line-height: 1.7;
     }
     .warning-note {
-      margin-top: 20px; font-size: 12px; color: var(--muted);
-      background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; line-height: 1.6;
+      margin-top: 22px; font-size: 12px; color: #94a3b8;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px; border-radius: 12px; line-height: 1.6;
     }
 
-    #appScreen { display: none; padding-bottom: 60px; }
+    #appScreen { display: none; padding-bottom: 70px; }
     header {
-      background: rgba(19,27,46,0.9); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border); padding: 16px 24px;
-      position: sticky; top: 0; z-index: 50;
-      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+      background: rgba(11, 15, 25, 0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding: 18px 28px;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand h1 { font-size: 20px; font-weight: 900; color: var(--gold); }
-    .sub-info { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 16px;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    }
+    .brand-text h1 { font-size: 20px; font-weight: 900; color: #fbbf24; line-height: 1.2; }
+    .brand-text p { font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .sub-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .badge-vip {
-      background: rgba(16,185,129,0.15); color: var(--emerald);
-      border: 1px solid rgba(16,185,129,0.4); padding: 4px 12px; border-radius: 99px; font-weight: 700;
+      background: rgba(16, 185, 129, 0.14); color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35); padding: 6px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px;
     }
-    .container { max-width: 1360px; margin: 24px auto; padding: 0 16px; }
+    .update-pill {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid #1e293b;
+      padding: 6px 14px; border-radius: 99px; font-size: 12px; color: #cbd5e1; font-weight: 700;
+    }
+
+    .container { max-width: 1400px; margin: 28px auto; padding: 0 18px; }
+
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px; margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
+      border: 1px solid #1e293b; border-radius: 16px; padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .kpi-card .k-lbl { font-size: 12px; color: #94a3b8; font-weight: 700; }
+    .kpi-card .k-val { font-size: 26px; font-weight: 900; color: #fbbf24; }
+    .kpi-card .k-sub { font-size: 11.5px; color: #34d399; font-weight: 700; }
+
     .filters-bar {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 16px; margin-bottom: 24px;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;
+      background: rgba(17, 24, 39, 0.9); border: 1px solid #1e293b;
+      border-radius: 18px; padding: 18px; margin-bottom: 26px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 11.5px; color: #94a3b8; font-weight: 700; padding-right: 4px; }
     .filter-control {
-      background: #090d16; border: 1px solid var(--border); color: #fff;
-      padding: 10px 12px; border-radius: 10px; font-size: 14px; outline: none;
+      background: #060911; border: 1px solid #1e293b; color: #f8fafc;
+      padding: 11px 14px; border-radius: 12px; font-size: 13.5px; font-weight: 700; outline: none; transition: 0.2s;
     }
-    .filter-control:focus { border-color: var(--gold); }
-    .stats-row {
-      display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px;
-    }
-    .stat-pill {
-      background: var(--card); border: 1px solid var(--border);
-      padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 700;
-    }
-    .stat-pill span { color: var(--gold); font-weight: 900; margin-right: 6px; }
+    .filter-control:focus { border-color: #f59e0b; }
 
     .grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;
     }
     .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
-      transition: 0.2s; position: relative;
+      background: linear-gradient(165deg, #131c31 0%, #0b101e 100%);
+      border: 1px solid #1e293b; border-radius: 20px;
+      padding: 20px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.25s ease; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     }
-    .card:hover { border-color: rgba(245,158,11,0.5); transform: translateY(-2px); }
-    .card.contacted { opacity: 0.55; border-color: var(--emerald); }
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 6px; flex-wrap: wrap; }
+    .card:hover {
+      border-color: rgba(245, 158, 11, 0.55);
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.08);
+    }
+    .card.contacted {
+      opacity: 0.6; border-color: rgba(16, 185, 129, 0.5);
+      background: linear-gradient(165deg, #0b1919 0%, #070d12 100%);
+    }
+    .card-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; gap: 8px; flex-wrap: wrap;
+    }
+    .badges-wrap { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .tag {
-      font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px;
-      background: rgba(255,255,255,0.06); color: #e2e8f0;
+      font-size: 11.5px; font-weight: 800; padding: 4px 11px; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06); color: #e2e8f0;
     }
-    .tag.sale { background: rgba(245,158,11,0.15); color: var(--gold); }
-    .tag.rent { background: rgba(59,130,246,0.15); color: #60a5fa; }
-    .tag.fresh { background: rgba(16,185,129,0.15); color: var(--emerald); }
-    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; line-height: 1.5; color: #fff; }
-    .card-price { font-size: 20px; font-weight: 900; color: var(--gold); margin-bottom: 12px; }
-    .meta-list { font-size: 13px; color: var(--muted); display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; }
-    .card-actions { display: flex; gap: 8px; margin-top: auto; }
+    .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.28); }
+    .tag.src-aq { background: rgba(59, 130, 246, 0.14); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.28); }
+    .tag.src-os { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.28); }
+    .time-badge {
+      font-size: 11px; font-weight: 800; color: #34d399;
+      background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 8px;
+    }
+
+    .card-title {
+      font-size: 16.5px; font-weight: 800; margin-bottom: 14px;
+      line-height: 1.55; color: #ffffff;
+    }
+    .price-box {
+      background: rgba(6, 9, 17, 0.65); border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .price-lbl { font-size: 12px; color: #94a3b8; font-weight: 700; }
+    .card-price { font-size: 20px; font-weight: 900; color: #fbbf24; }
+
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 18px; background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px;
+      font-size: 12.5px; color: #94a3b8;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-item span { font-size: 11px; color: #64748b; font-weight: 700; }
+    .meta-item b { color: #f1f5f9; font-size: 13px; font-weight: 800; }
+
+    .card-actions { display: flex; gap: 10px; margin-top: auto; }
     .btn-card {
-      flex: 1; text-align: center; padding: 10px; border-radius: 10px;
-      font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; border: none;
+      flex: 1; text-align: center; padding: 12px; border-radius: 12px;
+      font-size: 13.5px; font-weight: 900; text-decoration: none; cursor: pointer;
+      border: none; transition: 0.2s;
     }
-    .btn-card.primary { background: var(--gold); color: #000; }
-    .btn-card.done-btn { background: rgba(16,185,129,0.15); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
+    .btn-card.primary {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+    }
+    .btn-card.primary:hover { opacity: 0.95; transform: translateY(-1px); }
+    .btn-card.done-btn {
+      background: rgba(16, 185, 129, 0.12); color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .btn-card.done-btn.active {
+      background: #10b981; color: #060911;
+    }
+    .empty-state {
+      grid-column: 1 / -1; text-align: center; padding: 60px 20px;
+      background: #111827; border: 1px dashed #334155; border-radius: 20px; color: #94a3b8;
+    }
   </style>
 </head>
 <body>
 
   <div id="loginScreen">
     <div class="login-box">
-      <div class="login-badge">نظام محمي لمشتركي VIP فقط</div>
-      <div class="login-title">رادار مصيدة الملاك</div>
-      <div class="login-sub">إعلانات الملاك المباشرين فقط في القاهرة الجديدة والتجمعات بدون سماسرة وبدون تقسيط</div>
+      <div class="login-badge">
+        <span class="pulse-dot"></span>
+        <span>منصة VIP الحصرية لملاك القاهرة الجديدة</span>
+      </div>
+      <div class="login-title">رادار مصيدة الملاك VIP</div>
+      <div class="login-sub">البوابة الاستثمارية المباشرة لإعلانات الملاك الحقيقيين في التجمعات والقاهرة الجديدة (كاش وإيجار مباشر فقط بدون وسطاء وبدون تقسيط)</div>
 
       <div class="inapp-warning" id="inAppWarning">
         تنبيه هام جدا: أنت تفتح الموقع الآن من داخل متصفح المحادثة المؤقت (واتساب أو فيسبوك).<br>
         اضغط على النقاط الثلاث أعلى الشاشة واختر <b>"فتح في متصفح Chrome أو Safari"</b> قبل إدخال الكود حتى لا يقفل الكود على المتصفح المؤقت!
       </div>
 
-      <input type="text" id="subCodeInput" class="code-input" placeholder="VIP-XXXXXX" autocomplete="off" />
-      <button class="login-btn" id="loginBtn" onclick="activateSubscription()">تفعيل والدخول للرادار</button>
+      <input type="text" id="subCodeInput" class="code-input" placeholder="VIP-XXXXXX" autocomplete="off" onkeydown="if(event.key==='Enter') activateSubscription()" />
+      <button class="login-btn" id="loginBtn" onclick="activateSubscription()">تفعيل الاشتراك والدخول للرادار</button>
       <div class="error-msg" id="loginError"></div>
       <div class="warning-note">
-        تنبيه أمني صارم: كود الاشتراك يقفل تلقائيا على أول جهاز ومتصفح يتم تفعيله عليه فقط، ولا يقبل العمل على أي جهاز آخر.
+        حماية أمنية مشددة: كود الاشتراك مخصص لجهاز واحد فقط ويقفل تلقائيا على أول متصفح يتم تفعيله عليه، ولا يقبل الفتح على أي جهاز آخر.
       </div>
     </div>
   </div>
@@ -153,48 +238,83 @@
   <div id="appScreen">
     <header>
       <div class="brand">
-        <h1>رادار مصيدة الملاك VIP</h1>
+        <div class="brand-logo">VIP</div>
+        <div class="brand-text">
+          <h1>رادار مصيدة الملاك VIP</h1>
+          <p>القاهرة الجديدة والتجمعات | ملاك مباشرين 100%</p>
+        </div>
       </div>
       <div class="sub-info">
-        <span class="badge-vip" id="clientNameBadge">مشترك VIP</span>
-        <span id="updatedAtText" style="color:var(--muted)"></span>
+        <span class="badge-vip"><span class="pulse-dot"></span><span id="clientNameBadge">مشترك VIP</span></span>
+        <span class="update-pill" id="updatedAtText">آخر تحديث: -</span>
       </div>
     </header>
 
     <div class="container">
-      <div class="filters-bar">
-        <input type="text" id="searchInput" class="filter-control" placeholder="بحث بالعنوان أو المنطقة..." oninput="renderCards()" />
-        <select id="dealFilter" class="filter-control" onchange="renderCards()">
-          <option value="ALL">كل المعاملات (بيع وإيجار)</option>
-          <option value="تمليك">تمليك كاش فقط</option>
-          <option value="إيجار">إيجار فقط</option>
-        </select>
-        <select id="catFilter" class="filter-control" onchange="renderCards()">
-          <option value="ALL">كل العقارات</option>
-          <option value="شقق">شقق ودوبلكس</option>
-          <option value="فلل">فلل وتاون وتوين</option>
-          <option value="تجاري">تجاري وإداري وطبي</option>
-          <option value="أراضي">أراضي ومباني</option>
-        </select>
-        <select id="zoneFilter" class="filter-control" onchange="renderCards()">
-          <option value="ALL">كل مناطق التجمع</option>
-        </select>
-        <select id="sourceFilter" class="filter-control" onchange="renderCards()">
-          <option value="ALL">كل المنصات</option>
-          <option value="دوبيزل">دوبيزل</option>
-          <option value="عقارماب">عقارماب</option>
-          <option value="السوق المفتوح">السوق المفتوح</option>
-        </select>
-        <select id="sortFilter" class="filter-control" onchange="renderCards()">
-          <option value="NEWEST">الأحدث أولا</option>
-          <option value="PRICE_ASC">السعر: الأقل أولا</option>
-          <option value="PRICE_DESC">السعر: الأعلى أولا</option>
-        </select>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="k-lbl">إجمالي الملاك المطابقين للفلتر</span>
+          <span class="k-val" id="statShown">0</span>
+          <span class="k-sub">تم التحقق واستبعاد السماسرة والتقسيط</span>
+        </div>
+        <div class="kpi-card">
+          <span class="k-lbl">توزيع المنصات الحية</span>
+          <span class="k-val" id="statSources" style="font-size:17px;margin-top:6px;">-</span>
+          <span class="k-sub">تحديث أوتوماتيكي مستمر</span>
+        </div>
+        <div class="kpi-card">
+          <span class="k-lbl">قائمة المتابعة الشخصية</span>
+          <span class="k-val" id="statContacted">0</span>
+          <span class="k-sub">عقارات قمت بالتواصل معها</span>
+        </div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-pill">إجمالي الملاك المعروضين: <span id="statShown">0</span></div>
-        <div class="stat-pill">تم التواصل معهم: <span id="statContacted">0</span></div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>بحث حر (عنوان أو منطقة)</label>
+          <input type="text" id="searchInput" class="filter-control" placeholder="مثال: اللوتس، النرجس، أرضي..." oninput="renderCards()" />
+        </div>
+        <div class="filter-group">
+          <label>نوع المعاملة</label>
+          <select id="dealFilter" class="filter-control" onchange="renderCards()">
+            <option value="ALL">كل المعاملات (كاش وإيجار)</option>
+            <option value="تمليك">تمليك كاش فقط</option>
+            <option value="إيجار">إيجار مباشر فقط</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>نوع العقار</label>
+          <select id="catFilter" class="filter-control" onchange="renderCards()">
+            <option value="ALL">جميع أنواع العقارات</option>
+            <option value="شقق">شقق ودوبلكس</option>
+            <option value="فلل">فلل وتاون وتوين هاوس</option>
+            <option value="تجاري">تجاري وإداري وطبي</option>
+            <option value="أراضي">أراضي ومباني</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>المنطقة أو الحي</label>
+          <select id="zoneFilter" class="filter-control" onchange="renderCards()">
+            <option value="ALL">كل مناطق القاهرة الجديدة</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>المنصة العقارية</label>
+          <select id="sourceFilter" class="filter-control" onchange="renderCards()">
+            <option value="ALL">كل المنصات (دوبيزل + عقارماب + السوق)</option>
+            <option value="دوبيزل">دوبيزل فقط</option>
+            <option value="عقارماب">عقارماب فقط</option>
+            <option value="السوق المفتوح">السوق المفتوح فقط</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>ترتيب العرض</label>
+          <select id="sortFilter" class="filter-control" onchange="renderCards()">
+            <option value="NEWEST">الأحدث إضافة للرادار أولا</option>
+            <option value="PRICE_ASC">السعر: الأقل أولا</option>
+            <option value="PRICE_DESC">السعر: الأعلى أولا</option>
+          </select>
+        </div>
       </div>
 
       <div class="grid" id="adsGrid"></div>
@@ -227,6 +347,22 @@
       localStorage.setItem("vip_device_id", devId);
       document.cookie = `vip_dev_id=${encodeURIComponent(devId)}; path=/; max-age=31536000; SameSite=Strict; Secure`;
       return devId;
+    }
+
+    function formatAddedTime(ad) {
+      if (ad.first_seen_ts) {
+        const diffSec = Math.max(0, Math.floor(Date.now() / 1000) - Number(ad.first_seen_ts));
+        if (diffSec < 3600) return `أضيف منذ ${Math.max(1, Math.floor(diffSec / 60))} دقيقة`;
+        if (diffSec < 86400) return `أضيف منذ ${Math.floor(diffSec / 3600)} ساعة`;
+        return `أضيف منذ ${Math.floor(diffSec / 86400)} يوم`;
+      }
+      return ad.age || "حديث";
+    }
+
+    function getSourceBadgeClass(src) {
+      if (src === "عقارماب") return "src-aq";
+      if (src === "السوق المفتوح") return "src-os";
+      return "src-dub";
     }
 
     async function activateSubscription() {
@@ -268,7 +404,7 @@
         errBox.style.display = "block";
       } finally {
         btn.disabled = false;
-        btn.textContent = "تفعيل والدخول للرادار";
+        btn.textContent = "تفعيل الاشتراك والدخول للرادار";
       }
     }
 
@@ -295,6 +431,11 @@
         document.getElementById("updatedAtText").textContent = "آخر تحديث: " + (data.updated_at || "-");
 
         allAds = data.ads || [];
+        const dubCnt = allAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
+        const aqCnt = allAds.filter(a => a.source === "عقارماب").length;
+        const osCnt = allAds.filter(a => a.source === "السوق المفتوح").length;
+        document.getElementById("statSources").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | السوق: ${osCnt}`;
+
         populateZones();
         renderCards();
         return true;
@@ -307,7 +448,7 @@
       const sel = document.getElementById("zoneFilter");
       const current = sel.value;
       const zones = [...new Set(allAds.map(a => a.zone).filter(Boolean))].sort();
-      sel.innerHTML = `<option value="ALL">كل مناطق التجمع (${allAds.length})</option>` +
+      sel.innerHTML = `<option value="ALL">كل مناطق القاهرة الجديدة (${allAds.length})</option>` +
         zones.map(z => `<option value="${z}">${z}</option>`).join("");
       if (zones.includes(current)) sel.value = current;
     }
@@ -338,9 +479,9 @@
 
       if (sort === "NEWEST") {
         list.sort((a, b) => {
-          const tDiff = (b.fresh_tier || 1) - (a.fresh_tier || 1);
-          if (tDiff !== 0) return tDiff;
-          return (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+          const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+          if (tsDiff !== 0) return tsDiff;
+          return (b.ad_id || 0) - (a.ad_id || 0);
         });
       } else if (sort === "PRICE_ASC") {
         list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
@@ -352,28 +493,39 @@
       document.getElementById("statContacted").textContent = Object.keys(contactedMap).length;
 
       const grid = document.getElementById("adsGrid");
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state">لا توجد إعلانات مطابقة للفلتر المحدد حاليا. جرب تغيير شروط البحث.</div>`;
+        return;
+      }
+
       grid.innerHTML = list.map(a => {
         const isDone = !!contactedMap[a.ad_id];
+        const srcName = a.source || "دوبيزل";
         return `
           <div class="card ${isDone ? 'contacted' : ''}">
             <div>
               <div class="card-top">
-                <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal || 'تمليك'} | ${a.cat || 'عقار'}</span>
-                <span class="tag">${a.source || 'دوبيزل'}</span>
-                <span class="tag fresh">${a.age || 'حديث'}</span>
+                <div class="badges-wrap">
+                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
+                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
+                </div>
+                <span class="time-badge">${formatAddedTime(a)}</span>
               </div>
               <div class="card-title">${a.title}</div>
-              <div class="card-price">${a.price || 'السعر بالتفاصيل'}</div>
-              <div class="meta-list">
-                <div>المنطقة: <b style="color:#fff">${a.zone || 'القاهرة الجديدة'}</b></div>
-                <div>المساحة: <b style="color:#fff">${a.area ? a.area + ' م²' : '-'}</b></div>
-                <div>الغرف: <b style="color:#fff">${a.rooms || '-'}</b></div>
-                <div>الناشر: <b style="color:#fff">${a.publisher || 'مالك'} (${a.pub_ads || 1})</b></div>
+              <div class="price-box">
+                <span class="price-lbl">السعر المطلوب</span>
+                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
+                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
+                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
+                <div class="meta-item"><span>اسم المالك</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
               </div>
             </div>
             <div class="card-actions">
-              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان</a>
-              <button class="btn-card done-btn" onclick="toggleContacted(${a.ad_id})">
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان الأصلي</a>
+              <button class="btn-card done-btn ${isDone ? 'active' : ''}" onclick="toggleContacted(${a.ad_id})">
                 ${isDone ? 'تم التواصل' : 'تحديد كـ تم'}
               </button>
             </div>
