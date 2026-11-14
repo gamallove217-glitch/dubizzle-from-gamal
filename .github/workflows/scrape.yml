@@ -17,48 +17,55 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Checkout full repository history
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Restore Pre-Sentry Original Files
+      - name: Setup Cloudflare WARP Proxy
         run: |
-          echo "=== COMMITS BEFORE 4284d86 ==="
-          git log 4284d86 -n 5 --oneline
-          git checkout 4284d86~1 -- scraper.py || git checkout 4284d86 -- scraper.py
-          git checkout f783904~1 -- extra_radar.py || true
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add scraper.py extra_radar.py
-          git commit -m "Restore pre-sentry original scraper and extra_radar" || true
-          git push origin main || true
+          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+          sudo apt-get update
+          sudo apt-get install -y cloudflare-warp xvfb
+          warp-cli --accept-tos registration new || warp-cli --accept-tos register || true
+          warp-cli --accept-tos mode proxy || warp-cli --accept-tos set-mode proxy || true
+          warp-cli --accept-tos proxy port 40000 || warp-cli --accept-tos set-proxy-port 40000 || true
+          warp-cli --accept-tos connect || true
+          sleep 4
+          curl -s -x socks5h://127.0.0.1:40000 https://www.cloudflare.com/cdn-cgi/trace | grep -E "ip=|warp=" || true
 
-      - name: Install all dependencies
+      - name: Install Python and Browser Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt || true
-          pip install curl_cffi requests beautifulsoup4 lxml sentry-sdk google-generativeai
+          pip install curl_cffi requests beautifulsoup4 lxml playwright
+          playwright install chromium --with-deps
 
-      - name: Run Original Dubizzle Scraper
-        run: python -u scraper.py || true
+      - name: Run Dubizzle Scraper
+        env:
+          PAGES_PER_CATEGORY: "2"
+          MAX_RUNTIME_SECONDS: "600"
+        run: xvfb-run -a python -u scraper.py
 
-      - name: Run Original Extra Radar
-        run: python -u extra_radar.py || true
+      - name: Run Extra Radar (Aqarmap and OpenSooq and AI Brain)
+        run: xvfb-run -a python -u extra_radar.py
 
       - name: Commit and push updated ads
         if: always()
         run: |
-          git pull --rebase origin main || true
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ads.json
           if git diff --staged --quiet; then
             echo "No changes in ads.json"
           else
+            git pull --rebase origin main || true
+            git add ads.json
             git commit -m "Auto-update direct owner ads" || true
             git push origin main || true
           fi
