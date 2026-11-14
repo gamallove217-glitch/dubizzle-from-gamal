@@ -17,64 +17,44 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Checkout full repository history
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Inspect and Restore Original Engine Automatically
+      - name: Clean Sentry bug from scraper.py
         run: |
-          echo "=== LAST 10 COMMITS ==="
-          git log -n 10 --oneline
-          PREV_S=$(git log -n 2 --format="%H" -- scraper.py | tail -n 1)
-          PREV_E=$(git log -n 2 --format="%H" -- extra_radar.py | tail -n 1)
-          PREV_Y=$(git log -n 6 --format="%H" -- .github/workflows/scrape.yml | tail -n 1)
-          echo "Restoring scraper.py from: $PREV_S"
-          echo "Restoring extra_radar.py from: $PREV_E"
-          git checkout "$PREV_S" -- scraper.py || true
-          git checkout "$PREV_E" -- extra_radar.py || true
-          git show "$PREV_Y":.github/workflows/scrape.yml > old_workflow.txt || true
-          sed -i '/http/d' requirements.txt || true
-          echo "=== CLEANED REQUIREMENTS ==="
-          cat requirements.txt || true
+          python3 -c '
+          with open("scraper.py", "r", encoding="utf-8") as f:
+              lines = f.readlines()
+          cleaned = [l for l in lines if "sentry" not in l.lower()]
+          with open("scraper.py", "w", encoding="utf-8") as f:
+              f.writelines(cleaned)
+          '
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add scraper.py extra_radar.py requirements.txt old_workflow.txt
-          git commit -m "Restore original engine files to main" || true
+          git add scraper.py
+          git commit -m "Remove sentry lines from scraper.py" || true
           git push origin main || true
 
-      - name: Install all original dependencies
+      - name: Install all dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt || true
-          pip install curl_cffi requests beautifulsoup4
-          if grep -qi playwright requirements.txt; then
-            playwright install chromium --with-deps || true
-          fi
+          pip install curl_cffi requests beautifulsoup4 lxml sentry-sdk
 
       - name: Run Original Dubizzle Scraper
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
+          PAGES_PER_CATEGORY: "5"
+          MAX_RUNTIME_SECONDS: "600"
         run: python -u scraper.py || true
 
       - name: Run Original Extra Radar
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python -u extra_radar.py || true
 
       - name: Commit and push updated ads
