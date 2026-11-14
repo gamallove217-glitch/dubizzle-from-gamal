@@ -1,8 +1,10 @@
+import sentry_sdk
+sentry_sdk.init(
+    dsn="https://3b5256edded0be9600bd289dcf4b66c6@o4512424824799232.ingest.de.sentry.io/4512425074425936",
     traces_sample_rate=1.0,
 )
 import json, re, time, random, os
 from datetime import datetime, timezone, timedelta
-import requests as std_requests
 from curl_cffi import requests
 
 CAIRO_TZ = timezone(timedelta(hours=2))
@@ -100,6 +102,7 @@ def parse_age_and_tier(page_text):
             if num <= 5: return (f"منذ {num} أيام", 1, True)
             return (f"منذ {num} أيام", 0, False)
         return ("قديم", 0, False)
+
     m = re.search(r'منذ\s+(\d+|دقيقة|دقيقتين|ساعة|ساعتين|يوم|يومين)\s*(دقيقة|دقائق|ساعة|ساعات|يوم|أيام|ايام|يوما|اسبوع|أسبوع|اشهر|أشهر|شهر)?', norm_text)
     if not m:
         if "اليوم" in norm_text or "منذ لحظات" in norm_text or "الآن" in norm_text:
@@ -107,6 +110,7 @@ def parse_age_and_tier(page_text):
         if "أمس" in norm_text or "امس" in norm_text or "yesterday" in norm_text:
             return ("منذ يوم", 2, True)
         return ("حديث", 2, True)
+
     val_str = m.group(1)
     unit = m.group(2) or ""
     if val_str in ["دقيقة", "دقيقتين"] or "دقيق" in unit:
@@ -129,13 +133,15 @@ def parse_age_and_tier(page_text):
 
 def compute_tier_from_ts(ts):
     age_sec = int(time.time()) - int(ts)
-    if age_sec <= 12 * 3600: return 3
-    if age_sec <= 36 * 3600: return 2
+    if age_sec <= 12 * 3600:
+        return 3
+    if age_sec <= 36 * 3600:
+        return 2
     return 1
 
 def sync_ntfy_bans(banned_pubs, banned_ids):
     try:
-        r = std_requests.get(f"https://ntfy.sh/{NTFY_BAN_TOPIC}/json?poll=1&since=48h", timeout=10)
+        r = requests.get(f"https://ntfy.sh/{NTFY_BAN_TOPIC}/json?poll=1&since=48h", timeout=10)
         if r.status_code == 200:
             for line in r.text.strip().splitlines():
                 if not line: continue
@@ -165,38 +171,30 @@ def load_existing():
     except Exception:
         return {}, [], set(), set(), set()
 
-# --- دالة الذكاء الاصطناعي المحدثة والمحصنة بالكامل ---
-def analyze_with_ai(ad_text, active_ads_count, source_name="Dubizzle"):
+# --- دالة الذكاء الاصطناعي الجديدة للاتصال بخادم PythonAnywhere ---
+def analyze_with_ai(ad_text, active_ads_count):
     url = "https://gamal216.pythonanywhere.com/analyze"
     payload = {
         "text": ad_text,
         "active_ads_count": active_ads_count
     }
     try:
-        response = std_requests.post(url, json=payload, timeout=20)
+        # استخدام requests القياسي للاتصال بالـ API
+        import requests as std_requests 
+        response = std_requests.post(url, json=payload, timeout=15)
         if response.status_code == 200:
             result = response.json()
             if result.get("status") == "success":
                 analysis = result.get("analysis", "")
-                clean_analysis = analysis.replace("*", "").replace("\n", " ").strip()
-                
-                # خوارزمية الفلترة الصارمة بناء على الأسبقية
-                broker_pos = clean_analysis.find("سمسار")
-                owner_pos = clean_analysis.find("مالك حقيقي")
-                
-                if broker_pos != -1 and (owner_pos == -1 or broker_pos < owner_pos):
-                    print(f"[{source_name}] AI Verdict: BROKER -> Rejected.")
-                    return False 
-                elif owner_pos != -1:
-                    print(f"[{source_name}] AI Verdict: OWNER -> Approved.")
-                    return True
-                else:
-                    if active_ads_count > 4: return False
-                    return True
+                if "سمسار" in analysis and "مالك حقيقي" not in analysis:
+                    return False # سمسار
+                return True # مالك
     except Exception as e:
-        print(f"[{source_name} AI Error] {e}")
-        if active_ads_count > 4: return False
-        return True
+        print(f"[AI Server Error] {e}")
+        # في حالة فشل الخادم لأي سبب، نعتمد على الفلتر الآمن (من 1 لـ 4 إعلانات)
+        if 1 <= active_ads_count <= 4:
+            return True
+        return False
     return False
 
 def run_scraper():
@@ -214,16 +212,20 @@ def run_scraper():
     kept = []
     seen_ids = set()
     
+    # تنظيف الإعلانات القديمة والاحتفاظ بالصالحة
     for a in existing_ads:
         aid = a.get("ad_id")
-        if not aid: continue
+        if not aid:
+            continue
         checked_ids.add(aid)
         pub = a.get("publisher", "")
         if aid in banned_ids or pub in banned_pubs or aid in seen_ids:
             continue
+
         orig_ts = a.get("first_seen_ts") or (now_ts - 86400)
         if (now_ts - orig_ts) > MAX_AD_AGE_SECONDS:
             continue
+
         a["first_seen_ts"] = orig_ts
         a["fresh_tier"] = compute_tier_from_ts(orig_ts)
         kept.append(a)
@@ -232,19 +234,23 @@ def run_scraper():
     candidates = []
     pages_fetched = 0
 
+    # مرحلة سحب الروابط
     for page in range(1, PAGES_PER_CATEGORY + 1):
-        if time.time() - start_ts > MAX_RUNTIME_SECONDS * 0.40: break
+        if time.time() - start_ts > MAX_RUNTIME_SECONDS * 0.40:
+            break
         for cat in CATEGORIES:
             url = cat["url"] if page == 1 else f"{cat['url']}?page={page}"
             try:
                 resp = session.get(url, timeout=20)
                 pages_fetched += 1
                 print(f"[Dubizzle] {cat['name']} ({cat['deal']}) p.{page} -> HTTP {resp.status_code}")
-                if resp.status_code != 200: continue
+                if resp.status_code != 200:
+                    continue
                 matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/ar|/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', resp.text)
                 for raw_path, id_str in matches:
                     ad_id = int(id_str)
-                    if ad_id in seen_ids or ad_id in checked_ids or ad_id in banned_ids: continue
+                    if ad_id in seen_ids or ad_id in checked_ids or ad_id in banned_ids:
+                        continue
                     clean_path = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', raw_path)
                     clean_path = re.sub(r'^/(?:ar|en)/', '/', clean_path)
                     candidates.append({
@@ -263,32 +269,41 @@ def run_scraper():
     new_verified = []
     inspected_cnt = 0
 
+    # مرحلة الفحص العميق بالذكاء الاصطناعي
     for item in candidates:
-        if time.time() - start_ts > MAX_RUNTIME_SECONDS: break
+        if time.time() - start_ts > MAX_RUNTIME_SECONDS:
+            break
         ad_id = item["ad_id"]
         checked_ids.add(ad_id)
         inspected_cnt += 1
         try:
             r = session.get(item["url"], timeout=20)
-            if r.status_code != 200: continue
+            if r.status_code != 200:
+                continue
             html = r.text
-            if "/companies/" in html or "featured_agency" in html: continue
+
+            if "/companies/" in html or "featured_agency" in html:
+                continue
 
             t_m = re.search(r'<title>([^<]+)</title>', html)
             title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
-            if not title: continue
+            if not title:
+                continue
 
             visible_text = extract_visible_text(html)
             zone = detect_zone(title + " " + visible_text[:5000])
-            if not zone: continue
+            if not zone:
+                continue
 
             age_label, _, is_recent = parse_age_and_tier(visible_text)
-            if not is_recent: continue
+            if not is_recent:
+                continue
 
             pub_m = re.search(r'"((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
             if not pub_m:
                 pub_m2 = re.search(r'href="((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"', html)
-                if not pub_m2: continue
+                if not pub_m2:
+                    continue
                 pub_id = pub_m2.group(1)
                 name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
                 pub_name = name_m.group(1).strip() if name_m else "مالك مباشر"
@@ -315,16 +330,21 @@ def run_scraper():
             except Exception:
                 pub_ads_count = 1
 
-            is_direct_owner = analyze_with_ai(title + " " + visible_text, pub_ads_count, "Dubizzle")
+            # إرسال البيانات لخادم الذكاء الاصطناعي للفحص القاطع
+            is_direct_owner = analyze_with_ai(title + " " + visible_text, pub_ads_count)
+            
             if not is_direct_owner:
                 banned_pubs.add(pub_name)
+                print(f"[Rejected by AI] {pub_name} | Ads: {pub_ads_count}")
                 continue
 
             area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', visible_text, re.I)
             area_val = int(area_m.group(1)) if area_m else None
+
             rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم|beds|bed|bedrooms)', visible_text, re.I)
             rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
+            ad_ts = int(time.time())
             now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             new_verified.append({
                 "ad_id": ad_id,
@@ -341,16 +361,18 @@ def run_scraper():
                 "pub_ads": pub_ads_count,
                 "age": age_label,
                 "fresh_tier": 3,
-                "first_seen_ts": int(time.time()),
+                "first_seen_ts": ad_ts,
                 "desc_verified_v2": True,
                 "url": item["url"],
                 "verified_v12": True,
                 "scraped_at": now_cairo
             })
+            print(f"[+ Approved by AI] {item['deal']} | {zone} | {title[:40]}")
             time.sleep(random.uniform(0.9, 1.5))
         except Exception:
             continue
 
+    print(f"[Dubizzle] New verified direct owners added: {len(new_verified)}")
     final_ads = [a for a in (new_verified + kept) if a.get("publisher") not in banned_pubs and a.get("ad_id") not in banned_ids]
     final_ads.sort(key=lambda x: (x.get("first_seen_ts", 0), x.get("ad_id", 0)), reverse=True)
 
@@ -362,6 +384,7 @@ def run_scraper():
         "dub_inspected": inspected_cnt,
         "dub_added": len(new_verified)
     }
+
     out = {
         "updated_at": now_str,
         "total": len(final_ads),
@@ -374,9 +397,10 @@ def run_scraper():
         "telegram_config": raw_data.get("telegram_config", {}),
         "telegram_notified_ids": raw_data.get("telegram_notified_ids", [])
     }
+
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     run_scraper()
-                
+        
