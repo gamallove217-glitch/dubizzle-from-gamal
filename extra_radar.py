@@ -537,4 +537,26 @@ def run_extra_radar():
             f"<i>{ai_advice}</i>\n"
             f"إجمالي الإعلانات الحية بالموقع: <b>{len(merged_ads)} إعلان</b>\n"
             f"إيجار: <b>{rent_total}</b> | تمليك كاش: <b>{sale_total}</b>\n"
-            f"دوبيزل: <b>{dub_total}</b> (جديد
+            f"دوبيزل: <b>{dub_total}</b> (جديد بالرن: +{dub_added} من {dub_insp} مفحوص)\n"
+            f"عقارماب: <b>{aq_total}</b> (جديد بالرن: +{aq_added} من {len(aq_candidates)} مرشح)\n"
+            f"السوق المفتوح: <b>{os_total}</b> (جديد بالرن: +{os_added} من {len(os_candidates)} مرشح)"
+        )
+        send_telegram_msg(tok, cid, summary_msg)
+    else:
+        for a in merged_ads[:30]:
+            if a.get("ad_id"):
+                notified_ids.add(a.get("ad_id"))
+
+    data["updated_at"] = now_str
+    data["total"] = len(merged_ads)
+    data["last_run_report"] = run_report
+    data["ads"] = merged_ads
+    data["extra_checked_ids"] = list(extra_checked)[-10000:]
+    data["telegram_config"] = tg_cfg
+    data["telegram_notified_ids"] = list(notified_ids)[-5000:]
+
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+if __name__ == "__main__":
+    run_extra_radar()
