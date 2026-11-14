@@ -17,47 +17,66 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Checkout repository
+      - name: Checkout full repository history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install dependencies directly
+      - name: Inspect and Restore Original Engine
+        run: |
+          echo "=== ORIGINAL REQUIREMENTS ==="
+          git show 1953ca8fa75d52b69593262bf806934bc8d0b66d:requirements.txt || true
+          echo "=== ORIGINAL WORKFLOW ==="
+          git show 1953ca8fa75d52b69593262bf806934bc8d0b66d:.github/workflows/scrape.yml || true
+          git checkout 1953ca8fa75d52b69593262bf806934bc8d0b66d -- scraper.py extra_radar.py requirements.txt
+          sed -i '/http/d' requirements.txt
+          echo "=== CLEANED REQUIREMENTS ==="
+          cat requirements.txt
+
+      - name: Install all original dependencies
         run: |
           pip install --upgrade pip
+          pip install -r requirements.txt
           pip install curl_cffi requests
+          if grep -qi playwright requirements.txt; then
+            playwright install chromium --with-deps || true
+          fi
 
-      - name: Run Dubizzle Scraper (Rent Priority + Self Healing)
+      - name: Run Original Dubizzle Scraper
         env:
-          PAGES_PER_CATEGORY: "4"
-          MAX_RUNTIME_SECONDS: "600"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python -u scraper.py
 
-      - name: Run Extra Radar (Aqarmap & OpenSooq + AI Brain)
+      - name: Run Original Extra Radar
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python -u extra_radar.py
 
-      - name: Commit and push updated ads
+      - name: Commit and push updated files
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add ads.json
+          git add ads.json requirements.txt scraper.py extra_radar.py
           if git diff --staged --quiet; then
-            echo "No changes in ads.json"
+            echo "No changes to commit"
           else
             git pull --rebase origin main || true
-            git add ads.json
-            git commit -m "Auto-update direct owner ads" || true
+            git add ads.json requirements.txt scraper.py extra_radar.py
+            git commit -m "Restore original engine and update direct owner ads" || true
             git push origin main || true
           fi
-
-      - name: Notify AI Server on Failure
-        if: failure()
-        run: |
-          curl -s -X POST "https://gamal216.pythonanywhere.com/monitor" \
-            -H "Content-Type: application/json" \
-            -d '{"total_ads":0,"dub_added":0,"aq_checked":0,"os_checked":0}' || true
