@@ -1,4 +1,4 @@
-import json, re, time, random, os, base64
+import json, re, time, random, os, base64, socket, urllib.parse
 from datetime import datetime, timezone, timedelta
 import requests as std_requests
 from curl_cffi import requests
@@ -6,6 +6,7 @@ from curl_cffi import requests
 CAIRO_TZ = timezone(timedelta(hours=2))
 DATA_FILE = "ads.json"
 TG_CONFIG_TOPIC = "gamal_vip_tg_9941_sec"
+WARP_PROXY = "socks5h://127.0.0.1:40000"
 MAX_AD_AGE_SECONDS = 7 * 86400
 MIN_CASH_SALE_PRICE = 1400000
 
@@ -62,22 +63,128 @@ SAFE_CASH_NEGATIONS = [
 
 AQARMAP_SOURCES = [
     {"cat": "شقق", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
     {"cat": "فلل", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "فلل", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
     {"cat": "تجاري", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "شقق", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "فلل", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
     {"cat": "تجاري", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
     {"cat": "أراضي", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
 ]
 
 OPENSOOQ_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للايجار/شقق-للايجار"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع/شقق-للبيع"},
-    {"cat": "فلل", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للايجار/فلل-قصور-للايجار"},
+    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للإيجار/شقق-للايجار"},
+    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات-للإيجار/شقق-للايجار"},
+    {"cat": "فلل", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للإيجار"},
+    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات-للبيع/شقق-للبيع"},
     {"cat": "فلل", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع/فلل-قصور-للبيع"},
-    {"cat": "تجاري", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للايجار/محلات-وتجاري-للايجار"},
-    {"cat": "تجاري", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع/محلات-وتجاري-للبيع"},
+    {"cat": "تجاري", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع"},
 ]
+
+def is_warp_up():
+    try:
+        with socket.create_connection(("127.0.0.1", 40000), timeout=1):
+            return True
+    except Exception:
+        return False
+
+class SmartFetcher:
+    def __init__(self):
+        self.warp_active = is_warp_up()
+        self.warp_sess = requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY})
+        self.warp_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.google.com/"})
+        self.direct_sess = requests.Session(impersonate="chrome120")
+        self.direct_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.google.com/"})
+        self.pw = None
+        self.browser = None
+        self.context = None
+
+    def _ensure_pw(self):
+        if self.context is not None:
+            return True
+        try:
+            from playwright.sync_api import sync_playwright
+            self.pw = sync_playwright().start()
+            has_display = bool(os.environ.get("DISPLAY"))
+            launch_kwargs = {
+                "headless": (not has_display),
+                "args": ["--disable-blink-features=AutomationControlled", "--no-sandbox", "--disable-dev-shm-usage"]
+            }
+            if self.warp_active:
+                launch_kwargs["proxy"] = {"server": "socks5://127.0.0.1:40000"}
+            self.browser = self.pw.chromium.launch(**launch_kwargs)
+            self.context = self.browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                locale="ar-EG",
+                viewport={"width": 1366, "height": 768}
+            )
+            self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined});")
+            return True
+        except Exception as e:
+            print(f"[PW Init] {e}")
+            return False
+
+    def _is_valid_html(self, html):
+        if not html or len(html) < 1500:
+            return False
+        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html:
+            return False
+        return True
+
+    def get_html(self, raw_url):
+        url = urllib.parse.quote(raw_url, safe=":/?&=#%")
+        statuses = []
+        if self.warp_active:
+            try:
+                r = self.warp_sess.get(url, timeout=18)
+                statuses.append(f"WARP:{r.status_code}")
+                if r.status_code == 200 and self._is_valid_html(r.text):
+                    return r.text, "200 (WARP)"
+            except Exception:
+                statuses.append("WARP:ERR")
+
+        try:
+            r = self.direct_sess.get(url, timeout=18)
+            statuses.append(f"Direct:{r.status_code}")
+            if r.status_code == 200 and self._is_valid_html(r.text):
+                return r.text, "200 (Direct)"
+        except Exception:
+            statuses.append("Direct:ERR")
+
+        if self._ensure_pw():
+            page = None
+            try:
+                page = self.context.new_page()
+                resp = page.goto(url, wait_until="domcontentloaded", timeout=25000)
+                page.wait_for_timeout(3500)
+                html = page.content()
+                code = resp.status if resp else 0
+                page.close()
+                statuses.append(f"PW:{code}")
+                if self._is_valid_html(html):
+                    return html, "200 (Playwright)"
+            except Exception:
+                if page:
+                    try: page.close()
+                    except Exception: pass
+                statuses.append("PW:ERR")
+
+        try:
+            enc = urllib.parse.quote(url, safe="")
+            r = std_requests.get(f"https://api.codetabs.com/v1/proxy?quest={enc}", timeout=20)
+            statuses.append(f"Proxy:{r.status_code}")
+            if r.status_code == 200 and self._is_valid_html(r.text):
+                return r.text, "200 (Proxy)"
+        except Exception:
+            statuses.append("Proxy:ERR")
+
+        return "", " | ".join(statuses)
+
+    def close(self):
+        try:
+            if self.browser: self.browser.close()
+            if self.pw: self.pw.stop()
+        except Exception:
+            pass
 
 def normalize_ar(text):
     t = (text or "").lower()
@@ -89,37 +196,6 @@ def extract_visible_text(html):
     desc_matches = re.findall(r'"description"\s*:\s*"([^"]+)"', html)
     tags_stripped = re.sub(r'<[^>]+>', ' ', cleaned)
     return tags_stripped + " " + " ".join(desc_matches)
-
-def parse_scraped_at_ts(s, fallback_ts):
-    if not s or not isinstance(s, str):
-        return fallback_ts
-    for fmt in ("%Y-%m-%d %I:%M %p", "%Y-%m-%d %H:%M"):
-        try:
-            dt = datetime.strptime(s.strip(), fmt).replace(tzinfo=CAIRO_TZ)
-            return int(dt.timestamp())
-        except Exception:
-            pass
-    return fallback_ts
-
-def is_clean_direct_ad(title, desc_text="", deal="تمليك", price_num=0):
-    full_clean = normalize_ar(f"{title} {desc_text}")
-    for bad_loc in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب"]:
-        if bad_loc in full_clean:
-            return False
-
-    if deal == "تمليك":
-        if 0 < price_num < MIN_CASH_SALE_PRICE:
-            return False
-        cleaned_for_check = full_clean
-        for neg in SAFE_CASH_NEGATIONS:
-            cleaned_for_check = cleaned_for_check.replace(normalize_ar(neg), " ")
-        for pat in INSTALLMENT_PATTERNS:
-            p_norm = normalize_ar(pat)
-            if re.search(r'(^|\s|،|\.|/|-|\(|\[|\*)' + re.escape(p_norm) + r'(\s|$|،|\.|/|-|\)|\]|\*)', cleaned_for_check):
-                return False
-        if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه|down)', cleaned_for_check):
-            return False
-    return True
 
 def detect_zone(text):
     t = normalize_ar(text)
@@ -134,395 +210,339 @@ def detect_zone(text):
         return "القاهرة الجديدة"
     return None
 
-def compute_tier_from_ts(ts):
-    age_sec = int(time.time()) - int(ts)
-    if age_sec <= 12 * 3600:
-        return 3
-    if age_sec <= 36 * 3600:
-        return 2
-    return 1
+def parse_age_and_tier(page_text):
+    norm_text = normalize_ar(page_text)
+    if any(w in norm_text for w in ["اسبوع", "أسبوع", "شهر", "أشهر", "اشهر", "سنة", "سنه"]):
+        return ("قديم", 0, False)
+    m = re.search(r'منذ\s+(\d+)\s*(يوم|أيام|ايام)', norm_text)
+    if m:
+        days = int(m.group(1))
+        if days > 5: return (f"منذ {days} أيام", 0, False)
+        if days <= 1: return ("منذ يوم", 2, True)
+        return (f"منذ {days} أيام", 1, True)
+    if "أمس" in norm_text or "امس" in norm_text or "منذ يوم" in norm_text:
+        return ("منذ يوم", 2, True)
+    return ("حديث", 3, True)
 
-# --- دالة الذكاء الاصطناعي للاتصال بخادمك الخاص لفحص عقارماب والسوق المفتوح ---
-def analyze_with_ai(ad_text, source_name):
+def is_strict_cash_sale(title, visible_text, price_num):
+    full_text = normalize_ar(title + " " + visible_text[:4500])
+    for neg in SAFE_CASH_NEGATIONS:
+        full_text = full_text.replace(normalize_ar(neg), " ")
+    for kw in INSTALLMENT_PATTERNS:
+        kw_norm = normalize_ar(kw)
+        if re.search(r'(^|\s|،|\.|/|-|\(|\*)' + re.escape(kw_norm) + r'(\s|$|،|\.|/|-|\)|\*|:)', full_text):
+            return False
+    if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعة|دفعه|down)', full_text):
+        return False
+    if price_num > 0 and price_num < MIN_CASH_SALE_PRICE:
+        return False
+    return True
+
+def sync_telegram_config(current_cfg):
+    cfg = dict(current_cfg or {})
+    try:
+        r = std_requests.get(f"https://ntfy.sh/{TG_CONFIG_TOPIC}/json?poll=1&since=168h", timeout=10)
+        if r.status_code == 200:
+            for line in r.text.strip().splitlines():
+                if not line: continue
+                msg = json.loads(line).get("message", "")
+                if msg.startswith("TG_CFG:"):
+                    b64_part = msg.replace("TG_CFG:", "").strip()
+                    decoded = json.loads(base64.b64decode(b64_part).decode("utf-8"))
+                    if decoded.get("tok") and decoded.get("cid"):
+                        cfg["tok"] = decoded["tok"].strip()
+                        cfg["cid"] = str(decoded["cid"]).strip()
+    except Exception:
+        pass
+    return cfg
+
+def send_telegram_msg(tok, cid, text_msg):
+    if not tok or not cid:
+        return False
+    try:
+        url = f"https://api.telegram.org/bot{tok}/sendMessage"
+        payload = {
+            "chat_id": cid,
+            "text": text_msg,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": False
+        }
+        r = std_requests.post(url, json=payload, timeout=12)
+        return r.status_code == 200
+    except Exception:
+        return False
+
+def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source):
     url = "https://gamal216.pythonanywhere.com/analyze"
-    # نرسل 1 كعدد إعلانات لأن هذه المواقع لا تظهر عدد الإعلانات بسهولة، 
-    # فيعتمد الخادم بنسبة 100% على التحليل اللغوي الصارم للنص لاكتشاف السمسار.
     payload = {
-        "text": ad_text,
-        "active_ads_count": 1 
+        "text": f"{title} {visible_text[:3500]}",
+        "title": title,
+        "description": visible_text[:3500],
+        "publisher": pub_name,
+        "deal": deal,
+        "cat": cat,
+        "price_num": price_num,
+        "source": source,
+        "active_ads_count": 1
     }
     try:
         response = std_requests.post(url, json=payload, timeout=15)
         if response.status_code == 200:
             result = response.json()
             if result.get("status") == "success":
+                if result.get("decision") == "مرفوض":
+                    return False
                 analysis = result.get("analysis", "")
                 if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False # سمسار
-                return True # مالك
+                    return False
+                return True
     except Exception as e:
-        print(f"[{source_name} AI Error] {e}")
-        return True # في حالة سقوط الخادم نمرره ليتم فحصه يدويا
-    return False
+        print(f"[AI Server Error in Extra Radar] {e}")
+    if deal == "تمليك":
+        return is_strict_cash_sale(title, visible_text, price_num)
+    return True
 
-def parse_aqarmap_ad(session, url, ad_id, cat, deal, stats):
+def monitor_system_with_ai(stats_dict):
+    url = "https://gamal216.pythonanywhere.com/monitor"
     try:
-        r = session.get(url, timeout=18)
-        if r.status_code != 200:
-            return None
-        html = r.text
-        stats["aq_checked"] += 1
-
-        t_m = re.search(r'<title>([^<]+)</title>', html)
-        title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
-        if not title or len(title) < 5:
-            return None
-
-        visible_text = extract_visible_text(html)
-        if any(x in visible_text for x in ["مطور عقاري", "شركة عقارية", "وسيط عقاري", "وكيل عقاري"]):
-            if "المالك" not in visible_text[:4000]:
-                stats["aq_rejected_broker"] += 1
-                return None
-
-        zone = detect_zone(title + " " + visible_text[:5000])
-        if not zone:
-            stats["aq_rejected_zone"] += 1
-            return None
-
-        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
-        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالتفاصيل"
-        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
-
-        if not is_clean_direct_ad(title, visible_text, deal, price_num):
-            stats["aq_rejected_installments"] += 1
-            return None
-
-        # --- الفحص القاطع بالذكاء الاصطناعي ---
-        is_owner = analyze_with_ai(title + " " + visible_text, "Aqarmap")
-        if not is_owner:
-            stats["aq_rejected_broker"] += 1
-            print(f"[Aqarmap] Rejected by AI: {title[:30]}")
-            return None
-
-        area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', visible_text)
-        area_val = int(area_m.group(1)) if area_m else None
-
-        rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', visible_text)
-        rooms_val = int(rooms_m.group(1)) if rooms_m else None
-
-        now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-        return {
-            "ad_id": ad_id,
-            "source": "عقارماب",
-            "title": title,
-            "price": price_str,
-            "price_num": price_num,
-            "zone": zone,
-            "cat": cat,
-            "deal": deal,
-            "area": area_val,
-            "rooms": rooms_val,
-            "publisher": "مالك (عقارماب)",
-            "pub_ads": 1,
-            "age": "اليوم",
-            "fresh_tier": 3,
-            "first_seen_ts": int(time.time()),
-            "desc_verified_v2": True,
-            "url": url,
-            "verified_v12": True,
-            "scraped_at": now_cairo
-        }
-    except Exception:
-        return None
-
-def parse_opensooq_ad(session, url, ad_id, cat, deal, stats):
-    try:
-        r = session.get(url, timeout=18)
-        if r.status_code != 200:
-            return None
-        html = r.text
-        stats["os_checked"] += 1
-
-        t_m = re.search(r'<title>([^<]+)</title>', html)
-        title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
-        if not title or len(title) < 5:
-            return None
-
-        visible_text = extract_visible_text(html)
-        if any(x in visible_text[:6000] for x in ["الوسيط", "مكتب عقاري", "شركة عقارية"]):
-            stats["os_rejected_broker"] += 1
-            return None
-
-        zone = detect_zone(title + " " + visible_text[:5000])
-        if not zone:
-            stats["os_rejected_zone"] += 1
-            return None
-
-        p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html)
-        price_str = f"{p_m.group(1)} ج.م" if p_m else "السعر بالتفاصيل"
-        price_num = int(p_m.group(1).replace(",", "")) if p_m else 0
-
-        if not is_clean_direct_ad(title, visible_text, deal, price_num):
-            stats["os_rejected_installments"] += 1
-            return None
-
-        # --- الفحص القاطع بالذكاء الاصطناعي ---
-        is_owner = analyze_with_ai(title + " " + visible_text, "OpenSooq")
-        if not is_owner:
-            stats["os_rejected_broker"] += 1
-            print(f"[OpenSooq] Rejected by AI: {title[:30]}")
-            return None
-
-        area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2)', visible_text)
-        area_val = int(area_m.group(1)) if area_m else None
-
-        rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', visible_text)
-        rooms_val = int(rooms_m.group(1)) if rooms_m else None
-
-        now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-        return {
-            "ad_id": ad_id,
-            "source": "السوق المفتوح",
-            "title": title,
-            "price": price_str,
-            "price_num": price_num,
-            "zone": zone,
-            "cat": cat,
-            "deal": deal,
-            "area": area_val,
-            "rooms": rooms_val,
-            "publisher": "مالك (السوق المفتوح)",
-            "pub_ads": 1,
-            "age": "اليوم",
-            "fresh_tier": 3,
-            "first_seen_ts": int(time.time()),
-            "desc_verified_v2": True,
-            "url": url,
-            "verified_v12": True,
-            "scraped_at": now_cairo
-        }
-    except Exception:
-        return None
-
-def send_admin_telegram_reports(data, final_ads, stats):
-    tg_cfg = data.get("telegram_config") or {}
-    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN") or tg_cfg.get("tok", "")
-    admin_cid = os.environ.get("TELEGRAM_CHAT_ID") or tg_cfg.get("cid", "")
-
-    try:
-        r = std_requests.get(f"https://ntfy.sh/{TG_CONFIG_TOPIC}/json?poll=1&since=all", timeout=8)
-        if r.status_code == 200 and r.text.strip():
-            lines = [ln for ln in r.text.strip().splitlines() if ln.strip()]
-            if lines:
-                last_msg = json.loads(lines[-1]).get("message", "")
-                if last_msg:
-                    decoded = json.loads(base64.b64decode(last_msg).decode("utf-8"))
-                    if decoded.get("tok"):
-                        tg_token = decoded["tok"].strip()
-                    if decoded.get("cid"):
-                        admin_cid = str(decoded["cid"]).strip()
-                    data["telegram_config"] = {"tok": tg_token, "cid": admin_cid}
-    except Exception:
-        pass
-
-    if not tg_token or not admin_cid:
-        return
-
-    notified_ids = set(data.get("telegram_notified_ids", []))
-    is_first_notify = len(notified_ids) == 0
-
-    new_cards_to_send = []
-    for ad in final_ads:
-        aid = ad.get("ad_id")
-        if aid not in notified_ids:
-            new_cards_to_send.append(ad)
-            notified_ids.add(aid)
-
-    new_cards_to_send = new_cards_to_send[:5] if is_first_notify else new_cards_to_send[:15]
-
-    dub_total = sum(1 for a in final_ads if a.get("source", "دوبيزل") == "دوبيزل")
-    aq_total = sum(1 for a in final_ads if a.get("source") == "عقارماب")
-    os_total = sum(1 for a in final_ads if a.get("source") == "السوق المفتوح")
-    now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-
-    summary_text = (
-        f"تقرير الرن التفصيلي الكامل | مصيدة الملاك\n"
-        f"التوقيت: {now_str}\n"
-        f"--------------------------------\n"
-        f"الإجمالي الحي بالموقع الآن: {len(final_ads)} إعلان مالك\n"
-        f"- دوبيزل: {dub_total} إعلان\n"
-        f"- عقارماب: {aq_total} إعلان\n"
-        f"- السوق المفتوح: {os_total} إعلان\n"
-        f"--------------------------------\n"
-        f"تفاصيل الفحص في هذه الجولة:\n"
-        f"- عقارماب: فحص ({stats['aq_checked']}) | استبعاد سمسار ({stats['aq_rejected_broker']}) | استبعاد تقسيط ({stats['aq_rejected_installments']})\n"
-        f"- السوق المفتوح: فحص ({stats['os_checked']}) | استبعاد سمسار ({stats['os_rejected_broker']}) | استبعاد تقسيط ({stats['os_rejected_installments']})\n"
-        f"- صافي الملاك الجدد المضافين الآن: {len(new_cards_to_send)} إعلان"
-    )
-
-    try:
-        std_requests.post(
-            f"https://api.telegram.org/bot{tg_token}/sendMessage",
-            json={"chat_id": admin_cid, "text": summary_text},
-            timeout=10
-        )
-    except Exception:
-        pass
-
-    for ad in new_cards_to_send:
-        msg_text = (
-            f"إعلان مالك جديد ({ad.get('source', 'دوبيزل')})\n"
-            f"العنوان: {ad.get('title')}\n"
-            f"السعر: {ad.get('price')}\n"
-            f"المنطقة: {ad.get('zone')} | {ad.get('cat')} ({ad.get('deal')})\n"
-            f"المساحة: {ad.get('area') or '-'} م²\n"
-            f"الرابط: {ad.get('url')}"
-        )
-        try:
-            std_requests.post(
-                f"https://api.telegram.org/bot{tg_token}/sendMessage",
-                json={"chat_id": admin_cid, "text": msg_text, "disable_web_page_preview": True},
-                timeout=10
-            )
-            time.sleep(0.3)
-        except Exception:
-            pass
-
-    data["telegram_notified_ids"] = list(notified_ids)[-5000:]
+        response = std_requests.post(url, json=stats_dict, timeout=20)
+        if response.status_code == 200:
+            res = response.json()
+            if res.get("status") == "success":
+                return res.get("ai_advice", "النظام يعمل بشكل طبيعي"), res.get("health", "جيد")
+    except Exception as e:
+        print(f"[AI Monitor Error] {e}")
+    return "تعذر الاتصال بعقل المراقبة، الفحص التقليدي سليم.", "غير معروف"
 
 def run_extra_radar():
     if not os.path.exists(DATA_FILE):
         return
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return
 
-    now_ts = int(time.time())
     existing_ads = data.get("ads", [])
     extra_checked = set(data.get("extra_checked_ids", []))
-    banned_ids = set(data.get("banned_ad_ids", []))
     banned_pubs = set(data.get("banned_publishers", []))
+    banned_ids = set(data.get("banned_ad_ids", []))
+    notified_ids = set(data.get("telegram_notified_ids", []))
+    tg_cfg = sync_telegram_config(data.get("telegram_config", {}))
+    run_report = data.get("last_run_report", {})
 
-    session = requests.Session(impersonate="chrome120")
-    session.headers.update({"Accept-Language": "ar-EG,ar;q=0.9"})
+    seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
+    fetcher = SmartFetcher()
+    new_extra_ads = []
 
-    kept_map = {}
-    for a in existing_ads:
-        aid = a.get("ad_id")
-        if not aid:
-            continue
-        if a.get("source") in ("عقارماب", "السوق المفتوح"):
-            extra_checked.add(aid)
-        pub = a.get("publisher", "")
-        if aid in banned_ids or pub in banned_pubs:
-            continue
-        p_num = a.get("price_num", 0)
-        deal_type = a.get("deal", "تمليك")
-        if not is_clean_direct_ad(a.get("title", ""), "", deal_type, p_num):
-            continue
-        if not detect_zone(a.get("title", "") + " " + a.get("zone", "")):
-            continue
-
-        orig_ts = a.get("first_seen_ts")
-        if not orig_ts:
-            orig_ts = parse_scraped_at_ts(a.get("scraped_at"), now_ts - 86400)
-        if (now_ts - orig_ts) > MAX_AD_AGE_SECONDS:
-            continue
-
-        a["desc_verified_v2"] = True
-        a.pop("_extra_meta", None)
-        a["first_seen_ts"] = orig_ts
-        a["fresh_tier"] = compute_tier_from_ts(orig_ts)
-        kept_map[aid] = a
-
-    stats = {
-        "aq_checked": 0, "aq_rejected_broker": 0, "aq_rejected_zone": 0, "aq_rejected_installments": 0,
-        "os_checked": 0, "os_rejected_broker": 0, "os_rejected_zone": 0, "os_rejected_installments": 0
-    }
-
-    new_extra = []
-
+    aq_candidates = []
     for src in AQARMAP_SOURCES:
-        for page in [1, 2]:
+        for page in range(1, 3):
             page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
-            try:
-                r = session.get(page_url, timeout=18)
-                print(f"[Aqarmap] {src['cat']} ({src['deal']}) p.{page} -> HTTP {r.status_code}")
-                if r.status_code != 200:
-                    break
-                matches = re.findall(r'((?:https?://aqarmap\.com\.eg)?/ar/listing/(\d+)[^"\'\s<>\\]*)', r.text)
-                unseen_Batch = []
-                seen_in_page = set()
-                for raw_path, lid in matches:
-                    ad_id = 700000000 + int(lid)
-                    if ad_id in seen_in_page or ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
-                        continue
-                    seen_in_page.add(ad_id)
-                    clean_path = re.sub(r'^https?://aqarmap\.com\.eg', '', raw_path)
-                    unseen_Batch.append((ad_id, "https://aqarmap.com.eg" + clean_path))
+            html, status_info = fetcher.get_html(page_url)
+            print(f"[Aqarmap] {src['cat']} ({src['deal']}) p.{page} -> {status_info}")
+            time.sleep(random.uniform(1.0, 1.8))
+            if not html:
+                continue
+            links = re.findall(r'href="(/ar/listing/(\d+)[^"]*)"', html)
+            for path, num_str in links:
+                uid = int("91" + num_str)
+                if uid in seen_ids or uid in extra_checked or uid in banned_ids:
+                    continue
+                aq_candidates.append({
+                    "ad_id": uid,
+                    "source": "عقارماب",
+                    "url": "https://aqarmap.com.eg" + path,
+                    "cat": src["cat"],
+                    "deal": src["deal"]
+                })
+                seen_ids.add(uid)
 
-                for ad_id, full_url in unseen_Batch[:10]:
-                    extra_checked.add(ad_id)
-                    ad_obj = parse_aqarmap_ad(session, full_url, ad_id, src["cat"], src["deal"], stats)
-                    if ad_obj:
-                        new_extra.append(ad_obj)
-                        kept_map[ad_id] = ad_obj
-                    time.sleep(random.uniform(0.8, 1.3))
-            except Exception as e:
-                print(f"[Aqarmap Error] {e}")
-                break
-
+    os_candidates = []
     for src in OPENSOOQ_SOURCES:
-        for page in [1, 2]:
+        for page in range(1, 3):
             page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
-            try:
-                r = session.get(page_url, timeout=18)
-                print(f"[OpenSooq] {src['cat']} ({src['deal']}) p.{page} -> HTTP {r.status_code}")
-                if r.status_code != 200:
-                    break
-                matches = re.findall(r'((?:https?://eg\.opensooq\.com)?/ar/search/(\d{8,10})(?:/[^"\'\s<>\\]*)?)', r.text)
-                unseen_Batch = []
-                seen_in_page = set()
-                for raw_path, lid in matches:
-                    ad_id = 800000000 + int(lid[-8:])
-                    if ad_id in seen_in_page or ad_id in kept_map or ad_id in extra_checked or ad_id in banned_ids:
-                        continue
-                    seen_in_page.add(ad_id)
-                    clean_path = re.sub(r'^https?://eg\.opensooq\.com', '', raw_path)
-                    unseen_Batch.append((ad_id, "https://eg.opensooq.com" + clean_path))
+            html, status_info = fetcher.get_html(page_url)
+            print(f"[OpenSooq] {src['cat']} ({src['deal']}) p.{page} -> {status_info}")
+            time.sleep(random.uniform(1.0, 1.8))
+            if not html:
+                continue
+            links = re.findall(r'href="(/ar/search/(\d+)[^"]*)"', html)
+            for path, num_str in links:
+                uid = int("92" + num_str)
+                if uid in seen_ids or uid in extra_checked or uid in banned_ids:
+                    continue
+                os_candidates.append({
+                    "ad_id": uid,
+                    "source": "السوق المفتوح",
+                    "url": "https://eg.opensooq.com" + path,
+                    "cat": src["cat"],
+                    "deal": src["deal"]
+                })
+                seen_ids.add(uid)
 
-                for ad_id, full_url in unseen_Batch[:10]:
-                    extra_checked.add(ad_id)
-                    ad_obj = parse_opensooq_ad(session, full_url, ad_id, src["cat"], src["deal"], stats)
-                    if ad_obj:
-                        new_extra.append(ad_obj)
-                        kept_map[ad_id] = ad_obj
-                    time.sleep(random.uniform(0.8, 1.3))
-            except Exception as e:
-                print(f"[OpenSooq Error] {e}")
-                break
+    all_candidates = aq_candidates[:30] + os_candidates[:30]
+    print(f"[Extra Radar] Candidates -> Aqarmap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)}")
 
-    final_ads = sorted(
-        list(kept_map.values()),
-        key=lambda x: (x.get("first_seen_ts", 0), x.get("ad_id", 0)),
-        reverse=True
-    )
+    aq_added = 0
+    os_added = 0
 
-    send_admin_telegram_reports(data, final_ads, stats)
+    for item in all_candidates:
+        uid = item["ad_id"]
+        extra_checked.add(uid)
+        try:
+            html, _ = fetcher.get_html(item["url"])
+            if not html:
+                continue
+            t_m = re.search(r'<title>([^<]+)</title>', html)
+            title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
+            if not title or len(title) < 5:
+                continue
+            visible_text = extract_visible_text(html)
+            zone = detect_zone(title + " " + visible_text[:4500])
+            if not zone:
+                continue
+            age_label, fresh_tier, is_recent = parse_age_and_tier(visible_text)
+            if not is_recent:
+                continue
+
+            p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html, re.I)
+            if p_m:
+                price_num = int(p_m.group(1).replace(",", ""))
+                price_str = f"{p_m.group(1)} ج.م"
+            else:
+                price_num = 0
+                price_str = "السعر بالتفاصيل"
+
+            pub_name = f"مالك ({item['source']})"
+            is_owner = analyze_with_ai(title, visible_text, pub_name, item["deal"], item["cat"], price_num, item["source"])
+            if not is_owner:
+                print(f"[Rejected by AI Extra] {item['source']} | {title[:30]}")
+                continue
+
+            area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', visible_text, re.I)
+            area_val = int(area_m.group(1)) if area_m else None
+            rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', visible_text)
+            rooms_val = int(rooms_m.group(1)) if rooms_m else None
+
+            now_ts = int(time.time())
+            now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
+            new_extra_ads.append({
+                "ad_id": uid,
+                "source": item["source"],
+                "title": title,
+                "price": price_str,
+                "price_num": price_num,
+                "zone": zone,
+                "cat": item["cat"],
+                "deal": item["deal"],
+                "area": area_val,
+                "rooms": rooms_val,
+                "publisher": pub_name,
+                "pub_ads": 1,
+                "age": age_label,
+                "fresh_tier": fresh_tier,
+                "first_seen_ts": now_ts,
+                "desc_verified_v2": True,
+                "url": item["url"],
+                "verified_v12": True,
+                "scraped_at": now_cairo
+            })
+            if item["source"] == "عقارماب":
+                aq_added += 1
+            else:
+                os_added += 1
+            print(f"[+ Extra Approved by AI] {item['source']} | {item['deal']} | {zone} | {title[:35]}")
+            time.sleep(random.uniform(0.9, 1.5))
+        except Exception:
+            continue
+
+    fetcher.close()
+    merged_ads = new_extra_ads + existing_ads
+    merged_ads.sort(key=lambda x: (x.get("first_seen_ts", 0), x.get("ad_id", 0)), reverse=True)
+
+    dub_total = sum(1 for a in merged_ads if (a.get("source") or "دوبيزل") == "دوبيزل")
+    aq_total = sum(1 for a in merged_ads if a.get("source") == "عقارماب")
+    os_total = sum(1 for a in merged_ads if a.get("source") == "السوق المفتوح")
+    rent_total = sum(1 for a in merged_ads if a.get("deal") == "إيجار")
+    sale_total = sum(1 for a in merged_ads if a.get("deal") != "إيجار")
+
+    dub_added = run_report.get("dub_added", 0)
+    dub_insp = run_report.get("dub_inspected", 0)
+    ai_stats_payload = {
+        "total_ads": len(merged_ads),
+        "rent_total": rent_total,
+        "sale_total": sale_total,
+        "dub_inspected": dub_insp,
+        "dub_added": dub_added,
+        "aq_checked": len(aq_candidates),
+        "aq_added": aq_added,
+        "os_checked": len(os_candidates),
+        "os_added": os_added
+    }
+    ai_advice, sys_health = monitor_system_with_ai(ai_stats_payload)
+    print(f"[AI Monitor] Health: {sys_health} | Advice: {ai_advice}")
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-    rep = data.get("last_run_report") or {}
-    rep.update({
+    run_report.update({
         "last_run_at": now_str,
-        "aq_checked": stats["aq_checked"],
-        "os_checked": stats["os_checked"],
-        "extra_added": len(new_extra)
+        "aq_candidates": len(aq_candidates),
+        "aq_added": aq_added,
+        "os_candidates": len(os_candidates),
+        "os_added": os_added,
+        "total_live": len(merged_ads),
+        "dub_total": dub_total,
+        "aq_total": aq_total,
+        "os_total": os_total,
+        "rent_total": rent_total,
+        "sale_total": sale_total,
+        "ai_health": sys_health,
+        "ai_advice": ai_advice
     })
 
+    tok = os.environ.get("TELEGRAM_BOT_TOKEN") or tg_cfg.get("tok", "")
+    cid = os.environ.get("TELEGRAM_CHAT_ID") or tg_cfg.get("cid", "")
+
+    if tok and cid:
+        new_Alert_ads = [a for a in merged_ads if a.get("fresh_tier") == 3 and a.get("ad_id") not in notified_ids]
+        for ad in new_Alert_ads[:10]:
+            msg = (
+                f"<b>صيد جديد مفحوص بالذكاء الاصطناعي ({ad.get('deal')}) من {ad.get('source', 'دوبيزل')}</b>\n"
+                f"المنطقة: <b>{ad.get('zone')}</b> ({ad.get('cat')})\n"
+                f"السعر: <b>{ad.get('price')}</b>\n"
+                f"المساحة: {ad.get('area') or 'غير محدد'} م2 | الغرف: {ad.get('rooms') or 'غير محدد'}\n"
+                f"العنوان: {ad.get('title')}\n"
+                f"الناشر: {ad.get('publisher')}\n"
+                f"<a href=\"{ad.get('url')}\">اضغط هنا لفتح الإعلان الأصلي</a>"
+            )
+            if send_telegram_msg(tok, cid, msg):
+                notified_ids.add(ad.get("ad_id"))
+            time.sleep(0.5)
+
+        summary_msg = (
+            f"<b>التقرير الشامل وعقل المراقبة الذكي ({now_str})</b>\n"
+            f"حالة النظام: <b>{sys_health}</b>\n"
+            f"تشخيص الذكاء الاصطناعي:\n"
+            f"<i>{ai_advice}</i>\n"
+            f"إجمالي الإعلانات الحية بالموقع: <b>{len(merged_ads)} إعلان</b>\n"
+            f"إيجار: <b>{rent_total}</b> | تمليك كاش: <b>{sale_total}</b>\n"
+            f"دوبيزل: <b>{dub_total}</b> (جديد بالرن: +{dub_added} من {dub_insp} مفحوص)\n"
+            f"عقارماب: <b>{aq_total}</b> (جديد بالرن: +{aq_added} من {len(aq_candidates)} مرشح)\n"
+            f"السوق المفتوح: <b>{os_total}</b> (جديد بالرن: +{os_added} من {len(os_candidates)} مرشح)"
+        )
+        send_telegram_msg(tok, cid, summary_msg)
+    else:
+        for a in merged_ads[:30]:
+            if a.get("ad_id"):
+                notified_ids.add(a.get("ad_id"))
+
     data["updated_at"] = now_str
-    data["total"] = len(final_ads)
-    data["last_run_report"] = rep
-    data["ads"] = final_ads
-    data["extra_checked_ids"] = list(extra_checked)[-6000:]
+    data["total"] = len(merged_ads)
+    data["last_run_report"] = run_report
+    data["ads"] = merged_ads
+    data["extra_checked_ids"] = list(extra_checked)[-10000:]
+    data["telegram_config"] = tg_cfg
+    data["telegram_notified_ids"] = list(notified_ids)[-5000:]
 
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
