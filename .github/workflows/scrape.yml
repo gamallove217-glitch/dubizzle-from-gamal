@@ -17,41 +17,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Checkout repository
+      - name: Checkout full repository history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Clean Sentry bug from scraper.py
+      - name: Restore Pre-Sentry Original Files
         run: |
-          python3 -c '
-          with open("scraper.py", "r", encoding="utf-8") as f:
-              lines = f.readlines()
-          cleaned = [l for l in lines if "sentry" not in l.lower()]
-          with open("scraper.py", "w", encoding="utf-8") as f:
-              f.writelines(cleaned)
-          '
+          echo "=== COMMITS BEFORE 4284d86 ==="
+          git log 4284d86 -n 5 --oneline
+          git checkout 4284d86~1 -- scraper.py || git checkout 4284d86 -- scraper.py
+          git checkout f783904~1 -- extra_radar.py || true
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add scraper.py
-          git commit -m "Remove sentry lines from scraper.py" || true
+          git add scraper.py extra_radar.py
+          git commit -m "Restore pre-sentry original scraper and extra_radar" || true
           git push origin main || true
 
       - name: Install all dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt || true
-          pip install curl_cffi requests beautifulsoup4 lxml sentry-sdk
+          pip install curl_cffi requests beautifulsoup4 lxml sentry-sdk google-generativeai
 
       - name: Run Original Dubizzle Scraper
-        env:
-          PAGES_PER_CATEGORY: "5"
-          MAX_RUNTIME_SECONDS: "600"
         run: python -u scraper.py || true
 
       - name: Run Original Extra Radar
