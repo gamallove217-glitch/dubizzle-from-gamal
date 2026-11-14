@@ -14,16 +14,16 @@ MAX_AD_AGE_SECONDS = 7 * 86400
 MIN_CASH_SALE_PRICE = 1400000
 
 CATEGORIES = [
-    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-rent/new-cairo/"},
-    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/villas-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/villas-for-rent/new-cairo/"},
-    {"name": "تجاري", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
-    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/apartments-duplex-for-sale/new-cairo/"},
-    {"name": "فلل", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/villas-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "تجاري", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
-    {"name": "أراضي", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/ar/properties/vacation-homes-and-land-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
+    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
+    {"name": "تجاري", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
+    {"name": "فلل", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "تجاري", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
+    {"name": "أراضي", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/vacation-homes-and-land-for-sale/new-cairo-fifth-settlement/"},
 ]
 
 ZONES = [
@@ -73,9 +73,9 @@ class SmartFetcher:
     def __init__(self):
         self.warp_active = is_warp_up()
         self.warp_sess = requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY})
-        self.warp_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/ar/"})
+        self.warp_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/"})
         self.direct_sess = requests.Session(impersonate="chrome120")
-        self.direct_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/ar/"})
+        self.direct_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/"})
         self.pw = None
         self.browser = None
         self.context = None
@@ -105,29 +105,31 @@ class SmartFetcher:
             print(f"[PW Init] {e}")
             return False
 
-    def _is_valid_html(self, html):
+    def _is_valid_html(self, html, req_regex=None):
         if not html or len(html) < 1500:
             return False
-        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html:
+        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html or "_Incapsula_Resource" in html:
+            return False
+        if req_regex and not re.search(req_regex, html):
             return False
         return True
 
-    def get_html(self, url):
+    def get_html(self, url, req_regex=None):
         statuses = []
         if self.warp_active:
             try:
                 r = self.warp_sess.get(url, timeout=18)
-                statuses.append(f"WARP:{r.status_code}")
-                if r.status_code == 200 and self._is_valid_html(r.text):
+                if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                     return r.text, "200 (WARP)"
+                statuses.append(f"WARP:{r.status_code}")
             except Exception:
                 statuses.append("WARP:ERR")
 
         try:
             r = self.direct_sess.get(url, timeout=18)
-            statuses.append(f"Direct:{r.status_code}")
-            if r.status_code == 200 and self._is_valid_html(r.text):
+            if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Direct)"
+            statuses.append(f"Direct:{r.status_code}")
         except Exception:
             statuses.append("Direct:ERR")
 
@@ -136,13 +138,13 @@ class SmartFetcher:
             try:
                 page = self.context.new_page()
                 resp = page.goto(url, wait_until="domcontentloaded", timeout=25000)
-                page.wait_for_timeout(3500)
+                page.wait_for_timeout(4500)
                 html = page.content()
                 code = resp.status if resp else 0
                 page.close()
-                statuses.append(f"PW:{code}")
-                if self._is_valid_html(html):
+                if code == 200 and self._is_valid_html(html, req_regex):
                     return html, "200 (Playwright)"
+                statuses.append(f"PW:{code}")
             except Exception:
                 if page:
                     try: page.close()
@@ -152,9 +154,9 @@ class SmartFetcher:
         try:
             enc = urllib.parse.quote(url, safe="")
             r = std_requests.get(f"https://api.codetabs.com/v1/proxy?quest={enc}", timeout=20)
-            statuses.append(f"Proxy:{r.status_code}")
-            if r.status_code == 200 and self._is_valid_html(r.text):
+            if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Proxy)"
+            statuses.append(f"Proxy:{r.status_code}")
         except Exception:
             statuses.append("Proxy:ERR")
 
@@ -172,66 +174,40 @@ def normalize_ar(text):
     t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
     return re.sub(r'\s+', ' ', t).strip()
 
-def extract_visible_text(html):
-    cleaned = re.sub(r'<(script|style|svg|noscript)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
-    desc_matches = re.findall(r'"description"\s*:\s*"([^"]+)"', html)
-    tags_stripped = re.sub(r'<[^>]+>', ' ', cleaned)
-    return tags_stripped + " " + " ".join(desc_matches)
+def extract_ad_body(html):
+    meta_desc = " ".join(re.findall(r'<meta[^>]+(?:name="description"|property="og:description")[^>]+content="([^"]+)"', html, flags=re.I))
+    json_desc = " ".join(re.findall(r'"description"\s*:\s*"([^"]+)"', html))
+    body_cleaned = re.sub(r'<(script|style|svg|noscript|header|nav|footer|aside)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
+    tags_stripped = re.sub(r'<[^>]+>', ' ', body_cleaned)
+    tags_stripped = re.sub(r'\s+', ' ', tags_stripped).strip()
+    return f"{meta_desc} {json_desc} {tags_stripped[:3500]}".strip()
 
-def detect_zone(text):
-    t = normalize_ar(text)
+def detect_zone(title, body_text):
+    core = normalize_ar(f"{title} {body_text[:1500]}")
+    title_norm = normalize_ar(title)
+    for bad in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "النورث هاوس", "شمال الرحاب"]:
+        if normalize_ar(bad) in core:
+            return None
     for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in t:
+        if normalize_ar(city) in title_norm:
             return None
     for z_name, keywords in ZONES:
         for kw in keywords:
-            if normalize_ar(kw) in t:
+            if normalize_ar(kw) in core:
                 return z_name
-    if any(k in t for k in ["القاهرة الجديدة", "القاهره الجديده", "تجمع", "new cairo", "settlement"]):
-        return "القاهرة الجديدة"
-    return None
+    return "القاهرة الجديدة"
 
 def parse_age_and_tier(page_text):
     norm_text = normalize_ar(page_text)
-    en_m = re.search(r'(\d+)\s*(minute|minutes|hour|hours|day|days|week|weeks|month|months)\s+ago', norm_text, re.I)
-    if en_m:
-        num = int(en_m.group(1))
-        unit = en_m.group(2).lower()
-        if "min" in unit or "hour" in unit:
-            return (f"منذ {num} ساعة" if "hour" in unit else f"منذ {num} دقيقة", 3, True)
-        if "day" in unit:
-            if num <= 1: return ("منذ يوم", 2, True)
-            if num <= 5: return (f"منذ {num} أيام", 1, True)
-            return (f"منذ {num} أيام", 0, False)
+    if re.search(r'منذ\s+(\d+\s*)?(اسبوع|أسبوع|اسابيع|أسابيع|شهر|أشهر|اشهر|سنة|سنه|سنوات)', norm_text):
         return ("قديم", 0, False)
-
-    m = re.search(r'منذ\s+(\d+|دقيقة|دقيقتين|ساعة|ساعتين|يوم|يومين)\s*(دقيقة|دقائق|ساعة|ساعات|يوم|أيام|ايام|يوما|اسبوع|أسبوع|اشهر|أشهر|شهر)?', norm_text)
-    if not m:
-        if "اليوم" in norm_text or "منذ لحظات" in norm_text or "الآن" in norm_text:
-            return ("اليوم", 3, True)
-        if "أمس" in norm_text or "امس" in norm_text or "yesterday" in norm_text:
-            return ("منذ يوم", 2, True)
-        return ("حديث", 2, True)
-
-    val_str = m.group(1)
-    unit = m.group(2) or ""
-    if val_str in ["دقيقة", "دقيقتين"] or "دقيق" in unit:
-        return (f"منذ {val_str} {unit}".strip(), 3, True)
-    if val_str in ["ساعة", "ساعتين"] or "ساع" in unit:
-        return (f"منذ {val_str} {unit}".strip(), 3, True)
-    if val_str == "يوم":
-        return ("منذ يوم", 2, True)
-    if val_str == "يومين":
-        return ("منذ يومين", 1, True)
-    if val_str.isdigit():
-        num = int(val_str)
-        if "يوم" in unit or "أيام" in unit or "ايام" in unit:
-            if num <= 1: return ("منذ يوم", 2, True)
-            if num <= 5: return (f"منذ {num} أيام", 1, True)
-            return (f"منذ {num} أيام", 0, False)
-        if any(x in unit for x in ["اسبوع", "أسبوع", "شهر", "أشهر", "اشهر"]):
-            return ("قديم", 0, False)
-    return ("حديث", 2, True)
+    m = re.search(r'منذ\s+(\d+)\s*(يوم|أيام|ايام)', norm_text)
+    if m:
+        num = int(m.group(1))
+        if num <= 1: return ("منذ يوم", 2, True)
+        if num <= 5: return (f"منذ {num} أيام", 1, True)
+        return (f"منذ {num} أيام", 0, False)
+    return ("حديث", 3, True)
 
 def compute_tier_from_ts(ts):
     age_sec = int(time.time()) - int(ts)
@@ -276,9 +252,9 @@ def load_existing():
 def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, active_ads_count):
     url = "https://gamal216.pythonanywhere.com/analyze"
     payload = {
-        "text": f"{title} {visible_text[:3500]}",
+        "text": f"{title} {visible_text[:3000]}",
         "title": title,
-        "description": visible_text[:3500],
+        "description": visible_text[:3000],
         "publisher": pub_name,
         "deal": deal,
         "cat": cat,
@@ -292,14 +268,14 @@ def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, active_
             result = response.json()
             if result.get("status") == "success":
                 if result.get("decision") == "مرفوض":
-                    return False
+                    return False, result.get("reason", "سمسار")
                 analysis = result.get("analysis", "")
                 if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False
-                return True
+                    return False, result.get("reason", "سمسار")
+                return True, "مالك مباشر"
     except Exception as e:
         print(f"[AI Server Error] {e}")
-    return 1 <= active_ads_count <= 4
+    return (1 <= active_ads_count <= 4), "فحص احتياطي"
 
 def run_scraper():
     start_ts = time.time()
@@ -335,20 +311,20 @@ def run_scraper():
             break
         for cat in CATEGORIES:
             url = cat["url"] if page == 1 else f"{cat['url']}?page={page}"
-            html, status_info = fetcher.get_html(url)
+            html, status_info = fetcher.get_html(url, req_regex=r'-ID\d+\.html')
             pages_fetched += 1
             print(f"[Dubizzle] {cat['name']} ({cat['deal']}) p.{page} -> {status_info}")
-            time.sleep(random.uniform(1.2, 2.0))
+            time.sleep(random.uniform(1.0, 1.8))
             if not html:
                 continue
-            matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/ar|/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', html)
+            matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', html)
             for raw_path, id_str in matches:
                 ad_id = int(id_str)
                 if ad_id in seen_ids or ad_id in checked_ids or ad_id in banned_ids:
                     continue
                 clean_path = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', raw_path)
-                if not clean_path.startswith("/ar/") and not clean_path.startswith("/en/"):
-                    clean_path = "/ar" + (clean_path if clean_path.startswith("/") else "/" + clean_path)
+                if not clean_path.startswith("/"):
+                    clean_path = "/" + clean_path
                 candidates.append({
                     "ad_id": ad_id,
                     "url": "https://www.dubizzle.com.eg" + clean_path,
@@ -377,20 +353,18 @@ def run_scraper():
             title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
             if not title:
                 continue
-            visible_text = extract_visible_text(html)
-            zone = detect_zone(title + " " + visible_text[:5000])
+            body_text = extract_ad_body(html)
+            zone = detect_zone(title, body_text)
             if not zone:
                 continue
-            age_label, _, is_recent = parse_age_and_tier(visible_text)
+            age_label, _, is_recent = parse_age_and_tier(body_text)
             if not is_recent:
                 continue
 
-            pub_m = re.search(r'"((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
+            pub_m = re.search(r'"((?:/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
             if not pub_m:
-                pub_m2 = re.search(r'href="((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"', html)
-                if not pub_m2:
-                    continue
-                pub_id = pub_m2.group(1)
+                pub_m2 = re.search(r'href="((?:/en)?/profile/[a-zA-Z0-9_-]+)"', html)
+                pub_id = pub_m2.group(1) if pub_m2 else ""
                 name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
                 pub_name = name_m.group(1).strip() if name_m else "مالك مباشر"
             else:
@@ -406,27 +380,24 @@ def run_scraper():
                 price_str = "السعر بالتفاصيل"
 
             pub_ads_count = 1
-            try:
-                clean_prof = re.sub(r'^/(?:ar|en)/', '/ar/', pub_id)
-                if not clean_prof.startswith("/ar/"):
-                    clean_prof = "/ar" + clean_prof
-                pr_html, _ = fetcher.get_html("https://www.dubizzle.com.eg" + clean_prof)
-                if pr_html:
-                    profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr_html)))
-                    exact_counts = [int(x) for x in re.findall(r'(\d+)\s+(?:إعلان\b|اعلان\b|إعلانات\b|اعلانات\b|published ads\b|active ads\b)', pr_html, re.I) if int(x) < 300]
-                    pub_ads_count = max(exact_counts + [profile_cards, 1])
-            except Exception:
-                pub_ads_count = 1
+            if pub_id:
+                try:
+                    pr_html, _ = fetcher.get_html("https://www.dubizzle.com.eg" + pub_id)
+                    if pr_html:
+                        profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr_html)))
+                        exact_counts = [int(x) for x in re.findall(r'(\d+)\s+(?:إعلان\b|اعلان\b|إعلانات\b|اعلانات\b|published ads\b|active ads\b)', pr_html, re.I) if int(x) < 300]
+                        pub_ads_count = max(exact_counts + [profile_cards, 1])
+                except Exception:
+                    pub_ads_count = 1
 
-            is_direct_owner = analyze_with_ai(title, visible_text, pub_name, item["deal"], item["cat"], price_num, pub_ads_count)
+            is_direct_owner, ai_reason = analyze_with_ai(title, body_text, pub_name, item["deal"], item["cat"], price_num, pub_ads_count)
             if not is_direct_owner:
-                banned_pubs.add(pub_name)
-                print(f"[Rejected by AI] {pub_name} | Ads: {pub_ads_count}")
+                print(f"[Rejected by AI] {pub_name} | Reason: {ai_reason}")
                 continue
 
-            area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', visible_text, re.I)
+            area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', body_text, re.I)
             area_val = int(area_m.group(1)) if area_m else None
-            rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم|beds|bed|bedrooms)', visible_text, re.I)
+            rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم|beds|bed|bedrooms)', body_text, re.I)
             rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
             ad_ts = int(time.time())
