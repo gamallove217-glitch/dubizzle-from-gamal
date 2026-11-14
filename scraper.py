@@ -7,11 +7,12 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 DATA_FILE = "ads.json"
 NTFY_BAN_TOPIC = "gamal_vip_ban_9941_sec"
 WARP_PROXY = "socks5h://127.0.0.1:40000"
+HINDI_MAP = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
 PAGES_PER_CATEGORY = int(os.environ.get("PAGES_PER_CATEGORY", "2"))
 MAX_RUNTIME_SECONDS = int(os.environ.get("MAX_RUNTIME_SECONDS", "600"))
 MAX_AD_AGE_SECONDS = 7 * 86400
-MIN_CASH_SALE_PRICE = 1400000
+MIN_CASH_SALE_PRICE = 1500000
 
 CATEGORIES = [
     {"name": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
@@ -27,9 +28,9 @@ CATEGORIES = [
 ]
 
 ZONES = [
-    ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement"]),
+    ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement", "ميفيدا", "mivida", "هايد بارك", "ماونتن فيو", "كايرو فيستفال", "الباتيو", "فيلت", "سوديك"]),
     ("التجمع الأول", ["التجمع الأول", "التجمع الاول", "first settlement", "1st settlement"]),
-    ("التجمع الثالث", ["التجمع الثالث", "third settlement", "3rd settlement"]),
+    ("التجمع الثالث", ["التجمع الثالث", "third settlement", "3rd settlement", "أربيلا", "اربيلا"]),
     ("التجمع السادس", ["التجمع السادس", "sixth settlement"]),
     ("اللوتس", ["اللوتس", "lotus"]),
     ("النرجس", ["النرجس", "narges", "narjis"]),
@@ -39,8 +40,6 @@ ZONES = [
     ("جنوب الأكاديمية", ["جنوب الأكاديمية", "جنوب الاكاديمية", "south academy"]),
     ("شرق الأكاديمية", ["شرق الأكاديمية", "شرق الاكاديمية"]),
     ("المستثمرين", ["المستثمرين", "investors"]),
-    ("الرحاب", ["الرحاب", "rehab"]),
-    ("مدينتي", ["مدينتي", "madinaty"]),
     ("الشويفات", ["الشويفات", "choueifat", "shouyfat"]),
     ("القرنفل", ["القرنفل", "koronfel"]),
     ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
@@ -48,18 +47,33 @@ ZONES = [
     ("دار مصر", ["دار مصر", "سكن مصر", "جنة مصر", "فرجينيا"]),
     ("القطامية", ["القطامية", "القطاميه", "katameya"]),
     ("شارع التسعين", ["التسعين", "90th"]),
-    ("المستقبل سيتي", ["المستقبل", "mostakbal"]),
 ]
 
 EXCLUDED_CITIES = [
+    "الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty",
     "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب",
-    "العبور", "الشروق", "بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
+    "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
     "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي",
     "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس",
     "السلام", "جسر السويس", "قباء", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو",
     "حدائق حلوان", "دار السلام", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل",
     "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "الجونة",
-    "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المنصورة", "طنطا", "دمياط", "بورسعيد"
+    "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المنصورة", "طنطا", "دمياط", "بورسعيد",
+    "المستقبل", "mostakbal", "سمات"
+]
+
+INSTALLMENT_SUBSTRINGS = [
+    "قسط", "تقسيط", "بالتقسيط", "لتقسيط", "اقساط", "أقساط", "باقساط", "بأقساط",
+    "مقدم", "بمقدم", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد",
+    "بدون فوائد", "متبقي", "المتبقي", "أوفر", "اوفر", "امكانية التقسيط", "متاح تقسيط", "ويوجد تقسيط",
+    "down payment", "downpayment", "installment", "installments", "payment plan"
+]
+
+SAFE_CASH_NEGATIONS = [
+    "بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط",
+    "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن",
+    "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط",
+    "مسدد بالكامل", "مسددة بالكامل", "غير متاح تقسيط", "كاش فقط"
 ]
 
 def is_warp_up():
@@ -72,13 +86,23 @@ def is_warp_up():
 class SmartFetcher:
     def __init__(self):
         self.warp_active = is_warp_up()
+        base_headers = {
+            "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Referer": "https://www.google.com/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "cross-site"
+        }
         self.warp_sess = requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY})
-        self.warp_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/"})
+        self.warp_sess.headers.update(base_headers)
         self.direct_sess = requests.Session(impersonate="chrome120")
-        self.direct_sess.headers.update({"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8", "Referer": "https://www.dubizzle.com.eg/"})
+        self.direct_sess.headers.update(base_headers)
         self.pw = None
         self.browser = None
         self.context = None
+        self.pw_warmed = False
 
     def _ensure_pw(self):
         if self.context is not None:
@@ -97,7 +121,8 @@ class SmartFetcher:
             self.context = self.browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
                 locale="ar-EG",
-                viewport={"width": 1366, "height": 768}
+                viewport={"width": 1366, "height": 768},
+                extra_http_headers={"Referer": "https://www.google.com/"}
             )
             self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined});")
             return True
@@ -105,10 +130,20 @@ class SmartFetcher:
             print(f"[PW Init] {e}")
             return False
 
+    def _sync_cookies_from_pw(self):
+        try:
+            for c in self.context.cookies():
+                name, val, dom = c.get("name"), c.get("value"), c.get("domain", "")
+                if name and val and "dubizzle" in dom:
+                    self.warp_sess.cookies.set(name, val, domain=dom)
+                    self.direct_sess.cookies.set(name, val, domain=dom)
+        except Exception:
+            pass
+
     def _is_valid_html(self, html, req_regex=None):
         if not html or len(html) < 1500:
             return False
-        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html or "_Incapsula_Resource" in html:
+        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html:
             return False
         if req_regex and not re.search(req_regex, html):
             return False
@@ -137,12 +172,24 @@ class SmartFetcher:
             page = None
             try:
                 page = self.context.new_page()
+                if not self.pw_warmed:
+                    try:
+                        page.goto("https://www.dubizzle.com.eg/", wait_until="domcontentloaded", timeout=20000)
+                        page.wait_for_timeout(4000)
+                        self.pw_warmed = True
+                    except Exception:
+                        pass
                 resp = page.goto(url, wait_until="domcontentloaded", timeout=25000)
                 page.wait_for_timeout(4500)
                 html = page.content()
+                if not self._is_valid_html(html, req_regex):
+                    page.reload(wait_until="domcontentloaded", timeout=20000)
+                    page.wait_for_timeout(3500)
+                    html = page.content()
                 code = resp.status if resp else 0
                 page.close()
-                if code == 200 and self._is_valid_html(html, req_regex):
+                if self._is_valid_html(html, req_regex):
+                    self._sync_cookies_from_pw()
                     return html, "200 (Playwright)"
                 statuses.append(f"PW:{code}")
             except Exception:
@@ -152,13 +199,12 @@ class SmartFetcher:
                 statuses.append("PW:ERR")
 
         try:
-            enc = urllib.parse.quote(url, safe="")
-            r = std_requests.get(f"https://api.codetabs.com/v1/proxy?quest={enc}", timeout=20)
+            r = std_requests.get(f"https://r.jina.ai/{url}", headers={"X-Return-Format": "html", "User-Agent": "Mozilla/5.0"}, timeout=22)
             if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
-                return r.text, "200 (Proxy)"
-            statuses.append(f"Proxy:{r.status_code}")
+                return r.text, "200 (Jina)"
+            statuses.append(f"Jina:{r.status_code}")
         except Exception:
-            statuses.append("Proxy:ERR")
+            statuses.append("Jina:ERR")
 
         return "", " | ".join(statuses)
 
@@ -170,26 +216,28 @@ class SmartFetcher:
             pass
 
 def normalize_ar(text):
-    t = (text or "").lower()
+    t = str(text or "").translate(HINDI_MAP).lower()
     t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
+    t = re.sub(r'[إأآا]', 'ا', t)
+    t = re.sub(r'ة', 'ه', t)
+    t = re.sub(r'ى', 'ي', t)
     return re.sub(r'\s+', ' ', t).strip()
 
 def extract_ad_body(html):
     meta_desc = " ".join(re.findall(r'<meta[^>]+(?:name="description"|property="og:description")[^>]+content="([^"]+)"', html, flags=re.I))
     json_desc = " ".join(re.findall(r'"description"\s*:\s*"([^"]+)"', html))
-    body_cleaned = re.sub(r'<(script|style|svg|noscript|header|nav|footer|aside)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
-    tags_stripped = re.sub(r'<[^>]+>', ' ', body_cleaned)
-    tags_stripped = re.sub(r'\s+', ' ', tags_stripped).strip()
-    return f"{meta_desc} {json_desc} {tags_stripped[:3500]}".strip()
+    pure_desc = f"{meta_desc} {json_desc}".strip()
+    if len(pure_desc) < 40:
+        body_cleaned = re.sub(r'<(script|style|svg|noscript|header|nav|footer|aside|ul|ol)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
+        tags_stripped = re.sub(r'<[^>]+>', ' ', body_cleaned)
+        pure_desc = re.sub(r'\s+', ' ', tags_stripped).strip()[:1200]
+    pure_desc = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', pure_desc)
+    return pure_desc[:2500]
 
 def detect_zone(title, body_text):
-    core = normalize_ar(f"{title} {body_text[:1500]}")
-    title_norm = normalize_ar(title)
-    for bad in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "النورث هاوس", "شمال الرحاب"]:
-        if normalize_ar(bad) in core:
-            return None
+    core = normalize_ar(f"{title} {body_text[:1000]}")
     for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in title_norm:
+        if normalize_ar(city) in core:
             return None
     for z_name, keywords in ZONES:
         for kw in keywords:
@@ -197,11 +245,51 @@ def detect_zone(title, body_text):
                 return z_name
     return "القاهرة الجديدة"
 
+def is_strict_cash_sale(title, body_text, price_num, raw_html=""):
+    if int(price_num or 0) < MIN_CASH_SALE_PRICE:
+        return False
+    norm_html_check = normalize_ar(raw_html[:15000])
+    if "طريقه الدفع تقسيط" in norm_html_check or "طريقه الدفعتقسيط" in norm_html_check:
+        return False
+    full_text = normalize_ar(f"{title} {body_text[:2000]}")
+    for neg in SAFE_CASH_NEGATIONS:
+        full_text = full_text.replace(normalize_ar(neg), " ")
+    for kw in INSTALLMENT_SUBSTRINGS:
+        if normalize_ar(kw) in full_text:
+            return False
+    return True
+
+def is_valid_existing_ad(ad, banned_pubs, banned_ids):
+    aid = ad.get("ad_id")
+    pub = ad.get("publisher", "")
+    if not aid or aid in banned_ids or pub in banned_pubs:
+        return False
+    source = ad.get("source", "دوبيزل")
+    pub_ads = int(ad.get("pub_ads", 1) or 1)
+    if source == "دوبيزل":
+        if not (1 <= pub_ads <= 4):
+            return False
+    else:
+        if pub in ("مالك (عقارماب)", "مالك (السوق المفتوح)", "مالك") or pub_ads > 2:
+            return False
+    title = ad.get("title", "")
+    zone = ad.get("zone", "")
+    deal = ad.get("deal", "تمليك")
+    price_num = int(ad.get("price_num", 0) or 0)
+    norm_all = normalize_ar(f"{title} {zone}")
+    for city in EXCLUDED_CITIES:
+        if normalize_ar(city) in norm_all:
+            return False
+    if deal != "إيجار":
+        if not is_strict_cash_sale(title, "", price_num):
+            return False
+    return True
+
 def parse_age_and_tier(page_text):
     norm_text = normalize_ar(page_text)
-    if re.search(r'منذ\s+(\d+\s*)?(اسبوع|أسبوع|اسابيع|أسابيع|شهر|أشهر|اشهر|سنة|سنه|سنوات)', norm_text):
+    if re.search(r'منذ\s+(\d+\s*)?(اسبوع|اسابيع|شهر|اشهر|سنه|سنوات)', norm_text):
         return ("قديم", 0, False)
-    m = re.search(r'منذ\s+(\d+)\s*(يوم|أيام|ايام)', norm_text)
+    m = re.search(r'منذ\s+(\d+)\s*(يوم|ايام)', norm_text)
     if m:
         num = int(m.group(1))
         if num <= 1: return ("منذ يوم", 2, True)
@@ -249,33 +337,45 @@ def load_existing():
     except Exception:
         return {}, [], set(), set(), set()
 
-def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, active_ads_count):
+def get_real_dubizzle_active_ads(fetcher, ad_html, pub_id):
+    h_ad = ad_html.translate(HINDI_MAP)
+    json_counts = [int(x) for x in re.findall(r'"(?:activeAdsCount|publishedAdsCount|totalAds|adsCount)"\s*:\s*(\d+)', h_ad) if int(x) > 0]
+    clean_prof = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', pub_id)
+    if not clean_prof.startswith("/"):
+        clean_prof = "/" + clean_prof
+    pr_html, _ = fetcher.get_html("https://www.dubizzle.com.eg" + clean_prof)
+    if not pr_html and not json_counts:
+        return 0
+    pr_clean = (pr_html or "").translate(HINDI_MAP)
+    profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr_clean)))
+    text_counts = [
+        int(x) for x in re.findall(r'(\d+)\s+(?:إعلان\b|اعلان\b|إعلانات\b|اعلانات\b|published ads\b|active ads\b)', pr_clean, re.I)
+        if 0 < int(x) < 500
+    ]
+    all_found = json_counts + text_counts + ([profile_cards] if profile_cards > 0 else [])
+    return max(all_found) if all_found else 0
+
+def notify_ai_server_dubizzle(title, body_text, pub_name, deal, cat, price_num, pub_ads_count):
+    if not (1 <= pub_ads_count <= 4):
+        return False
     url = "https://gamal216.pythonanywhere.com/analyze"
     payload = {
-        "text": f"{title} {visible_text[:3000]}",
+        "text": f"{title} {body_text[:2000]}",
         "title": title,
-        "description": visible_text[:3000],
-        "publisher": pub_name,
+        "description": body_text[:2000],
+        "publisher": "مالك مباشر",
         "deal": deal,
         "cat": cat,
         "price_num": price_num,
         "source": "دوبيزل",
-        "active_ads_count": active_ads_count
+        "active_ads_count": pub_ads_count,
+        "dubizzle_strict_count_only": True
     }
     try:
-        response = std_requests.post(url, json=payload, timeout=15)
-        if response.status_code == 200:
-            result = response.json()
-            if result.get("status") == "success":
-                if result.get("decision") == "مرفوض":
-                    return False, result.get("reason", "سمسار")
-                analysis = result.get("analysis", "")
-                if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False, result.get("reason", "سمسار")
-                return True, "مالك مباشر"
-    except Exception as e:
-        print(f"[AI Server Error] {e}")
-    return (1 <= active_ads_count <= 4), "فحص احتياطي"
+        std_requests.post(url, json=payload, timeout=10)
+    except Exception:
+        pass
+    return True
 
 def run_scraper():
     start_ts = time.time()
@@ -289,11 +389,11 @@ def run_scraper():
 
     for a in existing_ads:
         aid = a.get("ad_id")
-        if not aid:
+        if not aid or aid in seen_ids:
             continue
         checked_ids.add(aid)
-        pub = a.get("publisher", "")
-        if aid in banned_ids or pub in banned_pubs or aid in seen_ids:
+        if not is_valid_existing_ad(a, banned_pubs, banned_ids):
+            print(f"[Purged Old Invalid Ad] {a.get('zone')} | {a.get('publisher')} | {a.get('title', '')[:35]}")
             continue
         orig_ts = a.get("first_seen_ts") or (now_ts - 86400)
         if (now_ts - orig_ts) > MAX_AD_AGE_SECONDS:
@@ -317,12 +417,13 @@ def run_scraper():
             time.sleep(random.uniform(1.0, 1.8))
             if not html:
                 continue
-            matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', html)
+            matches = re.findall(r'((?:https?://www\.dubizzle\.com\.eg)?(?:/ar|/en)?/ad/[^"\'\s<>\\]+-ID(\d+)\.html)', html)
             for raw_path, id_str in matches:
                 ad_id = int(id_str)
                 if ad_id in seen_ids or ad_id in checked_ids or ad_id in banned_ids:
                     continue
                 clean_path = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', raw_path)
+                clean_path = re.sub(r'^/(?:ar|en)/', '/', clean_path)
                 if not clean_path.startswith("/"):
                     clean_path = "/" + clean_path
                 candidates.append({
@@ -348,6 +449,7 @@ def run_scraper():
             if not html:
                 continue
             if "/companies/" in html or "featured_agency" in html:
+                print(f"[Rejected Dubizzle Agency] ID:{ad_id} (Corporate Account)")
                 continue
             t_m = re.search(r'<title>([^<]+)</title>', html)
             title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
@@ -356,20 +458,11 @@ def run_scraper():
             body_text = extract_ad_body(html)
             zone = detect_zone(title, body_text)
             if not zone:
+                print(f"[Rejected Dubizzle Forbidden Zone] {title[:35]}")
                 continue
             age_label, _, is_recent = parse_age_and_tier(body_text)
             if not is_recent:
                 continue
-
-            pub_m = re.search(r'"((?:/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
-            if not pub_m:
-                pub_m2 = re.search(r'href="((?:/en)?/profile/[a-zA-Z0-9_-]+)"', html)
-                pub_id = pub_m2.group(1) if pub_m2 else ""
-                name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
-                pub_name = name_m.group(1).strip() if name_m else "مالك مباشر"
-            else:
-                pub_id = pub_m.group(1)
-                pub_name = pub_m.group(2).strip()
 
             p_m = re.search(r'([\d,]{4,15})\s*ج\.م', html) or re.search(r'EGP\s*([\d,]{4,15})', html)
             if p_m:
@@ -379,21 +472,33 @@ def run_scraper():
                 price_num = 0
                 price_str = "السعر بالتفاصيل"
 
-            pub_ads_count = 1
-            if pub_id:
-                try:
-                    pr_html, _ = fetcher.get_html("https://www.dubizzle.com.eg" + pub_id)
-                    if pr_html:
-                        profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr_html)))
-                        exact_counts = [int(x) for x in re.findall(r'(\d+)\s+(?:إعلان\b|اعلان\b|إعلانات\b|اعلانات\b|published ads\b|active ads\b)', pr_html, re.I) if int(x) < 300]
-                        pub_ads_count = max(exact_counts + [profile_cards, 1])
-                except Exception:
-                    pub_ads_count = 1
-
-            is_direct_owner, ai_reason = analyze_with_ai(title, body_text, pub_name, item["deal"], item["cat"], price_num, pub_ads_count)
-            if not is_direct_owner:
-                print(f"[Rejected by AI] {pub_name} | Reason: {ai_reason}")
+            if item["deal"] != "إيجار" and not is_strict_cash_sale(title, body_text, price_num, html):
+                print(f"[Rejected Dubizzle Installment/Price] {price_str} | {title[:35]}")
                 continue
+
+            pub_m = re.search(r'"((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
+            if not pub_m:
+                pub_m2 = re.search(r'href="((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"', html)
+                if not pub_m2:
+                    continue
+                pub_id = pub_m2.group(1)
+                name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
+                pub_name = name_m.group(1).strip() if name_m else "مالك مباشر"
+            else:
+                pub_id = pub_m.group(1)
+                pub_name = pub_m.group(2).strip()
+
+            if pub_name in banned_pubs:
+                continue
+
+            pub_ads_count = get_real_dubizzle_active_ads(fetcher, html, pub_id)
+            if not (1 <= pub_ads_count <= 4):
+                if pub_ads_count > 4:
+                    banned_pubs.add(pub_name)
+                print(f"[Rejected Dubizzle Active Ads Count] {pub_name} | Active Ads: {pub_ads_count}")
+                continue
+
+            notify_ai_server_dubizzle(title, body_text, pub_name, item["deal"], item["cat"], price_num, pub_ads_count)
 
             area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', body_text, re.I)
             area_val = int(area_m.group(1)) if area_m else None
@@ -423,7 +528,7 @@ def run_scraper():
                 "verified_v12": True,
                 "scraped_at": now_cairo
             })
-            print(f"[+ Approved by AI] {item['deal']} | {zone} | {title[:40]}")
+            print(f"[+ Dubizzle Owner 1-4 Ads Approved] {item['deal']} | {zone} | {pub_name} ({pub_ads_count} إعلان) | {title[:35]}")
             time.sleep(random.uniform(1.0, 1.6))
         except Exception:
             continue
