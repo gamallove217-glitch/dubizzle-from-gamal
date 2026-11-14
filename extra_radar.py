@@ -72,12 +72,12 @@ AQARMAP_SOURCES = [
 ]
 
 OPENSOOQ_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للإيجار/شقق-للايجار"},
-    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات-للإيجار/شقق-للايجار"},
-    {"cat": "فلل", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للإيجار"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات-للبيع/شقق-للبيع"},
-    {"cat": "فلل", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع/فلل-قصور-للبيع"},
-    {"cat": "تجاري", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات-للبيع"},
+    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات/عقارات-للإيجار/سكني/شقق-للايجار"},
+    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات/عقارات-للإيجار/سكني/شقق-للايجار"},
+    {"cat": "فلل", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات/عقارات-للإيجار/سكني/فلل-وقصور-للايجار"},
+    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات/عقارات-للبيع/سكني/شقق-للبيع"},
+    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/القاهرة-الجديدة/عقارات/عقارات-للبيع/سكني/شقق-للبيع"},
+    {"cat": "فلل", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/القاهرة/التجمع-الخامس/عقارات/عقارات-للبيع/سكني/فلل-وقصور-للبيع"},
 ]
 
 def is_warp_up():
@@ -123,30 +123,32 @@ class SmartFetcher:
             print(f"[PW Init] {e}")
             return False
 
-    def _is_valid_html(self, html):
+    def _is_valid_html(self, html, req_regex=None):
         if not html or len(html) < 1500:
             return False
         if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html:
             return False
+        if req_regex and not re.search(req_regex, html):
+            return False
         return True
 
-    def get_html(self, raw_url):
+    def get_html(self, raw_url, req_regex=None):
         url = urllib.parse.quote(raw_url, safe=":/?&=#%")
         statuses = []
         if self.warp_active:
             try:
                 r = self.warp_sess.get(url, timeout=18)
-                statuses.append(f"WARP:{r.status_code}")
-                if r.status_code == 200 and self._is_valid_html(r.text):
+                if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                     return r.text, "200 (WARP)"
+                statuses.append(f"WARP:{r.status_code}")
             except Exception:
                 statuses.append("WARP:ERR")
 
         try:
             r = self.direct_sess.get(url, timeout=18)
-            statuses.append(f"Direct:{r.status_code}")
-            if r.status_code == 200 and self._is_valid_html(r.text):
+            if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Direct)"
+            statuses.append(f"Direct:{r.status_code}")
         except Exception:
             statuses.append("Direct:ERR")
 
@@ -155,13 +157,13 @@ class SmartFetcher:
             try:
                 page = self.context.new_page()
                 resp = page.goto(url, wait_until="domcontentloaded", timeout=25000)
-                page.wait_for_timeout(3500)
+                page.wait_for_timeout(4000)
                 html = page.content()
                 code = resp.status if resp else 0
                 page.close()
-                statuses.append(f"PW:{code}")
-                if self._is_valid_html(html):
+                if code == 200 and self._is_valid_html(html, req_regex):
                     return html, "200 (Playwright)"
+                statuses.append(f"PW:{code}")
             except Exception:
                 if page:
                     try: page.close()
@@ -171,9 +173,9 @@ class SmartFetcher:
         try:
             enc = urllib.parse.quote(url, safe="")
             r = std_requests.get(f"https://api.codetabs.com/v1/proxy?quest={enc}", timeout=20)
-            statuses.append(f"Proxy:{r.status_code}")
-            if r.status_code == 200 and self._is_valid_html(r.text):
+            if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Proxy)"
+            statuses.append(f"Proxy:{r.status_code}")
         except Exception:
             statuses.append("Proxy:ERR")
 
@@ -191,28 +193,32 @@ def normalize_ar(text):
     t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
     return re.sub(r'\s+', ' ', t).strip()
 
-def extract_visible_text(html):
-    cleaned = re.sub(r'<(script|style|svg|noscript)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
-    desc_matches = re.findall(r'"description"\s*:\s*"([^"]+)"', html)
-    tags_stripped = re.sub(r'<[^>]+>', ' ', cleaned)
-    return tags_stripped + " " + " ".join(desc_matches)
+def extract_ad_body(html):
+    meta_desc = " ".join(re.findall(r'<meta[^>]+(?:name="description"|property="og:description")[^>]+content="([^"]+)"', html, flags=re.I))
+    json_desc = " ".join(re.findall(r'"description"\s*:\s*"([^"]+)"', html))
+    body_cleaned = re.sub(r'<(script|style|svg|noscript|header|nav|footer|aside)[^>]*>.*?</\1>', ' ', html, flags=re.S | re.I)
+    tags_stripped = re.sub(r'<[^>]+>', ' ', body_cleaned)
+    tags_stripped = re.sub(r'\s+', ' ', tags_stripped).strip()
+    return f"{meta_desc} {json_desc} {tags_stripped[:3500]}".strip()
 
-def detect_zone(text):
-    t = normalize_ar(text)
+def detect_zone(title, body_text):
+    core = normalize_ar(f"{title} {body_text[:1500]}")
+    title_norm = normalize_ar(title)
+    for bad in ["بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "النورث هاوس", "شمال الرحاب"]:
+        if normalize_ar(bad) in core:
+            return None
     for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in t:
+        if normalize_ar(city) in title_norm:
             return None
     for z_name, keywords in ZONES:
         for kw in keywords:
-            if normalize_ar(kw) in t:
+            if normalize_ar(kw) in core:
                 return z_name
-    if any(k in t for k in ["القاهرة الجديدة", "القاهره الجديده", "تجمع", "new cairo", "settlement"]):
-        return "القاهرة الجديدة"
-    return None
+    return "القاهرة الجديدة"
 
 def parse_age_and_tier(page_text):
     norm_text = normalize_ar(page_text)
-    if any(w in norm_text for w in ["اسبوع", "أسبوع", "شهر", "أشهر", "اشهر", "سنة", "سنه"]):
+    if re.search(r'منذ\s+(\d+\s*)?(اسبوع|أسبوع|اسابيع|أسابيع|شهر|أشهر|اشهر|سنة|سنه|سنوات)', norm_text):
         return ("قديم", 0, False)
     m = re.search(r'منذ\s+(\d+)\s*(يوم|أيام|ايام)', norm_text)
     if m:
@@ -225,7 +231,7 @@ def parse_age_and_tier(page_text):
     return ("حديث", 3, True)
 
 def is_strict_cash_sale(title, visible_text, price_num):
-    full_text = normalize_ar(title + " " + visible_text[:4500])
+    full_text = normalize_ar(title + " " + visible_text[:2500])
     for neg in SAFE_CASH_NEGATIONS:
         full_text = full_text.replace(normalize_ar(neg), " ")
     for kw in INSTALLMENT_PATTERNS:
@@ -275,9 +281,9 @@ def send_telegram_msg(tok, cid, text_msg):
 def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source):
     url = "https://gamal216.pythonanywhere.com/analyze"
     payload = {
-        "text": f"{title} {visible_text[:3500]}",
+        "text": f"{title} {visible_text[:2500]}",
         "title": title,
-        "description": visible_text[:3500],
+        "description": visible_text[:2500],
         "publisher": pub_name,
         "deal": deal,
         "cat": cat,
@@ -291,16 +297,17 @@ def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source)
             result = response.json()
             if result.get("status") == "success":
                 if result.get("decision") == "مرفوض":
-                    return False
+                    return False, result.get("reason", "مرفوض")
                 analysis = result.get("analysis", "")
                 if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False
-                return True
+                    return False, result.get("reason", "سمسار")
+                return True, "مالك مباشر"
     except Exception as e:
         print(f"[AI Server Error in Extra Radar] {e}")
     if deal == "تمليك":
-        return is_strict_cash_sale(title, visible_text, price_num)
-    return True
+        ok = is_strict_cash_sale(title, visible_text, price_num)
+        return ok, ("مالك مباشر" if ok else "شبهة تقسيط")
+    return True, "مالك مباشر"
 
 def monitor_system_with_ai(stats_dict):
     url = "https://gamal216.pythonanywhere.com/monitor"
@@ -339,12 +346,12 @@ def run_extra_radar():
     for src in AQARMAP_SOURCES:
         for page in range(1, 3):
             page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
-            html, status_info = fetcher.get_html(page_url)
+            html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
             print(f"[Aqarmap] {src['cat']} ({src['deal']}) p.{page} -> {status_info}")
-            time.sleep(random.uniform(1.0, 1.8))
+            time.sleep(random.uniform(1.0, 1.6))
             if not html:
                 continue
-            links = re.findall(r'href="(/ar/listing/(\d+)[^"]*)"', html)
+            links = re.findall(r'(/ar/listing/(\d+)[^"\'\s<>\\]*)', html)
             for path, num_str in links:
                 uid = int("91" + num_str)
                 if uid in seen_ids or uid in extra_checked or uid in banned_ids:
@@ -362,27 +369,31 @@ def run_extra_radar():
     for src in OPENSOOQ_SOURCES:
         for page in range(1, 3):
             page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
-            html, status_info = fetcher.get_html(page_url)
+            html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/search/\d+')
             print(f"[OpenSooq] {src['cat']} ({src['deal']}) p.{page} -> {status_info}")
-            time.sleep(random.uniform(1.0, 1.8))
+            time.sleep(random.uniform(1.0, 1.6))
             if not html:
                 continue
-            links = re.findall(r'href="(/ar/search/(\d+)[^"]*)"', html)
-            for path, num_str in links:
+            ids_found = re.findall(r'/ar/search/(\d{7,12})', html)
+            for num_str in ids_found:
                 uid = int("92" + num_str)
                 if uid in seen_ids or uid in extra_checked or uid in banned_ids:
                     continue
                 os_candidates.append({
                     "ad_id": uid,
                     "source": "السوق المفتوح",
-                    "url": "https://eg.opensooq.com" + path,
+                    "url": f"https://eg.opensooq.com/ar/search/{num_str}",
                     "cat": src["cat"],
                     "deal": src["deal"]
                 })
                 seen_ids.add(uid)
 
-    all_candidates = aq_candidates[:30] + os_candidates[:30]
-    print(f"[Extra Radar] Candidates -> Aqarmap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)}")
+    rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
+    sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
+    rent_os = [x for x in os_candidates if x["deal"] == "إيجار"]
+    sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
+    all_candidates = rent_aq[:20] + rent_os[:15] + sale_aq[:15] + sale_os[:15]
+    print(f"[Extra Radar] Candidates -> Aqarmap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added = 0
     os_added = 0
@@ -398,15 +409,15 @@ def run_extra_radar():
             title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
             if not title or len(title) < 5:
                 continue
-            visible_text = extract_visible_text(html)
-            zone = detect_zone(title + " " + visible_text[:4500])
+            body_text = extract_ad_body(html)
+            zone = detect_zone(title, body_text)
             if not zone:
                 continue
-            age_label, fresh_tier, is_recent = parse_age_and_tier(visible_text)
+            age_label, fresh_tier, is_recent = parse_age_and_tier(body_text)
             if not is_recent:
                 continue
 
-            p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html, re.I)
+            p_m = re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', body_text, re.I) or re.search(r'([\d,]{4,15})\s*(?:جنيه|ج\.م|EGP)', html, re.I)
             if p_m:
                 price_num = int(p_m.group(1).replace(",", ""))
                 price_str = f"{p_m.group(1)} ج.م"
@@ -415,14 +426,14 @@ def run_extra_radar():
                 price_str = "السعر بالتفاصيل"
 
             pub_name = f"مالك ({item['source']})"
-            is_owner = analyze_with_ai(title, visible_text, pub_name, item["deal"], item["cat"], price_num, item["source"])
+            is_owner, ai_reason = analyze_with_ai(title, body_text, pub_name, item["deal"], item["cat"], price_num, item["source"])
             if not is_owner:
-                print(f"[Rejected by AI Extra] {item['source']} | {title[:30]}")
+                print(f"[Rejected by AI Extra] {item['source']} ({item['deal']}) | Reason: {ai_reason} | {title[:30]}")
                 continue
 
-            area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', visible_text, re.I)
+            area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|sqm|m²)', body_text, re.I)
             area_val = int(area_m.group(1)) if area_m else None
-            rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', visible_text)
+            rooms_m = re.search(r'(\d)\s*(?:غرف|غرفة|نوم)', body_text)
             rooms_val = int(rooms_m.group(1)) if rooms_m else None
 
             now_ts = int(time.time())
@@ -453,7 +464,7 @@ def run_extra_radar():
             else:
                 os_added += 1
             print(f"[+ Extra Approved by AI] {item['source']} | {item['deal']} | {zone} | {title[:35]}")
-            time.sleep(random.uniform(0.9, 1.5))
+            time.sleep(random.uniform(0.8, 1.3))
         except Exception:
             continue
 
@@ -526,26 +537,4 @@ def run_extra_radar():
             f"<i>{ai_advice}</i>\n"
             f"إجمالي الإعلانات الحية بالموقع: <b>{len(merged_ads)} إعلان</b>\n"
             f"إيجار: <b>{rent_total}</b> | تمليك كاش: <b>{sale_total}</b>\n"
-            f"دوبيزل: <b>{dub_total}</b> (جديد بالرن: +{dub_added} من {dub_insp} مفحوص)\n"
-            f"عقارماب: <b>{aq_total}</b> (جديد بالرن: +{aq_added} من {len(aq_candidates)} مرشح)\n"
-            f"السوق المفتوح: <b>{os_total}</b> (جديد بالرن: +{os_added} من {len(os_candidates)} مرشح)"
-        )
-        send_telegram_msg(tok, cid, summary_msg)
-    else:
-        for a in merged_ads[:30]:
-            if a.get("ad_id"):
-                notified_ids.add(a.get("ad_id"))
-
-    data["updated_at"] = now_str
-    data["total"] = len(merged_ads)
-    data["last_run_report"] = run_report
-    data["ads"] = merged_ads
-    data["extra_checked_ids"] = list(extra_checked)[-10000:]
-    data["telegram_config"] = tg_cfg
-    data["telegram_notified_ids"] = list(notified_ids)[-5000:]
-
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-if __name__ == "__main__":
-    run_extra_radar()
+            f"دوبيزل: <b>{dub_total}</b> (جديد
