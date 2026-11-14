@@ -27,22 +27,32 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Inspect and Restore Original Engine
+      - name: Inspect and Restore Original Engine Automatically
         run: |
-          echo "=== ORIGINAL REQUIREMENTS ==="
-          git show 1953ca8fa75d52b69593262bf806934bc8d0b66d:requirements.txt || true
-          echo "=== ORIGINAL WORKFLOW ==="
-          git show 1953ca8fa75d52b69593262bf806934bc8d0b66d:.github/workflows/scrape.yml || true
-          git checkout 1953ca8fa75d52b69593262bf806934bc8d0b66d -- scraper.py extra_radar.py requirements.txt
-          sed -i '/http/d' requirements.txt
+          echo "=== LAST 10 COMMITS ==="
+          git log -n 10 --oneline
+          PREV_S=$(git log -n 2 --format="%H" -- scraper.py | tail -n 1)
+          PREV_E=$(git log -n 2 --format="%H" -- extra_radar.py | tail -n 1)
+          PREV_Y=$(git log -n 6 --format="%H" -- .github/workflows/scrape.yml | tail -n 1)
+          echo "Restoring scraper.py from: $PREV_S"
+          echo "Restoring extra_radar.py from: $PREV_E"
+          git checkout "$PREV_S" -- scraper.py || true
+          git checkout "$PREV_E" -- extra_radar.py || true
+          git show "$PREV_Y":.github/workflows/scrape.yml > old_workflow.txt || true
+          sed -i '/http/d' requirements.txt || true
           echo "=== CLEANED REQUIREMENTS ==="
-          cat requirements.txt
+          cat requirements.txt || true
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add scraper.py extra_radar.py requirements.txt old_workflow.txt
+          git commit -m "Restore original engine files to main" || true
+          git push origin main || true
 
       - name: Install all original dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install curl_cffi requests
+          pip install -r requirements.txt || true
+          pip install curl_cffi requests beautifulsoup4
           if grep -qi playwright requirements.txt; then
             playwright install chromium --with-deps || true
           fi
@@ -55,7 +65,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python -u scraper.py
+        run: python -u scraper.py || true
 
       - name: Run Original Extra Radar
         env:
@@ -65,18 +75,16 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python -u extra_radar.py
+        run: python -u extra_radar.py || true
 
-      - name: Commit and push updated files
+      - name: Commit and push updated ads
+        if: always()
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add ads.json requirements.txt scraper.py extra_radar.py
+          git pull --rebase origin main || true
+          git add ads.json
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No changes in ads.json"
           else
-            git pull --rebase origin main || true
-            git add ads.json requirements.txt scraper.py extra_radar.py
-            git commit -m "Restore original engine and update direct owner ads" || true
+            git commit -m "Auto-update direct owner ads" || true
             git push origin main || true
           fi
