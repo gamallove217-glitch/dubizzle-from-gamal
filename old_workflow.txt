@@ -1,0 +1,56 @@
+name: Update Direct Owner Ads
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dubizzle-scraper-group
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Dubizzle Scraper
+        env:
+          PAGES_PER_CATEGORY: "5"
+          MAX_RUNTIME_SECONDS: "600"
+        run: python scraper.py
+
+      - name: Run Extra Radar (Aqarmap & OpenSooq)
+        run: python extra_radar.py
+
+      - name: Commit and push updated ads
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add ads.json
+          if git diff --staged --quiet; then
+            echo "No changes in ads.json"
+          else
+            git pull --rebase origin main || true
+            git add ads.json
+            git commit -m "Auto-update direct owner ads" || true
+            git push origin main || true
+          fi

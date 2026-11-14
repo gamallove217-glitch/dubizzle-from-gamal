@@ -4,4 +4,3 @@ requests>=2.31,<3
 beautifulsoup4>=4.12,<5
 lxml>=5.1,<6
 curl_cffi>=0.7,<1
-https://3b5256edded0be9600bd289dcf4b66c6@o4512424824799232.ingest.de.sentry.io/4512425074425936
