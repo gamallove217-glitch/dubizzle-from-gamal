@@ -11,32 +11,27 @@ if sys.platform.startswith("win"):
         pass
 
 try:
-    from curl_cffi import requests as cffi_requests
-    HAS_CFFI = True
+    from DrissionPage import ChromiumPage, ChromiumOptions
+    HAS_DRISSION = True
 except ImportError:
-    HAS_CFFI = False
-
-try:
-    from playwright.sync_api import sync_playwright
-    HAS_PLAYWRIGHT = True
-except ImportError:
-    HAS_PLAYWRIGHT = False
+    HAS_DRISSION = False
 
 AI_SERVER_URL = "https://gamal216.pythonanywhere.com"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 SEEN_FILE = os.path.join(BASE_DIR, "seen_links.json")
+PROFILE_DIR = os.path.join(BASE_DIR, "edge_profile")
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 80
 
 DUBIZZLE_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "فلل", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "تجاري", "deal": "إيجار", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "فلل", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "تجاري", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "أراضي", "deal": "تمليك", "url": "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo-fifth-settlement/"}
+    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
+    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo-fifth-settlement/"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
+    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
+    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo-fifth-settlement/"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
+    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "url": "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo-fifth-settlement/"}
 ]
 
 ZONE_MAPPING = {
@@ -111,19 +106,19 @@ def is_forbidden_or_installment(title, desc, deal, price_num):
     norm_text = normalize_ar(raw_combined)
     for bad in FORBIDDEN_ZONES:
         if normalize_ar(bad) in norm_text:
-            return True, f"منطقة محظورة ({bad})"
+            return True, f"Forbidden Zone ({bad})"
     if deal == "تمليك":
         if int(price_num or 0) < 1500000:
-            return True, f"سعر غير مكتمل أو مقدم تقسيط ({price_num})"
+            return True, f"Invalid/Downpayment Price ({price_num})"
         temp = norm_text
         for neg in CASH_NEGATIONS:
             temp = temp.replace(normalize_ar(neg), " ")
         for inst in INSTALLMENT_KEYWORDS:
             if normalize_ar(inst) in temp:
-                return True, f"إعلان تقسيط ({inst})"
+                return True, f"Installment Ad ({inst})"
         if re.search(r'\b\d+\s*%\s*(مقدم|تعاقد|دفعه|down)', temp):
-            return True, "مقدم تقسيط بالنسبة المئوية"
-    return False, "سليم"
+            return True, "Installment % Downpayment"
+    return False, "OK"
 
 def parse_price_strict(raw_val, deal="تمليك"):
     if not raw_val:
@@ -178,85 +173,78 @@ def extract_price_from_meta_and_html(soup, html_text, deal="تمليك"):
                 return p
     return 0
 
-class LocalDubizzleEngine:
+class RealBrowserEngine:
     def __init__(self):
-        self.pw = None
-        self.browser = None
-        self.context = None
+        self.page = None
 
-    def start_browser(self):
-        if not HAS_PLAYWRIGHT or self.browser:
-            return
+    def find_windows_browser(self):
+        candidates = [
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe"),
+            os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"),
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                return c
+        return None
+
+    def start(self):
+        if self.page is not None:
+            return True
+        if not HAS_DRISSION:
+            print("[ERROR] DrissionPage is missing! Run: pip install DrissionPage")
+            return False
         try:
-            self.pw = sync_playwright().start()
-            self.browser = self.pw.chromium.launch(
-                headless=True,
-                args=["--disable-blink-features=AutomationControlled", "--no-sandbox"]
-            )
-            self.context = self.browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                locale="ar-EG",
-                viewport={"width": 1366, "height": 768}
-            )
-            self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            os.makedirs(PROFILE_DIR, exist_ok=True)
+            co = ChromiumOptions()
+            b_path = self.find_windows_browser()
+            if b_path:
+                co.set_browser_path(b_path)
+                print(f"[Browser] Using: {b_path}")
+            co.set_paths(local_port=9333, user_data_path=PROFILE_DIR)
+            co.no_imgs(True)
+            co.mute(True)
+            co.set_argument("--disable-blink-features=AutomationControlled")
+            self.page = ChromiumPage(addr_or_opts=co)
+            return True
         except Exception as e:
-            print(f"[Browser Init Error] {e}")
-
-    def close(self):
-        for obj in (self.context, self.browser, self.pw):
-            try:
-                if obj:
-                    obj.close() if hasattr(obj, "close") else obj.stop()
-            except Exception:
-                pass
+            print(f"[Browser Start Error] {e}")
+            return False
 
     def fetch_page(self, url, label=""):
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Referer": "https://www.dubizzle.com.eg/"
-        }
-        cffi_status = "N/A"
-        if HAS_CFFI:
-            for imp in ("chrome124", "chrome120", "safari17_0"):
-                try:
-                    r = cffi_requests.get(url, impersonate=imp, headers=headers, timeout=20)
-                    cffi_status = str(r.status_code)
-                    if r.status_code == 200 and len(r.text) > 5000 and "Just a moment" not in r.text[:1500]:
-                        if label:
-                            print(f"[Dubizzle Local] {label} -> Direct CFFI: 200 OK")
-                        return r.text
-                except Exception:
-                    cffi_status = "ERR"
-        pw_status = "N/A"
-        if HAS_PLAYWRIGHT:
-            self.start_browser()
-            if self.context:
-                page = None
-                try:
-                    page = self.context.new_page()
-                    resp = page.goto(url, wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_timeout(2000)
-                    html = page.content()
-                    code = resp.status if resp else 0
-                    pw_status = str(code)
-                    if code == 200 and len(html) > 5000 and "Just a moment" not in html[:1500]:
-                        if label:
-                            print(f"[Dubizzle Local] {label} -> Playwright: 200 OK")
-                        page.close()
-                        return html
-                except Exception:
-                    pw_status = "ERR"
-                finally:
-                    if page:
-                        try:
-                            page.close()
-                        except Exception:
-                            pass
-        if label:
-            print(f"[Dubizzle Local] {label} -> CFFI:{cffi_status} | PW:{pw_status}")
-        return ""
+        if not self.start():
+            return ""
+        try:
+            self.page.get(url, retry=1, interval=1, timeout=25)
+            time.sleep(1.5)
+            html = self.page.html or ""
+            for wait_step in range(8):
+                if ("Just a moment" in html[:2500] or "Checking your browser" in html[:2500] or len(html) < 3500):
+                    if wait_step == 0 and label:
+                        print("  [Cloudflare Check] Waiting a few seconds for browser verification...")
+                    time.sleep(2.5)
+                    html = self.page.html or ""
+                else:
+                    break
+            if len(html) > 4000 and "Just a moment" not in html[:1500]:
+                return html
+            if label:
+                print(f"[Dubizzle Local] {label} -> Blocked or Empty (len={len(html)})")
+            return ""
+        except Exception as e:
+            if label:
+                print(f"[Dubizzle Local] {label} -> Fetch Error: {e}")
+            return ""
+
+    def close(self):
+        try:
+            if self.page:
+                self.page.quit()
+        except Exception:
+            pass
 
 def extract_dubizzle_links(html):
     links = []
@@ -290,10 +278,10 @@ def extract_profile_url(soup, html):
 
 def count_dubizzle_active_ads(ad_html, ad_soup, profile_url, engine):
     if "/companies/" in str(profile_url).lower():
-        return 99, "حساب شركة عقارية (/companies/)"
+        return 99, "Company Account (/companies/)"
     raw_ad_text = ad_soup.get_text(" ", strip=True).translate(HINDI_MAP)
     if re.search(r'(?:company\s*profile|verified\s*business|share\s*agency\s*profile|شركة\s*موثقة|مكتب\s*عقاري)', raw_ad_text, re.I):
-        return 99, "حساب شركة أو وكالة عقارية"
+        return 99, "Agency/Company Account"
     for pat in [
         r'"activeAdsCount"\s*:\s*(\d+)',
         r'"totalAds"\s*:\s*(\d+)',
@@ -304,17 +292,17 @@ def count_dubizzle_active_ads(ad_html, ad_soup, profile_url, engine):
         if m:
             c = int(m.group(1))
             if c >= 1:
-                return c, f"JSON الإعلان ({c} إعلان نشط)"
-    m_txt = re.search(r'(\d+)\s*(?:إعلانات\s*نشطة|إعلان\s*نشط|اعلانات\s*نشطه|اعلان\s*نشط|active\s*ads|published\s*ads|ads\s*posted)', raw_ad_text, re.I)
+                return c, f"Ad JSON ({c} active ads)"
+    m_txt = re.search(r'(?:Active\s*Ads\s*(\d+)|(\d+)\s*(?:إعلانات\s*نشطة|إعلان\s*نشط|اعلانات\s*نشطه|اعلان\s*نشط|active\s*ads|published\s*ads|ads\s*posted))', raw_ad_text, re.I)
     if m_txt:
-        c = int(m_txt.group(1))
+        c = int(m_txt.group(1) or m_txt.group(2))
         if c >= 1:
-            return c, f"بيانات المعلن ({c} إعلان نشط)"
+            return c, f"Seller Badge ({c} active ads)"
     if not profile_url:
-        return 0, "لا يوجد رابط ملف شخصي للتحقق من عدد الإعلانات"
+        return 0, "No profile URL found"
     prof_html = engine.fetch_page(profile_url)
     if not prof_html or len(prof_html) < 2000:
-        return 0, "تعذر فتح صفحة المعلن للتحقق من عدد الإعلانات"
+        return 0, "Could not load seller profile"
     prof_soup = BeautifulSoup(prof_html, "html.parser")
     prof_text = prof_soup.get_text(" ", strip=True).translate(HINDI_MAP)
     for pat in [
@@ -326,29 +314,29 @@ def count_dubizzle_active_ads(ad_html, ad_soup, profile_url, engine):
         m = re.search(pat, prof_html)
         if m and int(m.group(1)) >= 1:
             c = int(m.group(1))
-            return c, f"JSON صفحة المعلن ({c} إعلان نشط)"
+            return c, f"Profile JSON ({c} active ads)"
     m_p = re.search(r'(?:Showing|عرض)?\s*(?:\d+\s*[-–]\s*\d+\s*(?:of|من)\s*)?(\d+)\s*(?:إعلانات|إعلان|اعلانات|اعلان|Ads|ad|results|نتيجة)', prof_text, re.I)
     if m_p and int(m_p.group(1)) >= 1:
         c = int(m_p.group(1))
-        return c, f"عداد صفحة المعلن ({c} إعلان نشط)"
+        return c, f"Profile Counter ({c} active ads)"
     ad_cards = extract_dubizzle_links(prof_html)
     if len(ad_cards) >= 1:
-        return len(ad_cards), f"حصر بطاقات صفحة المعلن ({len(ad_cards)} إعلان نشط)"
-    return 0, "لم يتم العثور على عدد إعلانات نشطة موثق"
+        return len(ad_cards), f"Profile Cards ({len(ad_cards)} active ads)"
+    return 0, "Unverified ad count"
 
 def parse_dubizzle_ad(url, cat, deal, engine):
     html = engine.fetch_page(url)
     if not html or len(html) < 2500:
-        return None, "تعذر تحميل صفحة الإعلان"
+        return None, "Failed to load ad page"
     soup = BeautifulSoup(html, "html.parser")
     h1 = soup.find("h1")
     title = h1.get_text(" ", strip=True) if h1 else ""
     if not title:
         og_t = soup.find("meta", {"property": "og:title"})
         title = og_t["content"].strip() if og_t and og_t.get("content") else ""
-    title = re.sub(r'\s*\|\s*دوبيزل.*$', '', title).strip()
+    title = re.sub(r'\s*\|\s*(?:دوبيزل|dubizzle).*$', '', title, flags=re.I).strip()
     if not title or len(title) < 5:
-        return None, "عنوان الإعلان غير مكتمل"
+        return None, "Empty title"
     desc = ""
     desc_el = soup.find(attrs={"aria-label": "Description"}) or soup.find("div", {"data-testid": "description"})
     if desc_el:
@@ -364,7 +352,7 @@ def parse_dubizzle_ad(url, cat, deal, engine):
     prof_url = extract_profile_url(soup, html)
     active_count, count_info = count_dubizzle_active_ads(html, soup, prof_url, engine)
     if not (1 <= active_count <= 4):
-        return None, f"مرفوض بقاعدة (1-4): {count_info}"
+        return None, f"Broker/Count Rule (1-4): {count_info}"
     pub_raw = "مالك مباشر (دوبيزل)"
     m_seller = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"user"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"', html)
     if m_seller:
@@ -385,7 +373,7 @@ def parse_dubizzle_ad(url, cat, deal, engine):
         if r.status_code == 200:
             res = r.json()
             if res.get("decision") == "مرفوض":
-                return None, f"رفض الذكاء الاصطناعي ({res.get('reason', '')})"
+                return None, f"AI Rejected ({res.get('reason', '')})"
             ai_area = res.get("area")
             ai_rooms = res.get("rooms")
     except Exception:
@@ -413,7 +401,7 @@ def parse_dubizzle_ad(url, cat, deal, engine):
         "description": desc[:500],
         "timestamp": int(time.time()),
         "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-    }, f"مقبول ({count_info})"
+    }, f"Owner Verified ({count_info})"
 
 def load_json_list(path):
     if os.path.exists(path):
@@ -458,47 +446,49 @@ def clean_existing_dubizzle_only_db(ads_list):
     return cleaned
 
 def main():
-    print("=== بدء تشغيل رادار دوبيزل المحلي (Local Residential IP - 1 to 4 Active Ads Only) ===")
+    print("=== Starting Local Dubizzle Radar (Edge Browser - 1 to 4 Active Ads Only) ===")
     raw_existing = load_json_list(DATA_FILE)
     existing_ads = clean_existing_dubizzle_only_db(raw_existing)
     purged_count = len(raw_existing) - len(existing_ads)
     if purged_count > 0:
-        print(f"[Purge] تم تطهير وحذف {purged_count} إعلان غير مطابق أو تابع لمنصات أخرى من ads.json")
+        print(f"[Purge] Removed {purged_count} polluted/non-Dubizzle ads from ads.json")
     existing_urls = {(a.get("link") or a.get("url")) for a in existing_ads}
     seen_links = set(load_json_list(SEEN_FILE))
-    engine = LocalDubizzleEngine()
+    engine = RealBrowserEngine()
     candidates = []
     for page_num in (1, 2, 3):
         for src in DUBIZZLE_SOURCES:
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            label = f"{src['cat']} ({src['deal']}) p.{page_num}"
+            label = f"{src['en']} p.{page_num}"
             html = engine.fetch_page(page_url, label=label)
             links = extract_dubizzle_links(html)
+            if html:
+                print(f"[Dubizzle Local] {label} -> 200 OK (Extracted {len(links)} ads)")
             for lnk in links:
                 if lnk not in existing_urls and lnk not in seen_links:
                     if not any(c["url"] == lnk for c in candidates):
-                        candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"]})
-            time.sleep(random.uniform(1.0, 2.0))
-    print(f"[Dubizzle Local] إجمالي الإعلانات الجديدة المرشحة للفحص: {len(candidates)}")
+                        candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"]})
+            time.sleep(random.uniform(1.0, 1.8))
+    print(f"[Dubizzle Local] Total new candidates to inspect: {len(candidates)}")
     added_ads = []
-    for item in candidates[:MAX_CANDIDATES_PER_RUN]:
+    for idx, item in enumerate(candidates[:MAX_CANDIDATES_PER_RUN], 1):
         u = item["url"]
         seen_links.add(u)
         ad_obj, status_msg = parse_dubizzle_ad(u, item["cat"], item["deal"], engine)
         if ad_obj:
             added_ads.append(ad_obj)
             existing_urls.add(u)
-            print(f"  [+ مقبول مالك دوبيزل] {ad_obj['deal']} | {ad_obj['zone']} | {ad_obj['publisher']} | {ad_obj['price']} | {ad_obj['title'][:40]}")
+            print(f"  [{idx}] [+ ACCEPTED OWNER] {item['en']} | Active Ads: {ad_obj['active_ads_count']} | Price: {ad_obj['price_num']:,} EGP")
         else:
-            print(f"  [- استبعاد] {status_msg} | {u.split('/')[-1][:35]}")
-        time.sleep(random.uniform(1.2, 2.2))
+            print(f"  [{idx}] [- REJECTED] {status_msg}")
+        time.sleep(random.uniform(1.0, 1.8))
     engine.close()
     final_ads = (added_ads + existing_ads)[:MAX_ADS_STORED]
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(final_ads, f, ensure_ascii=False, indent=2)
     with open(SEEN_FILE, "w", encoding="utf-8") as f:
         json.dump(list(seen_links)[-4000:], f, ensure_ascii=False)
-    print(f"=== اكتمل الفحص المحلي: تم إضافة ({len(added_ads)}) مالك جديد | إجمالي الملاك الموثقين الآن: ({len(final_ads)}) ===")
+    print(f"=== Run Complete: Added ({len(added_ads)}) New Owners | Total Verified Owners in DB: ({len(final_ads)}) ===")
 
 if __name__ == "__main__":
     main()
