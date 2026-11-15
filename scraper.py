@@ -338,22 +338,33 @@ def load_existing():
         return {}, [], set(), set(), set()
 
 def get_real_dubizzle_active_ads(fetcher, ad_html, pub_id):
-    h_ad = ad_html.translate(HINDI_MAP)
-    json_counts = [int(x) for x in re.findall(r'"(?:activeAdsCount|publishedAdsCount|totalAds|adsCount)"\s*:\s*(\d+)', h_ad) if int(x) > 0]
     clean_prof = re.sub(r'^https?://www\.dubizzle\.com\.eg', '', pub_id)
     if not clean_prof.startswith("/"):
         clean_prof = "/" + clean_prof
+    
+    json_match = re.search(r'"userAdsCount"\s*:\s*(\d+)', ad_html)
+    if json_match:
+        return int(json_match.group(1))
+
     pr_html, _ = fetcher.get_html("https://www.dubizzle.com.eg" + clean_prof)
-    if not pr_html and not json_counts:
-        return 0
-    pr_clean = (pr_html or "").translate(HINDI_MAP)
+    if not pr_html:
+        return 99
+
+    pr_clean = pr_html.translate(HINDI_MAP)
+    
+    counts = []
+    text_counts = re.findall(r'>\s*(\d+)\s*<[^>]+>(?:إعلان|اعلان|إعلانات|اعلانات|Ads)\b', pr_clean, re.I)
+    if text_counts:
+        counts.extend([int(x) for x in text_counts])
+        
     profile_cards = len(set(re.findall(r'-ID(\d+)\.html', pr_clean)))
-    text_counts = [
-        int(x) for x in re.findall(r'(\d+)\s+(?:إعلان\b|اعلان\b|إعلانات\b|اعلانات\b|published ads\b|active ads\b)', pr_clean, re.I)
-        if 0 < int(x) < 500
-    ]
-    all_found = json_counts + text_counts + ([profile_cards] if profile_cards > 0 else [])
-    return max(all_found) if all_found else 0
+    if profile_cards > 0:
+        counts.append(profile_cards)
+
+    if counts:
+        return max(counts)
+    
+    return 1
 
 def notify_ai_server_dubizzle(title, body_text, pub_name, deal, cat, price_num, pub_ads_count):
     if not (1 <= pub_ads_count <= 4):
@@ -464,29 +475,41 @@ def run_scraper():
             if not is_recent:
                 continue
 
-            p_m = re.search(r'([\d,]{4,15})\s*ج\.م', html) or re.search(r'EGP\s*([\d,]{4,15})', html)
-            if p_m:
-                price_num = int(p_m.group(1).replace(",", ""))
-                price_str = f"{p_m.group(1)} ج.م"
+            meta_price = re.search(r'property="og:price:amount"\s+content="(\d+)"', html)
+            if meta_price:
+                price_num = int(meta_price.group(1))
+                price_str = f"{price_num:,} ج.م"
             else:
-                price_num = 0
-                price_str = "السعر بالتفاصيل"
+                p_m = re.search(r'([\d,]{4,15})\s*(?:ج\.م|جنيه|EGP)', html)
+                if p_m:
+                    price_num = int(p_m.group(1).replace(",", ""))
+                    price_str = f"{price_num:,} ج.م"
+                else:
+                    price_num = 0
+                    price_str = "السعر بالتفاصيل"
 
             if item["deal"] != "إيجار" and not is_strict_cash_sale(title, body_text, price_num, html):
                 print(f"[Rejected Dubizzle Installment/Price] {price_str} | {title[:35]}")
                 continue
 
+            pub_id = ""
+            pub_name = "مالك مباشر"
+            
             pub_m = re.search(r'"((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"[^>]*>([^<]+)<', html)
-            if not pub_m:
-                pub_m2 = re.search(r'href="((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"', html)
-                if not pub_m2:
-                    continue
-                pub_id = pub_m2.group(1)
-                name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
-                pub_name = name_m.group(1).strip() if name_m else "مالك مباشر"
-            else:
+            if pub_m:
                 pub_id = pub_m.group(1)
-                pub_name = pub_m.group(2).strip()
+                raw_name = pub_m.group(2).strip()
+                if "<" not in raw_name and ">" not in raw_name and "path" not in raw_name:
+                    pub_name = raw_name
+            else:
+                name_m = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"name"\s*:\s*"([^"]+)"', html)
+                if name_m:
+                    raw_name = name_m.group(1).strip()
+                    if "<" not in raw_name and ">" not in raw_name:
+                        pub_name = raw_name
+                prof_link = re.search(r'href="((?:/ar|/en)?/profile/[a-zA-Z0-9_-]+)"', html)
+                if prof_link:
+                    pub_id = prof_link.group(1)
 
             if pub_name in banned_pubs:
                 continue
