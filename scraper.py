@@ -25,13 +25,13 @@ MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 80
 
 DUBIZZLE_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo-fifth-settlement/"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo-fifth-settlement/"},
-    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "url": "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo-fifth-settlement/"}
+    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
+    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
+    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
+    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
+    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/"}
 ]
 
 ZONE_MAPPING = {
@@ -154,9 +154,10 @@ def extract_price_from_meta_and_html(soup, html_text, deal="تمليك"):
     for meta_desc in [{"property": "og:title"}, {"property": "og:description"}, {"name": "description"}]:
         tag = soup.find("meta", meta_desc)
         if tag and tag.get("content"):
-            m_egp = re.search(r'(\d[\d,]{3,11})\s*(?:ج\.?م|جنيه|EGP|LE)', tag.get("content").translate(HINDI_MAP), re.I)
+            m_egp = re.search(r'(?:EGP|ج\.?م|جنيه|LE)\s*(\d[\d,]{3,11})|(\d[\d,]{3,11})\s*(?:ج\.?م|جنيه|EGP|LE)', tag.get("content").translate(HINDI_MAP), re.I)
             if m_egp:
-                p = parse_price_strict(m_egp.group(1), deal)
+                raw_p = m_egp.group(1) or m_egp.group(2)
+                p = parse_price_strict(raw_p, deal)
                 if p > 0:
                     return p
     price_el = soup.find(attrs={"aria-label": "Price"})
@@ -165,7 +166,11 @@ def extract_price_from_meta_and_html(soup, html_text, deal="تمليك"):
         if p > 0:
             return p
     clean_html = html_text.translate(HINDI_MAP)
-    for pat in [r'"price"\s*:\s*(\d{4,10})', r'(\d[\d,]{4,11})\s*(?:ج\.?م|جنيه|EGP)']:
+    for pat in [
+        r'"price"\s*:\s*(\d{4,10})',
+        r'EGP\s*(\d[\d,]{4,11})',
+        r'(\d[\d,]{4,11})\s*(?:ج\.?م|جنيه|EGP)'
+    ]:
         m = re.search(pat, clean_html, re.I)
         if m:
             p = parse_price_strict(m.group(1), deal)
@@ -252,34 +257,41 @@ def extract_dubizzle_links(html):
         return links
     soup = BeautifulSoup(html, "html.parser")
     for a in soup.find_all("a", href=True):
-        href = a["href"].split("?")[0].strip()
-        if "/ad/" in href and ("-ID" in href or href.endswith(".html")):
+        href = a["href"].split("?")[0].split("#")[0].strip()
+        if "/ad/" in href and len(href) > 15:
             full = href if href.startswith("http") else f"https://www.dubizzle.com.eg{href}"
             if full not in links:
                 links.append(full)
-    for m in re.findall(r'(https?://(?:www\.)?dubizzle\.com\.eg/[^\s"\'<>]+/ad/[^\s"\'<>]+-ID\d+\.html)', html):
-        clean_u = m.split("?")[0]
-        if clean_u not in links:
+    for m in re.findall(r'(https?://(?:www\.)?dubizzle\.com\.eg/[^\s"\'<>]+/ad/[^\s"\'<>]+)', html):
+        clean_u = m.split("?")[0].split("#")[0].strip()
+        if clean_u not in links and len(clean_u) > 25:
             links.append(clean_u)
     return links
 
-def extract_profile_url(soup, html):
+def strip_related_ads_section(html):
+    for marker in ["إعلانات مشابهة", "إعلانات ذات صلة", "Related ads", "Similar ads"]:
+        idx = html.find(marker)
+        if idx > 2000:
+            return html[:idx]
+    return html
+
+def extract_profile_url(soup, main_html):
     for a in soup.find_all("a", href=True):
         h = a["href"].strip()
         if "/profile/" in h or "/companies/" in h:
             return h if h.startswith("http") else f"https://www.dubizzle.com.eg{h}"
-    m = re.search(r'(https?://(?:www\.)?dubizzle\.com\.eg/(?:ar/|en/)?(?:profile|companies)/[^\s"\'<>]+)', html)
+    m = re.search(r'(https?://(?:www\.)?dubizzle\.com\.eg/(?:ar/|en/)?(?:profile|companies)/[^\s"\'<>]+)', main_html)
     if m:
         return m.group(1)
-    m2 = re.search(r'"(\/(?:ar\/|en\/)?(?:profile|companies)\/[^"\'<>]+)"', html)
+    m2 = re.search(r'"(\/(?:ar\/|en\/)?(?:profile|companies)\/[^"\'<>]+)"', main_html)
     if m2:
         return f"https://www.dubizzle.com.eg{m2.group(1)}"
     return ""
 
-def count_dubizzle_active_ads(ad_html, ad_soup, profile_url, engine):
+def count_dubizzle_active_ads(ad_html, main_soup, profile_url, engine):
     if "/companies/" in str(profile_url).lower():
         return 99, "Company Account (/companies/)"
-    raw_ad_text = ad_soup.get_text(" ", strip=True).translate(HINDI_MAP)
+    raw_ad_text = main_soup.get_text(" ", strip=True).translate(HINDI_MAP)
     if re.search(r'(?:company\s*profile|verified\s*business|share\s*agency\s*profile|شركة\s*موثقة|مكتب\s*عقاري)', raw_ad_text, re.I):
         return 99, "Agency/Company Account"
     for pat in [
@@ -328,11 +340,13 @@ def parse_dubizzle_ad(url, cat, deal, engine):
     html = engine.fetch_page(url)
     if not html or len(html) < 2500:
         return None, "Failed to load ad page"
-    soup = BeautifulSoup(html, "html.parser")
-    h1 = soup.find("h1")
+    main_html = strip_related_ads_section(html)
+    soup = BeautifulSoup(main_html, "html.parser")
+    full_soup = BeautifulSoup(html, "html.parser")
+    h1 = soup.find("h1") or full_soup.find("h1")
     title = h1.get_text(" ", strip=True) if h1 else ""
     if not title:
-        og_t = soup.find("meta", {"property": "og:title"})
+        og_t = full_soup.find("meta", {"property": "og:title"})
         title = og_t["content"].strip() if og_t and og_t.get("content") else ""
     title = re.sub(r'\s*\|\s*(?:دوبيزل|dubizzle).*$', '', title, flags=re.I).strip()
     if not title or len(title) < 5:
@@ -342,19 +356,19 @@ def parse_dubizzle_ad(url, cat, deal, engine):
     if desc_el:
         desc = desc_el.get_text(" ", strip=True)
     if not desc:
-        og_d = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
+        og_d = full_soup.find("meta", {"property": "og:description"}) or full_soup.find("meta", {"name": "description"})
         if og_d and og_d.get("content"):
             desc = og_d["content"].strip()
-    price_num = extract_price_from_meta_and_html(soup, html, deal)
+    price_num = extract_price_from_meta_and_html(full_soup, main_html, deal)
     is_bad, bad_reason = is_forbidden_or_installment(title, desc, deal, price_num)
     if is_bad:
         return None, bad_reason
-    prof_url = extract_profile_url(soup, html)
-    active_count, count_info = count_dubizzle_active_ads(html, soup, prof_url, engine)
+    prof_url = extract_profile_url(soup, main_html)
+    active_count, count_info = count_dubizzle_active_ads(main_html, soup, prof_url, engine)
     if not (1 <= active_count <= 4):
         return None, f"Broker/Count Rule (1-4): {count_info}"
     pub_raw = "مالك مباشر (دوبيزل)"
-    m_seller = re.search(r'"sellerName"\s*:\s*"([^"]+)"', html) or re.search(r'"user"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"', html)
+    m_seller = re.search(r'"sellerName"\s*:\s*"([^"]+)"', main_html) or re.search(r'"user"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"', main_html)
     if m_seller:
         pub_raw = m_seller.group(1).strip()
     publisher_clean = clean_publisher_name(pub_raw)
