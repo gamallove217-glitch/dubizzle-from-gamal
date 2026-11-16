@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from bs4 import BeautifulSoup
 from curl_cffi import requests as cffi_requests
+from DrissionPage import ChromiumPage, ChromiumOptions
 
 if sys.platform.startswith("win"):
     try:
@@ -12,23 +13,18 @@ if sys.platform.startswith("win"):
     except Exception:
         pass
 
-try:
-    from DrissionPage import ChromiumPage, ChromiumOptions
-    HAS_DRISSION = True
-except ImportError:
-    HAS_DRISSION = False
-
 AI_SERVER_URL = "https://gamal216.pythonanywhere.com"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 SEEN_FILE = os.path.join(BASE_DIR, "seen_links_local.json")
 BLACKLIST_FILE = os.path.join(BASE_DIR, "blacklist.json")
-PROFILE_DIR = os.path.join(BASE_DIR, "chrome_cookie_profile")
+PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 120
 MAX_WORKERS = 6
 STATE_LOCK = threading.Lock()
+BROWSER_LOCK = threading.Lock()
 
 DUBIZZLE_SOURCES = [
     {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
@@ -161,11 +157,13 @@ def extract_dubizzle_links_from_html(html):
         if full_u not in links and len(full_u) > 30: links.append(full_u)
     return links
 
-class PureCffiEngine:
+class SmartHybridEngine:
     def __init__(self):
         self.cookies = {}
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         self._local = threading.local()
+        self.page = None
+        self.use_browser_fetch = False
 
     def get_worker_session(self):
         if not hasattr(self._local, "session"):
@@ -181,11 +179,10 @@ class PureCffiEngine:
             self._local.session = s
         return self._local.session
 
-    def grab_cookies_once_and_close_browser(self, test_url):
-        if not HAS_DRISSION: return False
-        page = None
+    def ensure_anchor_browser(self, test_url):
+        if self.page is not None:
+            return True
         try:
-            print("[Cookie Bootstrap] Opening Chrome once for 4s to grab cookies, then closing it completely...")
             os.makedirs(PROFILE_DIR, exist_ok=True)
             co = ChromiumOptions()
             for c in [
@@ -196,45 +193,53 @@ class PureCffiEngine:
                 if os.path.exists(c):
                     co.set_browser_path(c)
                     break
-            co.set_paths(local_port=9666, user_data_path=PROFILE_DIR)
-            co.set_load_mode("none")
+            co.set_paths(local_port=9555, user_data_path=PROFILE_DIR)
             co.no_imgs(True)
             co.mute(True)
             co.set_argument("--disable-blink-features=AutomationControlled")
             co.set_argument("--disable-extensions")
-            page = ChromiumPage(addr_or_opts=co)
-            page.get(test_url, timeout=8)
-            for _ in range(8):
-                time.sleep(1.0)
-                try:
-                    t = page.run_js("return document.title || '';") or ""
-                    if t and "Just a moment" not in t and len(t) > 3: break
-                except Exception: pass
-            ua = page.run_js("return navigator.userAgent;")
+            self.page = ChromiumPage(addr_or_opts=co)
+            cur_u = (self.page.url or "").lower()
+            if "dubizzle.com.eg" not in cur_u:
+                self.page.get(test_url, timeout=12)
+                for _ in range(8):
+                    time.sleep(1.0)
+                    try:
+                        t = self.page.run_js("return document.title || '';") or ""
+                        if t and "Just a moment" not in t and len(t) > 3: break
+                    except Exception: pass
+            ua = self.page.run_js("return navigator.userAgent;")
             if ua: self.user_agent = ua
-            for ck in (page.cookies() or []):
+            for ck in (self.page.cookies() or []):
                 if ck.get("name") and ck.get("value"):
                     self.cookies[ck["name"]] = ck["value"]
-            print(f"[Cookie Bootstrap] Captured {len(self.cookies)} cookies. Closing browser completely (0% RAM)...")
             return True
         except Exception as e:
-            print(f"[Cookie Bootstrap Error] {e}")
+            print(f"[Browser Port 9555 Error] {e}")
             return False
-        finally:
-            if page:
-                try: page.quit()
-                except Exception: pass
 
     def warmup(self):
         test_url = DUBIZZLE_SOURCES[0]["url"]
-        html = self.fetch_html(test_url, is_warmup=True)
-        if html and len(html) > 5000:
-            print("[Engine] Pure curl_cffi (chrome120) connected directly! Browser NOT needed (0% RAM).")
+        html = self.cffi_fetch(test_url, is_warmup=True)
+        if html and len(extract_dubizzle_links_from_html(html)) >= 5:
+            print("[Engine] Pure curl_cffi connected directly! (0% Browser RAM)")
             return
-        if self.grab_cookies_once_and_close_browser(test_url):
-            if hasattr(self._local, "session"): delattr(self._local, "session")
 
-    def fetch_html(self, url, is_warmup=False):
+        print("[Engine] Connecting to Chrome on port 9555 to sync Cloudflare clearance...")
+        if self.ensure_anchor_browser(test_url):
+            if hasattr(self._local, "session"): delattr(self._local, "session")
+            html2 = self.cffi_fetch(test_url, is_warmup=True)
+            if html2 and len(extract_dubizzle_links_from_html(html2)) >= 5:
+                print("[Engine] curl_cffi verified with Chrome cookies! Closing Chrome completely (0% RAM)...")
+                try:
+                    self.page.quit()
+                    self.page = None
+                except Exception: pass
+                return
+            print("[Engine] Activated Zero-Navigation Background window.fetch() inside single anchor tab (port 9555)!")
+            self.use_browser_fetch = True
+
+    def cffi_fetch(self, url, is_warmup=False):
         if not is_warmup:
             time.sleep(random.uniform(0.5, 1.4))
         s = self.get_worker_session()
@@ -244,14 +249,64 @@ class PureCffiEngine:
                 if r.status_code == 200 and len(r.text) > 5000 and "Just a moment" not in r.text[:1500] and "/notfound" not in str(r.url):
                     return r.text
             except Exception:
-                time.sleep(0.5)
+                time.sleep(0.4)
+        return ""
+
+    def browser_background_fetch_single(self, url):
+        time.sleep(random.uniform(0.4, 1.2))
+        with BROWSER_LOCK:
+            if not self.page:
+                return ""
+            js_code = """
+            window.__single_done = false;
+            window.__single_html = '';
+            const targetUrl = arguments[0];
+            (async () => {
+                try {
+                    const r = await fetch(targetUrl, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
+                    });
+                    if (r.ok) {
+                        window.__single_html = await r.text();
+                    }
+                } catch (e) {}
+                window.__single_done = true;
+            })();
+            return true;
+            """
+            try:
+                self.page.run_js(js_code, url)
+                for _ in range(35):
+                    time.sleep(0.25)
+                    if self.page.run_js("return window.__single_done === true;"):
+                        return self.page.run_js("return window.__single_html || '';") or ""
+            except Exception:
+                pass
+        return ""
+
+    def fetch_html(self, url, is_warmup=False):
+        if not self.use_browser_fetch:
+            h = self.cffi_fetch(url, is_warmup=is_warmup)
+            if h:
+                return h
+        if self.page is not None or self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]):
+            self.use_browser_fetch = True
+            return self.browser_background_fetch_single(url)
         return ""
 
     def get_category_links(self, url, label=""):
         html = self.fetch_html(url, is_warmup=False)
         links = extract_dubizzle_links_from_html(html)
-        print(f"[cffi Turbo] {label} -> {'200 OK' if links else 'Empty'} (Extracted {len(links)} ads)")
+        mode = "ZeroNav-Fetch" if self.use_browser_fetch else "cffi-Turbo"
+        print(f"[{mode}] {label} -> {'200 OK' if links else 'Empty'} (Extracted {len(links)} ads)")
         return links
+
+    def close(self):
+        if self.page:
+            try: self.page.quit()
+            except Exception: pass
 
 def extract_direct_ad_info(full_html, deal, blacklist):
     main_html = strip_related_ads_section(full_html)
@@ -504,7 +559,7 @@ def clean_existing_dubizzle_only_db(ads_list):
     return cleaned
 
 def main():
-    print("=== Starting Pure curl_cffi Parallel Dubizzle Radar (1-4 Active Ads | Zero Browser RAM) ===")
+    print("=== Starting Smart Hybrid Parallel Dubizzle Radar (1-4 Active Ads | No Profile Visits) ===")
     raw_existing = load_json_list(DATA_FILE)
     current_ads = clean_existing_dubizzle_only_db(raw_existing)
     seen_links = set(load_json_list(SEEN_FILE))
@@ -515,7 +570,7 @@ def main():
         save_state(current_ads, seen_links, blacklist, push_to_github=True)
 
     existing_urls = {(a.get("link") or a.get("url")) for a in current_ads}
-    engine = PureCffiEngine()
+    engine = SmartHybridEngine()
     engine.warmup()
 
     candidates, candidate_urls = [], set()
@@ -561,6 +616,7 @@ def main():
                 if completed_idx % 20 == 0:
                     save_state(current_ads, seen_links, blacklist, push_to_github=False)
 
+    engine.close()
     save_state(current_ads, seen_links, blacklist, push_to_github=(total_added > 0))
     print(f"\n=== Run Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist)}) ===")
 
