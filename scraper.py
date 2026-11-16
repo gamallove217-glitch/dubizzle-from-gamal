@@ -28,13 +28,13 @@ STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
 
 DUBIZZLE_SOURCES = [
-    {"cat_key": "apt", "cat": "شقق ودوبلكس", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
-    {"cat_key": "apt", "cat": "شقق ودوبلكس", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
-    {"cat_key": "villa", "cat": "فلل وتاون وتوين هاوس", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
-    {"cat_key": "villa", "cat": "فلل وتاون وتوين هاوس", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
-    {"cat_key": "comm", "cat": "تجاري وإداري وطبي", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
-    {"cat_key": "comm", "cat": "تجاري وإداري وطبي", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
-    {"cat_key": "land", "cat": "أراضي ومباني", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/"}
+    {"cat_key": "apt", "cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
+    {"cat_key": "apt", "cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
+    {"cat_key": "land", "cat": "أراضي", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands-for-sale/new-cairo/"}
 ]
 
 ZONE_MAPPING = {"النرجس": "النرجس", "نرجس": "النرجس", "الياسمين": "الياسمين", "ياسمين": "الياسمين", "البنفسج": "البنفسج", "بنفسج": "البنفسج", "اللوتس": "اللوتس", "لوتس": "اللوتس", "الأندلس": "الأندلس", "الاندلس": "الأندلس", "اندلس": "الأندلس", "القرنفل": "القرنفل", "قرنفل": "القرنفل", "تمر حنة": "التمر حنة", "التمر حنة": "التمر حنة", "جاردينيا": "جاردينيا", "جنوب الأكاديمية": "جنوب الأكاديمية", "جنوب الاكاديمية": "جنوب الأكاديمية", "شرق الأكاديمية": "شرق الأكاديمية", "شرق الاكاديمية": "شرق الأكاديمية", "المستثمرين": "المستثمرين", "الشويفات": "الشويفات", "شويفات": "الشويفات", "أبو الهول": "أبو الهول", "ابو الهول": "أبو الهول", "دار مصر": "دار مصر", "سكن مصر": "سكن مصر", "جنة": "جنة مصر", "القطامية": "القطامية", "قطامية": "القطامية", "التسعين": "شارع التسعين", "شارع التسعين": "شارع التسعين", "ميفيدا": "ميفيدا", "هايد بارك": "هايد بارك", "ماونتن فيو": "ماونتن فيو", "التجمع الأول": "التجمع الأول", "التجمع الاول": "التجمع الأول", "التجمع الثالث": "التجمع الثالث", "التجمع الخامس": "التجمع الخامس"}
@@ -45,8 +45,8 @@ COMPANY_NAME_KEYWORDS = ["شركه", "عقارات", "تسويق", "مكتب", "
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
 
 FRONTEND_SCHEMA = {
-    "wrap_object": False,
-    "cat_map": {"apt": "شقق ودوبلكس", "villa": "فلل وتاون وتوين هاوس", "comm": "تجاري وإداري وطبي", "land": "أراضي ومباني"},
+    "wrap_object": True,
+    "cat_map": {"apt": "شقق", "villa": "فلل", "comm": "تجاري", "land": "أراضي"},
     "deal_map": {"rent": "إيجار", "sale": "تمليك"}
 }
 
@@ -60,6 +60,7 @@ def normalize_ar(text):
     return re.sub(r'\s+', ' ', t).strip()
 
 def inspect_local_frontend_schema():
+    FRONTEND_SCHEMA["wrap_object"] = True
     idx_path = os.path.join(BASE_DIR, "index.html")
     if os.path.exists(idx_path):
         try:
@@ -90,19 +91,19 @@ def inspect_local_frontend_schema():
         if ck in FRONTEND_SCHEMA["cat_map"]: src["cat"] = FRONTEND_SCHEMA["cat_map"][ck]
         if src["deal"] in ("إيجار", "ايجار"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["rent"]
         elif src["deal"] in ("تمليك", "بيع"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["sale"]
-    api_data_path = os.path.join(BASE_DIR, "api", "data.js")
-    if os.path.exists(api_data_path):
-        try:
-            with open(api_data_path, "r", encoding="utf-8", errors="ignore") as f:
-                js_c = f.read()
-            if ".ads" in js_c and "Array.isArray" not in js_c:
-                FRONTEND_SCHEMA["wrap_object"] = True
-        except Exception:
-            pass
-    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']}")
+    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']} | WrapObj: True")
+
+def clear_git_locks():
+    git_dir = os.path.join(BASE_DIR, ".git")
+    for rel in ["index.lock", "HEAD.lock", "config.lock", os.path.join("refs", "heads", "main.lock")]:
+        p = os.path.join(git_dir, rel)
+        if os.path.exists(p):
+            try: os.remove(p)
+            except Exception: pass
 
 def fix_git_identity_for_vercel():
-    real_name, real_email = "", ""
+    clear_git_locks()
+    real_name, real_email = "gamallove217-glitch", "gamallove217@gmail.com"
     try:
         res = subprocess.run(["git", "log", "-n", "50", "--format=%an|%ae"], cwd=BASE_DIR, capture_output=True, text=True, timeout=10)
         for line in (res.stdout or "").splitlines():
@@ -113,19 +114,8 @@ def fix_git_identity_for_vercel():
                     break
     except Exception:
         pass
-    if not real_email:
-        try:
-            r_url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=BASE_DIR, capture_output=True, text=True, timeout=5).stdout.strip()
-            m_u = re.search(r'github\.com[:/]([^/]+)/', r_url)
-            if m_u:
-                real_name = m_u.group(1)
-                real_email = f"{m_u.group(1)}@users.noreply.github.com"
-        except Exception:
-            pass
-    if real_name and real_email:
-        subprocess.run(["git", "config", "user.name", real_name], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "config", "user.email", real_email], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"[Vercel Auth Fix] Git author synced to: {real_name} <{real_email}>")
+    subprocess.run(["git", "config", "user.name", real_name], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.email", real_email], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def is_age_fresh_24h(text):
     if not text: return True, "حديث"
@@ -154,7 +144,7 @@ def get_numeric_ad_id(url, html=""):
 def clean_publisher_name(name):
     if not name: return "مالك مباشر"
     s = re.sub(r'<[^>]+>', ' ', str(name))
-    s = re.sub(r'(?:path\s+d=|M\d+\.\d+|viewBox|xmlns|svg|fill=|رؤية\s*ملف|View\s*profile|عضو\s*منذ.*|\(\d+.*?\))', ' ', s, flags=re.I)
+    s = re.sub(r'(?:path\s+d=|M\d+\.\d+|viewBox|xmlns|svg|fill=|رؤية\s*ملف|View\s*profile|عضو\s*منذ.*|\(\d+.*?\)|\(دوبيزل\))', ' ', s, flags=re.I)
     s = re.sub(r'[\r\n\t]+', ' ', s)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,.")
     words = s.split()
@@ -283,28 +273,41 @@ class SmartHybridEngine:
         self.page = None
         self.land_url_resolved = False
 
+    def get_live_dom(self):
+        if not self.page: return ""
+        try:
+            return self.page.run_js("return document.documentElement ? document.documentElement.outerHTML : '';") or ""
+        except Exception:
+            return ""
+
     def try_auto_solve_turnstile(self):
         if not self.page: return
         try:
+            for iframe in self.page.eles("tag:iframe"):
+                src = str(iframe.attr("src") or "")
+                if "cloudflare" in src or "turnstile" in src or "challenge" in src:
+                    try:
+                        self.page.actions.move_to(iframe).click()
+                        time.sleep(2.0)
+                        return
+                    except Exception:
+                        pass
             for txt in ["تأكيد أنك إنسان", "Verify you are human"]:
-                el = self.page.ele(f"text:{txt}", timeout=1.2)
+                el = self.page.ele(f"text:{txt}", timeout=0.8)
                 if el:
-                    el.click()
-                    time.sleep(2.0)
-                    return
-            iframe = self.page.ele("tag:iframe", timeout=1.2)
-            if iframe:
-                cb = iframe.ele("tag:input", timeout=1.2) or iframe.ele("tag:body", timeout=1.2)
-                if cb:
-                    cb.click()
-                    time.sleep(2.0)
+                    try:
+                        el.click()
+                        time.sleep(2.0)
+                        return
+                    except Exception:
+                        pass
         except Exception:
             pass
 
     def ensure_anchor_browser(self, test_url):
         if self.page is not None:
             try:
-                _ = self.page.url
+                _ = self.page.run_js("return location.href;")
                 return True
             except Exception:
                 self.page = None
@@ -320,15 +323,15 @@ class SmartHybridEngine:
                     co.set_browser_path(c)
                     break
             co.set_paths(local_port=9555, user_data_path=PROFILE_DIR)
-            co.no_imgs(True)
             co.mute(True)
             self.page = ChromiumPage(addr_or_opts=co)
-            cur_u = (self.page.url or "").lower()
-            cur_links = extract_dubizzle_links_from_html(self.page.html or "", prefilter_cards=False)
+            cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
+            cur_dom = self.get_live_dom()
+            cur_links = extract_dubizzle_links_from_html(cur_dom, prefilter_cards=False)
             if "dubizzle.com.eg" not in cur_u or len(cur_links) < 5:
                 self.page.get(test_url, timeout=15)
-            for attempt in range(30):
-                html_now = self.page.html or ""
+            for attempt in range(40):
+                html_now = self.get_live_dom()
                 links_now = extract_dubizzle_links_from_html(html_now, prefilter_cards=False)
                 if len(links_now) >= 5 and "التحقق الأمني" not in html_now[:4000] and "تأكيد أنك إنسان" not in html_now[:4000]:
                     print(f"[Engine] Anchor tab verified ready! ({len(links_now)} ads loaded on screen)")
@@ -339,28 +342,24 @@ class SmartHybridEngine:
                 time.sleep(1.5)
             return True
         except Exception as e:
-            print(f"[Browser Port 9555 Error] {e}")
+            print(f"[Browser Port 9555 Info] {e}")
             return False
+
+    def discover_land_slug_from_html(self, html):
+        if self.land_url_resolved or not html: return
+        for slug in re.findall(r'/properties/([a-z0-9\-]+)/', html, re.I):
+            sl = slug.lower()
+            if ("land" in sl or "building" in sl) and "new-cairo" not in sl:
+                for src in DUBIZZLE_SOURCES:
+                    if src["cat_key"] == "land":
+                        src["url"] = f"https://www.dubizzle.com.eg/properties/{slug}/new-cairo/"
+                        self.land_url_resolved = True
+                        return
 
     def warmup(self):
         print("[Engine] Attaching to persistent Chrome session on port 9555 (Kept open 24/7)...")
         self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"])
-        if not self.land_url_resolved and self.page:
-            try:
-                soup = BeautifulSoup(self.page.html or "", "html.parser")
-                for a in soup.find_all("a", href=True):
-                    txt = normalize_ar(a.get_text(" ", strip=True))
-                    href = a["href"].strip()
-                    if ("مباني واراضي" in txt or "اراضي ومباني" in txt or "buildings" in href.lower() or "land" in href.lower()) and "/properties/" in href:
-                        full_l = href if href.startswith("http") else f"https://www.dubizzle.com.eg{href}"
-                        if "new-cairo" not in full_l:
-                            full_l = full_l.rstrip("/") + "/new-cairo/"
-                        for src in DUBIZZLE_SOURCES:
-                            if src["cat_key"] == "land": src["url"] = full_l
-                        self.land_url_resolved = True
-                        break
-            except Exception:
-                pass
+        self.discover_land_slug_from_html(self.get_live_dom())
 
     def browser_background_fetch_single(self, url):
         time.sleep(random.uniform(0.35, 0.90))
@@ -398,15 +397,17 @@ class SmartHybridEngine:
         for _ in range(2):
             h = self.browser_background_fetch_single(url)
             if h and "التحقق الأمني" not in h[:4000] and "تأكيد أنك إنسان" not in h[:4000] and len(h) > 5000:
+                if not self.land_url_resolved:
+                    self.discover_land_slug_from_html(h)
                 return h
             if h and ("التحقق الأمني" in h[:4000] or "تأكيد أنك إنسان" in h[:4000]):
                 with BROWSER_LOCK:
                     try:
                         self.page.get(url, timeout=15)
-                        for _ in range(15):
+                        for _ in range(20):
                             time.sleep(1.2)
                             self.try_auto_solve_turnstile()
-                            cur_h = self.page.html or ""
+                            cur_h = self.get_live_dom()
                             if "التحقق الأمني" not in cur_h[:4000] and len(cur_h) > 8000:
                                 return cur_h
                     except Exception:
@@ -414,14 +415,30 @@ class SmartHybridEngine:
             time.sleep(0.8)
         return ""
 
-    def get_category_links(self, url, label=""):
+    def get_category_links(self, url, label="", is_land=False):
         raw_pairs, fresh_pairs = [], []
-        for _ in range(2):
-            html = self.fetch_html(url, is_warmup=False)
+        urls_to_try = [url]
+        if is_land and "?page=" not in url:
+            urls_to_try.extend([
+                "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/",
+                "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo/",
+                "https://www.dubizzle.com.eg/properties/buildings-and-lands/new-cairo/"
+            ])
+        for u_try in urls_to_try:
+            html = self.fetch_html(u_try, is_warmup=False)
             raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
             fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
-            if raw_pairs: break
-            time.sleep(1.0)
+            if raw_pairs:
+                if is_land:
+                    for src in DUBIZZLE_SOURCES:
+                        if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
+                break
+        if not raw_pairs and self.page and "?page=" not in url:
+            dom_now = self.get_live_dom()
+            cur_loc = str(self.page.run_js("return location.href || '';") or "").split("?")[0].rstrip("/")
+            if url.rstrip("/") == cur_loc:
+                raw_pairs = extract_dubizzle_links_from_html(dom_now, prefilter_cards=False)
+                fresh_pairs = extract_dubizzle_links_from_html(dom_now, prefilter_cards=True)
         print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
         return fresh_pairs
 
@@ -615,7 +632,7 @@ def inspect_ad_worker(item, engine, blacklist):
         "ad_id": num_id, "id": f"dub_{num_id}", "title": title, "url": url, "link": url,
         "price": price_str, "price_num": price_num, "cat": cat, "category": cat,
         "deal": resolved_deal, "type": resolved_deal, "zone": sub_zone, "location": sub_zone,
-        "source": "دوبيزل", "publisher": f"{publisher_clean} ({active_count} إعلان نشط)",
+        "source": "دوبيزل", "publisher": publisher_clean,
         "pub_ads": active_count, "active_ads_count": active_count,
         "area": ai_area, "rooms": ai_rooms, "age": info["age"], "description": desc[:500],
         "first_seen_ts": now_ts, "timestamp": now_ts, "date": datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -649,23 +666,32 @@ def safe_write_json(path, data):
 def save_state(current_ads, seen_links, blacklist, push_to_github=False):
     with STATE_LOCK:
         final_ads = current_ads[:MAX_ADS_STORED]
-        payload_to_write = {"ads": final_ads} if FRONTEND_SCHEMA.get("wrap_object") else final_ads
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        payload_to_write = {
+            "updated_at": now_str,
+            "total": len(final_ads),
+            "ads": final_ads
+        }
         safe_write_json(DATA_FILE, payload_to_write)
         safe_write_json(SEEN_FILE, list(seen_links)[-6000:])
         safe_write_json(BLACKLIST_FILE, list(blacklist)[-6000:])
         if push_to_github:
             try:
                 fix_git_identity_for_vercel()
-                subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
-                c_res = subprocess.run(["git", "commit", "--reset-author", "-m", f"Owner Update ({len(final_ads)} Ads)"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
+                add_res = subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
+                if add_res.returncode != 0:
+                    clear_git_locks()
+                    subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
+                c_res = subprocess.run(["git", "commit", "-m", f"Live Radar Sync ({len(final_ads)} Owners at {now_str})"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
                 p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
                 if p_res.returncode != 0:
-                    subprocess.run(["git", "pull", "--rebase", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
+                    clear_git_locks()
+                    subprocess.run(["git", "pull", "--rebase", "--autostash", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
                     p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
                 if p_res.returncode == 0:
-                    print(f"    --> [LIVE SYNC] Pushed ads.json to GitHub & Vercel! (Total Owners in ads.json: {len(final_ads)})")
+                    print(f"    --> [LIVE SYNC] Pushed {len(final_ads)} owners in {{updated_at, ads}} format to GitHub & Vercel!")
                 else:
-                    err_msg = (p_res.stderr or c_res.stderr or "").strip()[:120]
+                    err_msg = (p_res.stderr or c_res.stderr or "").strip()[:140]
                     print(f"    --> [GIT WARNING] Saved locally ({len(final_ads)} owners), Git message: {err_msg}")
             except Exception as e:
                 print(f"    --> [LOCAL SAVE] Saved ads.json locally! (Total Owners: {len(final_ads)}) | {e}")
@@ -705,7 +731,7 @@ def clean_existing_dubizzle_only_db(ads_list):
         ad["ad_id"], ad["id"], ad["url"], ad["link"] = num_id, f"dub_{num_id}", u, u
         ad["cat"], ad["category"], ad["deal"], ad["type"] = cat, cat, deal, deal
         ad["pub_ads"], ad["active_ads_count"] = cnt, cnt
-        ad["publisher"] = f"{clean_publisher_name(raw_p)} ({cnt} إعلان نشط)"
+        ad["publisher"] = clean_publisher_name(raw_p)
         ad["price_num"] = p_num
         ad["price"] = f"{p_num:,} ج.م" if p_num > 0 else "السعر بالتفاصيل"
         ad["first_seen_ts"], ad["timestamp"] = now_ts, now_ts
@@ -729,11 +755,8 @@ def run_single_cycle(engine, is_first_run=False):
 
     existing_urls = {(a.get("url") or a.get("link")) for a in current_ads}
     if is_first_run:
+        print(f"[Instant Sync] Wrapping & pushing {len(current_ads)} existing verified owners to Vercel right now...")
         save_state(current_ads, seen_links, blacklist, push_to_github=True)
-        if len(current_ads) < 12:
-            print("[Recovery] Resetting seen_links once to scan all categories with the 24h filter & Vercel schema...")
-            seen_links = set(existing_urls)
-            safe_write_json(SEEN_FILE, list(seen_links))
 
     engine.warmup()
     per_source_queues = {i: [] for i in range(len(DUBIZZLE_SOURCES))}
@@ -743,7 +766,7 @@ def run_single_cycle(engine, is_first_run=False):
         if sum(len(q) for q in per_source_queues.values()) >= MAX_CANDIDATES_PER_RUN: break
         for s_idx, src in enumerate(DUBIZZLE_SOURCES):
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            fresh_pairs = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}")
+            fresh_pairs = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"))
             for lnk, age_lbl in fresh_pairs:
                 if lnk not in existing_urls and lnk not in seen_links and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
@@ -782,7 +805,7 @@ def run_single_cycle(engine, is_first_run=False):
                     current_ads.insert(0, ad_obj)
                     existing_urls.add(u)
                     total_added += 1
-                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} | Price: {ad_obj['price']}")
+                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} ({ad_obj['pub_ads']} ads) | Price: {ad_obj['price']}")
                 save_state(current_ads, seen_links, blacklist, push_to_github=True)
             else:
                 print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
