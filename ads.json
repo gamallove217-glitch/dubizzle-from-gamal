@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-17 01:27",
-  "total": 6,
+  "updated_at": "2026-11-17 01:39",
+  "total": 7,
   "ads": [
     {
       "ad_id": 209514722,
@@ -157,6 +157,32 @@
       "first_seen_ts": 1794835571,
       "timestamp": 1794835571,
       "date": "2026-11-16 15:26"
+    },
+    {
+      "ad_id": 209381259,
+      "id": "dub_209381259",
+      "title": "الترا لوكس مكتب بسوديك EDNC مفروش",
+      "url": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%84%D8%AA%D8%B1%D8%A7-%D9%84%D9%88%D9%83%D8%B3-%D9%85%D9%83%D8%AA%D8%A8-%D8%A8%D8%B3%D9%88%D8%AF%D9%8A%D9%83-ednc-%D9%85%D9%81%D8%B1%D9%88%D8%B4-ID209381259.html",
+      "link": "https://www.dubizzle.com.eg/ad/%D8%A7%D9%84%D8%AA%D8%B1%D8%A7-%D9%84%D9%88%D9%83%D8%B3-%D9%85%D9%83%D8%AA%D8%A8-%D8%A8%D8%B3%D9%88%D8%AF%D9%8A%D9%83-ednc-%D9%85%D9%81%D8%B1%D9%88%D8%B4-ID209381259.html",
+      "price": "312,650 ج.م",
+      "price_num": 312650,
+      "cat": "تجاري",
+      "category": "تجاري",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "zone": "القاهرة الجديدة",
+      "location": "القاهرة الجديدة",
+      "source": "دوبيزل",
+      "publisher": "؛ khaled Abokamar",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "area": null,
+      "rooms": null,
+      "age": "منذ 14 ساعة",
+      "description": "",
+      "first_seen_ts": 1794821542,
+      "timestamp": 1794821542,
+      "date": "2026-11-16 11:32"
     }
   ]
 }
