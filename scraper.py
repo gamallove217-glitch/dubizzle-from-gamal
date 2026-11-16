@@ -21,26 +21,34 @@ PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 180
+MAX_PAGES_PER_CATEGORY = 5
 MAX_WORKERS = 6
 AUTO_LOOP_MINUTES = 15
 STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
 
 DUBIZZLE_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
-    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"}
+    {"cat_key": "apt", "cat": "شقق ودوبلكس", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
+    {"cat_key": "apt", "cat": "شقق ودوبلكس", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل وتاون وتوين هاوس", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل وتاون وتوين هاوس", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري وإداري وطبي", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري وإداري وطبي", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
+    {"cat_key": "land", "cat": "أراضي ومباني", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/"}
 ]
 
 ZONE_MAPPING = {"النرجس": "النرجس", "نرجس": "النرجس", "الياسمين": "الياسمين", "ياسمين": "الياسمين", "البنفسج": "البنفسج", "بنفسج": "البنفسج", "اللوتس": "اللوتس", "لوتس": "اللوتس", "الأندلس": "الأندلس", "الاندلس": "الأندلس", "اندلس": "الأندلس", "القرنفل": "القرنفل", "قرنفل": "القرنفل", "تمر حنة": "التمر حنة", "التمر حنة": "التمر حنة", "جاردينيا": "جاردينيا", "جنوب الأكاديمية": "جنوب الأكاديمية", "جنوب الاكاديمية": "جنوب الأكاديمية", "شرق الأكاديمية": "شرق الأكاديمية", "شرق الاكاديمية": "شرق الأكاديمية", "المستثمرين": "المستثمرين", "الشويفات": "الشويفات", "شويفات": "الشويفات", "أبو الهول": "أبو الهول", "ابو الهول": "أبو الهول", "دار مصر": "دار مصر", "سكن مصر": "سكن مصر", "جنة": "جنة مصر", "القطامية": "القطامية", "قطامية": "القطامية", "التسعين": "شارع التسعين", "شارع التسعين": "شارع التسعين", "ميفيدا": "ميفيدا", "هايد بارك": "هايد بارك", "ماونتن فيو": "ماونتن فيو", "التجمع الأول": "التجمع الأول", "التجمع الاول": "التجمع الأول", "التجمع الثالث": "التجمع الثالث", "التجمع الخامس": "التجمع الخامس"}
-FORBIDDEN_ZONES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "المستقبل", "mostakbal", "سمات", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة"]
-INSTALLMENT_KEYWORDS = ["قسط", "تقسيط", "بالتقسيط", "أقساط", "اقساط", "تسهيلات", "فترة سداد", "سنوات سداد", "بمقدم", "مقدم", "دفعة", "دفعات", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "down payment", "downpayment", "installment", "installments", "payment plan"]
+FORBIDDEN_ZONES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "المستقبل", "mostakbal", "سمات", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "مقبرة", "مقابر", "مدفن", "مدافن", "جبانة", "طريق السخنة"]
+INSTALLMENT_KEYWORDS = ["قسط", "تقسيط", "بالتقسيط", "أقساط", "اقساط", "تسهيلات", "فترة سداد", "سنوات سداد", "بمقدم", "مقدم", "دفعة", "دفعات", "الدفعة المقدمة", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "down payment", "downpayment", "installment", "installments", "payment plan"]
 CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط", "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن", "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل", "مسدده بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش ولا تقبل التمويل", "كاش نهائي"]
 COMPANY_NAME_KEYWORDS = ["شركه", "عقارات", "تسويق", "مكتب", "استثمار", "تطوير", "جروب", "هوم", "هاوس", "بروكر", "ريال استيت", "real estate", "properties", "property", "broker", "brokers", "agency", "group", "developments", "investment", "hub", "home", "house", "egypt"]
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
+
+FRONTEND_SCHEMA = {
+    "wrap_object": False,
+    "cat_map": {"apt": "شقق ودوبلكس", "villa": "فلل وتاون وتوين هاوس", "comm": "تجاري وإداري وطبي", "land": "أراضي ومباني"},
+    "deal_map": {"rent": "إيجار", "sale": "تمليك"}
+}
 
 def normalize_ar(text):
     if not text: return ""
@@ -51,24 +59,102 @@ def normalize_ar(text):
     t = re.sub(r'ى', 'ي', t)
     return re.sub(r'\s+', ' ', t).strip()
 
+def inspect_local_frontend_schema():
+    idx_path = os.path.join(BASE_DIR, "index.html")
+    if os.path.exists(idx_path):
+        try:
+            with open(idx_path, "r", encoding="utf-8", errors="ignore") as f:
+                soup = BeautifulSoup(f.read(), "html.parser")
+            cat_sel = soup.find("select", {"id": "catFilter"})
+            if cat_sel:
+                for opt in cat_sel.find_all("option"):
+                    val = (opt.get("value") or "").strip()
+                    if not val or val == "ALL": continue
+                    txt = normalize_ar(opt.get_text(" ", strip=True) + " " + val)
+                    if "شقق" in txt: FRONTEND_SCHEMA["cat_map"]["apt"] = val
+                    elif "فلل" in txt or "فيلات" in txt: FRONTEND_SCHEMA["cat_map"]["villa"] = val
+                    elif "تجار" in txt: FRONTEND_SCHEMA["cat_map"]["comm"] = val
+                    elif "اراض" in txt or "مبان" in txt: FRONTEND_SCHEMA["cat_map"]["land"] = val
+            deal_sel = soup.find("select", {"id": "dealFilter"})
+            if deal_sel:
+                for opt in deal_sel.find_all("option"):
+                    val = (opt.get("value") or "").strip()
+                    if not val or val == "ALL": continue
+                    txt = normalize_ar(opt.get_text(" ", strip=True) + " " + val)
+                    if "ايجار" in txt: FRONTEND_SCHEMA["deal_map"]["rent"] = val
+                    elif "تمليك" in txt or "بيع" in txt or "كاش" in txt: FRONTEND_SCHEMA["deal_map"]["sale"] = val
+        except Exception:
+            pass
+    for src in DUBIZZLE_SOURCES:
+        ck = src["cat_key"]
+        if ck in FRONTEND_SCHEMA["cat_map"]: src["cat"] = FRONTEND_SCHEMA["cat_map"][ck]
+        if src["deal"] in ("إيجار", "ايجار"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["rent"]
+        elif src["deal"] in ("تمليك", "بيع"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["sale"]
+    api_data_path = os.path.join(BASE_DIR, "api", "data.js")
+    if os.path.exists(api_data_path):
+        try:
+            with open(api_data_path, "r", encoding="utf-8", errors="ignore") as f:
+                js_c = f.read()
+            if ".ads" in js_c and "Array.isArray" not in js_c:
+                FRONTEND_SCHEMA["wrap_object"] = True
+        except Exception:
+            pass
+    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']}")
+
+def fix_git_identity_for_vercel():
+    real_name, real_email = "", ""
+    try:
+        res = subprocess.run(["git", "log", "-n", "50", "--format=%an|%ae"], cwd=BASE_DIR, capture_output=True, text=True, timeout=10)
+        for line in (res.stdout or "").splitlines():
+            if "|" in line:
+                n, e = line.strip().split("|", 1)
+                if e and "radar.local" not in e.lower() and "@" in e:
+                    real_name, real_email = n.strip(), e.strip()
+                    break
+    except Exception:
+        pass
+    if not real_email:
+        try:
+            r_url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=BASE_DIR, capture_output=True, text=True, timeout=5).stdout.strip()
+            m_u = re.search(r'github\.com[:/]([^/]+)/', r_url)
+            if m_u:
+                real_name = m_u.group(1)
+                real_email = f"{m_u.group(1)}@users.noreply.github.com"
+        except Exception:
+            pass
+    if real_name and real_email:
+        subprocess.run(["git", "config", "user.name", real_name], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "config", "user.email", real_email], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(f"[Vercel Auth Fix] Git author synced to: {real_name} <{real_email}>")
+
+def is_age_fresh_24h(text):
+    if not text: return True, "حديث"
+    norm = normalize_ar(text)
+    m_old_days = re.search(r'(?:منذ\s*([2-9]|\d{2,})\s*(?:ايام|يوم)|منذ\s*يومين|\b([2-9]|\d{2,})\s*days?\s*ago\b)', norm, re.I)
+    if m_old_days: return False, f"Old Ad ({m_old_days.group(0)})"
+    m_old_wks = re.search(r'(?:منذ\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات)|\b(?:\d+|a|an)\s*(?:weeks?|months?|years?)\s*ago\b)', norm, re.I)
+    if m_old_wks: return False, f"Old Ad ({m_old_wks.group(0)})"
+    m_fresh = re.search(r'(منذ\s*(?:\d+\s*)?(?:ثانيه|ثواني|ثوان|دقيقه|دقائق|دقايق|دقيقتين|ساعه|ساعات|ساعتين|1\s*يوم|يوم\s*واحد|يوم\b)|اليوم|امس|\b(?:\d+|a|an)\s*(?:seconds?|mins?|minutes?|hours?|day)\s*ago\b|yesterday|today)', norm, re.I)
+    if m_fresh: return True, m_fresh.group(0)
+    return True, "منذ ساعات"
+
 def is_company_like_name(name):
     norm = normalize_ar(name)
-    if not norm or norm == normalize_ar("مالك مباشر (دوبيزل)"):
-        return False
+    if not norm or norm == normalize_ar("مالك مباشر"): return False
     return any(normalize_ar(k) in norm for k in COMPANY_NAME_KEYWORDS)
 
-def get_deterministic_ad_id(url, html=""):
+def get_numeric_ad_id(url, html=""):
     m_url = re.search(r'ID(\d{6,12})', url, re.I)
-    if m_url: return f"dub_{m_url.group(1)}"
+    if m_url: return int(m_url.group(1))
     if html:
         m_html = re.search(r'(?:رقم\s*الإعلان|رقم\s*الاعلان|Ad\s*ID)\s*[:\-]?\s*(\d{6,12})', html.translate(HINDI_MAP), re.I)
-        if m_html: return f"dub_{m_html.group(1)}"
-    return f"dub_{hashlib.md5(url.encode('utf-8')).hexdigest()[:10]}"
+        if m_html: return int(m_html.group(1))
+    return int(hashlib.md5(url.encode("utf-8")).hexdigest()[:8], 16)
 
 def clean_publisher_name(name):
-    if not name: return "مالك مباشر (دوبيزل)"
+    if not name: return "مالك مباشر"
     s = re.sub(r'<[^>]+>', ' ', str(name))
-    s = re.sub(r'(?:path\s+d=|M\d+\.\d+|viewBox|xmlns|svg|fill=|رؤية\s*ملف|View\s*profile|عضو\s*منذ.*)', ' ', s, flags=re.I)
+    s = re.sub(r'(?:path\s+d=|M\d+\.\d+|viewBox|xmlns|svg|fill=|رؤية\s*ملف|View\s*profile|عضو\s*منذ.*|\(\d+.*?\))', ' ', s, flags=re.I)
     s = re.sub(r'[\r\n\t]+', ' ', s)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,.")
     words = s.split()
@@ -76,7 +162,7 @@ def clean_publisher_name(name):
     if half >= 1 and len(words) % 2 == 0 and [w.lower() for w in words[:half]] == [w.lower() for w in words[half:]]:
         s = " ".join(words[:half])
     if not s or len(s) < 2 or len(s) > 55 or re.search(r'[<>{}\[\]=/\\]', s):
-        return "مالك مباشر (دوبيزل)"
+        return "مالك مباشر"
     return s
 
 def detect_sub_zone(full_text):
@@ -88,31 +174,28 @@ def detect_sub_zone(full_text):
 def extract_local_specs(main_text, combined_blob):
     area, rooms = None, None
     clean_t = main_text.translate(HINDI_MAP)
-    m_area = re.search(r'(\d{2,5})\s*(?:م٢|م2|متر\s*مربع|متر|sqm|m2)\b', clean_t, re.I)
-    if m_area and 25 <= int(m_area.group(1)) <= 10000:
-        area = f"{m_area.group(1)} م²"
+    m_area = re.search(r'(\d{2,6})\s*(?:م٢|م2|متر\s*مربع|متر|sqm|m2)\b', clean_t, re.I)
+    if m_area and 20 <= int(m_area.group(1)) <= 100000: area = str(int(m_area.group(1)))
     else:
-        m_aj = re.search(r'"(?:ft|area|size|surface)"\s*:\s*"?(\d{2,5})"?', combined_blob, re.I)
-        if m_aj and 25 <= int(m_aj.group(1)) <= 10000:
-            area = f"{m_aj.group(1)} م²"
+        m_aj = re.search(r'"(?:ft|area|size|surface)"\s*:\s*"?(\d{2,6})"?', combined_blob, re.I)
+        if m_aj and 20 <= int(m_aj.group(1)) <= 100000: area = str(int(m_aj.group(1)))
     m_rooms = re.search(r'(\d{1,2})\s*(?:غرف\s*نوم|غرفه\s*نوم|غرف|غرفة|bedrooms|beds)\b', clean_t, re.I)
-    if m_rooms and 1 <= int(m_rooms.group(1)) <= 20:
-        rooms = f"{m_rooms.group(1)} غرف"
+    if m_rooms and 1 <= int(m_rooms.group(1)) <= 20: rooms = str(int(m_rooms.group(1)))
     else:
         m_rj = re.search(r'"(?:rooms|bedrooms|beds)"\s*:\s*"?(\d{1,2})"?', combined_blob, re.I)
-        if m_rj and 1 <= int(m_rj.group(1)) <= 20:
-            rooms = f"{m_rj.group(1)} غرف"
+        if m_rj and 1 <= int(m_rj.group(1)) <= 20: rooms = str(int(m_rj.group(1)))
     return area, rooms
 
-def parse_price_strict(raw_val, deal="تمليك"):
+def parse_price_strict(raw_val, deal_norm="تمليك"):
     if not raw_val: return 0
     s = str(raw_val).translate(HINDI_MAP)
+    is_rent = ("ايجار" in normalize_ar(deal_norm))
     for m in re.findall(r'\d[\d,\.]*', s):
         digits = re.sub(r'[^\d]', '', m)
         if not digits: continue
         val = int(digits)
-        if deal == "إيجار" and 2500 <= val <= 2000000: return val
-        if deal == "تمليك" and 1000000 <= val <= 800000000: return val
+        if is_rent and 2500 <= val <= 4000000: return val
+        if not is_rent and 1000000 <= val <= 1500000000: return val
     return 0
 
 def extract_best_price(full_soup, soup, main_html, combined_blob, deal):
@@ -144,7 +227,7 @@ def is_forbidden_or_installment(title, desc, deal, price_num):
     for idx, bad in enumerate(FORBIDDEN_ZONES):
         if normalize_ar(bad) in norm_text:
             return True, f"Forbidden Zone (#{idx+1})"
-    if deal == "تمليك":
+    if "ايجار" not in normalize_ar(deal):
         if 0 < int(price_num or 0) < 1200000:
             return True, f"Downpayment Price ({price_num})"
         temp = norm_text
@@ -163,24 +246,42 @@ def strip_related_ads_section(html):
         if idx > 1500: return html[:idx]
     return html
 
-def extract_dubizzle_links_from_html(html):
-    links = []
-    if not html: return links
+def extract_dubizzle_links_from_html(html, prefilter_cards=False):
+    results, seen_u = [], set()
+    if not html: return results
     soup = BeautifulSoup(html, "html.parser")
     for a in soup.find_all("a", href=True):
         href = a["href"].split("?")[0].split("#")[0].strip()
         if "/ad/" in href and len(href) > 15:
             full = href if href.startswith("http") else f"https://www.dubizzle.com.eg{href}"
-            if full not in links: links.append(full)
-    for m in re.findall(r'((?:https?://(?:www\.)?dubizzle\.com\.eg)?/[a-zA-Z0-9_\-/]+/ad/[^\s"\'<>]+)', html):
-        clean_u = m.split("?")[0].split("#")[0].strip()
-        full_u = clean_u if clean_u.startswith("http") else f"https://www.dubizzle.com.eg{clean_u}"
-        if full_u not in links and len(full_u) > 30: links.append(full_u)
-    return links
+            if full in seen_u: continue
+            card_age = "حديث"
+            if prefilter_cards:
+                card = a.find_parent("article") or a.find_parent("li") or (a.parent.parent if a.parent else a)
+                card_txt = card.get_text(" ", strip=True) if card else ""
+                is_fresh, age_lbl = is_age_fresh_24h(card_txt)
+                if not is_fresh: continue
+                card_age = age_lbl
+                norm_c = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', card_txt))
+                if "الدفعه المقدمه" in norm_c or "طريقه الدفع تقسيط" in norm_c or "down payment" in norm_c:
+                    continue
+                if any(normalize_ar(bz) in norm_c for bz in FORBIDDEN_ZONES):
+                    continue
+            seen_u.add(full)
+            results.append((full, card_age))
+    if not prefilter_cards and not results:
+        for m in re.findall(r'((?:https?://(?:www\.)?dubizzle\.com\.eg)?/[a-zA-Z0-9_\-/]+/ad/[^\s"\'<>]+)', html):
+            clean_u = m.split("?")[0].split("#")[0].strip()
+            full_u = clean_u if clean_u.startswith("http") else f"https://www.dubizzle.com.eg{clean_u}"
+            if full_u not in seen_u and len(full_u) > 30:
+                seen_u.add(full_u)
+                results.append((full_u, "حديث"))
+    return results
 
 class SmartHybridEngine:
     def __init__(self):
         self.page = None
+        self.land_url_resolved = False
 
     def try_auto_solve_turnstile(self):
         if not self.page: return
@@ -223,12 +324,12 @@ class SmartHybridEngine:
             co.mute(True)
             self.page = ChromiumPage(addr_or_opts=co)
             cur_u = (self.page.url or "").lower()
-            cur_links = extract_dubizzle_links_from_html(self.page.html or "")
+            cur_links = extract_dubizzle_links_from_html(self.page.html or "", prefilter_cards=False)
             if "dubizzle.com.eg" not in cur_u or len(cur_links) < 5:
                 self.page.get(test_url, timeout=15)
             for attempt in range(30):
                 html_now = self.page.html or ""
-                links_now = extract_dubizzle_links_from_html(html_now)
+                links_now = extract_dubizzle_links_from_html(html_now, prefilter_cards=False)
                 if len(links_now) >= 5 and "التحقق الأمني" not in html_now[:4000] and "تأكيد أنك إنسان" not in html_now[:4000]:
                     print(f"[Engine] Anchor tab verified ready! ({len(links_now)} ads loaded on screen)")
                     break
@@ -244,9 +345,25 @@ class SmartHybridEngine:
     def warmup(self):
         print("[Engine] Attaching to persistent Chrome session on port 9555 (Kept open 24/7)...")
         self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"])
+        if not self.land_url_resolved and self.page:
+            try:
+                soup = BeautifulSoup(self.page.html or "", "html.parser")
+                for a in soup.find_all("a", href=True):
+                    txt = normalize_ar(a.get_text(" ", strip=True))
+                    href = a["href"].strip()
+                    if ("مباني واراضي" in txt or "اراضي ومباني" in txt or "buildings" in href.lower() or "land" in href.lower()) and "/properties/" in href:
+                        full_l = href if href.startswith("http") else f"https://www.dubizzle.com.eg{href}"
+                        if "new-cairo" not in full_l:
+                            full_l = full_l.rstrip("/") + "/new-cairo/"
+                        for src in DUBIZZLE_SOURCES:
+                            if src["cat_key"] == "land": src["url"] = full_l
+                        self.land_url_resolved = True
+                        break
+            except Exception:
+                pass
 
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(0.35, 0.95))
+        time.sleep(random.uniform(0.35, 0.90))
         with BROWSER_LOCK:
             if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]):
                 return ""
@@ -261,9 +378,7 @@ class SmartHybridEngine:
                         credentials: 'include',
                         headers: {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
                     });
-                    if (r.ok) {
-                        window.__single_html = await r.text();
-                    }
+                    if (r.ok) { window.__single_html = await r.text(); }
                 } catch (e) {}
                 window.__single_done = true;
             })();
@@ -280,7 +395,7 @@ class SmartHybridEngine:
         return ""
 
     def fetch_html(self, url, is_warmup=False):
-        for retry in range(2):
+        for _ in range(2):
             h = self.browser_background_fetch_single(url)
             if h and "التحقق الأمني" not in h[:4000] and "تأكيد أنك إنسان" not in h[:4000] and len(h) > 5000:
                 return h
@@ -296,28 +411,21 @@ class SmartHybridEngine:
                                 return cur_h
                     except Exception:
                         pass
-            time.sleep(1.0)
+            time.sleep(0.8)
         return ""
 
     def get_category_links(self, url, label=""):
-        links = []
-        for attempt in range(2):
+        raw_pairs, fresh_pairs = [], []
+        for _ in range(2):
             html = self.fetch_html(url, is_warmup=False)
-            links = extract_dubizzle_links_from_html(html)
-            if not links and self.page:
-                with BROWSER_LOCK:
-                    try:
-                        if url.rstrip("/") == (self.page.url or "").split("?")[0].rstrip("/") and "?page=" not in url:
-                            links = extract_dubizzle_links_from_html(self.page.html or "")
-                    except Exception:
-                        pass
-            if links:
-                break
-            time.sleep(1.5)
-        print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if links else 'Empty'} (Extracted {len(links)} ads)")
-        return links
+            raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
+            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
+            if raw_pairs: break
+            time.sleep(1.0)
+        print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
+        return fresh_pairs
 
-def extract_direct_ad_info(full_html, deal, blacklist):
+def extract_direct_ad_info(full_html, deal, blacklist, hint_age="حديث"):
     main_html = strip_related_ads_section(full_html)
     soup = BeautifulSoup(main_html, "html.parser")
     full_soup = BeautifulSoup(full_html, "html.parser")
@@ -344,6 +452,25 @@ def extract_direct_ad_info(full_html, deal, blacklist):
         og_d = full_soup.find("meta", {"property": "og:description"}) or full_soup.find("meta", {"name": "description"})
         if og_d and og_d.get("content"): desc = og_d["content"].strip()
 
+    main_text = soup.get_text(" ", strip=True)
+    norm_main_text = normalize_ar(main_text)
+
+    if deal == "AUTO":
+        if re.search(r'(?:غرض\s*العقار\s*[:\-]?\s*للايجار|للايجار|for\s*rent)', normalize_ar(f"{title} {main_text[:1500]}"), re.I):
+            deal = FRONTEND_SCHEMA["deal_map"]["rent"]
+        else:
+            deal = FRONTEND_SCHEMA["deal_map"]["sale"]
+
+    creation_el = soup.find(attrs={"aria-label": "Creation date"}) or soup.find(attrs={"aria-label": "تاريخ النشر"})
+    age_text_to_check = creation_el.get_text(" ", strip=True) if creation_el else main_text[:1800]
+    is_fresh, detected_age = is_age_fresh_24h(age_text_to_check)
+    if not is_fresh: return None, detected_age, None
+    final_age = detected_age if detected_age != "حديث" else hint_age
+
+    if "طريقه الدفع تقسيط" in norm_main_text or "الدفعه المقدمه" in norm_main_text:
+        if "ايجار" not in normalize_ar(deal):
+            return None, "Installment Ad (Payment Badge)", None
+
     nd_script = full_soup.find("script", {"id": "__NEXT_DATA__"})
     if nd_script and nd_script.string:
         next_data_str = nd_script.string
@@ -357,16 +484,12 @@ def extract_direct_ad_info(full_html, deal, blacklist):
     is_bad, bad_reason = is_forbidden_or_installment(title, desc, deal, price_num)
     if is_bad: return None, bad_reason, None
 
-    main_text = soup.get_text(" ", strip=True)
-    norm_main_text = normalize_ar(main_text)
-
     seller_id, is_agency, profile_link_name = "", False, ""
     for a_tag in soup.find_all("a", href=True):
         h_clean = str(a_tag["href"]).split("?")[0].rstrip("/").strip()
         m_p = re.search(r'/(?:ar/|en/)?profile/([a-zA-Z0-9_-]{5,})', h_clean)
         if m_p:
-            if not seller_id:
-                seller_id = f"prof_{m_p.group(1)}"
+            if not seller_id: seller_id = f"prof_{m_p.group(1)}"
             a_txt = a_tag.get_text(" ", strip=True)
             if a_txt and not re.search(r'رؤية\s*ملف|View\s*profile|الإعلانات', a_txt, re.I) and 2 <= len(a_txt) <= 45:
                 profile_link_name = a_txt
@@ -400,14 +523,12 @@ def extract_direct_ad_info(full_html, deal, blacklist):
 
     with STATE_LOCK:
         in_bl = (seller_id and seller_id in blacklist) or (company_name_key and company_name_key in blacklist)
-    if in_bl:
-        return None, f"Blacklisted Broker ({safe_bl_key})", None
+    if in_bl: return None, f"Blacklisted Broker ({safe_bl_key})", None
 
     if is_agency or re.search(r'(?:company\s*profile|verified\s*business|share\s*agency\s*profile|شركة\s*موثقة|مكتب\s*عقاري)', norm_main_text, re.I):
         return None, f"Agency Account ({publisher_clean})", safe_bl_key
 
     active_count, count_source = 0, ""
-
     for el in soup.find_all(string=re.compile(r'الإعلانات\s*النشطة|الاعلانات\s*النشطه|Active\s*ads', re.I)):
         for candidate_box in ([el.parent, el.parent.parent] if (el.parent and el.parent.parent) else [el.parent]):
             if not candidate_box: continue
@@ -418,8 +539,7 @@ def extract_direct_ad_info(full_html, deal, blacklist):
                 active_count = nums[0]
                 count_source = f"DOM Box ({active_count} active ads)"
                 break
-        if active_count > 0:
-            break
+        if active_count > 0: break
 
     if active_count == 0:
         m_after = re.search(r'(?:الاعلانات\s*النشطه|اعلانات\s*نشطه|active\s*ads)\s*[:\-]?\s*(\d{1,5})\b', norm_main_text, re.I)
@@ -449,51 +569,56 @@ def extract_direct_ad_info(full_html, deal, blacklist):
 
     local_area, local_rooms = extract_local_specs(main_text, combined_blob)
     return {
-        "title": title, "desc": desc, "price_num": price_num,
+        "title": title, "desc": desc, "price_num": price_num, "deal": deal,
         "publisher_clean": publisher_clean, "active_count": active_count,
-        "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms
+        "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms,
+        "age": final_age
     }, "OK", None
 
 def inspect_ad_worker(item, engine, blacklist):
-    url, cat, deal, en_label = item["url"], item["cat"], item["deal"], item["en"]
+    url, cat, deal, en_label, hint_age = item["url"], item["cat"], item["deal"], item["en"], item.get("age", "حديث")
     html = engine.fetch_html(url, is_warmup=False)
     if not html:
         return {"url": url, "ad": None, "reason": "Failed to fetch ad HTML", "bl_key": None, "loaded": False}
-    info, reason, bl_key = extract_direct_ad_info(html, deal, blacklist)
+    info, reason, bl_key = extract_direct_ad_info(html, deal, blacklist, hint_age=hint_age)
     if not info:
         return {"url": url, "ad": None, "reason": reason, "bl_key": bl_key, "loaded": True}
 
-    title, desc, price_num = info["title"], info["desc"], info["price_num"]
+    title, desc, price_num, resolved_deal = info["title"], info["desc"], info["price_num"], info["deal"]
     publisher_clean, active_count, count_source = info["publisher_clean"], info["active_count"], info["count_source"]
     ai_area, ai_rooms = info["local_area"], info["local_rooms"]
 
     try:
         r = requests.post(
             f"{AI_SERVER_URL}/analyze",
-            json={"title": title, "description": desc, "publisher": publisher_clean, "deal": deal, "cat": cat, "price_num": price_num, "source": "دوبيزل", "active_ads_count": active_count, "dubizzle_strict_count_only": True},
+            json={"title": title, "description": desc, "publisher": publisher_clean, "deal": resolved_deal, "cat": cat, "price_num": price_num, "source": "دوبيزل", "active_ads_count": active_count, "dubizzle_strict_count_only": True},
             timeout=6
         )
         if r.status_code == 200:
             res = r.json()
             if res.get("decision") == "مرفوض":
                 return {"url": url, "ad": None, "reason": "AI Rejected (Broker Pattern)", "bl_key": None, "loaded": True}
-            if not ai_area and res.get("area"): ai_area = res.get("area")
-            if not ai_rooms and res.get("rooms"): ai_rooms = res.get("rooms")
+            if not ai_area and res.get("area"):
+                m_a = re.search(r'\d+', str(res.get("area")).translate(HINDI_MAP))
+                if m_a: ai_area = m_a.group(0)
+            if not ai_rooms and res.get("rooms"):
+                m_r = re.search(r'\d+', str(res.get("rooms")).translate(HINDI_MAP))
+                if m_r: ai_rooms = m_r.group(0)
     except Exception:
         pass
 
     sub_zone = detect_sub_zone(f"{title} {desc}")
-    price_str = f"{price_num:,} ج.م" if price_num > 0 else "السعر عند التواصل"
+    price_str = f"{price_num:,} ج.م" if price_num > 0 else "السعر بالتفاصيل"
+    num_id = get_numeric_ad_id(url, html)
+    now_ts = int(time.time())
     ad_obj = {
-        "id": get_deterministic_ad_id(url, html),
-        "title": title, "link": url, "url": url,
-        "price": price_str, "price_num": price_num,
-        "cat": cat, "category": cat, "deal": deal, "type": deal,
-        "zone": sub_zone, "location": sub_zone, "source": "دوبيزل",
-        "publisher": f"{publisher_clean} ({active_count} إعلان نشط)",
-        "active_ads_count": active_count, "area": ai_area, "rooms": ai_rooms,
-        "description": desc[:500], "timestamp": int(time.time()),
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        "ad_id": num_id, "id": f"dub_{num_id}", "title": title, "url": url, "link": url,
+        "price": price_str, "price_num": price_num, "cat": cat, "category": cat,
+        "deal": resolved_deal, "type": resolved_deal, "zone": sub_zone, "location": sub_zone,
+        "source": "دوبيزل", "publisher": f"{publisher_clean} ({active_count} إعلان نشط)",
+        "pub_ads": active_count, "active_ads_count": active_count,
+        "area": ai_area, "rooms": ai_rooms, "age": info["age"], "description": desc[:500],
+        "first_seen_ts": now_ts, "timestamp": now_ts, "date": datetime.now().strftime("%Y-%m-%d %H:%M")
     }
     return {"url": url, "ad": ad_obj, "reason": f"Owner Verified ({count_source})", "bl_key": None, "loaded": True, "en": en_label}
 
@@ -503,7 +628,9 @@ def load_json_list(path):
             with open(path, "r", encoding="utf-8") as f:
                 d = json.load(f)
                 if isinstance(d, list): return d
-        except Exception: pass
+                if isinstance(d, dict) and isinstance(d.get("ads"), list): return d["ads"]
+        except Exception:
+            pass
     return []
 
 def safe_write_json(path, data):
@@ -515,86 +642,125 @@ def safe_write_json(path, data):
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             return True
-        except Exception: time.sleep(0.2)
+        except Exception:
+            time.sleep(0.2)
     return False
 
 def save_state(current_ads, seen_links, blacklist, push_to_github=False):
     with STATE_LOCK:
         final_ads = current_ads[:MAX_ADS_STORED]
-        safe_write_json(DATA_FILE, final_ads)
+        payload_to_write = {"ads": final_ads} if FRONTEND_SCHEMA.get("wrap_object") else final_ads
+        safe_write_json(DATA_FILE, payload_to_write)
         safe_write_json(SEEN_FILE, list(seen_links)[-6000:])
         safe_write_json(BLACKLIST_FILE, list(blacklist)[-6000:])
         if push_to_github:
             try:
-                subprocess.run(["git", "config", "user.name", "Gamal Radar"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
-                subprocess.run(["git", "config", "user.email", "gamal@radar.local"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+                fix_git_identity_for_vercel()
                 subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
-                c_res = subprocess.run(["git", "commit", "-m", f"Owner Update ({len(final_ads)} Ads)"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
+                c_res = subprocess.run(["git", "commit", "--reset-author", "-m", f"Owner Update ({len(final_ads)} Ads)"], cwd=BASE_DIR, capture_output=True, text=True, timeout=15)
                 p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
                 if p_res.returncode != 0:
                     subprocess.run(["git", "pull", "--rebase", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
                     p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
                 if p_res.returncode == 0:
-                    print(f"    --> [LIVE SYNC] Pushed ads.json to GitHub & Website! (Total Owners in ads.json: {len(final_ads)})")
+                    print(f"    --> [LIVE SYNC] Pushed ads.json to GitHub & Vercel! (Total Owners in ads.json: {len(final_ads)})")
                 else:
                     err_msg = (p_res.stderr or c_res.stderr or "").strip()[:120]
                     print(f"    --> [GIT WARNING] Saved locally ({len(final_ads)} owners), Git message: {err_msg}")
             except Exception as e:
                 print(f"    --> [LOCAL SAVE] Saved ads.json locally! (Total Owners: {len(final_ads)}) | {e}")
 
+def normalize_cat_to_schema(raw_cat):
+    nc = normalize_ar(raw_cat)
+    if "شقق" in nc: return FRONTEND_SCHEMA["cat_map"]["apt"]
+    if "فلل" in nc or "فيلات" in nc: return FRONTEND_SCHEMA["cat_map"]["villa"]
+    if "تجار" in nc: return FRONTEND_SCHEMA["cat_map"]["comm"]
+    if "اراض" in nc or "مبان" in nc: return FRONTEND_SCHEMA["cat_map"]["land"]
+    return FRONTEND_SCHEMA["cat_map"]["apt"]
+
+def normalize_deal_to_schema(raw_deal):
+    nd = normalize_ar(raw_deal)
+    if "ايجار" in nd: return FRONTEND_SCHEMA["deal_map"]["rent"]
+    return FRONTEND_SCHEMA["deal_map"]["sale"]
+
 def clean_existing_dubizzle_only_db(ads_list):
     cleaned, seen_u = [], set()
     for ad in ads_list:
         if not isinstance(ad, dict) or ad.get("source") != "دوبيزل": continue
-        u = ad.get("link") or ad.get("url") or ""
+        u = ad.get("url") or ad.get("link") or ""
         if not u or u in seen_u or "dubizzle.com.eg" not in u: continue
-        cnt = int(ad.get("active_ads_count", 0) or 0)
+        cnt = int(ad.get("active_ads_count") or ad.get("pub_ads") or 0)
         if not (1 <= cnt <= 4):
             m_c = re.search(r'\((\d+)\s*(?:إعلان|اعلان|عقار)', str(ad.get("publisher", "")))
             cnt = int(m_c.group(1)) if m_c else 0
             if not (1 <= cnt <= 4): continue
-            ad["active_ads_count"] = cnt
-        deal = ad.get("deal") or ad.get("type") or "تمليك"
+        deal = normalize_deal_to_schema(ad.get("deal") or ad.get("type") or "تمليك")
+        cat = normalize_cat_to_schema(ad.get("cat") or ad.get("category") or "شقق")
         p_num = parse_price_strict(ad.get("price_num") or ad.get("price"), deal)
         bad, _ = is_forbidden_or_installment(ad.get("title", ""), ad.get("description", ""), deal, p_num)
         if bad: continue
         raw_p = re.sub(r'\(\d+.*?\)$', '', str(ad.get("publisher", ""))).strip()
+        num_id = get_numeric_ad_id(u)
+        now_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or time.time())
+        ad["ad_id"], ad["id"], ad["url"], ad["link"] = num_id, f"dub_{num_id}", u, u
+        ad["cat"], ad["category"], ad["deal"], ad["type"] = cat, cat, deal, deal
+        ad["pub_ads"], ad["active_ads_count"] = cnt, cnt
         ad["publisher"] = f"{clean_publisher_name(raw_p)} ({cnt} إعلان نشط)"
         ad["price_num"] = p_num
-        ad["price"] = f"{p_num:,} ج.م" if p_num > 0 else "السعر عند التواصل"
+        ad["price"] = f"{p_num:,} ج.م" if p_num > 0 else "السعر بالتفاصيل"
+        ad["first_seen_ts"], ad["timestamp"] = now_ts, now_ts
+        if ad.get("area"):
+            m_a = re.search(r'\d+', str(ad["area"]).translate(HINDI_MAP))
+            ad["area"] = m_a.group(0) if m_a else None
+        if ad.get("rooms"):
+            m_r = re.search(r'\d+', str(ad["rooms"]).translate(HINDI_MAP))
+            ad["rooms"] = m_r.group(0) if m_r else None
         seen_u.add(u)
         cleaned.append(ad)
     return cleaned
 
 def run_single_cycle(engine, is_first_run=False):
+    inspect_local_frontend_schema()
+    fix_git_identity_for_vercel()
     raw_existing = load_json_list(DATA_FILE)
     current_ads = clean_existing_dubizzle_only_db(raw_existing)
     seen_links = set(load_json_list(SEEN_FILE))
     blacklist = {k for k in load_json_list(BLACKLIST_FILE) if not str(k).startswith("name_")}
 
-    existing_urls = {(a.get("link") or a.get("url")) for a in current_ads}
-    if is_first_run and len(current_ads) < 15:
-        print("[Recovery] Resetting seen_links once to re-scan Apartments & Villas with the fixed price parser...")
-        seen_links = set(existing_urls)
-        safe_write_json(SEEN_FILE, list(seen_links))
+    existing_urls = {(a.get("url") or a.get("link")) for a in current_ads}
+    if is_first_run:
+        save_state(current_ads, seen_links, blacklist, push_to_github=True)
+        if len(current_ads) < 12:
+            print("[Recovery] Resetting seen_links once to scan all categories with the 24h filter & Vercel schema...")
+            seen_links = set(existing_urls)
+            safe_write_json(SEEN_FILE, list(seen_links))
 
     engine.warmup()
+    per_source_queues = {i: [] for i in range(len(DUBIZZLE_SOURCES))}
+    candidate_urls = set()
 
-    candidates, candidate_urls = [], set()
-    for page_num in (1, 2, 3):
-        if len(candidates) >= MAX_CANDIDATES_PER_RUN: break
-        for src in DUBIZZLE_SOURCES:
-            if len(candidates) >= MAX_CANDIDATES_PER_RUN: break
+    for page_num in range(1, MAX_PAGES_PER_CATEGORY + 1):
+        if sum(len(q) for q in per_source_queues.values()) >= MAX_CANDIDATES_PER_RUN: break
+        for s_idx, src in enumerate(DUBIZZLE_SOURCES):
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            links = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}")
-            for lnk in links:
+            fresh_pairs = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}")
+            for lnk, age_lbl in fresh_pairs:
                 if lnk not in existing_urls and lnk not in seen_links and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
-                    candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"]})
-                    if len(candidates) >= MAX_CANDIDATES_PER_RUN: break
+                    per_source_queues[s_idx].append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl})
+
+    candidates = []
+    while len(candidates) < MAX_CANDIDATES_PER_RUN:
+        added_in_round = False
+        for s_idx in range(len(DUBIZZLE_SOURCES)):
+            if per_source_queues[s_idx]:
+                candidates.append(per_source_queues[s_idx].pop(0))
+                added_in_round = True
+                if len(candidates) >= MAX_CANDIDATES_PER_RUN: break
+        if not added_in_round: break
 
     total_cand = len(candidates)
-    print(f"\n[Parallel Inspector] Launching ThreadPoolExecutor (max_workers={MAX_WORKERS}) for {total_cand} new ads...")
+    print(f"\n[Parallel Inspector] Launching ThreadPoolExecutor (max_workers={MAX_WORKERS}) for {total_cand} fresh (<=24h) ads across all categories...")
     total_added, completed_idx = 0, 0
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -616,7 +782,7 @@ def run_single_cycle(engine, is_first_run=False):
                     current_ads.insert(0, ad_obj)
                     existing_urls.add(u)
                     total_added += 1
-                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} | {ad_obj['publisher']} | Price: {ad_obj['price']}")
+                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} | Price: {ad_obj['price']}")
                 save_state(current_ads, seen_links, blacklist, push_to_github=True)
             else:
                 print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
@@ -627,7 +793,7 @@ def run_single_cycle(engine, is_first_run=False):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist)}) ===")
 
 def main():
-    print("=== Starting 24/7 Automatic Dubizzle Owner Radar (1-4 Active Ads | Persistent Session) ===")
+    print("=== Starting 24/7 Automatic Dubizzle Owner Radar (All Categories | <=24h Fresh | Vercel Synced) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
