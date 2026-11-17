@@ -30,7 +30,7 @@ PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 800
-MAX_WORKERS = 2
+MAX_WORKERS = 1
 AUTO_LOOP_MINUTES = 45
 STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
@@ -240,16 +240,17 @@ def strip_related_ads_section(html):
 
 def is_turnstile_failed_in_html(html):
     if not html: return False
-    norm_h = normalize_ar(html)
+    norm_h = normalize_ar(html[:25000])
     for marker in ("فشل التحقق", "تعذر التحقق من اتصالك", "حدث الصفحه للمحاوله", "refresh the page to try again"):
         if marker in norm_h: return True
     return False
 
 def is_turnstile_in_html(html):
     if not html: return False
+    if html.count("/ad/") >= 6 or len(html) > 95000: return False
     if is_turnstile_failed_in_html(html): return True
-    norm_h = normalize_ar(html)
-    for marker in ("التحقق الامني", "زائر حقيقي للمتابعه", "حدد المربع ادناه", "محمي ضد الحركه الاليه", "تاكيد انك انسان"):
+    norm_h = normalize_ar(html[:25000])
+    for marker in ("زائر حقيقي للمتابعه", "حدد المربع ادناه", "محمي ضد الحركه الاليه", "تاكيد انك انسان"):
         if marker in norm_h: return True
     return "<title>just a moment" in norm_h[:3000]
 
@@ -287,12 +288,7 @@ class SmartHybridEngine:
         if not self.page: return ""
         try:
             with BROWSER_LOCK:
-                return self.page.run_js(
-                    "let h = document.documentElement ? document.documentElement.outerHTML : ''; "
-                    "try { document.querySelectorAll('iframe').forEach(f => { "
-                    "  if (f.src && (f.src.includes('cloudflare') || f.src.includes('turnstile') || f.src.includes('challenge'))) h += ' التحقق الامني '; "
-                    "}); } catch(e) {} return h;"
-                ) or ""
+                return self.page.run_js("return document.documentElement ? document.documentElement.outerHTML : '';") or ""
         except Exception: return ""
 
     def hard_refresh_anchor(self):
@@ -317,6 +313,7 @@ class SmartHybridEngine:
 
     def find_turnstile_box_via_cdp_pierce(self):
         try:
+            self.page.run_cdp("DOM.enable")
             doc = self.page.run_cdp("DOM.getFlattenedDocument", depth=-1, pierce=True)
             for node in doc.get("nodes", []):
                 n_name = str(node.get("nodeName") or "").upper()
@@ -350,46 +347,39 @@ class SmartHybridEngine:
                         const r = el.getBoundingClientRect();
                         if (r.height < 8 || r.height > 120 || r.width < 80) continue;
                         const t = (el.innerText || '').trim();
-                        if ((t.includes('المربع أدناه') || t.includes('زائر حقيقي')) && (!topR || r.height < topR.height)) topR = r;
-                        if (t.includes('لماذا أرى هذه الصفحة') && (!botR || r.height < botR.height)) botR = r;
+                        if ((t.includes('المربع') || t.includes('زائر حقيقي')) && (!topR || r.height < topR.height)) topR = r;
+                        if (t.includes('لماذا') && (!botR || r.height < botR.height)) botR = r;
                     }
-                    if (!topR || !botR) return { blank: true };
-                    return { blank: false, cx: Math.round((topR.left + topR.right) / 2), ty: Math.round((topR.bottom + botR.top) / 2) };
+                    if (!topR || !botR) return null;
+                    return { cx: Math.round((topR.left + topR.right) / 2), ty: Math.round((topR.bottom + botR.top) / 2) };
                 """)
-                if not box or box.get("blank"):
-                    return "blank_dead_page"
-                cx, ty = int(box["cx"]), int(box["ty"])
-                self.cdp_human_click(cx + 120, ty)
-                time.sleep(0.25)
-                self.cdp_human_click(cx + 106, ty)
-                return "clicked_geometry"
-        except Exception:
-            return "err"
+                if box and isinstance(box, dict):
+                    cx, ty = int(box["cx"]), int(box["ty"])
+                    self.cdp_human_click(cx + 120, ty)
+                    time.sleep(0.2)
+                    self.cdp_human_click(cx + 106, ty)
+                    return "clicked_geometry"
+        except Exception: pass
+        return "waiting"
 
-    def wait_until_turnstile_cleared(self, max_wait_loops=24):
+    def wait_until_turnstile_cleared(self, max_wait_loops=20):
         if not self.page: return False
         with TURNSTILE_LOCK:
-            time.sleep(1.5)
+            time.sleep(1.0)
             refreshed_once = False
             for attempt in range(max_wait_loops):
                 dom_now = self.get_live_dom()
-                if not is_turnstile_in_html(dom_now) and ("/ad/" in dom_now or len(dom_now) > 25000):
-                    time.sleep(1.5)
+                if not is_turnstile_in_html(dom_now):
                     return True
                 if is_turnstile_failed_in_html(dom_now) and not refreshed_once:
                     print("[Self-Healing] 'فشل التحقق' detected -> Refreshing tab once...")
                     refreshed_once = True
                     self.hard_refresh_anchor()
                     continue
-                if attempt in (0, 3, 6, 10, 15, 20):
+                if attempt in (0, 3, 6, 10, 15):
                     status = self.try_auto_solve_turnstile()
-                    if status == "blank_dead_page" and not refreshed_once:
-                        print("[Self-Healing] Blank/expired verification tab detected -> Refreshing tab once...")
-                        refreshed_once = True
-                        self.hard_refresh_anchor()
-                        continue
                     if attempt == 0:
-                        print(f"[Security Solver] Internal background click executed ({status})...")
+                        print(f"[Security Solver] Turnstile challenge active -> Internal click ({status})...")
                 time.sleep(2.5)
             return not is_turnstile_in_html(self.get_live_dom())
 
@@ -419,7 +409,7 @@ class SmartHybridEngine:
             init_links = extract_dubizzle_links_from_html(dom_init, prefilter_cards=False)
             if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(init_links) == 0:
                 self.hard_refresh_anchor()
-            self.wait_until_turnstile_cleared(max_wait_loops=28)
+            self.wait_until_turnstile_cleared(max_wait_loops=25)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
             print(f"[Engine] Anchor tab ready (100% Background/Minimized Mode)! ({len(links_now)} ads visible)")
             return True
@@ -443,9 +433,8 @@ class SmartHybridEngine:
         self.discover_land_slug_from_html(self.get_live_dom())
 
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(1.2, 2.2))
+        time.sleep(random.uniform(0.9, 1.5))
         if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]): return ""
-        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=24)
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
         window.__fetches = window.__fetches || {};
@@ -463,7 +452,7 @@ class SmartHybridEngine:
         """
         try:
             with BROWSER_LOCK: self.page.run_js(js_start, req_id, url)
-            for _ in range(35):
+            for _ in range(40):
                 time.sleep(0.25)
                 with BROWSER_LOCK:
                     res_state = self.page.run_js(
@@ -473,10 +462,11 @@ class SmartHybridEngine:
                     )
                 if res_state and isinstance(res_state, dict):
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
-                    if st in (403, 429, 503, -1) or is_turnstile_in_html(h):
+                    if st in (403, 429) or is_turnstile_in_html(h):
                         with TURNSTILE_LOCK:
-                            time.sleep(6.0)
-                            self.wait_until_turnstile_cleared(max_wait_loops=24)
+                            time.sleep(5.0)
+                            if is_turnstile_in_html(self.get_live_dom()):
+                                self.wait_until_turnstile_cleared(max_wait_loops=20)
                         return ""
                     return h
         except Exception: pass
@@ -492,7 +482,7 @@ class SmartHybridEngine:
             if h and not is_turnstile_in_html(h) and len(h) > 5000:
                 if not self.land_url_resolved: self.discover_land_slug_from_html(h)
                 return h
-            time.sleep(2.0)
+            time.sleep(1.5)
         return ""
 
     def get_category_links(self, url, label="", is_land=False):
@@ -772,44 +762,42 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Parallel Inspector] Launching (max_workers={MAX_WORKERS}) for ({total_cand}) new <=24h ads...")
+    print(f"\n[Inspector] Launching clean sequential background scan for ({total_cand}) new <=24h ads...")
     total_added, completed_idx = 0, 0
-    for batch_start in range(0, total_cand, 35):
-        batch = candidates[batch_start:batch_start + 35]
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            futures = [executor.submit(inspect_ad_worker, item, engine, blacklist_dict) for item in batch]
-            for fut in as_completed(futures):
-                completed_idx += 1
-                try: res = fut.result()
-                except Exception as e:
-                    print(f"  [{completed_idx}/{total_cand}] [ERROR] {e}"); continue
-                u = res["url"]
-                if res.get("loaded"):
-                    with STATE_LOCK:
-                        seen_links_dict[u] = True
-                        seen_links_dict[f"id_{get_numeric_ad_id(u)}"] = True
-                if res.get("bl_key"):
-                    with STATE_LOCK: blacklist_dict[res["bl_key"]] = True
-                ad_obj = res.get("ad")
-                if ad_obj:
-                    with STATE_LOCK:
-                        current_ads.insert(0, ad_obj)
-                        existing_urls.add(u)
-                        total_added += 1
-                    print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} ({ad_obj['pub_ads']} ads) | Price: {ad_obj['price']}")
-                    save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
-                else:
-                    print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
+    for batch_start in range(0, total_cand, 40):
+        batch = candidates[batch_start:batch_start + 40]
+        for item in batch:
+            completed_idx += 1
+            try: res = inspect_ad_worker(item, engine, blacklist_dict)
+            except Exception as e:
+                print(f"  [{completed_idx}/{total_cand}] [ERROR] {e}"); continue
+            u = res["url"]
+            if res.get("loaded"):
+                with STATE_LOCK:
+                    seen_links_dict[u] = True
+                    seen_links_dict[f"id_{get_numeric_ad_id(u)}"] = True
+            if res.get("bl_key"):
+                with STATE_LOCK: blacklist_dict[res["bl_key"]] = True
+            ad_obj = res.get("ad")
+            if ad_obj:
+                with STATE_LOCK:
+                    current_ads.insert(0, ad_obj)
+                    existing_urls.add(u)
+                    total_added += 1
+                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} ({ad_obj['pub_ads']} ads) | Price: {ad_obj['price']}")
+                save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
+            else:
+                print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
         save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
-        if batch_start + 35 < total_cand:
-            print(f"    [Rate-Guard] Batch of 35 ads done -> Cooling down 20s to keep IP 100% clean...")
-            time.sleep(20.0)
+        if batch_start + 40 < total_cand:
+            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 15s to keep IP 100% clean...")
+            time.sleep(15.0)
 
     save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added > 0))
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (100% Background Mode | Zero Mouse Hijack | Anti-Ban Pacing) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (100% Background Mode | Zero False Refresh | Anti-Ban Pacing) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
