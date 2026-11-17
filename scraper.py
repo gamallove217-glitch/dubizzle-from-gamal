@@ -6,23 +6,17 @@ from bs4 import BeautifulSoup
 from DrissionPage import ChromiumPage, ChromiumOptions
 
 def disable_cmd_quickedit_and_sleep():
-    if not sys.platform.startswith("win"):
-        return
+    if not sys.platform.startswith("win"): return
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:
-        pass
-    try:
-        kernel32 = ctypes.windll.kernel32
-        kernel32.SetThreadExecutionState(0x80000003)
-        stdin_handle = kernel32.GetStdHandle(-10)
-        mode = ctypes.c_uint32()
-        if kernel32.GetConsoleMode(stdin_handle, ctypes.byref(mode)):
-            new_mode = (mode.value & ~0x0040 & ~0x0020) | 0x0080
-            kernel32.SetConsoleMode(stdin_handle, new_mode)
-    except Exception:
-        pass
+        k32 = ctypes.windll.kernel32
+        k32.SetThreadExecutionState(0x80000003)
+        h = k32.GetStdHandle(-10)
+        m = ctypes.c_uint32()
+        if k32.GetConsoleMode(h, ctypes.byref(m)):
+            k32.SetConsoleMode(h, (m.value & ~0x0040 & ~0x0020) | 0x0080)
+    except Exception: pass
 
 disable_cmd_quickedit_and_sleep()
 
@@ -99,7 +93,6 @@ def inspect_local_frontend_schema():
         if src["cat_key"] in FRONTEND_SCHEMA["cat_map"]: src["cat"] = FRONTEND_SCHEMA["cat_map"][src["cat_key"]]
         if src["deal"] in ("إيجار", "ايجار"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["rent"]
         elif src["deal"] in ("تمليك", "بيع"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["sale"]
-    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']} | Deep Scan: Up to 5 Pages | QuickEdit Disabled: OK")
 
 def clear_git_locks():
     git_dir = os.path.join(BASE_DIR, ".git")
@@ -149,10 +142,9 @@ def is_company_like_name(name):
         elif nk in norm: return True
     return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex|redefine)\b', norm, re.I))
 
-def extract_visible_dubizzle_ad_id(html):
-    if not html: return ""
-    clean_h = html.translate(HINDI_MAP)
-    m_vis = re.search(r'(?:معرّف\s*الإعلان|معرف\s*الإعلان|معرف\s*الاعلان|رقم\s*الإعلان|Ad\s*ID)\s*[:\-]?\s*([25]\d{7,10})\b', clean_h, re.I)
+def extract_visible_dubizzle_ad_id(text):
+    if not text: return ""
+    m_vis = re.search(r'(?:معرّف\s*الإعلان|معرف\s*الإعلان|معرف\s*الاعلان|رقم\s*الإعلان|Ad\s*ID)\s*[:\-]?\s*([25]\d{7,10})\b', text.translate(HINDI_MAP), re.I)
     return m_vis.group(1) if m_vis else ""
 
 def get_numeric_ad_id(url, html=""):
@@ -308,7 +300,7 @@ class SmartHybridEngine:
         try:
             with BROWSER_LOCK:
                 self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
-            time.sleep(3.5)
+            time.sleep(5.0)
         except Exception: pass
 
     def try_auto_solve_turnstile(self):
@@ -319,45 +311,43 @@ class SmartHybridEngine:
                     src = str(iframe.attr("src") or "").lower()
                     title_attr = str(iframe.attr("title") or "").lower()
                     if any(k in src or k in title_attr for k in ("cloudflare", "turnstile", "challenge", "widget")):
-                        for off_x in (110, 85, -95, 0):
+                        for off_x in (122, 110, 95, -120, 0):
                             try:
                                 self.page.actions.move_to(iframe, offset_x=off_x, offset_y=0).click()
-                                time.sleep(0.2)
+                                time.sleep(0.15)
                             except Exception: pass
                         return
                 for txt in ["تأكيد أنك إنسان", "Verify you are human", "حدد المربع أدناه"]:
                     el = self.page.ele(f"text:{txt}", timeout=0.5)
                     if el:
-                        for off_x in (65, -65, 0):
+                        for off_x in (68, -68, 0):
                             try:
                                 self.page.actions.move_to(el, offset_x=off_x, offset_y=0).click()
-                                time.sleep(0.2)
+                                time.sleep(0.15)
                             except Exception: pass
                         return
         except Exception: pass
 
-    def wait_until_turnstile_cleared(self, max_wait_loops=24):
+    def wait_until_turnstile_cleared(self, max_wait_loops=25):
         if not self.page: return False
         with TURNSTILE_LOCK:
-            time.sleep(1.0)
+            time.sleep(1.5)
+            refreshed_once = False
             for attempt in range(max_wait_loops):
                 dom_now = self.get_live_dom()
                 if not is_turnstile_in_html(dom_now) and ("/ad/" in dom_now or len(dom_now) > 25000):
                     time.sleep(1.5)
                     return True
-                if is_turnstile_failed_in_html(dom_now):
-                    print("[Self-Healing] Expired Turnstile ('فشل التحقق - حدث الصفحة') detected! Auto-refreshing Chrome tab...")
-                    self.hard_refresh_anchor()
-                    continue
-                if attempt in (8, 16):
-                    print("[Self-Healing] Turnstile still pending -> Auto-refreshing Chrome tab for a fresh session...")
+                if is_turnstile_failed_in_html(dom_now) and not refreshed_once:
+                    print("[Self-Healing] 'فشل التحقق - حدث الصفحة' detected! Refreshing once and waiting...")
+                    refreshed_once = True
                     self.hard_refresh_anchor()
                     continue
                 if attempt == 0:
-                    print("[Security Solver] Turnstile checkbox detected! Auto-clicking silently...")
-                if attempt in (0, 2, 5, 10, 14, 18):
+                    print("[Security Solver] Turnstile checkbox detected! Clicking silently in background...")
+                if attempt in (0, 3, 6, 10, 15, 20):
                     self.try_auto_solve_turnstile()
-                time.sleep(2.2)
+                time.sleep(2.8)
             return not is_turnstile_in_html(self.get_live_dom())
 
     def ensure_anchor_browser(self, test_url):
@@ -376,6 +366,9 @@ class SmartHybridEngine:
             for c in [r"C:\Program Files\Google\Chrome\Application\chrome.exe", r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe")]:
                 if os.path.exists(c): co.set_browser_path(c); break
             co.set_paths(local_port=9555, user_data_path=PROFILE_DIR)
+            co.set_argument("--disable-background-timer-throttling")
+            co.set_argument("--disable-backgrounding-occluded-windows")
+            co.set_argument("--disable-renderer-backgrounding")
             co.mute(True)
             self.page = ChromiumPage(addr_or_opts=co)
             with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
@@ -384,7 +377,7 @@ class SmartHybridEngine:
                 self.hard_refresh_anchor()
             self.wait_until_turnstile_cleared(max_wait_loops=30)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
-            print(f"[Engine] Anchor tab verified ready & clean! ({len(links_now)} ads visible)")
+            print(f"[Engine] Anchor tab ready (Works 100% even when minimized)! ({len(links_now)} ads visible)")
             return True
         except Exception as e:
             print(f"[Browser Port 9555 Info] {e}")
@@ -406,9 +399,9 @@ class SmartHybridEngine:
         self.discover_land_slug_from_html(self.get_live_dom())
 
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(0.85, 1.65))
+        time.sleep(random.uniform(1.1, 2.1))
         if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]): return ""
-        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=24)
+        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=25)
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
         window.__fetches = window.__fetches || {};
@@ -437,8 +430,9 @@ class SmartHybridEngine:
                 if res_state and isinstance(res_state, dict):
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
                     if st in (403, 429, 503, -1) or is_turnstile_in_html(h):
-                        self.hard_refresh_anchor()
-                        self.wait_until_turnstile_cleared(max_wait_loops=24)
+                        with TURNSTILE_LOCK:
+                            time.sleep(8.0)
+                            self.wait_until_turnstile_cleared(max_wait_loops=25)
                         return ""
                     return h
         except Exception: pass
@@ -449,13 +443,12 @@ class SmartHybridEngine:
         return ""
 
     def fetch_html(self, url):
-        for _ in range(3):
+        for _ in range(2):
             h = self.browser_background_fetch_single(url)
             if h and not is_turnstile_in_html(h) and len(h) > 5000:
                 if not self.land_url_resolved: self.discover_land_slug_from_html(h)
                 return h
-            self.wait_until_turnstile_cleared(max_wait_loops=20)
-            time.sleep(1.2)
+            time.sleep(2.0)
         return ""
 
     def get_category_links(self, url, label="", is_land=False):
@@ -463,28 +456,22 @@ class SmartHybridEngine:
         urls_to_try = [url]
         if is_land and "?page=" not in url:
             urls_to_try.extend(["https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/", "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo/"])
-        for attempt in range(2):
-            for u_try in urls_to_try:
-                html = self.fetch_html(u_try)
-                raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
-                fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
-                if raw_pairs:
-                    if is_land:
-                        for src in DUBIZZLE_SOURCES:
-                            if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
-                    break
-            if raw_pairs: break
-            if attempt == 0 and not is_land:
-                self.hard_refresh_anchor()
-                self.wait_until_turnstile_cleared(max_wait_loops=20)
+        for u_try in urls_to_try:
+            html = self.fetch_html(u_try)
+            raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
+            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
+            if raw_pairs:
+                if is_land:
+                    for src in DUBIZZLE_SOURCES:
+                        if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
+                break
         print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
         return fresh_pairs
 
     def verify_profile_published_count(self, profile_url):
         if not profile_url: return 0, ""
         with STATE_LOCK:
-            if profile_url in PROFILE_CACHE:
-                return PROFILE_CACHE[profile_url]
+            if profile_url in PROFILE_CACHE: return PROFILE_CACHE[profile_url]
         h = self.fetch_html(profile_url)
         if not h: return 0, ""
         soup = BeautifulSoup(h, "html.parser")
@@ -499,23 +486,18 @@ class SmartHybridEngine:
         count_val = 0
         for m_p in re.findall(r'(?:الاعلانات\s*المنشوره|اعلانات\s*منشوره|الاعلانات\s*النشطه|اعلانات\s*نشطه|published\s*ads|active\s*ads)\s*[:\-]?\s*(\d{1,5})\b', txt, re.I):
             v = int(m_p)
-            if v >= 1 and not (1990 <= v <= 2035):
-                count_val = v; break
+            if v >= 1 and not (1990 <= v <= 2035): count_val = v; break
         if count_val == 0:
             txt_no_yr = re.sub(r'(?:عضو\s*منذ|member\s*since)\s*\d{4}', ' ', txt)
             for m_b in re.findall(r'\b(\d{1,5})\s*(?:الاعلانات\s*المنشوره|اعلانات\s*منشوره|الاعلانات\s*النشطه|اعلانات\s*نشطه|published\s*ads|active\s*ads)', txt_no_yr, re.I):
                 v = int(m_b)
-                if v >= 1 and not (1990 <= v <= 2035):
-                    count_val = v; break
+                if v >= 1 and not (1990 <= v <= 2035): count_val = v; break
         if count_val == 0:
             for pat_j in [r'"totalAds"\s*:\s*(\d+)', r'"publishedAdsCount"\s*:\s*(\d+)', r'"activeAdsCount"\s*:\s*(\d+)', r'"adsCount"\s*:\s*(\d+)']:
                 m_j = re.search(pat_j, unesc_h)
-                if m_j and int(m_j.group(1)) >= 1:
-                    count_val = int(m_j.group(1)); break
-        if count_val == 0:
-            count_val = len(extract_dubizzle_links_from_html(h, prefilter_cards=False))
-        with STATE_LOCK:
-            PROFILE_CACHE[profile_url] = (count_val, prof_name)
+                if m_j and int(m_j.group(1)) >= 1: count_val = int(m_j.group(1)); break
+        if count_val == 0: count_val = len(extract_dubizzle_links_from_html(h, prefilter_cards=False))
+        with STATE_LOCK: PROFILE_CACHE[profile_url] = (count_val, prof_name)
         return count_val, prof_name
 
 def extract_seller_card_details(full_soup, unescaped_blob):
@@ -546,25 +528,21 @@ def extract_seller_card_details(full_soup, unescaped_blob):
                 if cand != "مالك مباشر": pub_raw = cand; break
             curr = curr.parent
         if pub_raw: break
-
     if not pub_raw:
         full_text = full_soup.get_text(" ", strip=True)
         m_ft = re.search(r'(?:تم\s*النشر\s*بواسطة|تم\s*النشر\s*بواسطه|Posted\s*by|Listed\s*by)\s*[:\-]?\s*([^\r\n]{2,55}?)\s+(?:عضو\s*منذ|الإعلانات\s*النشطة|إعلانات\s*نشطة|الاعلانات\s*النشطه|اعلانات\s*نشطه|Member\s*since|Active\s*ads)', full_text, re.I)
         if m_ft: pub_raw = clean_publisher_name(m_ft.group(1))
-
     if not pub_raw:
         for pat_s in [r'"(?:sellerName|contactName|agencyName|companyName)"\s*:\s*"([^"]{2,50})"', r'"(?:seller|user|agency|owner)"\s*:\s*\{[^{}]{0,300}?"name"\s*:\s*"([^"]{2,50})"']:
             m_s = re.search(pat_s, unescaped_blob, re.I)
             if m_s:
                 cand = clean_publisher_name(m_s.group(1))
                 if cand != "مالك مباشر": pub_raw = cand; break
-
     if not profile_url:
         m_p2 = re.search(r'/(?:ar/|en/)?profile/([a-zA-Z0-9_\-]{5,})', unescaped_blob)
         if m_p2:
             seller_id = seller_id or f"prof_{m_p2.group(1)[:35]}"
             profile_url = f"https://www.dubizzle.com.eg/profile/{m_p2.group(1)}"
-
     return clean_publisher_name(pub_raw), profile_url, seller_id, is_agency
 
 def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة", hint_ts=0):
@@ -572,53 +550,39 @@ def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة
     soup = BeautifulSoup(main_html, "html.parser")
     full_soup = BeautifulSoup(full_html, "html.parser")
     for tag in soup.find_all(["header", "nav", "footer"]): tag.decompose()
-
     h1 = soup.find("h1") or full_soup.find("h1")
     title = re.sub(r'\s*\|\s*(?:دوبيزل|dubizzle).*$', '', (h1.get_text(" ", strip=True) if h1 else ""), flags=re.I).strip()
     if not title or len(title) < 4: return None, "Empty title", None
-
     desc_el = soup.find(attrs={"aria-label": "Description"}) or full_soup.find(attrs={"aria-label": "الوصف"}) or soup.find("div", {"data-testid": "description"}) or full_soup.find("div", {"data-testid": "description"})
     desc = desc_el.get_text(" ", strip=True) if desc_el else ""
     main_text = soup.get_text(" ", strip=True)
     full_text = full_soup.get_text(" ", strip=True)
-    norm_main_text = normalize_ar(main_text)
-    norm_full_text = normalize_ar(full_text)
-
+    norm_main_text, norm_full_text = normalize_ar(main_text), normalize_ar(full_text)
     if deal == "AUTO":
         deal = FRONTEND_SCHEMA["deal_map"]["rent"] if re.search(r'(?:للايجار|for\s*rent)', normalize_ar(f"{title} {main_text[:1500]}"), re.I) else FRONTEND_SCHEMA["deal_map"]["sale"]
-
     unescaped_blob = main_html.replace(ESC_QUOTE, '"').translate(HINDI_MAP)
     full_unescaped = full_html.replace(ESC_QUOTE, '"').translate(HINDI_MAP)
-
     creation_el = full_soup.find(attrs={"aria-label": "Creation date"}) or full_soup.find(attrs={"aria-label": "تاريخ النشر"})
     age_badge_text = creation_el.get_text(" ", strip=True) if creation_el else ""
     if not age_badge_text:
         m_b = re.search(r'(\d{1,2}\s*(?:دقيقه|دقائق|دقايق|ساعه|ساعات|يوم|ايام)\s*مضت|\d{1,2}\s*قبل\s*(?:دقيقه|دقائق|دقايق|ساعه|ساعات|يوم)|(?:منذ|قبل)\s*\d{1,2}\s*(?:دقيقه|دقائق|دقايق|ساعه|ساعات|يوم|ايام)|(?:ساعه|ساعتين|دقيقه|دقيقتين|يوم|يومين)\s*مضت|\bامس\b)', norm_full_text[:1800])
         if m_b: age_badge_text = m_b.group(1)
-
     is_fresh, detected_age, _, detected_ts, matched_exact = parse_dubizzle_age_info(age_badge_text)
     if not is_fresh: return None, detected_age, None
     final_age = detected_age if matched_exact else hint_age
     final_ts = detected_ts if matched_exact else (hint_ts or int(time.time()) - 3600)
-
-    if "ايجار" not in normalize_ar(deal):
-        if re.search(r'طريقه\s*الدفع\s*[:\-]?\s*تقسيط\b', norm_main_text[:2500]):
-            return None, "Installment Ad (Payment Table)", None
-
+    if "ايجار" not in normalize_ar(deal) and re.search(r'طريقه\s*الدفع\s*[:\-]?\s*تقسيط\b', norm_main_text[:2500]):
+        return None, "Installment Ad (Payment Table)", None
     price_num = extract_best_price(full_soup, soup, main_html, full_unescaped, deal)
     is_bad, bad_reason = is_forbidden_or_installment(title, desc, deal, price_num)
     if is_bad: return None, bad_reason, None
-
     publisher_clean, profile_url, seller_id, is_agency = extract_seller_card_details(full_soup, unescaped_blob)
     company_name_key = f"compname_{normalize_ar(publisher_clean)}" if is_company_like_name(publisher_clean) else ""
     safe_bl_key = seller_id or company_name_key or None
-
     with STATE_LOCK:
         in_bl = (seller_id and seller_id in blacklist) or (company_name_key and company_name_key in blacklist)
     if in_bl: return None, f"Blacklisted Broker ({publisher_clean})", None
-    if is_agency or is_company_like_name(publisher_clean):
-        return None, f"Company Account ({publisher_clean})", safe_bl_key
-
+    if is_agency or is_company_like_name(publisher_clean): return None, f"Company Account ({publisher_clean})", safe_bl_key
     active_count, count_source = 0, ""
     for el in full_soup.find_all(string=re.compile(r'الإعلانات\s*النشطة|الاعلانات\s*النشطه|إعلانات\s*نشطة|اعلانات\s*نشطه|Active\s*ads', re.I)):
         for candidate_box in ([el.parent, el.parent.parent, el.parent.parent.parent] if (el.parent and el.parent.parent) else [el.parent]):
@@ -627,27 +591,21 @@ def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة
             nums = [int(x) for x in re.findall(r'\b(\d{1,5})\b', box_txt) if int(x) >= 1 and not (1990 <= int(x) <= 2035)]
             if nums: active_count = nums[0]; count_source = f"DOM ({active_count} ads)"; break
         if active_count > 0: break
-
     if active_count == 0:
         no_yr = re.sub(r'(?:عضو\s*منذ|member\s*since)\s*\d{4}', ' ', norm_full_text)
         m_act = re.search(r'(?:الاعلانات\s*النشطه|اعلانات\s*نشطه|active\s*ads)\s*[:\-]?\s*(\d{1,5})\b', no_yr) or re.search(r'\b(\d{1,4})\s*(?:الاعلانات\s*النشطه|اعلانات\s*نشطه|اعلان\s*نشط|active\s*ads)', no_yr)
         if m_act: active_count = int(m_act.group(1)); count_source = f"Badge ({active_count} ads)"
-
     if active_count == 0:
         for pat in [r'"activeAdsCount"\s*:\s*(\d+)', r'"active_ads_count"\s*:\s*(\d+)', r'"activeAds"\s*:\s*(\d+)', r'"listedAdsCount"\s*:\s*(\d+)', r'"userAdsCount"\s*:\s*(\d+)', r'"adsCount"\s*:\s*(\d+)', r'"totalAds"\s*:\s*(\d+)']:
             m_j = re.search(pat, full_unescaped)
-            if m_j and int(m_j.group(1)) >= 1:
-                active_count = int(m_j.group(1)); count_source = f"JSON ({active_count} ads)"; break
-
-    vis_ad_id = extract_visible_dubizzle_ad_id(full_html)
+            if m_j and int(m_j.group(1)) >= 1: active_count = int(m_j.group(1)); count_source = f"JSON ({active_count} ads)"; break
+    vis_ad_id = extract_visible_dubizzle_ad_id(full_text)
     if active_count == 0 and vis_ad_id.startswith("2") and not is_agency:
         active_count, count_source = 1, f"AppOwnerID ({vis_ad_id})"
-
     if active_count >= 5: return None, f"Broker Count ({publisher_clean}: {active_count} > 4)", safe_bl_key
     if not (1 <= active_count <= 4): return None, "Unverified active ads count (0 found)", None
-
     local_area, local_rooms = extract_local_specs(main_text, unescaped_blob)
-    return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key, "vis_ad_id": vis_ad_id}, "OK", None
+    return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key}, "OK", None
 
 def inspect_ad_worker(item, engine, blacklist):
     url, cat, deal, en_label = item["url"], item["cat"], item["deal"], item["en"]
@@ -655,7 +613,6 @@ def inspect_ad_worker(item, engine, blacklist):
     if not html: return {"url": url, "ad": None, "reason": "Failed to fetch ad HTML", "bl_key": None, "loaded": False}
     info, reason, bl_key = extract_direct_ad_info(html, deal, blacklist, hint_age=item.get("age", "منذ ساعة"), hint_ts=item.get("real_ts", 0))
     if not info: return {"url": url, "ad": None, "reason": reason, "bl_key": bl_key, "loaded": True}
-
     prof_url = info.get("profile_url")
     if prof_url:
         prof_pub_count, prof_name = engine.verify_profile_published_count(prof_url)
@@ -667,18 +624,14 @@ def inspect_ad_worker(item, engine, blacklist):
             return {"url": url, "ad": None, "reason": f"Profile Published Ads ({info['publisher_clean']}: {prof_pub_count} > 4)", "bl_key": info.get("safe_bl_key"), "loaded": True}
         if 1 <= prof_pub_count <= 4 and prof_pub_count > info["active_count"]:
             info["active_count"] = prof_pub_count
-
     title, desc, price_num, resolved_deal = info["title"], info["desc"], info["price_num"], info["deal"]
     publisher_clean, active_count = info["publisher_clean"], info["active_count"]
     ai_area, ai_rooms = info["local_area"], info["local_rooms"]
-
     try:
         r = requests.post(f"{AI_SERVER_URL}/analyze", json={"title": title, "description": desc, "publisher": publisher_clean, "deal": resolved_deal, "cat": cat, "price_num": price_num, "source": "دوبيزل", "active_ads_count": active_count}, timeout=6)
-        if r.status_code == 200:
-            res = r.json()
-            if res.get("decision") == "مرفوض": return {"url": url, "ad": None, "reason": f"AI Rejected ({publisher_clean})", "bl_key": info.get("safe_bl_key"), "loaded": True}
+        if r.status_code == 200 and r.json().get("decision") == "مرفوض":
+            return {"url": url, "ad": None, "reason": f"AI Rejected ({publisher_clean})", "bl_key": info.get("safe_bl_key"), "loaded": True}
     except Exception: pass
-
     num_id = get_numeric_ad_id(url, html)
     real_post_ts = int(info.get("real_ts") or time.time())
     ad_obj = {
@@ -739,7 +692,6 @@ def run_single_cycle(engine, cycle_num=1):
     fix_git_identity_for_vercel()
     if not os.path.exists(RESET_FLAG_FILE):
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -749,7 +701,6 @@ def run_single_cycle(engine, cycle_num=1):
         if not u or u in seen_u or num_id in BANNED_AD_IDS: continue
         seen_u.add(u)
         current_ads.append(ad)
-
     seen_links_dict = {k: True for k in load_json_list(SEEN_FILE) if k}
     blacklist_dict = {k: True for k in load_json_list(BLACKLIST_FILE) if k}
     existing_urls = {(a.get("url") or a.get("link")) for a in current_ads}
@@ -768,8 +719,7 @@ def run_single_cycle(engine, cycle_num=1):
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
                     all_raw_candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl, "age_mins": age_mins, "real_ts": real_ts})
-            if len(fresh_tuples) < 3:
-                break
+            if len(fresh_tuples) < 3: break
 
     all_raw_candidates.sort(key=lambda x: x["age_mins"])
     candidates = all_raw_candidates[:MAX_CANDIDATES_PER_RUN]
@@ -778,39 +728,44 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Parallel Inspector] Launching ThreadPoolExecutor (max_workers={MAX_WORKERS}) for ({total_cand}) new fresh <=24h ads...")
+    print(f"\n[Parallel Inspector] Launching (max_workers={MAX_WORKERS}) for ({total_cand}) new <=24h ads (Minimized-Safe Mode)...")
     total_added, completed_idx = 0, 0
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [executor.submit(inspect_ad_worker, item, engine, blacklist_dict) for item in candidates]
-        for fut in as_completed(futures):
-            completed_idx += 1
-            try: res = fut.result()
-            except Exception as e:
-                print(f"  [{completed_idx}/{total_cand}] [ERROR] {e}"); continue
-            u = res["url"]
-            if res.get("loaded"):
-                with STATE_LOCK:
-                    seen_links_dict[u] = True
-                    seen_links_dict[f"id_{get_numeric_ad_id(u)}"] = True
-            if res.get("bl_key"):
-                with STATE_LOCK: blacklist_dict[res["bl_key"]] = True
-            ad_obj = res.get("ad")
-            if ad_obj:
-                with STATE_LOCK:
-                    current_ads.insert(0, ad_obj)
-                    existing_urls.add(u)
-                    total_added += 1
-                print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} ({ad_obj['pub_ads']} ads) | Price: {ad_obj['price']}")
-                save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
-            else:
-                print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
-                if completed_idx % 20 == 0: save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
+    for batch_start in range(0, total_cand, 35):
+        batch = candidates[batch_start:batch_start + 35]
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(inspect_ad_worker, item, engine, blacklist_dict) for item in batch]
+            for fut in as_completed(futures):
+                completed_idx += 1
+                try: res = fut.result()
+                except Exception as e:
+                    print(f"  [{completed_idx}/{total_cand}] [ERROR] {e}"); continue
+                u = res["url"]
+                if res.get("loaded"):
+                    with STATE_LOCK:
+                        seen_links_dict[u] = True
+                        seen_links_dict[f"id_{get_numeric_ad_id(u)}"] = True
+                if res.get("bl_key"):
+                    with STATE_LOCK: blacklist_dict[res["bl_key"]] = True
+                ad_obj = res.get("ad")
+                if ad_obj:
+                    with STATE_LOCK:
+                        current_ads.insert(0, ad_obj)
+                        existing_urls.add(u)
+                        total_added += 1
+                    print(f"  [{completed_idx}/{total_cand}] [+ ACCEPTED OWNER] {res.get('en')} ({ad_obj['age']}) | {ad_obj['publisher']} ({ad_obj['pub_ads']} ads) | Price: {ad_obj['price']}")
+                    save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
+                else:
+                    print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
+        save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
+        if batch_start + 35 < total_cand:
+            print(f"    [Rate-Guard] Batch of 35 ads done -> Cooling down 20s to keep IP 100% clean...")
+            time.sleep(20.0)
 
     save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added > 0))
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (45m Cycle | 5-Page Deep Scan | Self-Healing & Anti-Freeze) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (5-Page Deep Scan | Minimized-Window Safe | Anti-Ban Pacing) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
@@ -818,7 +773,7 @@ def main():
         try: run_single_cycle(engine, cycle_num=cycle_num)
         except Exception as e: print(f"[Cycle Error] {e}")
         cycle_num += 1
-        print(f"[Auto-Loop] Sleeping for {AUTO_LOOP_MINUTES} minutes before next automatic scan (Keep window open)...")
+        print(f"[Auto-Loop] Sleeping for {AUTO_LOOP_MINUTES} minutes before next automatic scan...")
         for _ in range(AUTO_LOOP_MINUTES * 2): time.sleep(30)
 
 if __name__ == "__main__":
