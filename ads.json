@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-17 18:55",
-  "total": 22,
+  "updated_at": "2026-11-17 19:04",
+  "total": 23,
   "ads": [
     {
       "ad_id": 209410052,
@@ -417,6 +417,32 @@
       "first_seen_ts": 1794848864,
       "timestamp": 1794848864,
       "date": "2026-11-16 19:07"
+    },
+    {
+      "ad_id": 209420697,
+      "id": "dub_209420697",
+      "title": "Luxury Apartment Behind CFC – South Academy B | 100m² Garden",
+      "url": "https://www.dubizzle.com.eg/ad/luxury-apartment-behind-cfc-south-academy-b-100m2-garden-ID209420697.html",
+      "link": "https://www.dubizzle.com.eg/ad/luxury-apartment-behind-cfc-south-academy-b-100m2-garden-ID209420697.html",
+      "price": "80,000 ج.م",
+      "price_num": 80000,
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "zone": "القاهرة الجديدة",
+      "location": "القاهرة الجديدة",
+      "source": "دوبيزل",
+      "publisher": "Amro H",
+      "pub_ads": 2,
+      "active_ads_count": 2,
+      "area": "400",
+      "rooms": "4",
+      "age": "منذ 24 ساعة",
+      "description": "",
+      "first_seen_ts": 1794848579,
+      "timestamp": 1794848579,
+      "date": "2026-11-16 19:02"
     },
     {
       "ad_id": 504429249,
