@@ -5,16 +5,26 @@ import requests
 from bs4 import BeautifulSoup
 from DrissionPage import ChromiumPage, ChromiumOptions
 
-if sys.platform.startswith("win"):
+def disable_cmd_quickedit_and_sleep():
+    if not sys.platform.startswith("win"):
+        return
     try:
-        import winsound
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-        ctypes.windll.kernel32.SetThreadExecutionState(0x80000003)
     except Exception:
-        winsound = None
-else:
-    winsound = None
+        pass
+    try:
+        kernel32 = ctypes.windll.kernel32
+        kernel32.SetThreadExecutionState(0x80000003)
+        stdin_handle = kernel32.GetStdHandle(-10)
+        mode = ctypes.c_uint32()
+        if kernel32.GetConsoleMode(stdin_handle, ctypes.byref(mode)):
+            new_mode = (mode.value & ~0x0040 & ~0x0020) | 0x0080
+            kernel32.SetConsoleMode(stdin_handle, new_mode)
+    except Exception:
+        pass
+
+disable_cmd_quickedit_and_sleep()
 
 AI_SERVER_URL = "https://gamal216.pythonanywhere.com"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,11 +36,12 @@ PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 500
-MAX_WORKERS = 3
+MAX_WORKERS = 2
 AUTO_LOOP_MINUTES = 45
 STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
 TURNSTILE_LOCK = threading.Lock()
+PROFILE_CACHE = {}
 ESC_QUOTE = chr(92) + '"'
 
 DUBIZZLE_SOURCES = [
@@ -39,14 +50,15 @@ DUBIZZLE_SOURCES = [
     {"cat_key": "villa", "cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
     {"cat_key": "villa", "cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
     {"cat_key": "comm", "cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
-    {"cat_key": "comm", "cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"}
+    {"cat_key": "comm", "cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
+    {"cat_key": "land", "cat": "أراضي", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands-for-sale/new-cairo/"}
 ]
 
 ZONE_MAPPING = {"النرجس": "النرجس", "نرجس": "النرجس", "الياسمين": "الياسمين", "ياسمين": "الياسمين", "البنفسج": "البنفسج", "بنفسج": "البنفسج", "اللوتس": "اللوتس", "لوتس": "اللوتس", "الأندلس": "الأندلس", "الاندلس": "الأندلس", "اندلس": "الأندلس", "القرنفل": "القرنفل", "قرنفل": "القرنفل", "تمر حنة": "التمر حنة", "التمر حنة": "التمر حنة", "جاردينيا": "جاردينيا", "جنوب الأكاديمية": "جنوب الأكاديمية", "جنوب الاكاديمية": "جنوب الأكاديمية", "شرق الأكاديمية": "شرق الأكاديمية", "شرق الاكاديمية": "شرق الأكاديمية", "المستثمرين": "المستثمرين", "الشويفات": "الشويفات", "شويفات": "الشويفات", "أبو الهول": "أبو الهول", "ابو الهول": "أبو الهول", "دار مصر": "دار مصر", "سكن مصر": "سكن مصر", "جنة": "جنة مصر", "القطامية": "القطامية", "قطامية": "القطامية", "التسعين": "شارع التسعين", "شارع التسعين": "شارع التسعين", "ميفيدا": "ميفيدا", "هايد بارك": "هايد بارك", "ماونتن فيو": "ماونتن فيو", "التجمع الأول": "التجمع الأول", "التجمع الاول": "التجمع الأول", "التجمع الثالث": "التجمع الثالث", "التجمع الخامس": "التجمع الخامس"}
 FORBIDDEN_ZONES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "المستقبل", "mostakbal", "سمات", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "مقبرة", "مقابر", "مدفن", "مدافن", "جبانة", "طريق السخنة"]
 INSTALLMENT_KEYWORDS = ["قسط", "تقسيط", "بالتقسيط", "أقساط", "اقساط", "تسهيلات", "فترة سداد", "سنوات سداد", "بمقدم", "مقدم", "دفعة", "دفعات", "الدفعة المقدمة", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "down payment", "downpayment", "installment", "installments", "payment plan"]
 CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط", "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن", "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل", "مسدده بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش ولا تقبل التمويل", "كاش نهائي"]
-COMPANY_NAME_KEYWORDS = ["شركه", "شركة", "عقارات", "للعقارات", "تسويق", "للتسويق", "ماركتنج", "مكتب", "استثمار", "تطوير", "جروب", "هوم", "هاوس", "بروكر", "ريال استيت", "استيت", "فيرتكس", "روي", "ايكو", "إيكو", "كابيتال", "كونسلت", "للاستشارات", "إعمار", "معمار", "vertex", "echo", "roy real", "real estate", "realestate", "estate", "estates", "realty", "properties", "property", "broker", "brokers", "brokerage", "agency", "agencies", "group", "developments", "development", "investment", "investments", "marketing", "lounge", "scouts", "hub", "home", "homes", "house", "egypt", "capital", "consultant", "consultancy", "consulting", "prime", "elite", "empire", "avenue", "landmark", "residence", "living", "towers", "tower"]
+COMPANY_NAME_KEYWORDS = ["شركه", "شركة", "عقارات", "للعقارات", "تسويق", "للتسويق", "ماركتنج", "مكتب", "استثمار", "تطوير", "جروب", "هوم", "هاوس", "بروكر", "ريال استيت", "استيت", "فيرتكس", "روي", "ايكو", "إيكو", "كابيتال", "كونسلت", "للاستشارات", "إعمار", "معمار", "ريديفاين", "redefine", "vertex", "echo", "roy real", "real estate", "realestate", "estate", "estates", "realty", "properties", "property", "broker", "brokers", "brokerage", "agency", "agencies", "group", "developments", "development", "investment", "investments", "marketing", "lounge", "scouts", "hub", "home", "homes", "house", "egypt", "capital", "consultant", "consultancy", "consulting", "prime", "elite", "empire", "avenue", "landmark", "residence", "living", "towers", "tower"]
 BROKER_DESC_PHRASES = ["لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "فيرتكس استيت", "vertex estate", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "مجموعه متنوعه من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "لو حابب تعرض معانا", "تعرض معانا وحدتك", "لدينا شقق", "متاح لدينا شقق", "متاح لدينا فيلات", "يوجد لدينا شقق", "يوجد لدينا فيلات", "لدينا أكثر من", "متاح لدينا اكثر من", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "مكتب عمل جماعي", "غرف خاصه للشركات", "تظهر شركتكم بصوره", "كود الوحدة", "كود الوحده", "كود الشقة", "كود الشقه", "كود العقار", "كود الفيلا", "للتواصل مع قسم المبيعات", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات"]
 BANNED_AD_IDS = {503407019, 504430732, 503219833}
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
@@ -60,21 +72,6 @@ def normalize_ar(text):
     t = re.sub(r'ة', 'ه', t)
     t = re.sub(r'ى', 'ي', t)
     return re.sub(r'\s+', ' ', t).strip()
-
-def os_physical_mouse_click(screen_x, screen_y):
-    if not sys.platform.startswith("win"): return
-    try:
-        u32 = ctypes.windll.user32
-        sx, sy = int(screen_x), int(screen_y)
-        if sx <= 10 or sy <= 10: return
-        u32.SetCursorPos(sx - 25, sy - 15)
-        time.sleep(0.08)
-        u32.SetCursorPos(sx, sy)
-        time.sleep(0.08)
-        u32.mouse_event(0x0002, 0, 0, 0, 0)
-        time.sleep(0.06)
-        u32.mouse_event(0x0004, 0, 0, 0, 0)
-    except Exception: pass
 
 def inspect_local_frontend_schema():
     idx_path = os.path.join(BASE_DIR, "index.html")
@@ -102,6 +99,7 @@ def inspect_local_frontend_schema():
         if src["cat_key"] in FRONTEND_SCHEMA["cat_map"]: src["cat"] = FRONTEND_SCHEMA["cat_map"][src["cat_key"]]
         if src["deal"] in ("إيجار", "ايجار"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["rent"]
         elif src["deal"] in ("تمليك", "بيع"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["sale"]
+    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']} | Loop: {AUTO_LOOP_MINUTES}m | QuickEdit Disabled: OK")
 
 def clear_git_locks():
     git_dir = os.path.join(BASE_DIR, ".git")
@@ -149,7 +147,7 @@ def is_company_like_name(name):
         if len(nk) <= 3:
             if re.search(rf'\b{re.escape(nk)}\b', norm): return True
         elif nk in norm: return True
-    return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex)\b', norm, re.I))
+    return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex|redefine)\b', norm, re.I))
 
 def get_numeric_ad_id(url, html=""):
     m_url = re.search(r'ID(\d{6,12})', str(url), re.I)
@@ -181,8 +179,14 @@ def extract_local_specs(main_text, combined_blob):
     clean_t = main_text.translate(HINDI_MAP)
     m_area = re.search(r'(\d{2,6})\s*(?:م٢|م2|متر\s*مربع|متر|sqm|m2)\b', clean_t, re.I)
     if m_area and 20 <= int(m_area.group(1)) <= 100000: area = str(int(m_area.group(1)))
+    else:
+        m_aj = re.search(r'"(?:ft|area|size|surface)"\s*:\s*"?(\d{2,6})"?', combined_blob, re.I)
+        if m_aj and 20 <= int(m_aj.group(1)) <= 100000: area = str(int(m_aj.group(1)))
     m_rooms = re.search(r'(\d{1,2})\s*(?:غرف\s*نوم|غرفه\s*نوم|غرف|غرفة|أسرة|اسره|سرير|bedrooms|beds)\b', clean_t, re.I)
     if m_rooms and 1 <= int(m_rooms.group(1)) <= 20: rooms = str(int(m_rooms.group(1)))
+    else:
+        m_rj = re.search(r'"(?:rooms|bedrooms|beds)"\s*:\s*"?(\d{1,2})"?', combined_blob, re.I)
+        if m_rj and 1 <= int(m_rj.group(1)) <= 20: rooms = str(int(m_rj.group(1)))
     return area, rooms
 
 def parse_price_strict(raw_val, deal_norm="تمليك"):
@@ -237,8 +241,16 @@ def strip_related_ads_section(html):
         if idx > 15000: return html[:idx]
     return html
 
+def is_turnstile_failed_in_html(html):
+    if not html: return False
+    norm_h = normalize_ar(html)
+    for marker in ("فشل التحقق", "تعذر التحقق من اتصالك", "حدث الصفحه للمحاوله", "refresh the page to try again"):
+        if marker in norm_h: return True
+    return False
+
 def is_turnstile_in_html(html):
     if not html: return False
+    if is_turnstile_failed_in_html(html): return True
     norm_h = normalize_ar(html)
     for marker in ("التحقق الامني", "زائر حقيقي للمتابعه", "حدد المربع ادناه", "محمي ضد الحركه الاليه", "تاكيد انك انسان"):
         if marker in norm_h: return True
@@ -263,6 +275,7 @@ def extract_dubizzle_links_from_html(html, prefilter_cards=False):
                 if not is_fresh: continue
                 card_age = age_lbl
                 norm_c = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', card_txt))
+                if "الدفعه المقدمه" in norm_c or "طريقه الدفع تقسيط" in norm_c or "down payment" in norm_c: continue
                 if any(normalize_ar(bz) in norm_c for bz in FORBIDDEN_ZONES): continue
             seen_u.add(full)
             results.append((full, card_age, age_mins, real_ts))
@@ -271,6 +284,7 @@ def extract_dubizzle_links_from_html(html, prefilter_cards=False):
 class SmartHybridEngine:
     def __init__(self):
         self.page = None
+        self.land_url_resolved = False
 
     def get_live_dom(self):
         if not self.page: return ""
@@ -284,58 +298,60 @@ class SmartHybridEngine:
                 ) or ""
         except Exception: return ""
 
+    def hard_refresh_anchor(self):
+        if not self.page: return
+        try:
+            with BROWSER_LOCK:
+                self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
+            time.sleep(3.5)
+        except Exception: pass
+
     def try_auto_solve_turnstile(self):
         if not self.page: return
         try:
             with BROWSER_LOCK:
-                coords = self.page.run_js("""
-                    const dpr = window.devicePixelRatio || 1;
-                    const chromeTop = window.outerHeight - Math.round(window.innerHeight * dpr);
-                    let tx = 0, ty = 0;
-                    for (const f of document.querySelectorAll('iframe')) {
-                        const r = f.getBoundingClientRect();
-                        if (r.width >= 150 && r.height >= 35 && r.top > 40) { tx = r.right - 30; ty = r.top + (r.height / 2); break; }
-                    }
-                    if (!tx) {
-                        let topEl = null, botEl = null;
-                        for (const el of document.querySelectorAll('div, p, span')) {
-                            const t = (el.innerText || '').trim();
-                            if (t.includes('المربع أدناه') || t.includes('زائر حقيقي')) topEl = el;
-                            if (t.includes('لماذا أرى هذه الصفحة')) botEl = el;
-                        }
-                        if (topEl && botEl) {
-                            const r1 = topEl.getBoundingClientRect(), r2 = botEl.getBoundingClientRect();
-                            tx = ((r1.left + r1.right) / 2) + 68; ty = (r1.bottom + r2.top) / 2;
-                        }
-                    }
-                    if (!tx) { tx = (window.innerWidth / 2) + 68; ty = (window.innerHeight / 2) + 28; }
-                    return { sx: Math.round((window.screenX || 0) + (tx * dpr)), sy: Math.round((window.screenY || 0) + chromeTop + (ty * dpr)) };
-                """)
-                if coords and isinstance(coords, dict):
-                    os_physical_mouse_click(coords.get("sx", 0), coords.get("sy", 0))
                 for iframe in self.page.eles("tag:iframe"):
                     src = str(iframe.attr("src") or "").lower()
-                    if any(k in src for k in ("cloudflare", "turnstile", "challenge")):
-                        for off_x in (110, 85, -110):
-                            try: self.page.actions.move_to(iframe, offset_x=off_x, offset_y=0).click()
+                    title_attr = str(iframe.attr("title") or "").lower()
+                    if any(k in src or k in title_attr for k in ("cloudflare", "turnstile", "challenge", "widget")):
+                        for off_x in (110, 85, -95, 0):
+                            try:
+                                self.page.actions.move_to(iframe, offset_x=off_x, offset_y=0).click()
+                                time.sleep(0.2)
+                            except Exception: pass
+                        return
+                for txt in ["تأكيد أنك إنسان", "Verify you are human", "حدد المربع أدناه"]:
+                    el = self.page.ele(f"text:{txt}", timeout=0.5)
+                    if el:
+                        for off_x in (65, -65, 0):
+                            try:
+                                self.page.actions.move_to(el, offset_x=off_x, offset_y=0).click()
+                                time.sleep(0.2)
                             except Exception: pass
                         return
         except Exception: pass
 
-    def wait_until_turnstile_cleared(self, max_wait_loops=35):
+    def wait_until_turnstile_cleared(self, max_wait_loops=24):
         if not self.page: return False
         with TURNSTILE_LOCK:
-            time.sleep(1.2)
+            time.sleep(1.0)
             for attempt in range(max_wait_loops):
                 dom_now = self.get_live_dom()
                 if not is_turnstile_in_html(dom_now) and ("/ad/" in dom_now or len(dom_now) > 25000):
                     time.sleep(1.5)
                     return True
-                if attempt == 0: print("[Security Solver] Turnstile modal detected! Auto-clicking checkbox...")
-                if attempt in (0, 2, 5, 9, 14): self.try_auto_solve_turnstile()
-                if attempt == 5 and winsound:
-                    try: winsound.Beep(1000, 400)
-                    except Exception: pass
+                if is_turnstile_failed_in_html(dom_now):
+                    print("[Self-Healing] Expired Turnstile ('فشل التحقق - حدث الصفحة') detected! Auto-refreshing Chrome tab...")
+                    self.hard_refresh_anchor()
+                    continue
+                if attempt in (8, 16):
+                    print("[Self-Healing] Turnstile still pending -> Auto-refreshing Chrome tab for a fresh session...")
+                    self.hard_refresh_anchor()
+                    continue
+                if attempt == 0:
+                    print("[Security Solver] Turnstile checkbox detected! Auto-clicking silently...")
+                if attempt in (0, 2, 5, 10, 14, 18):
+                    self.try_auto_solve_turnstile()
                 time.sleep(2.2)
             return not is_turnstile_in_html(self.get_live_dom())
 
@@ -344,8 +360,9 @@ class SmartHybridEngine:
             try:
                 with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
                 if "notfound" in cur_u or "dubizzle.com.eg" not in cur_u:
-                    with BROWSER_LOCK: self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
-                if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared()
+                    self.hard_refresh_anchor()
+                if is_turnstile_in_html(self.get_live_dom()):
+                    self.wait_until_turnstile_cleared()
                 return True
             except Exception: self.page = None
         try:
@@ -357,9 +374,10 @@ class SmartHybridEngine:
             co.mute(True)
             self.page = ChromiumPage(addr_or_opts=co)
             with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
-            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(self.get_live_dom()) < 5000:
-                with BROWSER_LOCK: self.page.get(test_url, timeout=15)
-            self.wait_until_turnstile_cleared(max_wait_loops=40)
+            dom_init = self.get_live_dom()
+            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(dom_init) < 5000 or is_turnstile_failed_in_html(dom_init):
+                self.hard_refresh_anchor()
+            self.wait_until_turnstile_cleared(max_wait_loops=30)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
             print(f"[Engine] Anchor tab verified ready & clean! ({len(links_now)} ads visible)")
             return True
@@ -367,13 +385,25 @@ class SmartHybridEngine:
             print(f"[Browser Port 9555 Info] {e}")
             return False
 
+    def discover_land_slug_from_html(self, html):
+        if self.land_url_resolved or not html: return
+        for slug in re.findall(r'/properties/([a-z0-9\-]+)/', html, re.I):
+            sl = slug.lower()
+            if ("land" in sl or "building" in sl) and "new-cairo" not in sl:
+                for src in DUBIZZLE_SOURCES:
+                    if src["cat_key"] == "land":
+                        src["url"] = f"https://www.dubizzle.com.eg/properties/{slug}/new-cairo/"
+                        self.land_url_resolved = True
+                        return
+
     def warmup(self):
         self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"])
+        self.discover_land_slug_from_html(self.get_live_dom())
 
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(0.45, 1.05))
+        time.sleep(random.uniform(0.85, 1.65))
         if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]): return ""
-        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=35)
+        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=24)
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
         window.__fetches = window.__fetches || {};
@@ -401,11 +431,10 @@ class SmartHybridEngine:
                     )
                 if res_state and isinstance(res_state, dict):
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
-                    if st in (403, 429, 503) or is_turnstile_in_html(h):
-                        with TURNSTILE_LOCK:
-                            with BROWSER_LOCK: self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
-                            self.wait_until_turnstile_cleared(max_wait_loops=40)
-                            return ""
+                    if st in (403, 429, 503, -1) or is_turnstile_in_html(h):
+                        self.hard_refresh_anchor()
+                        self.wait_until_turnstile_cleared(max_wait_loops=24)
+                        return ""
                     return h
         except Exception: pass
         finally:
@@ -417,24 +446,40 @@ class SmartHybridEngine:
     def fetch_html(self, url):
         for _ in range(3):
             h = self.browser_background_fetch_single(url)
-            if h and not is_turnstile_in_html(h) and len(h) > 5000: return h
-            self.wait_until_turnstile_cleared(max_wait_loops=25)
-            time.sleep(1.0)
+            if h and not is_turnstile_in_html(h) and len(h) > 5000:
+                if not self.land_url_resolved: self.discover_land_slug_from_html(h)
+                return h
+            self.wait_until_turnstile_cleared(max_wait_loops=20)
+            time.sleep(1.2)
         return ""
 
-    def get_category_links(self, url, label=""):
+    def get_category_links(self, url, label="", is_land=False):
         raw_pairs, fresh_pairs = [], []
-        for _ in range(2):
-            html = self.fetch_html(url)
-            raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
-            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
+        urls_to_try = [url]
+        if is_land and "?page=" not in url:
+            urls_to_try.extend(["https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/", "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo/"])
+        for attempt in range(2):
+            for u_try in urls_to_try:
+                html = self.fetch_html(u_try)
+                raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
+                fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
+                if raw_pairs:
+                    if is_land:
+                        for src in DUBIZZLE_SOURCES:
+                            if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
+                    break
             if raw_pairs: break
-            self.wait_until_turnstile_cleared(max_wait_loops=25)
+            if attempt == 0 and not is_land:
+                self.hard_refresh_anchor()
+                self.wait_until_turnstile_cleared(max_wait_loops=20)
         print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
         return fresh_pairs
 
     def verify_profile_published_count(self, profile_url):
         if not profile_url: return 0, ""
+        with STATE_LOCK:
+            if profile_url in PROFILE_CACHE:
+                return PROFILE_CACHE[profile_url]
         h = self.fetch_html(profile_url)
         if not h: return 0, ""
         soup = BeautifulSoup(h, "html.parser")
@@ -445,14 +490,28 @@ class SmartHybridEngine:
                 cand = clean_publisher_name(el_n.get_text(" ", strip=True))
                 if cand != "مالك مباشر": prof_name = cand; break
         txt = normalize_ar(soup.get_text(" ", strip=True))
+        unesc_h = h.replace(ESC_QUOTE, '"').translate(HINDI_MAP)
+        count_val = 0
         for m_p in re.findall(r'(?:الاعلانات\s*المنشوره|اعلانات\s*منشوره|الاعلانات\s*النشطه|اعلانات\s*نشطه|published\s*ads|active\s*ads)\s*[:\-]?\s*(\d{1,5})\b', txt, re.I):
             v = int(m_p)
-            if v >= 1 and not (1990 <= v <= 2035): return v, prof_name
-        txt_no_yr = re.sub(r'(?:عضو\s*منذ|member\s*since)\s*\d{4}', ' ', txt)
-        for m_b in re.findall(r'\b(\d{1,5})\s*(?:الاعلانات\s*المنشوره|اعلانات\s*منشوره|الاعلانات\s*النشطه|اعلانات\s*نشطه|published\s*ads|active\s*ads)', txt_no_yr, re.I):
-            v = int(m_b)
-            if v >= 1 and not (1990 <= v <= 2035): return v, prof_name
-        return len(extract_dubizzle_links_from_html(h, prefilter_cards=False)), prof_name
+            if v >= 1 and not (1990 <= v <= 2035):
+                count_val = v; break
+        if count_val == 0:
+            txt_no_yr = re.sub(r'(?:عضو\s*منذ|member\s*since)\s*\d{4}', ' ', txt)
+            for m_b in re.findall(r'\b(\d{1,5})\s*(?:الاعلانات\s*المنشوره|اعلانات\s*منشوره|الاعلانات\s*النشطه|اعلانات\s*نشطه|published\s*ads|active\s*ads)', txt_no_yr, re.I):
+                v = int(m_b)
+                if v >= 1 and not (1990 <= v <= 2035):
+                    count_val = v; break
+        if count_val == 0:
+            for pat_j in [r'"totalAds"\s*:\s*(\d+)', r'"publishedAdsCount"\s*:\s*(\d+)', r'"activeAdsCount"\s*:\s*(\d+)', r'"adsCount"\s*:\s*(\d+)']:
+                m_j = re.search(pat_j, unesc_h)
+                if m_j and int(m_j.group(1)) >= 1:
+                    count_val = int(m_j.group(1)); break
+        if count_val == 0:
+            count_val = len(extract_dubizzle_links_from_html(h, prefilter_cards=False))
+        with STATE_LOCK:
+            PROFILE_CACHE[profile_url] = (count_val, prof_name)
+        return count_val, prof_name
 
 def extract_seller_card_details(full_soup, unescaped_blob):
     pub_raw, profile_url, seller_id, is_agency = "", "", "", False
@@ -596,7 +655,7 @@ def inspect_ad_worker(item, engine, blacklist):
         if is_company_like_name(info["publisher_clean"]):
             return {"url": url, "ad": None, "reason": f"Profile Company ({info['publisher_clean']})", "bl_key": info.get("safe_bl_key"), "loaded": True}
         if prof_pub_count >= 5:
-            return {"url": url, "ad": None, "reason": f"Profile Ads ({info['publisher_clean']}: {prof_pub_count} > 4)", "bl_key": info.get("safe_bl_key"), "loaded": True}
+            return {"url": url, "ad": None, "reason": f"Profile Published Ads ({info['publisher_clean']}: {prof_pub_count} > 4)", "bl_key": info.get("safe_bl_key"), "loaded": True}
         if 1 <= prof_pub_count <= 4 and prof_pub_count > info["active_count"]:
             info["active_count"] = prof_pub_count
 
@@ -636,6 +695,9 @@ def load_json_list(path):
 def safe_write_json(path, data):
     for _ in range(3):
         try:
+            if os.path.exists(path):
+                try: os.chmod(path, stat.S_IWRITE)
+                except Exception: pass
             with open(path, "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=2)
             return True
         except Exception: time.sleep(0.2)
@@ -667,9 +729,6 @@ def run_single_cycle(engine, cycle_num=1):
     inspect_local_frontend_schema()
     fix_git_identity_for_vercel()
     if not os.path.exists(RESET_FLAG_FILE):
-        print("[Clean Reset v4] Clearing previous 0-count rejections to re-inspect all 401 fresh ads...")
-        safe_write_json(SEEN_FILE, [])
-        safe_write_json(BLACKLIST_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
 
     engine.warmup()
@@ -690,11 +749,11 @@ def run_single_cycle(engine, cycle_num=1):
         seen_links_dict[f"id_{get_numeric_ad_id(u_ex)}"] = True
 
     candidate_urls, all_raw_candidates = set(), []
-    pages_to_scan = 2 if (cycle_num == 1 or len(current_ads) < 25) else 1
+    pages_to_scan = 2 if len(current_ads) < 10 else 1
     for page_num in range(1, pages_to_scan + 1):
         for src in DUBIZZLE_SOURCES:
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}")
+            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"))
             for lnk, age_lbl, age_mins, real_ts in fresh_tuples:
                 ad_id_key = f"id_{get_numeric_ad_id(lnk)}"
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
@@ -708,7 +767,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Parallel Inspector] Launching ThreadPoolExecutor (max_workers={MAX_WORKERS}) for ALL ({total_cand}) fresh <=24h ads...")
+    print(f"\n[Parallel Inspector] Launching ThreadPoolExecutor (max_workers={MAX_WORKERS}) for ({total_cand}) new fresh <=24h ads...")
     total_added, completed_idx = 0, 0
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = [executor.submit(inspect_ad_worker, item, engine, blacklist_dict) for item in candidates]
@@ -740,7 +799,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (45m Cycle | All <=24h Ads | Full-Soup Active Count Restored) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (45m Cycle | Self-Healing Refresh | Silent & Anti-Freeze Mode) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
