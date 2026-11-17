@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-17 20:23",
-  "total": 26,
+  "updated_at": "2026-11-17 21:24",
+  "total": 27,
   "ads": [
     {
       "ad_id": 504441135,
@@ -53,6 +53,32 @@
       "first_seen_ts": 1794937238,
       "timestamp": 1794937238,
       "date": "2026-11-17 19:40"
+    },
+    {
+      "ad_id": 208074611,
+      "id": "dub_208074611",
+      "title": "Villa for rent in golden square",
+      "url": "https://www.dubizzle.com.eg/ad/villa-for-rent-in-golden-square-ID208074611.html",
+      "link": "https://www.dubizzle.com.eg/ad/villa-for-rent-in-golden-square-ID208074611.html",
+      "price": "140,000 ج.م",
+      "price_num": 140000,
+      "cat": "فلل",
+      "category": "فلل",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "zone": "القاهرة الجديدة",
+      "location": "القاهرة الجديدة",
+      "source": "دوبيزل",
+      "publisher": "Ali",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "area": "420",
+      "rooms": "4",
+      "age": "منذ 2 ساعة",
+      "description": "",
+      "first_seen_ts": 1794932671,
+      "timestamp": 1794932671,
+      "date": "2026-11-17 18:24"
     },
     {
       "ad_id": 504440702,
