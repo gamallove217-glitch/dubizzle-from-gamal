@@ -35,7 +35,7 @@ RESET_FLAG_FILE = os.path.join(BASE_DIR, "clean_reset_v4.flag")
 PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
-MAX_CANDIDATES_PER_RUN = 500
+MAX_CANDIDATES_PER_RUN = 800
 MAX_WORKERS = 2
 AUTO_LOOP_MINUTES = 45
 STATE_LOCK = threading.Lock()
@@ -45,13 +45,13 @@ PROFILE_CACHE = {}
 ESC_QUOTE = chr(92) + '"'
 
 DUBIZZLE_SOURCES = [
-    {"cat_key": "apt", "cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
-    {"cat_key": "apt", "cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
-    {"cat_key": "villa", "cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
-    {"cat_key": "villa", "cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
-    {"cat_key": "comm", "cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
-    {"cat_key": "comm", "cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
-    {"cat_key": "land", "cat": "أراضي", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "url": "https://www.dubizzle.com.eg/properties/buildings-lands-for-sale/new-cairo/"}
+    {"cat_key": "apt", "cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "max_pages": 5, "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-rent/new-cairo/"},
+    {"cat_key": "apt", "cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "max_pages": 5, "url": "https://www.dubizzle.com.eg/properties/apartments-duplex-for-sale/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "max_pages": 3, "url": "https://www.dubizzle.com.eg/properties/villas-for-rent/new-cairo/"},
+    {"cat_key": "villa", "cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "max_pages": 3, "url": "https://www.dubizzle.com.eg/properties/villas-for-sale/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "max_pages": 3, "url": "https://www.dubizzle.com.eg/properties/commercial-for-rent/new-cairo/"},
+    {"cat_key": "comm", "cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "max_pages": 3, "url": "https://www.dubizzle.com.eg/properties/commercial-for-sale/new-cairo/"},
+    {"cat_key": "land", "cat": "أراضي", "deal": "AUTO", "en": "Buildings & Lands (Sale/Rent)", "max_pages": 3, "url": "https://www.dubizzle.com.eg/properties/buildings-lands-for-sale/new-cairo/"}
 ]
 
 ZONE_MAPPING = {"النرجس": "النرجس", "نرجس": "النرجس", "الياسمين": "الياسمين", "ياسمين": "الياسمين", "البنفسج": "البنفسج", "بنفسج": "البنفسج", "اللوتس": "اللوتس", "لوتس": "اللوتس", "الأندلس": "الأندلس", "الاندلس": "الأندلس", "اندلس": "الأندلس", "القرنفل": "القرنفل", "قرنفل": "القرنفل", "تمر حنة": "التمر حنة", "التمر حنة": "التمر حنة", "جاردينيا": "جاردينيا", "جنوب الأكاديمية": "جنوب الأكاديمية", "جنوب الاكاديمية": "جنوب الأكاديمية", "شرق الأكاديمية": "شرق الأكاديمية", "شرق الاكاديمية": "شرق الأكاديمية", "المستثمرين": "المستثمرين", "الشويفات": "الشويفات", "شويفات": "الشويفات", "أبو الهول": "أبو الهول", "ابو الهول": "أبو الهول", "دار مصر": "دار مصر", "سكن مصر": "سكن مصر", "جنة": "جنة مصر", "القطامية": "القطامية", "قطامية": "القطامية", "التسعين": "شارع التسعين", "شارع التسعين": "شارع التسعين", "ميفيدا": "ميفيدا", "هايد بارك": "هايد بارك", "ماونتن فيو": "ماونتن فيو", "التجمع الأول": "التجمع الأول", "التجمع الاول": "التجمع الأول", "التجمع الثالث": "التجمع الثالث", "التجمع الخامس": "التجمع الخامس"}
@@ -99,7 +99,7 @@ def inspect_local_frontend_schema():
         if src["cat_key"] in FRONTEND_SCHEMA["cat_map"]: src["cat"] = FRONTEND_SCHEMA["cat_map"][src["cat_key"]]
         if src["deal"] in ("إيجار", "ايجار"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["rent"]
         elif src["deal"] in ("تمليك", "بيع"): src["deal"] = FRONTEND_SCHEMA["deal_map"]["sale"]
-    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']} | Loop: {AUTO_LOOP_MINUTES}m | QuickEdit Disabled: OK")
+    print(f"[Schema Sync] Categories: {FRONTEND_SCHEMA['cat_map']} | Deals: {FRONTEND_SCHEMA['deal_map']} | Deep Scan: Up to 5 Pages | QuickEdit Disabled: OK")
 
 def clear_git_locks():
     git_dir = os.path.join(BASE_DIR, ".git")
@@ -141,7 +141,7 @@ def parse_dubizzle_age_info(text):
 
 def is_company_like_name(name):
     norm = normalize_ar(name)
-    if not norm or norm == normalize_ar("مالك مباشر"): return False
+    if not norm or norm in (normalize_ar("مالك مباشر"), "owner"): return False
     for k in COMPANY_NAME_KEYWORDS:
         nk = normalize_ar(k)
         if len(nk) <= 3:
@@ -149,12 +149,17 @@ def is_company_like_name(name):
         elif nk in norm: return True
     return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex|redefine)\b', norm, re.I))
 
+def extract_visible_dubizzle_ad_id(html):
+    if not html: return ""
+    clean_h = html.translate(HINDI_MAP)
+    m_vis = re.search(r'(?:معرّف\s*الإعلان|معرف\s*الإعلان|معرف\s*الاعلان|رقم\s*الإعلان|Ad\s*ID)\s*[:\-]?\s*([25]\d{7,10})\b', clean_h, re.I)
+    return m_vis.group(1) if m_vis else ""
+
 def get_numeric_ad_id(url, html=""):
     m_url = re.search(r'ID(\d{6,12})', str(url), re.I)
     if m_url: return int(m_url.group(1))
-    if html:
-        m_html = re.search(r'(?:رقم\s*الإعلان|رقم\s*الاعلان|معرف\s*الإعلان|Ad\s*ID)\s*[:\-]?\s*(\d{6,12})', html.translate(HINDI_MAP), re.I)
-        if m_html: return int(m_html.group(1))
+    vis_id = extract_visible_dubizzle_ad_id(html)
+    if vis_id: return int(vis_id)
     return int(hashlib.md5(str(url).encode("utf-8")).hexdigest()[:8], 16)
 
 def clean_publisher_name(name):
@@ -634,11 +639,15 @@ def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة
             if m_j and int(m_j.group(1)) >= 1:
                 active_count = int(m_j.group(1)); count_source = f"JSON ({active_count} ads)"; break
 
+    vis_ad_id = extract_visible_dubizzle_ad_id(full_html)
+    if active_count == 0 and vis_ad_id.startswith("2") and not is_agency:
+        active_count, count_source = 1, f"AppOwnerID ({vis_ad_id})"
+
     if active_count >= 5: return None, f"Broker Count ({publisher_clean}: {active_count} > 4)", safe_bl_key
     if not (1 <= active_count <= 4): return None, "Unverified active ads count (0 found)", None
 
     local_area, local_rooms = extract_local_specs(main_text, unescaped_blob)
-    return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key}, "OK", None
+    return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key, "vis_ad_id": vis_ad_id}, "OK", None
 
 def inspect_ad_worker(item, engine, blacklist):
     url, cat, deal, en_label = item["url"], item["cat"], item["deal"], item["en"]
@@ -650,7 +659,7 @@ def inspect_ad_worker(item, engine, blacklist):
     prof_url = info.get("profile_url")
     if prof_url:
         prof_pub_count, prof_name = engine.verify_profile_published_count(prof_url)
-        if prof_name and (info["publisher_clean"] == "مالك مباشر" or is_company_like_name(prof_name)):
+        if prof_name and (info["publisher_clean"] in ("مالك مباشر", "Owner", "owner") or is_company_like_name(prof_name)):
             info["publisher_clean"] = prof_name
         if is_company_like_name(info["publisher_clean"]):
             return {"url": url, "ad": None, "reason": f"Profile Company ({info['publisher_clean']})", "bl_key": info.get("safe_bl_key"), "loaded": True}
@@ -709,7 +718,7 @@ def save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=Fals
         final_ads = current_ads[:MAX_ADS_STORED]
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
         safe_write_json(DATA_FILE, {"updated_at": now_str, "total": len(final_ads), "ads": final_ads})
-        safe_write_json(SEEN_FILE, list(seen_links_dict.keys())[-12000:])
+        safe_write_json(SEEN_FILE, list(seen_links_dict.keys())[-15000:])
         safe_write_json(BLACKLIST_FILE, list(blacklist_dict.keys())[-8000:])
     if push_to_github:
         try:
@@ -749,9 +758,9 @@ def run_single_cycle(engine, cycle_num=1):
         seen_links_dict[f"id_{get_numeric_ad_id(u_ex)}"] = True
 
     candidate_urls, all_raw_candidates = set(), []
-    pages_to_scan = 2 if len(current_ads) < 10 else 1
-    for page_num in range(1, pages_to_scan + 1):
-        for src in DUBIZZLE_SOURCES:
+    for src in DUBIZZLE_SOURCES:
+        max_p = src.get("max_pages", 3) if cycle_num == 1 else 2
+        for page_num in range(1, max_p + 1):
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
             fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"))
             for lnk, age_lbl, age_mins, real_ts in fresh_tuples:
@@ -759,6 +768,8 @@ def run_single_cycle(engine, cycle_num=1):
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
                     all_raw_candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl, "age_mins": age_mins, "real_ts": real_ts})
+            if len(fresh_tuples) < 3:
+                break
 
     all_raw_candidates.sort(key=lambda x: x["age_mins"])
     candidates = all_raw_candidates[:MAX_CANDIDATES_PER_RUN]
@@ -799,7 +810,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (45m Cycle | Self-Healing Refresh | Silent & Anti-Freeze Mode) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (45m Cycle | 5-Page Deep Scan | Self-Healing & Anti-Freeze) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
