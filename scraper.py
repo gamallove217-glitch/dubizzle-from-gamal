@@ -1,6 +1,5 @@
 import os, sys, re, json, time, random, stat, subprocess, threading, hashlib, ctypes
 from datetime import datetime, timezone
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from bs4 import BeautifulSoup
 from DrissionPage import ChromiumPage, ChromiumOptions
@@ -30,7 +29,6 @@ PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 800
-MAX_WORKERS = 1
 AUTO_LOOP_MINUTES = 45
 STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
@@ -283,6 +281,7 @@ class SmartHybridEngine:
     def __init__(self):
         self.page = None
         self.land_url_resolved = False
+        self.last_refresh_ts = 0
 
     def get_live_dom(self):
         if not self.page: return ""
@@ -291,12 +290,14 @@ class SmartHybridEngine:
                 return self.page.run_js("return document.documentElement ? document.documentElement.outerHTML : '';") or ""
         except Exception: return ""
 
-    def hard_refresh_anchor(self):
+    def hard_refresh_anchor(self, target_url=None):
         if not self.page: return
+        u = target_url or DUBIZZLE_SOURCES[0]["url"]
         try:
             with BROWSER_LOCK:
-                self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
-            time.sleep(5.5)
+                self.page.get(u, timeout=18)
+            self.last_refresh_ts = time.time()
+            time.sleep(3.5)
         except Exception: pass
 
     def cdp_human_click(self, vx, vy):
@@ -362,14 +363,14 @@ class SmartHybridEngine:
         except Exception: pass
         return "waiting"
 
-    def wait_until_turnstile_cleared(self, max_wait_loops=20):
+    def wait_until_turnstile_cleared(self, max_wait_loops=22):
         if not self.page: return False
         with TURNSTILE_LOCK:
             time.sleep(1.0)
             refreshed_once = False
             for attempt in range(max_wait_loops):
                 dom_now = self.get_live_dom()
-                if not is_turnstile_in_html(dom_now):
+                if not is_turnstile_in_html(dom_now) and len(dom_now) > 8000:
                     return True
                 if is_turnstile_failed_in_html(dom_now) and not refreshed_once:
                     print("[Self-Healing] 'فشل التحقق' detected -> Refreshing tab once...")
@@ -383,16 +384,16 @@ class SmartHybridEngine:
                 time.sleep(2.5)
             return not is_turnstile_in_html(self.get_live_dom())
 
-    def ensure_anchor_browser(self, test_url):
+    def ensure_anchor_browser(self, force_fresh_load=False):
         if self.page is not None:
             try:
-                with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
-                if "notfound" in cur_u or "dubizzle.com.eg" not in cur_u:
-                    self.hard_refresh_anchor()
+                if force_fresh_load:
+                    self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
                 if is_turnstile_in_html(self.get_live_dom()):
                     self.wait_until_turnstile_cleared()
                 return True
-            except Exception: self.page = None
+            except Exception:
+                self.page = None
         try:
             os.makedirs(PROFILE_DIR, exist_ok=True)
             co = ChromiumOptions()
@@ -402,16 +403,13 @@ class SmartHybridEngine:
             co.set_argument("--disable-background-timer-throttling")
             co.set_argument("--disable-backgrounding-occluded-windows")
             co.set_argument("--disable-renderer-backgrounding")
+            co.set_argument("--disable-features=CalculateNativeWinOcclusion")
             co.mute(True)
             self.page = ChromiumPage(addr_or_opts=co)
-            with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
-            dom_init = self.get_live_dom()
-            init_links = extract_dubizzle_links_from_html(dom_init, prefilter_cards=False)
-            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(init_links) == 0:
-                self.hard_refresh_anchor()
+            self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
             self.wait_until_turnstile_cleared(max_wait_loops=25)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
-            print(f"[Engine] Anchor tab ready (100% Background/Minimized Mode)! ({len(links_now)} ads visible)")
+            print(f"[Engine] Fresh Live Session Ready (100% Background/Minimized Mode)! ({len(links_now)} ads visible)")
             return True
         except Exception as e:
             print(f"[Browser Port 9555 Info] {e}")
@@ -429,12 +427,27 @@ class SmartHybridEngine:
                         return
 
     def warmup(self):
-        self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"])
+        self.ensure_anchor_browser(force_fresh_load=True)
         self.discover_land_slug_from_html(self.get_live_dom())
 
+    def direct_tab_fetch(self, url):
+        if not self.page and not self.ensure_anchor_browser(): return ""
+        try:
+            with BROWSER_LOCK:
+                self.page.get(url, timeout=18)
+            time.sleep(2.2)
+            dom = self.get_live_dom()
+            if is_turnstile_in_html(dom):
+                self.wait_until_turnstile_cleared(max_wait_loops=22)
+                dom = self.get_live_dom()
+            if dom and not is_turnstile_in_html(dom) and len(dom) > 5000:
+                return dom
+        except Exception: pass
+        return ""
+
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(0.9, 1.5))
-        if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]): return ""
+        time.sleep(random.uniform(0.8, 1.4))
+        if not self.page and not self.ensure_anchor_browser(): return ""
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
         window.__fetches = window.__fetches || {};
@@ -452,7 +465,7 @@ class SmartHybridEngine:
         """
         try:
             with BROWSER_LOCK: self.page.run_js(js_start, req_id, url)
-            for _ in range(40):
+            for _ in range(36):
                 time.sleep(0.25)
                 with BROWSER_LOCK:
                     res_state = self.page.run_js(
@@ -462,13 +475,9 @@ class SmartHybridEngine:
                     )
                 if res_state and isinstance(res_state, dict):
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
-                    if st in (403, 429) or is_turnstile_in_html(h):
-                        with TURNSTILE_LOCK:
-                            time.sleep(5.0)
-                            if is_turnstile_in_html(self.get_live_dom()):
-                                self.wait_until_turnstile_cleared(max_wait_loops=20)
-                        return ""
-                    return h
+                    if st == 200 and h and not is_turnstile_in_html(h) and len(h) > 5000:
+                        return h
+                    return ""
         except Exception: pass
         finally:
             try:
@@ -477,12 +486,14 @@ class SmartHybridEngine:
         return ""
 
     def fetch_html(self, url):
-        for _ in range(2):
-            h = self.browser_background_fetch_single(url)
-            if h and not is_turnstile_in_html(h) and len(h) > 5000:
-                if not self.land_url_resolved: self.discover_land_slug_from_html(h)
-                return h
-            time.sleep(1.5)
+        h = self.browser_background_fetch_single(url)
+        if h and not is_turnstile_in_html(h) and len(h) > 5000:
+            if not self.land_url_resolved: self.discover_land_slug_from_html(h)
+            return h
+        h_nav = self.direct_tab_fetch(url)
+        if h_nav and not is_turnstile_in_html(h_nav) and len(h_nav) > 5000:
+            if not self.land_url_resolved: self.discover_land_slug_from_html(h_nav)
+            return h_nav
         return ""
 
     def get_category_links(self, url, label="", is_land=False):
@@ -499,7 +510,7 @@ class SmartHybridEngine:
                     for src in DUBIZZLE_SOURCES:
                         if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
                 break
-        print(f"[ZeroNav-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
+        print(f"[Hybrid-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
         return fresh_pairs
 
     def verify_profile_published_count(self, profile_url):
@@ -762,7 +773,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector] Launching clean sequential background scan for ({total_cand}) new <=24h ads...")
+    print(f"\n[Inspector] Launching hybrid background scan for ({total_cand}) new <=24h ads...")
     total_added, completed_idx = 0, 0
     for batch_start in range(0, total_cand, 40):
         batch = candidates[batch_start:batch_start + 40]
@@ -797,7 +808,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (100% Background Mode | Zero False Refresh | Anti-Ban Pacing) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (Hybrid Fetch + Direct Tab Fallback | Minimized Safe) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
