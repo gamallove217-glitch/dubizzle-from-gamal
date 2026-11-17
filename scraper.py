@@ -67,21 +67,6 @@ def normalize_ar(text):
     t = re.sub(r'ى', 'ي', t)
     return re.sub(r'\s+', ' ', t).strip()
 
-def os_physical_mouse_click(screen_x, screen_y):
-    if not sys.platform.startswith("win"): return
-    try:
-        u32 = ctypes.windll.user32
-        sx, sy = int(screen_x), int(screen_y)
-        if sx <= 10 or sy <= 10: return
-        u32.SetCursorPos(sx - 15, sy - 8)
-        time.sleep(0.06)
-        u32.SetCursorPos(sx, sy)
-        time.sleep(0.06)
-        u32.mouse_event(0x0002, 0, 0, 0, 0)
-        time.sleep(0.05)
-        u32.mouse_event(0x0004, 0, 0, 0, 0)
-    except Exception: pass
-
 def inspect_local_frontend_schema():
     idx_path = os.path.join(BASE_DIR, "index.html")
     if os.path.exists(idx_path):
@@ -315,29 +300,51 @@ class SmartHybridEngine:
         try:
             with BROWSER_LOCK:
                 self.page.get(DUBIZZLE_SOURCES[0]["url"], timeout=15)
-            time.sleep(5.0)
+            time.sleep(5.5)
         except Exception: pass
 
-    def cdp_click_viewport(self, vx, vy):
+    def cdp_human_click(self, vx, vy):
         try:
             x, y = int(vx), int(vy)
-            if x <= 5 or y <= 5: return
-            self.page.run_cdp("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y)
-            time.sleep(0.05)
+            if x <= 10 or y <= 10: return
+            for step in (35, 14, 0):
+                self.page.run_cdp("Input.dispatchMouseEvent", type="mouseMoved", x=x - step, y=y - (step // 3))
+                time.sleep(0.03)
             self.page.run_cdp("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
-            time.sleep(0.05)
+            time.sleep(0.07)
             self.page.run_cdp("Input.dispatchMouseEvent", type="mouseReleased", x=x, y=y, button="left", clickCount=1)
         except Exception: pass
 
+    def find_turnstile_box_via_cdp_pierce(self):
+        try:
+            doc = self.page.run_cdp("DOM.getFlattenedDocument", depth=-1, pierce=True)
+            for node in doc.get("nodes", []):
+                n_name = str(node.get("nodeName") or "").upper()
+                attrs = [str(a).lower() for a in (node.get("attributes") or [])]
+                has_shadow = bool(node.get("shadowRoots"))
+                is_cf_iframe = (n_name == "IFRAME" and any("cloudflare" in a or "turnstile" in a or "challenge" in a for a in attrs))
+                if is_cf_iframe or has_shadow or n_name == "IFRAME":
+                    try:
+                        bm = self.page.run_cdp("DOM.getBoxModel", backendNodeId=node["backendNodeId"])
+                        c = bm.get("model", {}).get("content", [])
+                        if len(c) >= 8:
+                            left, top, right, bottom = c[0], c[1], c[2], c[5]
+                            w, h = right - left, bottom - top
+                            if 230 <= w <= 360 and 45 <= h <= 95 and top > 40:
+                                return int(right - 28), int(top + (h / 2))
+                    except Exception: pass
+        except Exception: pass
+        return 0, 0
+
     def try_auto_solve_turnstile(self):
-        if not self.page: return
+        if not self.page: return "no_page"
         try:
             with BROWSER_LOCK:
-                try: self.page.set.window.normal()
-                except Exception: pass
+                px, py = self.find_turnstile_box_via_cdp_pierce()
+                if px > 0 and py > 0:
+                    self.cdp_human_click(px, py)
+                    return "clicked_cdp_box"
                 box = self.page.run_js("""
-                    const dpr = window.devicePixelRatio || 1;
-                    const chromeTop = window.outerHeight - Math.round(window.innerHeight * dpr);
                     let topR = null, botR = null;
                     for (const el of document.querySelectorAll('p, div, span, h1, h2')) {
                         const r = el.getBoundingClientRect();
@@ -346,23 +353,20 @@ class SmartHybridEngine:
                         if ((t.includes('المربع أدناه') || t.includes('زائر حقيقي')) && (!topR || r.height < topR.height)) topR = r;
                         if (t.includes('لماذا أرى هذه الصفحة') && (!botR || r.height < botR.height)) botR = r;
                     }
-                    let cx = window.innerWidth / 2, ty = (window.innerHeight / 2) + 25;
-                    if (topR && botR) {
-                        cx = (topR.left + topR.right) / 2;
-                        ty = (topR.bottom + botR.top) / 2;
-                    }
-                    return { cx: Math.round(cx), ty: Math.round(ty), dpr: dpr, sx0: window.screenX || 0, sy0: (window.screenY || 0) + chromeTop };
+                    if (!topR || !botR) return { blank: true };
+                    return { blank: false, cx: Math.round((topR.left + topR.right) / 2), ty: Math.round((topR.bottom + botR.top) / 2) };
                 """)
-                if box and isinstance(box, dict):
-                    cx, ty, dpr, sx0, sy0 = box["cx"], box["ty"], box["dpr"], box["sx0"], box["sy0"]
-                    for off in (120, 106, 92, 75, -120):
-                        vx = cx + off
-                        self.cdp_click_viewport(vx, ty)
-                        os_physical_mouse_click(sx0 + (vx * dpr), sy0 + (ty * dpr))
-                        time.sleep(0.12)
-        except Exception: pass
+                if not box or box.get("blank"):
+                    return "blank_dead_page"
+                cx, ty = int(box["cx"]), int(box["ty"])
+                self.cdp_human_click(cx + 120, ty)
+                time.sleep(0.25)
+                self.cdp_human_click(cx + 106, ty)
+                return "clicked_geometry"
+        except Exception:
+            return "err"
 
-    def wait_until_turnstile_cleared(self, max_wait_loops=25):
+    def wait_until_turnstile_cleared(self, max_wait_loops=24):
         if not self.page: return False
         with TURNSTILE_LOCK:
             time.sleep(1.5)
@@ -373,14 +377,19 @@ class SmartHybridEngine:
                     time.sleep(1.5)
                     return True
                 if is_turnstile_failed_in_html(dom_now) and not refreshed_once:
-                    print("[Self-Healing] 'فشل التحقق - حدث الصفحة' detected! Refreshing once...")
+                    print("[Self-Healing] 'فشل التحقق' detected -> Refreshing tab once...")
                     refreshed_once = True
                     self.hard_refresh_anchor()
                     continue
-                if attempt == 0:
-                    print("[Security Solver] Turnstile detected! Auto-clicking checkbox at (+120px RTL)...")
-                if attempt in (0, 2, 5, 9, 14, 19):
-                    self.try_auto_solve_turnstile()
+                if attempt in (0, 3, 6, 10, 15, 20):
+                    status = self.try_auto_solve_turnstile()
+                    if status == "blank_dead_page" and not refreshed_once:
+                        print("[Self-Healing] Blank/expired verification tab detected -> Refreshing tab once...")
+                        refreshed_once = True
+                        self.hard_refresh_anchor()
+                        continue
+                    if attempt == 0:
+                        print(f"[Security Solver] Internal background click executed ({status})...")
                 time.sleep(2.5)
             return not is_turnstile_in_html(self.get_live_dom())
 
@@ -407,11 +416,12 @@ class SmartHybridEngine:
             self.page = ChromiumPage(addr_or_opts=co)
             with BROWSER_LOCK: cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
             dom_init = self.get_live_dom()
-            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(dom_init) < 5000 or is_turnstile_failed_in_html(dom_init):
+            init_links = extract_dubizzle_links_from_html(dom_init, prefilter_cards=False)
+            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or len(init_links) == 0:
                 self.hard_refresh_anchor()
-            self.wait_until_turnstile_cleared(max_wait_loops=30)
+            self.wait_until_turnstile_cleared(max_wait_loops=28)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
-            print(f"[Engine] Anchor tab ready! ({len(links_now)} ads visible)")
+            print(f"[Engine] Anchor tab ready (100% Background/Minimized Mode)! ({len(links_now)} ads visible)")
             return True
         except Exception as e:
             print(f"[Browser Port 9555 Info] {e}")
@@ -433,9 +443,9 @@ class SmartHybridEngine:
         self.discover_land_slug_from_html(self.get_live_dom())
 
     def browser_background_fetch_single(self, url):
-        time.sleep(random.uniform(1.1, 2.1))
+        time.sleep(random.uniform(1.2, 2.2))
         if not self.page and not self.ensure_anchor_browser(DUBIZZLE_SOURCES[0]["url"]): return ""
-        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=25)
+        if is_turnstile_in_html(self.get_live_dom()): self.wait_until_turnstile_cleared(max_wait_loops=24)
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
         window.__fetches = window.__fetches || {};
@@ -466,7 +476,7 @@ class SmartHybridEngine:
                     if st in (403, 429, 503, -1) or is_turnstile_in_html(h):
                         with TURNSTILE_LOCK:
                             time.sleep(6.0)
-                            self.wait_until_turnstile_cleared(max_wait_loops=25)
+                            self.wait_until_turnstile_cleared(max_wait_loops=24)
                         return ""
                     return h
         except Exception: pass
@@ -799,7 +809,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (5-Page Deep Scan | RTL +120px Solver | Anti-Ban Pacing) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (100% Background Mode | Zero Mouse Hijack | Anti-Ban Pacing) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
