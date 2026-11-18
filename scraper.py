@@ -845,7 +845,7 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v8.2] Initialized clean seen links!")
+        print("[Clean-Retry v8.3] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -874,7 +874,6 @@ def run_single_cycle(engine, cycle_num=1):
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
                     all_raw_candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl, "age_mins": age_mins, "real_ts": real_ts})
-            if len(fresh_tuples) < 3: break
 
     all_raw_candidates.sort(key=lambda x: x["age_mins"])
     candidates = all_raw_candidates[:MAX_CANDIDATES_PER_RUN]
@@ -883,7 +882,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v8.2] Launching Eager-Mode 5x Fast Scan for ({total_cand}) non-agency <=24h ads...")
+    print(f"\n[Inspector v8.3] Launching Full 25-Page Eager Scan for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
     for batch_start in range(0, total_cand, 40):
         batch = candidates[batch_start:batch_start + 40]
@@ -920,7 +919,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v8.2 (Eager 5x Fast | 100% Profile-Verified | Auto-Minimize) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v8.3 (Full 25-Page Scan | Eager 5x Fast | Auto-Minimize) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
