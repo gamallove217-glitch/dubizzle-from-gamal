@@ -29,6 +29,7 @@ PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
 MAX_CANDIDATES_PER_RUN = 800
+BATCH_SIZE = 3
 AUTO_LOOP_MINUTES = 45
 STATE_LOCK = threading.Lock()
 BROWSER_LOCK = threading.Lock()
@@ -252,7 +253,7 @@ def is_turnstile_in_html(html):
         if marker in norm_h: return True
     return "<title>just a moment" in norm_h[:5000]
 
-def extract_dubizzle_links_from_html(html, prefilter_cards=False, blacklist_dict=None):
+def extract_dubizzle_links_from_html(html, prefilter_cards=False, filter_agencies=False):
     results, seen_u = [], set()
     if not html or is_turnstile_in_html(html): return results
     soup = BeautifulSoup(html, "html.parser")
@@ -270,19 +271,16 @@ def extract_dubizzle_links_from_html(html, prefilter_cards=False, blacklist_dict
                 is_fresh, age_lbl, age_mins, real_ts, _ = parse_dubizzle_age_info(age_target_txt)
                 if not is_fresh: continue
                 card_age = age_lbl
-                if card:
-                    skip_company_card = False
-                    for a_c in card.find_all("a", href=True):
-                        h_c = str(a_c["href"]).lower()
-                        if "/companies/" in h_c or "/agencies/" in h_c:
-                            skip_company_card = True; break
-                    if not skip_company_card:
-                        if card.find(attrs={"aria-label": re.compile(r'agency|company|شركة|وكيل', re.I)}):
-                            skip_company_card = True
-                    if skip_company_card: continue
                 norm_c = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', card_txt))
                 if "الدفعه المقدمه" in norm_c or "طريقه الدفع تقسيط" in norm_c or "down payment" in norm_c: continue
                 if any(normalize_ar(bz) in norm_c for bz in FORBIDDEN_ZONES): continue
+                if filter_agencies and card:
+                    is_corp = False
+                    for a_c in card.find_all("a", href=True):
+                        hc = str(a_c["href"]).lower()
+                        if "/companies/" in hc or "/agencies/" in hc:
+                            is_corp = True; break
+                    if is_corp: continue
             seen_u.add(full)
             results.append((full, card_age, age_mins, real_ts))
     return results
@@ -491,9 +489,9 @@ class SmartHybridEngine:
         if not self.page and not self.ensure_anchor_browser(): return ""
         try:
             with BROWSER_LOCK:
-                self.page.get(url, timeout=18)
-            for _ in range(10):
-                time.sleep(0.5)
+                self.page.get(url, timeout=16)
+            for _ in range(8):
+                time.sleep(0.45)
                 dom = self.get_live_dom()
                 if is_turnstile_in_html(dom):
                     self.wait_until_turnstile_cleared(max_wait_loops=35, expect_ads=require_ads)
@@ -511,8 +509,57 @@ class SmartHybridEngine:
         except Exception: pass
         return ""
 
+    def browser_background_fetch_batch(self, urls):
+        if not urls or not self.page: return {}
+        time.sleep(random.uniform(0.6, 1.0))
+        batch_id = f"b_{int(time.time()*1000)}_{random.randint(1000,9999)}"
+        js_batch = """
+        window.__batches = window.__batches || {};
+        const bId = arguments[0], uList = arguments[1];
+        window.__batches[bId] = { done: false, results: {} };
+        (async () => {
+            try {
+                const arr = await Promise.all(uList.map(async (u) => {
+                    try {
+                        const r = await fetch(u, { method: 'GET', credentials: 'include' });
+                        return [u, r.status, await r.text()];
+                    } catch (e) { return [u, -1, '']; }
+                }));
+                const mapOut = {};
+                for (const item of arr) { mapOut[item[0]] = { status: item[1], html: item[2] }; }
+                window.__batches[bId].results = mapOut;
+            } catch (e) {}
+            window.__batches[bId].done = true;
+        })();
+        return true;
+        """
+        out_map = {}
+        try:
+            with BROWSER_LOCK: self.page.run_js(js_batch, batch_id, list(urls))
+            for _ in range(35):
+                time.sleep(0.2)
+                with BROWSER_LOCK:
+                    res = self.page.run_js(
+                        "const b = (window.__batches && window.__batches[arguments[0]]); "
+                        "if (!b || !b.done) return null; "
+                        "const r = b.results; delete window.__batches[arguments[0]]; return r;", batch_id
+                    )
+                if res and isinstance(res, dict):
+                    for u, info in res.items():
+                        st = int(info.get("status") or 0)
+                        h = info.get("html") or ""
+                        if st == 200 and h and not is_turnstile_in_html(h) and len(h) > 5000 and "<h1" in h.lower():
+                            out_map[u] = h
+                    break
+        except Exception: pass
+        finally:
+            try:
+                with BROWSER_LOCK: self.page.run_js("if (window.__batches) delete window.__batches[arguments[0]];", batch_id)
+            except Exception: pass
+        return out_map
+
     def browser_background_fetch_single(self, url, require_h1=False, require_ads=False):
-        time.sleep(random.uniform(0.7, 1.2))
+        time.sleep(random.uniform(0.5, 0.9))
         if not self.page: return ""
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
@@ -531,8 +578,8 @@ class SmartHybridEngine:
         """
         try:
             with BROWSER_LOCK: self.page.run_js(js_start, req_id, url)
-            for _ in range(32):
-                time.sleep(0.22)
+            for _ in range(30):
+                time.sleep(0.2)
                 with BROWSER_LOCK:
                     res_state = self.page.run_js(
                         "const f = (window.__fetches && window.__fetches[arguments[0]]); "
@@ -564,22 +611,23 @@ class SmartHybridEngine:
             return h_nav
         return ""
 
-    def get_category_links(self, url, label="", is_land=False, blacklist_dict=None):
-        raw_pairs, fresh_pairs = [], []
+    def get_category_links(self, url, label="", is_land=False):
+        raw_pairs, all_fresh, non_agency_fresh = [], [], []
         urls_to_try = [url]
         if is_land and "?page=" not in url:
             urls_to_try.extend(["https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/", "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo/"])
         for u_try in urls_to_try:
             html = self.fetch_html(u_try, require_h1=False, require_ads=True)
-            raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
-            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True, blacklist_dict=blacklist_dict)
+            raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False, filter_agencies=False)
+            all_fresh = extract_dubizzle_links_from_html(html, prefilter_cards=True, filter_agencies=False)
+            non_agency_fresh = extract_dubizzle_links_from_html(html, prefilter_cards=True, filter_agencies=True)
             if raw_pairs:
                 if is_land:
                     for src in DUBIZZLE_SOURCES:
                         if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
                 break
-        print(f"[Hybrid-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Non-Agency Fresh & Cash: {len(fresh_pairs)})")
-        return fresh_pairs
+        print(f"[Hybrid-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(all_fresh)} | Non-Agency: {len(non_agency_fresh)})")
+        return non_agency_fresh
 
     def verify_profile_published_count(self, profile_url):
         if not profile_url: return 0, ""
@@ -719,9 +767,9 @@ def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة
     local_area, local_rooms = extract_local_specs(main_text, unescaped_blob)
     return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key}, "OK", None
 
-def inspect_ad_worker(item, engine, blacklist):
+def inspect_ad_worker(item, engine, blacklist, pre_html=""):
     url, cat, deal, en_label = item["url"], item["cat"], item["deal"], item["en"]
-    html = engine.fetch_html(url, require_h1=True, require_ads=False)
+    html = pre_html or engine.fetch_html(url, require_h1=True, require_ads=False)
     if not html: return {"url": url, "ad": None, "reason": "Failed to fetch ad HTML", "bl_key": None, "loaded": False}
     info, reason, bl_key = extract_direct_ad_info(html, deal, blacklist, hint_age=item.get("age", "منذ ساعة"), hint_ts=item.get("real_ts", 0))
     if not info:
@@ -744,7 +792,7 @@ def inspect_ad_worker(item, engine, blacklist):
     publisher_clean, active_count = info["publisher_clean"], info["active_count"]
     ai_area, ai_rooms = info["local_area"], info["local_rooms"]
     try:
-        r = requests.post(f"{AI_SERVER_URL}/analyze", json={"title": title, "description": desc, "publisher": publisher_clean, "deal": resolved_deal, "cat": cat, "price_num": price_num, "source": "دوبيزل", "active_ads_count": active_count}, timeout=6)
+        r = requests.post(f"{AI_SERVER_URL}/analyze", json={"title": title, "description": desc, "publisher": publisher_clean, "deal": resolved_deal, "cat": cat, "price_num": price_num, "source": "دوبيزل", "active_ads_count": active_count}, timeout=4)
         if r.status_code == 200 and r.json().get("decision") == "مرفوض":
             return {"url": url, "ad": None, "reason": f"AI Rejected ({publisher_clean})", "bl_key": info.get("safe_bl_key"), "loaded": True}
     except Exception: pass
@@ -809,7 +857,7 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v8.6] Initialized clean seen links!")
+        print("[Clean-Retry v8.8] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -832,13 +880,12 @@ def run_single_cycle(engine, cycle_num=1):
         max_p = src.get("max_pages", 3) if cycle_num == 1 else 2
         for page_num in range(1, max_p + 1):
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"), blacklist_dict=blacklist_dict)
+            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"))
             for lnk, age_lbl, age_mins, real_ts in fresh_tuples:
                 ad_id_key = f"id_{get_numeric_ad_id(lnk)}"
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
                     all_raw_candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl, "age_mins": age_mins, "real_ts": real_ts})
-            if len(fresh_tuples) < 3: break
 
     all_raw_candidates.sort(key=lambda x: x["age_mins"])
     candidates = all_raw_candidates[:MAX_CANDIDATES_PER_RUN]
@@ -847,16 +894,19 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v8.6] Launching 100% Minimized Scan for ({total_cand}) non-agency <=24h ads...")
+    print(f"\n[Inspector v8.8] Launching 3x HTTP/2 Batch Inspector for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
-    for batch_start in range(0, total_cand, 40):
-        batch = candidates[batch_start:batch_start + 40]
-        for item in batch:
+    for i in range(0, total_cand, BATCH_SIZE):
+        sub_batch = candidates[i:i + BATCH_SIZE]
+        batch_urls = [x["url"] for x in sub_batch]
+        prefetched_map = engine.browser_background_fetch_batch(batch_urls)
+        for item in sub_batch:
             completed_idx += 1
-            try: res = inspect_ad_worker(item, engine, blacklist_dict)
+            u = item["url"]
+            try:
+                res = inspect_ad_worker(item, engine, blacklist_dict, pre_html=prefetched_map.get(u, ""))
             except Exception as e:
                 print(f"  [{completed_idx}/{total_cand}] [ERROR] {e}"); continue
-            u = res["url"]
             if res.get("loaded"):
                 with STATE_LOCK:
                     seen_links_dict[u] = True
@@ -873,18 +923,17 @@ def run_single_cycle(engine, cycle_num=1):
                 save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
             else:
                 print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
-            if completed_idx % 10 == 0:
-                save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
-        save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
-        if batch_start + 40 < total_cand:
-            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 12s to keep IP 100% clean...")
-            time.sleep(12.0)
+        if completed_idx % 9 == 0:
+            save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
+        if completed_idx % 45 == 0 and completed_idx < total_cand:
+            print(f"    [Rate-Guard] {completed_idx} ads inspected -> Cooling down 10s to keep IP 100% clean...")
+            time.sleep(10.0)
 
     save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added > 0))
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v8.6 (Zero Mouse | Tab+Space Only | Always Minimized) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v8.8 (3x HTTP/2 Fast Batch Inspector | Tab+Space | 25 Pages) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
