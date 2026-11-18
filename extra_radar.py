@@ -7,6 +7,7 @@ from curl_cffi import requests as cffi_requests
 def disable_cmd_quickedit_and_sleep():
     if not sys.platform.startswith("win"): return
     try:
+        os.system("chcp 65001 > nul")
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
         k32 = ctypes.windll.kernel32
@@ -105,25 +106,13 @@ BROKER_TEXT_PHRASES = [
 ]
 
 AQARMAP_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "فلل", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "تجاري", "deal": "إيجار", "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "فلل", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "تجاري", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-    {"cat": "أراضي", "deal": "تمليك", "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
-]
-
-OPENSOOQ_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1/%D8%B4%D9%82%D9%82-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1"},
-    {"cat": "شقق", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1/%D8%B4%D9%82%D9%82-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D8%B4%D9%82%D9%82-%D9%84%D9%84%D8%A8%D9%8A%D8%B9"},
-    {"cat": "شقق", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D8%AA%D8%AC%D9%85%D8%B9-%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D8%B4%D9%82%D9%82-%D9%84%D9%84%D8%A8%D9%8A%D8%B9"},
-    {"cat": "فلل", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1/%D9%81%D9%84%D9%84-%D9%82%D8%B5%D9%88%D8%B1-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1"},
-    {"cat": "فلل", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D9%81%D9%84%D9%84-%D9%82%D8%B5%D9%88%D8%B1-%D9%84%D9%84%D8%A8%D9%8A%D8%B9"},
-    {"cat": "تجاري", "deal": "إيجار", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9-%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1"},
-    {"cat": "تجاري", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D8%AA%D8%AC%D8%A7%D8%B1%D9%8A%D8%A9-%D9%84%D9%84%D8%A8%D9%8A%D8%B9"},
-    {"cat": "أراضي", "deal": "تمليك", "url": "https://eg.opensooq.com/ar/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9/%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9-%D8%A7%D9%84%D8%AC%D8%AF%D9%8A%D8%AF%D8%A9/%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%A8%D9%8A%D8%B9/%D8%A3%D8%B1%D8%A7%D8%B6%D9%8A-%D9%84%D9%84%D8%A8%D9%8A%D8%B9"},
+    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Sale)", "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Sale)", "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
+    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?seller_type=1&sort=publishedAt"},
 ]
 
 def clear_git_locks():
@@ -141,7 +130,7 @@ def fix_git_identity_for_vercel():
 
 def is_warp_up():
     try:
-        with socket.create_connection(("127.0.0.1", 40000), timeout=1):
+        with socket.create_connection(("127.0.0.1", 40000), timeout=0.8):
             return True
     except Exception:
         return False
@@ -166,8 +155,11 @@ class SmartFetcher:
         self.pw = None
         self.browser = None
         self.context = None
+        self.pw_unavailable = False
 
     def _ensure_pw(self):
+        if self.pw_unavailable:
+            return False
         if self.context is not None:
             return True
         try:
@@ -189,8 +181,8 @@ class SmartFetcher:
             )
             self.context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined});")
             return True
-        except Exception as e:
-            print(f"[PW Init] {e}")
+        except Exception:
+            self.pw_unavailable = True
             return False
 
     def _is_valid_html(self, html, req_regex=None):
@@ -219,6 +211,8 @@ class SmartFetcher:
             if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Direct)"
             statuses.append(f"Direct:{r.status_code}")
+            if r.status_code in (404, 410):
+                return "", " | ".join(statuses)
         except Exception:
             statuses.append("Direct:ERR")
 
@@ -241,6 +235,54 @@ class SmartFetcher:
                 statuses.append("PW:ERR")
 
         return "", " | ".join(statuses)
+
+    def discover_opensooq_sources(self):
+        sources, seen_urls = [], set()
+        seed_pages = ["https://eg.opensooq.com/ar"]
+        for seed in seed_pages:
+            html, st = self.get_html(seed)
+            print(f"[OpenSooq Auto-Discovery] {seed} -> {st}")
+            if not html:
+                continue
+            raw_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', html))
+            for h in raw_hrefs:
+                dec = urllib.parse.unquote(h)
+                if ("التجمع" in dec or "القاهرة-الجديدة" in dec) and any(k in dec for k in ("شقق", "فلل", "عقارات", "تجاري", "أراضي", "اراضي")):
+                    full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
+                    if full_u in seen_urls:
+                        continue
+                    seen_urls.add(full_u)
+                    is_rent = ("ايجار" in dec or "إيجار" in dec)
+                    deal = "إيجار" if is_rent else "تمليك"
+                    deal_en = "Rent" if is_rent else "Sale"
+                    if "فلل" in dec: cat, cat_en = "فلل", "Villas"
+                    elif "تجار" in dec or "مكاتب" in dec or "محلات" in dec: cat, cat_en = "تجاري", "Commercial"
+                    elif "أراض" in dec or "اراض" in dec: cat, cat_en = "أراضي", "Lands"
+                    else: cat, cat_en = "شقق", "Apartments"
+                    sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en})", "url": full_u})
+
+        if sources:
+            first_html, _ = self.get_html(sources[0]["url"])
+            if first_html:
+                sub_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', first_html))
+                for h in sub_hrefs:
+                    dec = urllib.parse.unquote(h)
+                    if ("التجمع" in dec or "القاهرة-الجديدة" in dec) and any(k in dec for k in ("فلل", "تجاري", "أراضي", "اراضي", "عقارات-للبيع", "عقارات-للإيجار", "عقارات-للايجار")):
+                        if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة")):
+                            continue
+                        full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
+                        if full_u in seen_urls:
+                            continue
+                        seen_urls.add(full_u)
+                        is_rent = ("ايجار" in dec or "إيجار" in dec)
+                        deal = "إيجار" if is_rent else "تمليك"
+                        deal_en = "Rent" if is_rent else "Sale"
+                        if "فلل" in dec: cat, cat_en = "فلل", "Villas"
+                        elif "تجار" in dec: cat, cat_en = "تجاري", "Commercial"
+                        elif "أراض" in dec or "اراض" in dec: cat, cat_en = "أراضي", "Lands"
+                        else: cat, cat_en = "شقق", "RealEstate"
+                        sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en})", "url": full_u})
+        return sources[:10]
 
     def close(self):
         try:
@@ -311,9 +353,9 @@ def has_broker_copywriting(title, desc_text):
     norm_body = normalize_ar(f"{title} {desc_text[:2500]}")
     for bp in BROKER_TEXT_PHRASES:
         if normalize_ar(bp) in norm_body:
-            return True, f"صياغة سمسار ({bp})"
+            return True, "Broker Copywriting Phrase"
     if re.search(r'\b(?:code|كود)\s*[:\-]?\s*[a-z0-9]{2,10}\b', norm_body, re.I) or re.search(r'\bmsr\d{2,5}\b', norm_body, re.I):
-        return True, "كود سمسار في الوصف"
+        return True, "Broker Inventory Code"
     return False, ""
 
 def parse_age_and_tier(page_text):
@@ -347,7 +389,7 @@ def extract_aqarmap_details(html, deal):
         t_m = re.search(r'<title>([^<]+)</title>', html)
         title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
     if not title or len(title) < 5:
-        return None, "عنوان فارغ"
+        return None, "Empty title"
 
     full_txt = soup_full.get_text(" ", strip=True).translate(HINDI_MAP)
     specs_start = full_txt.find("تفاصيل الإعلان")
@@ -358,11 +400,11 @@ def extract_aqarmap_details(html, deal):
     norm_specs = normalize_ar(specs_txt)
 
     if re.search(r'نوع\s*المعلن\s*[:\-]?\s*(?:مسوق|مطور|شركه|وسيط|broker|developer)', norm_specs):
-        return None, "نوع المعلن في عقارماب: مسوق/مطور"
+        return None, "AqarMap Role: Broker/Developer"
     if "نوع المعلن" in norm_specs and "مالك عقار" not in norm_specs:
-        return None, "نوع المعلن ليس مالك عقار"
+        return None, "AqarMap Role: Not Private Owner"
     if re.search(r'(?:سنه\s*التسليم|سنه\s*البناء)\s*[:\-]?\s*20(?:27|28|29|30)\b', norm_specs):
-        return None, "وحدة تحت الإنشاء تسليم مستقبلي"
+        return None, "Off-Plan Future Delivery (2027+)"
 
     if desc_start != -1 and seller_start > desc_start:
         pure_desc = full_txt[desc_start + len("وصف الإعلان"):seller_start].strip()
@@ -376,12 +418,12 @@ def extract_aqarmap_details(html, deal):
     if raw_seller_idx != -1:
         seller_html = html[raw_seller_idx:raw_seller_idx + 4000]
         if "company-img" in seller_html or "/companies/" in seller_html.lower():
-            return None, "حساب شركة عقارية في عقارماب"
+            return None, "Company Account in Seller Box"
         s_soup = BeautifulSoup(seller_html, "html.parser")
         s_block = s_soup.get_text(" | ", strip=True).translate(HINDI_MAP)
         norm_s = normalize_ar(s_block)
         if re.search(r'\b[345]\.[0-9]\b', norm_s):
-            return None, "حساب سمسار بتقييم تجاري"
+            return None, "Subscribed Broker Rating Badge"
         if "0 عقار" in norm_s or "عقار واحد" in norm_s:
             pub_ads = 1
         elif "عقارين" in norm_s:
@@ -399,9 +441,9 @@ def extract_aqarmap_details(html, deal):
                     break
 
     if is_company_name(pub_name):
-        return None, f"اسم المعلن شركة أو سمسار ({pub_name})"
+        return None, f"Company/Broker Name ({pub_name})"
     if pub_ads > 7:
-        return None, f"سمسار يمتلك {pub_ads} عقارات على عقارماب"
+        return None, f"Broker Count ({pub_ads} > 7 properties)"
 
     is_brk_txt, brk_reason = has_broker_copywriting(title, pure_desc)
     if is_brk_txt:
@@ -409,15 +451,15 @@ def extract_aqarmap_details(html, deal):
 
     zone = detect_zone(title, pure_desc)
     if not zone:
-        return None, "منطقة مستبعدة"
+        return None, "Excluded Zone"
 
     age_label, fresh_tier, is_recent = parse_age_and_tier(specs_txt + " " + pure_desc[:400])
     if not is_recent:
-        return None, f"إعلان قديم ({age_label})"
+        return None, "Old Ad (>5d)"
 
     price_context = full_txt[:1500] + " " + specs_txt
     if deal != "إيجار" and re.search(r'ج\.?م\s*(?:بالتقسيط|تكمله\s*اقساط)', normalize_ar(price_context)):
-        return None, "إعلان بالتقسيط"
+        return None, "Installment Price Badge"
 
     price_num = 0
     price_str = "السعر بالتفاصيل"
@@ -429,7 +471,7 @@ def extract_aqarmap_details(html, deal):
             break
 
     if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num):
-        return None, f"تقسيط أو مقدم ({price_str})"
+        return None, f"Installment or Downpayment ({price_num:,})"
 
     area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', specs_txt + " " + pure_desc, re.I)
     area_val = int(area_m.group(1)) if area_m else None
@@ -446,7 +488,7 @@ def extract_aqarmap_details(html, deal):
 
 def extract_opensooq_details(html, deal):
     if "إعلانات المتجر" in html or "اعلانات المتجر" in normalize_ar(html):
-        return None, "حساب متجر تجاري على السوق المفتوح"
+        return None, "OpenSooq Commercial Store Account"
 
     clean_html = html
     for marker in ["إعلانات مشابهة", "بيع كل شئ على السوق المفتوح", "الأسئلة الشائعة"]:
@@ -464,7 +506,7 @@ def extract_opensooq_details(html, deal):
         t_m = re.search(r'<title>([^<]+)</title>', clean_html)
         title = t_m.group(1).split("|")[0].split("-")[0].strip() if t_m else ""
     if not title or len(title) < 5:
-        return None, "عنوان فارغ"
+        return None, "Empty title"
 
     post_txt = soup.get_text(" ", strip=True).translate(HINDI_MAP)
     h1_pos = post_txt.find(title[:20])
@@ -473,11 +515,11 @@ def extract_opensooq_details(html, deal):
     norm_post = normalize_ar(post_txt)
 
     if re.search(r'المعلن\s*[:\-]?\s*(?:الوسيط|مكتب|شركه|مطور)', norm_post):
-        return None, "المعلن في السوق المفتوح: الوسيط"
+        return None, "OpenSooq Role: Broker (الوسيط)"
     if deal != "إيجار" and re.search(r'طريقه\s*الدفع\s*[:\-]?\s*(?:اقساط|بالتقسيط)', norm_post):
-        return None, "طريقة الدفع في الجدول: أقساط"
+        return None, "OpenSooq Payment Spec: Installment"
     if re.search(r'عمر\s*البناء\s*[:\-]?\s*قيد\s*الانشاء', norm_post):
-        return None, "العقار قيد الإنشاء"
+        return None, "OpenSooq Under Construction"
 
     pub_ads = 1
     m_cnt = re.search(r'شاهد\s*كل\s*الاعلانات\s*\(\s*(\d{1,5})\s*\)|view\s*all\s*ads\s*\(\s*(\d{1,5})\s*\)', norm_post, re.I)
@@ -498,9 +540,9 @@ def extract_opensooq_details(html, deal):
                 break
 
     if is_company_name(pub_name):
-        return None, f"اسم المعلن شركة أو سمسار ({pub_name})"
+        return None, f"Company/Broker Name ({pub_name})"
     if pub_ads > 8:
-        return None, f"سمسار يمتلك {pub_ads} إعلانات على السوق المفتوح"
+        return None, f"Broker Count ({pub_ads} > 8 ads)"
 
     meta_d = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
     pure_desc = (meta_d.get("content") or "").strip() if meta_d else ""
@@ -508,7 +550,7 @@ def extract_opensooq_details(html, deal):
         pure_desc = post_txt[:1800]
 
     if pub_ads >= 4 and re.search(r'(?:انظمه\s*سداد|مساحات\s*خضراء|امن\s*و\s*حراسه\s*24|دقايق\s*من\s*المحاور)', normalize_ar(pure_desc)):
-        return None, f"مندوب مبيعات كمبوندات ({pub_name}: {pub_ads} إعلانات)"
+        return None, f"Compound Sales Rep ({pub_ads} ads)"
 
     is_brk_txt, brk_reason = has_broker_copywriting(title, pure_desc)
     if is_brk_txt:
@@ -516,11 +558,11 @@ def extract_opensooq_details(html, deal):
 
     zone = detect_zone(title, pure_desc)
     if not zone:
-        return None, "منطقة مستبعدة"
+        return None, "Excluded Zone"
 
     age_label, fresh_tier, is_recent = parse_age_and_tier(post_txt[:1500])
     if not is_recent:
-        return None, f"إعلان قديم ({age_label})"
+        return None, "Old Ad (>5d)"
 
     price_num = 0
     price_str = "السعر بالتفاصيل"
@@ -532,7 +574,7 @@ def extract_opensooq_details(html, deal):
             break
 
     if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num):
-        return None, f"تقسيط أو مقدم ({price_str})"
+        return None, f"Installment or Downpayment ({price_num:,})"
 
     m_area = re.search(r'المساحه\s*[:\-]?\s*(\d{2,5})|(\d{2,4})\s*(?:متر|م²|م2|sqm)', normalize_ar(post_txt[:2200]))
     area_raw = (m_area.group(1) or m_area.group(2)) if m_area else None
@@ -621,17 +663,17 @@ def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source)
             result = response.json()
             if result.get("status") == "success":
                 if result.get("decision") == "مرفوض":
-                    return False, result.get("reason", "مرفوض")
+                    return False, "AI Rejected"
                 analysis = result.get("analysis", "")
                 if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False, result.get("reason", "سمسار")
-                return True, "مالك مباشر"
+                    return False, "AI Detected Broker"
+                return True, "Owner"
     except Exception as e:
         print(f"[AI Server Error] {e}")
     if deal != "إيجار":
         ok = is_strict_cash_sale(title, visible_text, price_num)
-        return ok, ("مالك مباشر" if ok else "شبهة تقسيط")
-    return True, "مالك مباشر"
+        return ok, ("Owner" if ok else "Installment Suspect")
+    return True, "Owner"
 
 def monitor_system_with_ai(stats_dict):
     url = "https://gamal216.pythonanywhere.com/monitor"
@@ -640,10 +682,10 @@ def monitor_system_with_ai(stats_dict):
         if response.status_code == 200:
             res = response.json()
             if res.get("status") == "success":
-                return res.get("ai_advice", "النظام يعمل بشكل طبيعي"), res.get("health", "جيد")
+                return res.get("ai_advice", "System healthy"), res.get("health", "Good")
     except Exception as e:
         print(f"[AI Monitor Error] {e}")
-    return "تعذر الاتصال بعقل المراقبة، الفحص التقليدي سليم.", "غير معروف"
+    return "Local filter active and healthy.", "Good"
 
 def run_extra_radar():
     if os.path.exists(DATA_FILE):
@@ -673,7 +715,6 @@ def run_extra_radar():
             aid = ad.get("ad_id")
             if aid in extra_checked:
                 extra_checked.discard(aid)
-            print(f"[Purged Invalid Extra Ad] {ad.get('source')} | {ad.get('publisher')} | {ad.get('title', '')[:35]}")
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
     fetcher = SmartFetcher()
@@ -684,8 +725,8 @@ def run_extra_radar():
         for page in range(1, 3):
             page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
             html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
-            print(f"[Aqarmap] {src['cat']} ({src['deal']}) p.{page} -> {status_info}")
-            time.sleep(random.uniform(0.9, 1.4))
+            print(f"[AqarMap] {src['en']} p.{page} -> {status_info}")
+            time.sleep(random.uniform(0.8, 1.3))
             if not html:
                 continue
             links = re.findall(r'(/ar/listing/(\d{5,12})[^"\'\s<>\\]*)', html)
@@ -696,6 +737,7 @@ def run_extra_radar():
                 aq_candidates.append({
                     "ad_id": uid,
                     "source": "عقارماب",
+                    "en_src": "AqarMap",
                     "url": "https://aqarmap.com.eg" + path.split("?")[0],
                     "cat": src["cat"],
                     "deal": src["deal"]
@@ -703,10 +745,11 @@ def run_extra_radar():
                 seen_ids.add(uid)
 
     os_candidates = []
-    for src in OPENSOOQ_SOURCES:
+    os_sources = fetcher.discover_opensooq_sources()
+    for src in os_sources:
         html, status_info = fetcher.get_html(src["url"], req_regex=r'/ar/search/\d+')
-        print(f"[OpenSooq] {src['cat']} ({src['deal']}) -> {status_info}")
-        time.sleep(random.uniform(0.9, 1.4))
+        print(f"[OpenSooq] {src['en']} -> {status_info}")
+        time.sleep(random.uniform(0.8, 1.3))
         if not html:
             continue
         ids_found = re.findall(r'/ar/search/(\d{7,12})', html)
@@ -717,6 +760,7 @@ def run_extra_radar():
             os_candidates.append({
                 "ad_id": uid,
                 "source": "السوق المفتوح",
+                "en_src": "OpenSooq",
                 "url": f"https://eg.opensooq.com/ar/search/{num_str}",
                 "cat": src["cat"],
                 "deal": src["deal"]
@@ -727,14 +771,16 @@ def run_extra_radar():
     sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
     rent_os = [x for x in os_candidates if x["deal"] == "إيجار"]
     sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
-    all_candidates = rent_aq[:35] + rent_os[:25] + sale_aq[:35] + sale_os[:25]
-    print(f"[Extra Radar] Candidates -> Aqarmap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)} | Inspecting: {len(all_candidates)}")
+    all_candidates = rent_aq[:50] + rent_os[:35] + sale_aq[:50] + sale_os[:35]
+    print(f"[Extra Radar] Candidates -> AqarMap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added = 0
     os_added = 0
+    total_c = len(all_candidates)
 
-    for item in all_candidates:
+    for idx, item in enumerate(all_candidates, 1):
         uid = item["ad_id"]
+        en_s = item["en_src"]
         try:
             html, _ = fetcher.get_html(item["url"])
             if not html:
@@ -745,11 +791,11 @@ def run_extra_radar():
             else:
                 info, reason = extract_opensooq_details(html, item["deal"])
 
-            if reason != "عنوان فارغ":
+            if reason != "Empty title":
                 extra_checked.add(uid)
 
             if not info:
-                print(f"[Rejected {item['source']}] {reason}")
+                print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] {reason}")
                 continue
 
             is_owner, ai_reason = analyze_with_ai(
@@ -757,7 +803,7 @@ def run_extra_radar():
                 item["deal"], item["cat"], info["price_num"], item["source"]
             )
             if not is_owner:
-                print(f"[Rejected by AI Extra] {item['source']} ({item['deal']}) | Reason: {ai_reason} | {info['title'][:30]}")
+                print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] {ai_reason}")
                 continue
 
             now_ts = int(time.time())
@@ -796,8 +842,8 @@ def run_extra_radar():
                 aq_added += 1
             else:
                 os_added += 1
-            print(f"[+ Extra Approved] {item['source']} | {item['deal']} | {info['zone']} | {info['pub_name']} ({info['pub_ads']}) | {info['title'][:35]}")
-            time.sleep(random.uniform(0.7, 1.2))
+            print(f"  [{idx}/{total_c}] [+ ACCEPTED OWNER] {en_s} | Ads: {info['pub_ads']} | Price: {info['price_num']:,} EGP")
+            time.sleep(random.uniform(0.6, 1.0))
         except Exception:
             continue
 
@@ -843,7 +889,7 @@ def run_extra_radar():
         "os_added": os_added
     }
     ai_advice, sys_health = monitor_system_with_ai(ai_stats_payload)
-    print(f"[AI Monitor] Health: {sys_health} | Advice: {ai_advice}")
+    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Total DB: {len(merged_ads)} (Dubizzle: {dub_total}, AqarMap: {aq_total}, OpenSooq: {os_total}) ===")
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
     run_report.update({
@@ -927,7 +973,7 @@ def main():
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
-    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar (Zero Browser / Lightweight) ===")
+    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.2 (Auto-Discovery | Clean Logs) ===")
     cycle = 1
     while True:
         print(f"\n>>> Starting AqarMap & OpenSooq Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
