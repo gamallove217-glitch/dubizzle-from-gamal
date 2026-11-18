@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 SEEN_FILE = os.path.join(BASE_DIR, "seen_links_local.json")
 BLACKLIST_FILE = os.path.join(BASE_DIR, "blacklist.json")
-RESET_FLAG_FILE = os.path.join(BASE_DIR, "clean_reset_v4.flag")
+RESET_FLAG_FILE = os.path.join(BASE_DIR, "clean_reset_v5.flag")
 PROFILE_DIR = os.path.join(BASE_DIR, "chrome_clean_profile")
 
 MAX_ADS_STORED = 450
@@ -245,10 +245,10 @@ def is_turnstile_failed_in_html(html):
 
 def is_turnstile_in_html(html):
     if not html: return False
-    if html.count("/ad/") >= 6 or len(html) > 95000: return False
+    if html.count("/ad/") >= 6 or len(html) > 110000: return False
     if is_turnstile_failed_in_html(html): return True
     norm_h = normalize_ar(html[:25000])
-    for marker in ("زائر حقيقي للمتابعه", "حدد المربع ادناه", "محمي ضد الحركه الاليه", "تاكيد انك انسان"):
+    for marker in ("التحقق الامني", "زائر حقيقي للمتابعه", "حدد المربع ادناه", "محمي ضد الحركه الاليه", "تاكيد انك انسان"):
         if marker in norm_h: return True
     return "<title>just a moment" in norm_h[:3000]
 
@@ -370,7 +370,7 @@ class SmartHybridEngine:
             refreshed_once = False
             for attempt in range(max_wait_loops):
                 dom_now = self.get_live_dom()
-                if not is_turnstile_in_html(dom_now) and len(dom_now) > 8000:
+                if not is_turnstile_in_html(dom_now) and ("<h1" in dom_now.lower() or dom_now.count("/ad/") >= 4):
                     return True
                 if is_turnstile_failed_in_html(dom_now) and not refreshed_once:
                     print("[Self-Healing] 'فشل التحقق' detected -> Refreshing tab once...")
@@ -430,22 +430,27 @@ class SmartHybridEngine:
         self.ensure_anchor_browser(force_fresh_load=True)
         self.discover_land_slug_from_html(self.get_live_dom())
 
-    def direct_tab_fetch(self, url):
+    def direct_tab_fetch(self, url, require_h1=False):
         if not self.page and not self.ensure_anchor_browser(): return ""
         try:
             with BROWSER_LOCK:
                 self.page.get(url, timeout=18)
-            time.sleep(2.2)
-            dom = self.get_live_dom()
-            if is_turnstile_in_html(dom):
-                self.wait_until_turnstile_cleared(max_wait_loops=22)
+            for _ in range(8):
+                time.sleep(0.7)
                 dom = self.get_live_dom()
+                if is_turnstile_in_html(dom):
+                    self.wait_until_turnstile_cleared(max_wait_loops=22)
+                    dom = self.get_live_dom()
+                if dom and not is_turnstile_in_html(dom) and len(dom) > 5000:
+                    if not require_h1 or "<h1" in dom.lower():
+                        return dom
+            dom = self.get_live_dom()
             if dom and not is_turnstile_in_html(dom) and len(dom) > 5000:
                 return dom
         except Exception: pass
         return ""
 
-    def browser_background_fetch_single(self, url):
+    def browser_background_fetch_single(self, url, require_h1=False):
         time.sleep(random.uniform(0.8, 1.4))
         if not self.page and not self.ensure_anchor_browser(): return ""
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
@@ -476,7 +481,8 @@ class SmartHybridEngine:
                 if res_state and isinstance(res_state, dict):
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
                     if st == 200 and h and not is_turnstile_in_html(h) and len(h) > 5000:
-                        return h
+                        if not require_h1 or "<h1" in h.lower():
+                            return h
                     return ""
         except Exception: pass
         finally:
@@ -485,12 +491,12 @@ class SmartHybridEngine:
             except Exception: pass
         return ""
 
-    def fetch_html(self, url):
-        h = self.browser_background_fetch_single(url)
+    def fetch_html(self, url, require_h1=False):
+        h = self.browser_background_fetch_single(url, require_h1=require_h1)
         if h and not is_turnstile_in_html(h) and len(h) > 5000:
             if not self.land_url_resolved: self.discover_land_slug_from_html(h)
             return h
-        h_nav = self.direct_tab_fetch(url)
+        h_nav = self.direct_tab_fetch(url, require_h1=require_h1)
         if h_nav and not is_turnstile_in_html(h_nav) and len(h_nav) > 5000:
             if not self.land_url_resolved: self.discover_land_slug_from_html(h_nav)
             return h_nav
@@ -502,7 +508,7 @@ class SmartHybridEngine:
         if is_land and "?page=" not in url:
             urls_to_try.extend(["https://www.dubizzle.com.eg/properties/buildings-lands/new-cairo/", "https://www.dubizzle.com.eg/properties/land-for-sale/new-cairo/"])
         for u_try in urls_to_try:
-            html = self.fetch_html(u_try)
+            html = self.fetch_html(u_try, require_h1=False)
             raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
             fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
             if raw_pairs:
@@ -517,7 +523,7 @@ class SmartHybridEngine:
         if not profile_url: return 0, ""
         with STATE_LOCK:
             if profile_url in PROFILE_CACHE: return PROFILE_CACHE[profile_url]
-        h = self.fetch_html(profile_url)
+        h = self.fetch_html(profile_url, require_h1=False)
         if not h: return 0, ""
         soup = BeautifulSoup(h, "html.parser")
         prof_name = ""
@@ -648,16 +654,17 @@ def extract_direct_ad_info(full_html, deal, blacklist, hint_age="منذ ساعة
     if active_count == 0 and vis_ad_id.startswith("2") and not is_agency:
         active_count, count_source = 1, f"AppOwnerID ({vis_ad_id})"
     if active_count >= 5: return None, f"Broker Count ({publisher_clean}: {active_count} > 4)", safe_bl_key
-    if not (1 <= active_count <= 4): return None, "Unverified active ads count (0 found)", None
     local_area, local_rooms = extract_local_specs(main_text, unescaped_blob)
     return {"title": title, "desc": desc, "price_num": price_num, "deal": deal, "publisher_clean": publisher_clean, "active_count": active_count, "count_source": count_source, "local_area": local_area, "local_rooms": local_rooms, "age": final_age, "real_ts": final_ts, "profile_url": profile_url, "safe_bl_key": safe_bl_key}, "OK", None
 
 def inspect_ad_worker(item, engine, blacklist):
     url, cat, deal, en_label = item["url"], item["cat"], item["deal"], item["en"]
-    html = engine.fetch_html(url)
+    html = engine.fetch_html(url, require_h1=True)
     if not html: return {"url": url, "ad": None, "reason": "Failed to fetch ad HTML", "bl_key": None, "loaded": False}
     info, reason, bl_key = extract_direct_ad_info(html, deal, blacklist, hint_age=item.get("age", "منذ ساعة"), hint_ts=item.get("real_ts", 0))
-    if not info: return {"url": url, "ad": None, "reason": reason, "bl_key": bl_key, "loaded": True}
+    if not info:
+        is_loaded = (reason != "Empty title")
+        return {"url": url, "ad": None, "reason": reason, "bl_key": bl_key, "loaded": is_loaded}
     prof_url = info.get("profile_url")
     if prof_url:
         prof_pub_count, prof_name = engine.verify_profile_published_count(prof_url)
@@ -669,6 +676,8 @@ def inspect_ad_worker(item, engine, blacklist):
             return {"url": url, "ad": None, "reason": f"Profile Published Ads ({info['publisher_clean']}: {prof_pub_count} > 4)", "bl_key": info.get("safe_bl_key"), "loaded": True}
         if 1 <= prof_pub_count <= 4 and prof_pub_count > info["active_count"]:
             info["active_count"] = prof_pub_count
+    if info["active_count"] == 0:
+        info["active_count"] = 1
     title, desc, price_num, resolved_deal = info["title"], info["desc"], info["price_num"], info["deal"]
     publisher_clean, active_count = info["publisher_clean"], info["active_count"]
     ai_area, ai_rooms = info["local_area"], info["local_rooms"]
@@ -736,7 +745,9 @@ def run_single_cycle(engine, cycle_num=1):
     inspect_local_frontend_schema()
     fix_git_identity_for_vercel()
     if not os.path.exists(RESET_FLAG_FILE):
+        safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
+        print("[Clean-Retry] Cleared unfairly rejected seen links once to re-inspect all fresh owners!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -808,7 +819,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar (Hybrid Fetch + Direct Tab Fallback | Minimized Safe) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar (Profile-Verified Owners | H1-Checked Hybrid Fetch) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
