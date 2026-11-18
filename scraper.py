@@ -50,7 +50,7 @@ ZONE_MAPPING = {"النرجس": "النرجس", "نرجس": "النرجس", "ا�
 FORBIDDEN_ZONES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "المستقبل", "mostakbal", "سمات", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "مقبرة", "مقابر", "مدفن", "مدافن", "جبانة", "طريق السخنة"]
 INSTALLMENT_KEYWORDS = ["قسط", "تقسيط", "بالتقسيط", "أقساط", "اقساط", "تسهيلات", "فترة سداد", "سنوات سداد", "بمقدم", "مقدم", "دفعة", "دفعات", "الدفعة المقدمة", "متبقي", "المتبقي", "أوفر", "اوفر", "أوفر برايس", "down payment", "downpayment", "installment", "installments", "payment plan"]
 CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط", "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن", "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل", "مسدده بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش ولا تقبل التمويل", "كاش نهائي"]
-COMPANY_NAME_KEYWORDS = ["شركه", "شركة", "عقارات", "للعقارات", "تسويق", "للتسويق", "ماركتنج", "مكتب", "استثمار", "تطوير", "جروب", "هوم", "هاوس", "بروكر", "ريال استيت", "استيت", "فيرتكس", "روي", "ايكو", "إيكو", "كابيتال", "كونسلت", "للاستشارات", "إعمار", "معمار", "ريديفاين", "redefine", "vertex", "echo", "roy real", "real estate", "realestate", "estate", "estates", "realty", "properties", "property", "broker", "brokers", "brokerage", "agency", "agencies", "group", "developments", "development", "investment", "investments", "marketing", "lounge", "scouts", "hub", "home", "homes", "house", "egypt", "capital", "consultant", "consultancy", "consulting", "prime", "elite", "empire", "avenue", "landmark", "residence", "living", "towers", "tower"]
+COMPANY_NAME_KEYWORDS = ["شركه", "شركة", "عقارات", "للعقارات", "تسويق", "للتسويق", "ماركتنج", "مكتب", "استثمار", "تطوير", "جروب", "هوم", "هاوس", "بروكر", "ريال استيت", "استيت", "فيرتكس", "روي", "ايكو", "إيكو", "كابيتال", "كونسلت", "للاستشارات", "إعمار", "معمار", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار", "إمكان", "امكان", "نيو أفينيو", "فالكون", "جلوبال", "جرين هوم", "فيوز", "أورا", "اورا", "انسبيريشن", "برايم", "ديل", "redefine", "vertex", "echo", "roy real", "real estate", "realestate", "estate", "estates", "realty", "properties", "property", "broker", "brokers", "brokerage", "agency", "agencies", "group", "developments", "development", "investment", "investments", "marketing", "lounge", "scouts", "hub", "home", "homes", "house", "egypt", "capital", "consultant", "consultancy", "consulting", "prime", "elite", "empire", "avenue", "landmark", "residence", "living", "towers", "tower", "irtkaz", "ebtkar", "imkan", "falcon", "views", "aura", "inspairtion", "inspiration", "insider", "meer", "deal", "ghp"]
 BROKER_DESC_PHRASES = ["لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "فيرتكس استيت", "vertex estate", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "مجموعه متنوعه من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "لو حابب تعرض معانا", "تعرض معانا وحدتك", "لدينا شقق", "متاح لدينا شقق", "متاح لدينا فيلات", "يوجد لدينا شقق", "يوجد لدينا فيلات", "لدينا أكثر من", "متاح لدينا اكثر من", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "مكتب عمل جماعي", "غرف خاصه للشركات", "تظهر شركتكم بصوره", "كود الوحدة", "كود الوحده", "كود الشقة", "كود الشقه", "كود العقار", "كود الفيلا", "للتواصل مع قسم المبيعات", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات"]
 BANNED_AD_IDS = {503407019, 504430732, 503219833}
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
@@ -153,7 +153,7 @@ def is_company_like_name(name):
         if len(nk) <= 3:
             if re.search(rf'\b{re.escape(nk)}\b', norm): return True
         elif nk in norm: return True
-    return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex|redefine)\b', norm, re.I))
+    return bool(re.search(r'\b(?:real|estate|properties|property|broker|agency|agencies|group|developments|investment|marketing|lounge|scouts|homes|house|capital|consultant|prime|elite|empire|echo|roy|vertex|redefine|irtkaz|ebtkar|imkan|falcon|views|aura|insider|meer|deal|ghp)\b', norm, re.I))
 
 def extract_visible_dubizzle_ad_id(text):
     if not text: return ""
@@ -267,7 +267,7 @@ def is_turnstile_in_html(html):
         if marker in norm_h: return True
     return "<title>just a moment" in norm_h[:5000]
 
-def extract_dubizzle_links_from_html(html, prefilter_cards=False):
+def extract_dubizzle_links_from_html(html, prefilter_cards=False, blacklist_dict=None):
     results, seen_u = [], set()
     if not html or is_turnstile_in_html(html): return results
     soup = BeautifulSoup(html, "html.parser")
@@ -285,6 +285,16 @@ def extract_dubizzle_links_from_html(html, prefilter_cards=False):
                 is_fresh, age_lbl, age_mins, real_ts, _ = parse_dubizzle_age_info(age_target_txt)
                 if not is_fresh: continue
                 card_age = age_lbl
+                if card:
+                    skip_company_card = False
+                    for a_c in card.find_all("a", href=True):
+                        h_c = str(a_c["href"]).lower()
+                        if "/companies/" in h_c or "/agencies/" in h_c:
+                            skip_company_card = True; break
+                    if not skip_company_card:
+                        if card.find(attrs={"aria-label": re.compile(r'agency|company|شركة|وكيل', re.I)}):
+                            skip_company_card = True
+                    if skip_company_card: continue
                 norm_c = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', card_txt))
                 if "الدفعه المقدمه" in norm_c or "طريقه الدفع تقسيط" in norm_c or "down payment" in norm_c: continue
                 if any(normalize_ar(bz) in norm_c for bz in FORBIDDEN_ZONES): continue
@@ -317,9 +327,9 @@ class SmartHybridEngine:
         u = target_url or DUBIZZLE_SOURCES[0]["url"]
         try:
             with BROWSER_LOCK:
-                self.page.get(u, timeout=18)
+                self.page.get(u, timeout=15)
             self.last_refresh_ts = time.time()
-            time.sleep(3.5)
+            time.sleep(2.5)
         except Exception: pass
 
     def cdp_press_key(self, key_name, vk_code, code_str, char_txt=""):
@@ -458,12 +468,17 @@ class SmartHybridEngine:
                 co.set_argument("--disable-backgrounding-occluded-windows")
                 co.set_argument("--disable-renderer-backgrounding")
                 co.set_argument("--disable-features=CalculateNativeWinOcclusion")
+                co.set_load_mode("eager")
                 co.mute(True)
                 self.page = ChromiumPage(addr_or_opts=co)
+                try: self.page.set.load_mode.eager()
+                except Exception: pass
             except Exception as e:
                 print(f"[Browser Port 9555 Info] {e}")
                 return False
         try:
+            try: self.page.set.load_mode.eager()
+            except Exception: pass
             dom_now = self.get_live_dom()
             cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
             if "dubizzle.com.eg" in cur_u and not is_turnstile_in_html(dom_now) and dom_now.count("/ad/") >= 8:
@@ -506,10 +521,11 @@ class SmartHybridEngine:
     def direct_tab_fetch(self, url, require_h1=False, require_ads=False):
         if not self.page and not self.ensure_anchor_browser(): return ""
         try:
+            time.sleep(random.uniform(0.5, 0.9))
             with BROWSER_LOCK:
-                self.page.get(url, timeout=18)
-            for _ in range(18):
-                time.sleep(0.8)
+                self.page.get(url, timeout=12)
+            for _ in range(10):
+                time.sleep(0.35)
                 dom = self.get_live_dom()
                 if is_turnstile_in_html(dom):
                     self.wait_until_turnstile_cleared(max_wait_loops=35, expect_ads=require_ads)
@@ -517,9 +533,9 @@ class SmartHybridEngine:
                 if dom and not is_turnstile_in_html(dom):
                     if require_ads and dom.count("/ad/") >= 8:
                         return dom
-                    if require_h1 and "<h1" in dom.lower() and ("تم النشر" in dom or "السعر" in dom or "الوصف" in dom or len(dom) > 35000):
+                    if require_h1 and "<h1" in dom.lower() and ("تم النشر" in dom or "الإعلانات النشطة" in dom or "الاعلانات النشطه" in dom or "/companies/" in dom or "/profile/" in dom):
                         return dom
-                    if not require_ads and not require_h1 and len(dom) > 15000:
+                    if not require_ads and not require_h1 and len(dom) > 12000:
                         return dom
             dom = self.get_live_dom()
             if dom and not is_turnstile_in_html(dom) and len(dom) > 10000:
@@ -528,7 +544,7 @@ class SmartHybridEngine:
         return ""
 
     def browser_background_fetch_single(self, url, require_h1=False, require_ads=False):
-        time.sleep(random.uniform(0.8, 1.4))
+        time.sleep(random.uniform(0.6, 1.0))
         if not self.page: return ""
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
@@ -547,8 +563,8 @@ class SmartHybridEngine:
         """
         try:
             with BROWSER_LOCK: self.page.run_js(js_start, req_id, url)
-            for _ in range(36):
-                time.sleep(0.25)
+            for _ in range(25):
+                time.sleep(0.2)
                 with BROWSER_LOCK:
                     res_state = self.page.run_js(
                         "const f = (window.__fetches && window.__fetches[arguments[0]]); "
@@ -559,7 +575,7 @@ class SmartHybridEngine:
                     st, h = int(res_state.get("status") or 0), res_state.get("html") or ""
                     if st == 200 and h and not is_turnstile_in_html(h) and len(h) > 5000:
                         if require_ads and h.count("/ad/") < 8: return ""
-                        if require_h1 and ("<h1" not in h.lower() or ("تم النشر" not in h and "السعر" not in h and "الوصف" not in h)): return ""
+                        if require_h1 and "<h1" not in h.lower(): return ""
                         return h
                     return ""
         except Exception: pass
@@ -570,6 +586,10 @@ class SmartHybridEngine:
         return ""
 
     def fetch_html(self, url, require_h1=False, require_ads=False):
+        if require_h1:
+            h_nav = self.direct_tab_fetch(url, require_h1=True, require_ads=False)
+            if h_nav and not is_turnstile_in_html(h_nav) and len(h_nav) > 5000:
+                return h_nav
         h = self.browser_background_fetch_single(url, require_h1=require_h1, require_ads=require_ads)
         if h and not is_turnstile_in_html(h) and len(h) > 5000:
             if not self.land_url_resolved: self.discover_land_slug_from_html(h)
@@ -580,7 +600,7 @@ class SmartHybridEngine:
             return h_nav
         return ""
 
-    def get_category_links(self, url, label="", is_land=False):
+    def get_category_links(self, url, label="", is_land=False, blacklist_dict=None):
         raw_pairs, fresh_pairs = [], []
         urls_to_try = [url]
         if is_land and "?page=" not in url:
@@ -588,13 +608,13 @@ class SmartHybridEngine:
         for u_try in urls_to_try:
             html = self.fetch_html(u_try, require_h1=False, require_ads=True)
             raw_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=False)
-            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True)
+            fresh_pairs = extract_dubizzle_links_from_html(html, prefilter_cards=True, blacklist_dict=blacklist_dict)
             if raw_pairs:
                 if is_land:
                     for src in DUBIZZLE_SOURCES:
                         if src["cat_key"] == "land": src["url"] = u_try.split("?")[0]
                 break
-        print(f"[Hybrid-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Fresh <=24h & Cash: {len(fresh_pairs)})")
+        print(f"[Hybrid-Fetch] {label} -> {'200 OK' if raw_pairs else 'Empty'} (Total: {len(raw_pairs)} | Non-Agency Fresh & Cash: {len(fresh_pairs)})")
         return fresh_pairs
 
     def verify_profile_published_count(self, profile_url):
@@ -825,14 +845,15 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v8.0] Cleared seen links once to re-inspect all fresh owners!")
+        print("[Clean-Retry v8.2] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
     for ad in raw_existing:
         u = ad.get("url") or ad.get("link") or ""
         num_id = get_numeric_ad_id(u)
-        if not u or u in seen_u or num_id in BANNED_AD_IDS: continue
+        pub_n = ad.get("publisher") or ""
+        if not u or u in seen_u or num_id in BANNED_AD_IDS or is_company_like_name(pub_n): continue
         seen_u.add(u)
         current_ads.append(ad)
     seen_links_dict = {k: True for k in load_json_list(SEEN_FILE) if k}
@@ -847,7 +868,7 @@ def run_single_cycle(engine, cycle_num=1):
         max_p = src.get("max_pages", 3) if cycle_num == 1 else 2
         for page_num in range(1, max_p + 1):
             page_url = src["url"] if page_num == 1 else f"{src['url']}?page={page_num}"
-            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"))
+            fresh_tuples = engine.get_category_links(page_url, label=f"{src['en']} p.{page_num}", is_land=(src["cat_key"] == "land"), blacklist_dict=blacklist_dict)
             for lnk, age_lbl, age_mins, real_ts in fresh_tuples:
                 ad_id_key = f"id_{get_numeric_ad_id(lnk)}"
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
@@ -862,7 +883,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v8.0] Launching hybrid background scan for ({total_cand}) new <=24h ads...")
+    print(f"\n[Inspector v8.2] Launching Eager-Mode 5x Fast Scan for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
     for batch_start in range(0, total_cand, 40):
         batch = candidates[batch_start:batch_start + 40]
@@ -888,16 +909,18 @@ def run_single_cycle(engine, cycle_num=1):
                 save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added % 3 == 0))
             else:
                 print(f"  [{completed_idx}/{total_cand}] [- REJECTED] {res.get('reason')}")
+            if completed_idx % 10 == 0:
+                save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
         save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
         if batch_start + 40 < total_cand:
-            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 15s to keep IP 100% clean...")
-            time.sleep(15.0)
+            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 10s to keep IP 100% clean...")
+            time.sleep(10.0)
 
     save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added > 0))
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v8.0 (Full-DOM Turnstile Detector | Auto-Minimize) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v8.2 (Eager 5x Fast | 100% Profile-Verified | Auto-Minimize) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
