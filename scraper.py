@@ -342,11 +342,22 @@ class SmartHybridEngine:
     def cdp_press_key(self, key_name, vk_code, code_str, char_txt=""):
         try:
             self.page.run_cdp("Input.dispatchKeyEvent", type="rawKeyDown", windowsVirtualKeyCode=vk_code, nativeVirtualKeyCode=vk_code, key=key_name, code=code_str)
-            time.sleep(0.06)
+            time.sleep(0.05)
             if char_txt:
                 self.page.run_cdp("Input.dispatchKeyEvent", type="char", windowsVirtualKeyCode=vk_code, key=key_name, code=code_str, text=char_txt, unmodifiedText=char_txt)
-                time.sleep(0.06)
+                time.sleep(0.05)
             self.page.run_cdp("Input.dispatchKeyEvent", type="keyUp", windowsVirtualKeyCode=vk_code, nativeVirtualKeyCode=vk_code, key=key_name, code=code_str)
+        except Exception: pass
+
+    def cdp_internal_focus_point(self, vx, vy):
+        try:
+            x, y = int(vx), int(vy)
+            if x <= 10 or y <= 10: return
+            self.page.run_cdp("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y)
+            time.sleep(0.04)
+            self.page.run_cdp("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
+            time.sleep(0.06)
+            self.page.run_cdp("Input.dispatchMouseEvent", type="mouseReleased", x=x, y=y, button="left", clickCount=1)
         except Exception: pass
 
     def try_auto_solve_turnstile(self, attempt_idx=0):
@@ -355,15 +366,16 @@ class SmartHybridEngine:
             with BROWSER_LOCK:
                 try: self.page.run_cdp("Emulation.setFocusEmulationEnabled", enabled=True)
                 except Exception: pass
-                self.page.run_js("""
-                    let targetEl = null;
+                box = self.page.run_js("""
+                    let targetEl = null, topR = null, botR = null;
                     for (const el of document.querySelectorAll('p, div, span, h1, h2')) {
                         const r = el.getBoundingClientRect();
                         if (r.height < 8 || r.height > 280 || r.width < 50) continue;
                         const t = (el.innerText || '').trim();
                         if (t.includes('المربع') || t.includes('زائر حقيقي')) {
-                            if (!targetEl || r.height < targetEl.getBoundingClientRect().height) targetEl = el;
+                            if (!topR || r.height < topR.height) { topR = r; targetEl = el; }
                         }
+                        if (t.includes('لماذا') && (!botR || r.height < botR.height)) botR = r;
                     }
                     if (targetEl) {
                         targetEl.setAttribute('tabindex', '0');
@@ -372,21 +384,30 @@ class SmartHybridEngine:
                         document.body.setAttribute('tabindex', '0');
                         document.body.focus();
                     }
+                    let cx = (window.innerWidth || 640) / 2, ty = ((window.innerHeight || 700) / 2) + 25;
+                    if (topR && botR) { cx = (topR.left + topR.right) / 2; ty = (topR.bottom + botR.top) / 2; }
+                    else if (topR) { cx = (topR.left + topR.right) / 2; ty = topR.bottom + 52; }
+                    return { cx: Math.round(cx), ty: Math.round(ty), hasTarget: Boolean(targetEl) };
                 """)
-                time.sleep(0.25)
-                tabs_count = 1 if attempt_idx == 0 else 2
-                for _ in range(tabs_count):
-                    self.cdp_press_key("Tab", 9, "Tab")
-                    time.sleep(0.35)
+                if box and isinstance(box, dict):
+                    self.cdp_internal_focus_point(box["cx"], max(30, box["ty"] - 65))
+                    time.sleep(0.18)
+                self.cdp_press_key("Tab", 9, "Tab")
+                time.sleep(0.28)
                 self.cdp_press_key(" ", 32, "Space", " ")
-                return "Calm(Tab+Space)"
+                time.sleep(0.28)
+                if box and isinstance(box, dict):
+                    self.cdp_internal_focus_point(box["cx"] + 120, box["ty"])
+                    time.sleep(0.18)
+                    self.cdp_press_key(" ", 32, "Space", " ")
+                return "Background(DirectBox+Tab+Space)"
         except Exception: pass
-        return "Calm(Tab+Space)"
+        return "Background(DirectBox+Tab+Space)"
 
     def wait_until_turnstile_cleared(self, max_wait_loops=35, expect_ads=False):
         if not self.page: return False
         with TURNSTILE_LOCK:
-            time.sleep(1.5)
+            time.sleep(1.0)
             refreshed_once = False
             was_turnstile = False
             for attempt in range(max_wait_loops):
@@ -395,15 +416,15 @@ class SmartHybridEngine:
                     if expect_ads:
                         if dom_now.count("/ad/") >= 8:
                             if was_turnstile:
-                                print("[Security Solver] Turnstile cleared via Calm Tab+Space! Stabilizing 3.5s...")
-                                time.sleep(3.5)
+                                print("[Security Solver] Turnstile cleared! Stabilizing 3.0s...")
+                                time.sleep(3.0)
                                 self.bg_fetch_fails = 0
                             self.minimize_chrome_safely()
                             return True
                     else:
                         if "<h1" in dom_now.lower() or dom_now.count("/ad/") >= 8 or len(dom_now) > 30000:
                             if was_turnstile:
-                                time.sleep(2.5)
+                                time.sleep(2.0)
                                 self.bg_fetch_fails = 0
                             self.minimize_chrome_safely()
                             return True
@@ -414,9 +435,9 @@ class SmartHybridEngine:
                     refreshed_once = True
                     self.hard_refresh_anchor()
                     continue
-                if is_turnstile_in_html(dom_now) and attempt in (1, 10, 20):
-                    status = self.try_auto_solve_turnstile(attempt_idx=(0 if attempt == 1 else 1))
-                    print(f"[Security Solver] Turnstile detected -> Executed {status} (Waiting 18s for slow laptop verification)...")
+                if is_turnstile_in_html(dom_now) and attempt in (0, 6, 14, 22):
+                    status = self.try_auto_solve_turnstile(attempt_idx=(attempt // 6))
+                    print(f"[Security Solver] Turnstile detected -> Executed {status}...")
                 time.sleep(2.0)
             self.minimize_chrome_safely()
             return not is_turnstile_in_html(self.get_live_dom())
@@ -812,7 +833,7 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v9.1] Initialized clean seen links!")
+        print("[Clean-Retry v9.2] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -849,7 +870,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v9.1] Launching Natural Full-DOM Scan for ({total_cand}) non-agency <=24h ads...")
+    print(f"\n[Inspector v9.2] Launching Natural Full-DOM Scan for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
     for item in candidates:
         completed_idx += 1
@@ -884,7 +905,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v9.1 (Natural Images | Calm Single Tab+Space | 25 Pages) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v9.2 (Direct Internal Click + Tab+Space | Natural Images) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
