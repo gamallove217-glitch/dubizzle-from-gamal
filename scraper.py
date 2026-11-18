@@ -327,9 +327,11 @@ class SmartHybridEngine:
         u = target_url or DUBIZZLE_SOURCES[0]["url"]
         try:
             with BROWSER_LOCK:
-                self.page.get(u, timeout=15)
+                try: self.page.set.load_mode.normal()
+                except Exception: pass
+                self.page.get(u, timeout=18)
             self.last_refresh_ts = time.time()
-            time.sleep(2.5)
+            time.sleep(3.5)
         except Exception: pass
 
     def cdp_press_key(self, key_name, vk_code, code_str, char_txt=""):
@@ -404,12 +406,15 @@ class SmartHybridEngine:
                     else if (topR) { cx = (topR.left + topR.right) / 2; ty = topR.bottom + 52; }
                     const vx = Math.round(cx + 120), vy = Math.round(ty);
                     return {
+                        hasModal: Boolean(topR || botR),
                         vx: vx, vy: vy,
                         sx: Math.round((window.screenX || 0) + (vx * dpr)),
                         sy: Math.round((window.screenY || 0) + chromeTop + (vy * dpr))
                     };
                 """)
                 if box and isinstance(box, dict):
+                    if not box.get("hasModal"):
+                        return "blank_turnstile"
                     self.cdp_human_click(box["vx"], box["vy"])
                     if attempt_idx >= 1:
                         os_single_right_box_click(box["sx"], box["sy"])
@@ -436,7 +441,7 @@ class SmartHybridEngine:
                             self.minimize_chrome_safely()
                             return True
                     else:
-                        if ("<h1" in dom_now.lower() and ("تم النشر" in dom_now or "السعر" in dom_now or "الوصف" in dom_now)) or dom_now.count("/ad/") >= 8:
+                        if "<h1" in dom_now.lower() or dom_now.count("/ad/") >= 8 or len(dom_now) > 35000:
                             if was_turnstile:
                                 time.sleep(2.5)
                             self.minimize_chrome_safely()
@@ -450,6 +455,11 @@ class SmartHybridEngine:
                     continue
                 if is_turnstile_in_html(dom_now) and attempt in (0, 2, 4, 7, 10, 14, 18, 23, 28):
                     status = self.try_auto_solve_turnstile(attempt_idx=(attempt // 2))
+                    if status == "blank_turnstile" and not refreshed_once and attempt >= 2:
+                        print("[Self-Healing] Blank verification screen detected -> Reloading in normal mode...")
+                        refreshed_once = True
+                        self.hard_refresh_anchor()
+                        continue
                     if attempt in (0, 4, 10):
                         print(f"[Security Solver] Turnstile detected -> Executed {status}...")
                 time.sleep(2.2)
@@ -468,16 +478,13 @@ class SmartHybridEngine:
                 co.set_argument("--disable-backgrounding-occluded-windows")
                 co.set_argument("--disable-renderer-backgrounding")
                 co.set_argument("--disable-features=CalculateNativeWinOcclusion")
-                co.set_load_mode("eager")
                 co.mute(True)
                 self.page = ChromiumPage(addr_or_opts=co)
-                try: self.page.set.load_mode.eager()
-                except Exception: pass
             except Exception as e:
                 print(f"[Browser Port 9555 Info] {e}")
                 return False
         try:
-            try: self.page.set.load_mode.eager()
+            try: self.page.set.load_mode.normal()
             except Exception: pass
             dom_now = self.get_live_dom()
             cur_u = str(self.page.run_js("return location.href || '';") or "").lower()
@@ -488,8 +495,7 @@ class SmartHybridEngine:
                     links_now = extract_dubizzle_links_from_html(test_h, prefilter_cards=False)
                     print(f"[Engine] Existing Live Session Verified & Minimized! ({len(links_now)} ads visible)")
                     return True
-            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or (not is_turnstile_in_html(dom_now) and dom_now.count("/ad/") < 8):
-                self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
+            self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
             self.wait_until_turnstile_cleared(max_wait_loops=40, expect_ads=True)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
             if len(links_now) == 0:
@@ -521,11 +527,10 @@ class SmartHybridEngine:
     def direct_tab_fetch(self, url, require_h1=False, require_ads=False):
         if not self.page and not self.ensure_anchor_browser(): return ""
         try:
-            time.sleep(random.uniform(0.5, 0.9))
             with BROWSER_LOCK:
-                self.page.get(url, timeout=12)
+                self.page.get(url, timeout=18)
             for _ in range(10):
-                time.sleep(0.35)
+                time.sleep(0.5)
                 dom = self.get_live_dom()
                 if is_turnstile_in_html(dom):
                     self.wait_until_turnstile_cleared(max_wait_loops=35, expect_ads=require_ads)
@@ -533,7 +538,7 @@ class SmartHybridEngine:
                 if dom and not is_turnstile_in_html(dom):
                     if require_ads and dom.count("/ad/") >= 8:
                         return dom
-                    if require_h1 and "<h1" in dom.lower() and ("تم النشر" in dom or "الإعلانات النشطة" in dom or "الاعلانات النشطه" in dom or "/companies/" in dom or "/profile/" in dom):
+                    if require_h1 and "<h1" in dom.lower() and len(dom) > 20000:
                         return dom
                     if not require_ads and not require_h1 and len(dom) > 12000:
                         return dom
@@ -544,7 +549,7 @@ class SmartHybridEngine:
         return ""
 
     def browser_background_fetch_single(self, url, require_h1=False, require_ads=False):
-        time.sleep(random.uniform(0.6, 1.0))
+        time.sleep(random.uniform(0.7, 1.2))
         if not self.page: return ""
         req_id = f"req_{int(time.time()*1000)}_{random.randint(1000,9999)}"
         js_start = """
@@ -563,8 +568,8 @@ class SmartHybridEngine:
         """
         try:
             with BROWSER_LOCK: self.page.run_js(js_start, req_id, url)
-            for _ in range(25):
-                time.sleep(0.2)
+            for _ in range(32):
+                time.sleep(0.22)
                 with BROWSER_LOCK:
                     res_state = self.page.run_js(
                         "const f = (window.__fetches && window.__fetches[arguments[0]]); "
@@ -586,10 +591,6 @@ class SmartHybridEngine:
         return ""
 
     def fetch_html(self, url, require_h1=False, require_ads=False):
-        if require_h1:
-            h_nav = self.direct_tab_fetch(url, require_h1=True, require_ads=False)
-            if h_nav and not is_turnstile_in_html(h_nav) and len(h_nav) > 5000:
-                return h_nav
         h = self.browser_background_fetch_single(url, require_h1=require_h1, require_ads=require_ads)
         if h and not is_turnstile_in_html(h) and len(h) > 5000:
             if not self.land_url_resolved: self.discover_land_slug_from_html(h)
@@ -845,7 +846,7 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v8.3] Initialized clean seen links!")
+        print("[Clean-Retry v8.4] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -874,6 +875,7 @@ def run_single_cycle(engine, cycle_num=1):
                 if lnk not in existing_urls and lnk not in seen_links_dict and ad_id_key not in seen_links_dict and lnk not in candidate_urls:
                     candidate_urls.add(lnk)
                     all_raw_candidates.append({"url": lnk, "cat": src["cat"], "deal": src["deal"], "en": src["en"], "age": age_lbl, "age_mins": age_mins, "real_ts": real_ts})
+            if len(fresh_tuples) < 3: break
 
     all_raw_candidates.sort(key=lambda x: x["age_mins"])
     candidates = all_raw_candidates[:MAX_CANDIDATES_PER_RUN]
@@ -882,7 +884,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v8.3] Launching Full 25-Page Eager Scan for ({total_cand}) non-agency <=24h ads...")
+    print(f"\n[Inspector v8.4] Launching v8.0-Engine Fast Background Scan for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
     for batch_start in range(0, total_cand, 40):
         batch = candidates[batch_start:batch_start + 40]
@@ -912,14 +914,14 @@ def run_single_cycle(engine, cycle_num=1):
                 save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
         save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=False)
         if batch_start + 40 < total_cand:
-            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 10s to keep IP 100% clean...")
-            time.sleep(10.0)
+            print(f"    [Rate-Guard] Batch of 40 ads done -> Cooling down 12s to keep IP 100% clean...")
+            time.sleep(12.0)
 
     save_state(current_ads, seen_links_dict, blacklist_dict, push_to_github=(total_added > 0))
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v8.3 (Full 25-Page Scan | Eager 5x Fast | Auto-Minimize) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v8.4 (v8.0 Normal Load Mode | Fast Fetch | Auto-Minimize) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
