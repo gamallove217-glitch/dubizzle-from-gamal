@@ -1,5 +1,5 @@
 import os, sys, re, json, time, random, stat, socket, base64, subprocess, urllib.parse, ctypes
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 import requests as std_requests
 from bs4 import BeautifulSoup
 from curl_cffi import requests as cffi_requests
@@ -28,6 +28,13 @@ WARP_PROXY = "socks5h://127.0.0.1:40000"
 MIN_CASH_SALE_PRICE = 1200000
 AUTO_LOOP_MINUTES = 45
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
+
+ARABIC_MONTHS = {
+    "يناير": 1, "فبراير": 2, "مارس": 3, "ابريل": 4, "أبريل": 4, "إبريل": 4,
+    "مايو": 5, "يونيو": 6, "يونية": 6, "يوليو": 7, "يوليه": 7,
+    "اغسطس": 8, "أغسطس": 8, "سبتمبر": 9, "اكتوبر": 10, "أكتوبر": 10,
+    "نوفمبر": 11, "ديسمبر": 12
+}
 
 ZONES = [
     ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement", "ميفيدا", "mivida", "هايد بارك", "ماونتن فيو", "كايرو فيستفال", "الباتيو", "فيلت", "سوديك"]),
@@ -247,7 +254,13 @@ class SmartFetcher:
             raw_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', html))
             for h in raw_hrefs:
                 dec = urllib.parse.unquote(h)
+                if any(c in dec for c in ("عقارات-للبيع", "عقارات-للايجار", "عقارات-للإيجار")) and len(seed_pages) < 4:
+                    full_c = h if h.startswith("http") else "https://eg.opensooq.com" + h
+                    if full_c not in seed_pages:
+                        seed_pages.append(full_c)
                 if ("التجمع" in dec or "القاهرة-الجديدة" in dec) and any(k in dec for k in ("شقق", "فلل", "عقارات", "تجاري", "أراضي", "اراضي")):
+                    if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة")):
+                        continue
                     full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
                     if full_u in seen_urls:
                         continue
@@ -259,7 +272,8 @@ class SmartFetcher:
                     elif "تجار" in dec or "مكاتب" in dec or "محلات" in dec: cat, cat_en = "تجاري", "Commercial"
                     elif "أراض" in dec or "اراض" in dec: cat, cat_en = "أراضي", "Lands"
                     else: cat, cat_en = "شقق", "Apartments"
-                    sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en})", "url": full_u})
+                    loc_en = "5th Settlement" if "التجمع" in dec else "New Cairo"
+                    sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_u})
 
         if sources:
             first_html, _ = self.get_html(sources[0]["url"])
@@ -267,7 +281,7 @@ class SmartFetcher:
                 sub_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', first_html))
                 for h in sub_hrefs:
                     dec = urllib.parse.unquote(h)
-                    if ("التجمع" in dec or "القاهرة-الجديدة" in dec) and any(k in dec for k in ("فلل", "تجاري", "أراضي", "اراضي", "عقارات-للبيع", "عقارات-للإيجار", "عقارات-للايجار")):
+                    if ("التجمع" in dec or "القاهرة-الجديدة" in dec) and any(k in dec for k in ("شقق", "فلل", "تجاري", "أراضي", "اراضي", "عقارات")):
                         if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة")):
                             continue
                         full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
@@ -280,9 +294,10 @@ class SmartFetcher:
                         if "فلل" in dec: cat, cat_en = "فلل", "Villas"
                         elif "تجار" in dec: cat, cat_en = "تجاري", "Commercial"
                         elif "أراض" in dec or "اراض" in dec: cat, cat_en = "أراضي", "Lands"
-                        else: cat, cat_en = "شقق", "RealEstate"
-                        sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en})", "url": full_u})
-        return sources[:10]
+                        else: cat, cat_en = "شقق", "Apartments"
+                        loc_en = "5th Settlement" if "التجمع" in dec else "New Cairo"
+                        sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_u})
+        return sources[:12]
 
     def close(self):
         try:
@@ -317,9 +332,12 @@ def clean_publisher_name(name):
     if not name:
         return default_lbl
     s = re.sub(r'<[^>]+>', ' ', str(name))
-    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|واتساب|رسالة|Avatar|الصورة\s*الشخصية)', ' ', s, flags=re.I)
+    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|إبلاغ)', ' ', s, flags=re.I)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,><.★⭐•·")
-    if not s or len(s) < 2 or len(s) > 45 or re.search(r'[<>{}\[\]=/\\]', s):
+    norm_s = normalize_ar(s)
+    if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه")):
+        return default_lbl
+    if not s or len(s) < 2 or len(s) > 42 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s):
         return default_lbl
     return s
 
@@ -358,25 +376,93 @@ def has_broker_copywriting(title, desc_text):
         return True, "Broker Inventory Code"
     return False, ""
 
-def parse_age_and_tier(page_text):
-    norm_text = normalize_ar(page_text)
-    if re.search(r'(?:منذ|قبل)\s+(\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات)', norm_text):
-        return ("قديم", 0, False)
-    m = re.search(r'(?:منذ|قبل)?\s*(\d{1,2})\s*(?:يوم|ايام)', norm_text)
-    if m:
-        days = int(m.group(1))
-        if days > 5: return (f"منذ {days} أيام", 0, False)
-        if days <= 1: return ("منذ يوم", 2, True)
-        return (f"منذ {days} أيام", 1, True)
-    m_hr = re.search(r'(\d{1,2})\s*(?:ساعه|ساعات)', norm_text)
-    if m_hr:
-        return (f"منذ {int(m_hr.group(1))} ساعة", 3, True)
-    m_min = re.search(r'(\d{1,2})\s*(?:دقيقه|دقائق|دقايق)', norm_text)
+def parse_strict_24h_official_time(html, text_block, platform="aqarmap"):
+    now_dt = datetime.now(CAIRO_TZ)
+    now_ts = int(now_dt.timestamp())
+    clean_t = str(text_block or "").translate(HINDI_MAP)
+    norm_t = normalize_ar(clean_t)
+
+    if re.search(r'(?:منذ|قبل)\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات)', norm_t):
+        return False, "Old Ad (>1w)", 0, 0
+
+    m_days = re.search(r'(?:منذ|قبل)\s*([2-9]|\d{2,})\s*(?:يوم|ايام)|(?:منذ|قبل)\s*يومين', norm_t)
+    if m_days:
+        return False, "Old Ad (>24h)", 0, 0
+
+    m_min = re.search(r'(?:منذ|قبل)\s*(\d{1,3})\s*(?:دقيقه|دقائق|دقايق)', norm_t)
     if m_min:
-        return (f"منذ {int(m_min.group(1))} دقيقة", 3, True)
-    if "امس" in norm_text or "منذ يوم" in norm_text:
-        return ("منذ يوم", 2, True)
-    return ("حديث", 3, True)
+        mins = max(1, int(m_min.group(1)))
+        return True, f"منذ {mins} دقيقة", 3, now_ts - (mins * 60)
+
+    if re.search(r'(?:منذ|قبل)\s*(?:دقيقه|دقيقتين)\b|\bالان\b|\bحالا\b', norm_t):
+        return True, "منذ 2 دقيقة", 3, now_ts - 120
+
+    m_hr = re.search(r'(?:منذ|قبل)\s*(\d{1,2})\s*(?:ساعه|ساعات)', norm_t)
+    if m_hr:
+        hrs = int(m_hr.group(1))
+        if hrs > 24:
+            return False, f"Old Ad ({hrs}h > 24h)", 0, 0
+        return True, f"منذ {hrs} ساعة", 3, now_ts - (hrs * 3600)
+
+    if re.search(r'(?:منذ|قبل)\s*(?:ساعتين|ساعتان)\b', norm_t):
+        return True, "منذ 2 ساعة", 3, now_ts - 7200
+
+    if re.search(r'(?:منذ|قبل)\s*ساعه\b', norm_t):
+        return True, "منذ 1 ساعة", 3, now_ts - 3600
+
+    for m_iso in re.findall(r'"(?:published_at|created_at|datePublished|createdAt|publishedAt)"\s*:\s*"(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})', html[:60000]):
+        try:
+            iso_clean = m_iso.replace("T", " ")
+            dt_obj = datetime.strptime(iso_clean, "%Y-%m-%d %H:%M:%S").replace(tzinfo=CAIRO_TZ)
+            diff_sec = (now_dt - dt_obj).total_seconds()
+            if diff_sec < -7200:
+                continue
+            if diff_sec > 86400:
+                return False, f"Old Ad ISO ({m_iso[:10]})", 0, 0
+            hrs = max(1, int(diff_sec // 3600))
+            mins = max(1, int(diff_sec // 60))
+            lbl = f"منذ {mins} دقيقة" if diff_sec < 3600 else f"منذ {hrs} ساعة"
+            return True, lbl, 3, int(dt_obj.timestamp())
+        except Exception:
+            pass
+
+    if platform == "opensooq":
+        m_num_date = re.search(r'تاريخ\s*النشر\s*[:\-]?\s*(\d{2})-(\d{2})-(202\d)|\b(\d{2})-(\d{2})-(202\d)\b', clean_t[:1500])
+        if m_num_date:
+            g = [x for x in m_num_date.groups() if x is not None]
+            d_val, m_val, y_val = int(g[0]), int(g[1]), int(g[2])
+            try:
+                ad_d = date(y_val, m_val, d_val)
+                d_diff = (now_dt.date() - ad_d).days
+                if d_diff > 1 or d_diff < 0:
+                    return False, f"Old OpenSooq Ad ({d_val:02d}-{m_val:02d}-{y_val})", 0, 0
+            except Exception:
+                return False, "Invalid OpenSooq Date", 0, 0
+
+    m_ar_cal = re.search(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)\s+(202\d)\b', clean_t[:2000])
+    if m_ar_cal:
+        d_val = int(m_ar_cal.group(1))
+        m_name = m_ar_cal.group(2)
+        y_val = int(m_ar_cal.group(3))
+        m_val = ARABIC_MONTHS.get(m_name, 0)
+        if m_val > 0:
+            try:
+                ad_d = date(y_val, m_val, d_val)
+                d_diff = (now_dt.date() - ad_d).days
+                if d_diff < 0 or d_diff > 1:
+                    return False, f"Old AqarMap Ad ({d_val} {m_name} {y_val})", 0, 0
+                if d_diff == 0:
+                    return True, f"اليوم ({d_val} {m_name})", 3, now_ts - 3600
+                return True, f"منذ 20 ساعة ({d_val} {m_name})", 2, now_ts - 72000
+            except Exception:
+                return False, "Invalid AqarMap Date", 0, 0
+
+    if re.search(r'(?:تاريخ\s*النشر\s*[:\-]?\s*)?\b(?:اليوم|امس|منذ\s*يوم|قبل\s*يوم)\b', norm_t[:1500]):
+        if "اليوم" in norm_t[:1500]:
+            return True, "منذ 2 ساعة", 3, now_ts - 7200
+        return True, "منذ 22 ساعة", 2, now_ts - 79200
+
+    return False, "Unverified Publication Date (>24h)", 0, 0
 
 def extract_aqarmap_details(html, deal):
     soup_full = BeautifulSoup(html, "html.parser")
@@ -394,7 +480,12 @@ def extract_aqarmap_details(html, deal):
     full_txt = soup_full.get_text(" ", strip=True).translate(HINDI_MAP)
     specs_start = full_txt.find("تفاصيل الإعلان")
     desc_start = full_txt.find("وصف الإعلان")
-    seller_start = full_txt.find("تواصل مع المعلن")
+    seller_start = full_txt.rfind("تواصل مع المعلن")
+
+    header_and_specs = full_txt[:specs_start + 1200] if specs_start != -1 else full_txt[:2500]
+    is_fresh_24h, age_label, fresh_tier, official_ts = parse_strict_24h_official_time(html, header_and_specs, platform="aqarmap")
+    if not is_fresh_24h:
+        return None, age_label
 
     specs_txt = full_txt[specs_start:desc_start] if (specs_start != -1 and desc_start > specs_start) else full_txt[:2500]
     norm_specs = normalize_ar(specs_txt)
@@ -414,14 +505,16 @@ def extract_aqarmap_details(html, deal):
 
     pub_name = "مالك مباشر"
     pub_ads = 1
-    raw_seller_idx = html.find("تواصل مع المعلن")
-    if raw_seller_idx != -1:
-        seller_html = html[raw_seller_idx:raw_seller_idx + 4000]
-        if "company-img" in seller_html or "/companies/" in seller_html.lower():
-            return None, "Company Account in Seller Box"
+    for m_sel in re.finditer(r'تواصل\s*مع\s*المعلن', html):
+        idx_s = m_sel.start()
+        seller_html = html[idx_s:idx_s + 4000]
         s_soup = BeautifulSoup(seller_html, "html.parser")
         s_block = s_soup.get_text(" | ", strip=True).translate(HINDI_MAP)
         norm_s = normalize_ar(s_block)
+        if not re.search(r'(?:0\s*عقار|عقار\s*واحد|عقارين|\d+\s*عقارات|\d+\s*عقار)', norm_s):
+            continue
+        if "company-img" in seller_html or "/companies/" in seller_html.lower():
+            return None, "Company Account in Seller Box"
         if re.search(r'\b[345]\.[0-9]\b', norm_s):
             return None, "Subscribed Broker Rating Badge"
         if "0 عقار" in norm_s or "عقار واحد" in norm_s:
@@ -433,12 +526,17 @@ def extract_aqarmap_details(html, deal):
             if m_cnt:
                 pub_ads = int(m_cnt.group(1))
         parts = [p.strip() for p in s_block.split("|") if p.strip() and "تواصل مع المعلن" not in p]
-        for p in parts[:8]:
-            if not re.search(r'(?:عقار|اتصال|واتساب|رسالة|ملف|\d{3,})', p):
-                cand = clean_publisher_name(p)
-                if cand != "مالك مباشر":
-                    pub_name = cand
+        for idx_p, p in enumerate(parts[:10]):
+            norm_p = normalize_ar(p)
+            if re.search(r'^(?:0\s*عقار|عقار\s*واحد|(?:\d+\s*)?عقارين|\d+\s*عقارات|\d+\s*عقار)$', norm_p) and idx_p >= 1:
+                cand_prev = clean_publisher_name(parts[idx_p - 1])
+                if cand_prev != "مالك مباشر":
+                    pub_name = cand_prev
                     break
+            cand = clean_publisher_name(p)
+            if cand != "مالك مباشر":
+                pub_name = cand
+        break
 
     if is_company_name(pub_name):
         return None, f"Company/Broker Name ({pub_name})"
@@ -452,10 +550,6 @@ def extract_aqarmap_details(html, deal):
     zone = detect_zone(title, pure_desc)
     if not zone:
         return None, "Excluded Zone"
-
-    age_label, fresh_tier, is_recent = parse_age_and_tier(specs_txt + " " + pure_desc[:400])
-    if not is_recent:
-        return None, "Old Ad (>5d)"
 
     price_context = full_txt[:1500] + " " + specs_txt
     if deal != "إيجار" and re.search(r'ج\.?م\s*(?:بالتقسيط|تكمله\s*اقساط)', normalize_ar(price_context)):
@@ -473,9 +567,10 @@ def extract_aqarmap_details(html, deal):
     if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num):
         return None, f"Installment or Downpayment ({price_num:,})"
 
-    area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', specs_txt + " " + pure_desc, re.I)
+    top_specs_blob = full_txt[:2200] + " " + specs_txt + " " + pure_desc
+    area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', top_specs_blob, re.I)
     area_val = int(area_m.group(1)) if area_m else None
-    rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', specs_txt + " " + pure_desc)
+    rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', top_specs_blob)
     rooms_val = int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None
 
     return {
@@ -483,7 +578,7 @@ def extract_aqarmap_details(html, deal):
         "pub_name": pub_name, "pub_ads": max(1, pub_ads),
         "price_num": price_num, "price_str": price_str,
         "area": area_val, "rooms": rooms_val,
-        "age_label": age_label, "fresh_tier": fresh_tier
+        "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts
     }, "OK"
 
 def extract_opensooq_details(html, deal):
@@ -513,6 +608,10 @@ def extract_opensooq_details(html, deal):
     if h1_pos > 0:
         post_txt = post_txt[h1_pos:]
     norm_post = normalize_ar(post_txt)
+
+    is_fresh_24h, age_label, fresh_tier, official_ts = parse_strict_24h_official_time(clean_html, post_txt[:1800], platform="opensooq")
+    if not is_fresh_24h:
+        return None, age_label
 
     if re.search(r'المعلن\s*[:\-]?\s*(?:الوسيط|مكتب|شركه|مطور)', norm_post):
         return None, "OpenSooq Role: Broker (الوسيط)"
@@ -560,10 +659,6 @@ def extract_opensooq_details(html, deal):
     if not zone:
         return None, "Excluded Zone"
 
-    age_label, fresh_tier, is_recent = parse_age_and_tier(post_txt[:1500])
-    if not is_recent:
-        return None, "Old Ad (>5d)"
-
     price_num = 0
     price_str = "السعر بالتفاصيل"
     for m_p in re.findall(r'([\d,]{4,15})\s*(?:جنيه|ج\.?م|EGP)', post_txt[:2200], re.I):
@@ -588,24 +683,24 @@ def extract_opensooq_details(html, deal):
         "pub_name": pub_name, "pub_ads": max(1, pub_ads),
         "price_num": price_num, "price_str": price_str,
         "area": area_val, "rooms": rooms_val,
-        "age_label": age_label, "fresh_tier": fresh_tier
+        "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts
     }, "OK"
 
 def is_valid_existing_extra_ad(ad):
     src = ad.get("source") or "دوبيزل"
     if src == "دوبيزل":
         return True
+    if not ad.get("verified_24h_v93"):
+        return False
+    pub = ad.get("publisher", "")
+    if "اتصل" in pub or "السعر" in pub or pub in ("مالك (عقارماب)", "مالك (السوق المفتوح)", "مالك"):
+        return False
     title = ad.get("title", "")
     zone = ad.get("zone", "")
     deal = ad.get("deal", "تمليك")
     price_num = int(ad.get("price_num", 0) or 0)
-    pub = ad.get("publisher", "")
     pub_ads = int(ad.get("pub_ads", 1) or 1)
-    if pub in ("مالك (عقارماب)", "مالك (السوق المفتوح)", "مالك"):
-        return False
-    if pub_ads > 8:
-        return False
-    if is_company_name(pub):
+    if pub_ads > 8 or is_company_name(pub):
         return False
     norm_all = normalize_ar(f"{title} {zone}")
     for city in EXCLUDED_CITIES:
@@ -708,13 +803,16 @@ def run_extra_radar():
     run_report = data.get("last_run_report", {})
 
     existing_ads = []
+    purged_old_extra = 0
     for ad in raw_existing:
         if is_valid_existing_extra_ad(ad):
             existing_ads.append(ad)
         else:
+            purged_old_extra += 1
             aid = ad.get("ad_id")
             if aid in extra_checked:
                 extra_checked.discard(aid)
+            print(f"[Purged Old/Unverified Extra Ad] {ad.get('source')} | {ad.get('publisher')} | {ad.get('title', '')[:35]}")
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
     fetcher = SmartFetcher()
@@ -747,32 +845,34 @@ def run_extra_radar():
     os_candidates = []
     os_sources = fetcher.discover_opensooq_sources()
     for src in os_sources:
-        html, status_info = fetcher.get_html(src["url"], req_regex=r'/ar/search/\d+')
-        print(f"[OpenSooq] {src['en']} -> {status_info}")
-        time.sleep(random.uniform(0.8, 1.3))
-        if not html:
-            continue
-        ids_found = re.findall(r'/ar/search/(\d{7,12})', html)
-        for num_str in ids_found:
-            uid = int("92" + num_str)
-            if uid in seen_ids or uid in extra_checked or uid in banned_ids:
+        for page in range(1, 3):
+            page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
+            html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/search/\d+')
+            print(f"[OpenSooq] {src['en']} p.{page} -> {status_info}")
+            time.sleep(random.uniform(0.8, 1.3))
+            if not html:
                 continue
-            os_candidates.append({
-                "ad_id": uid,
-                "source": "السوق المفتوح",
-                "en_src": "OpenSooq",
-                "url": f"https://eg.opensooq.com/ar/search/{num_str}",
-                "cat": src["cat"],
-                "deal": src["deal"]
-            })
-            seen_ids.add(uid)
+            ids_found = re.findall(r'/ar/search/(\d{7,12})', html)
+            for num_str in ids_found:
+                uid = int("92" + num_str)
+                if uid in seen_ids or uid in extra_checked or uid in banned_ids:
+                    continue
+                os_candidates.append({
+                    "ad_id": uid,
+                    "source": "السوق المفتوح",
+                    "en_src": "OpenSooq",
+                    "url": f"https://eg.opensooq.com/ar/search/{num_str}",
+                    "cat": src["cat"],
+                    "deal": src["deal"]
+                })
+                seen_ids.add(uid)
 
     rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
     sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
     rent_os = [x for x in os_candidates if x["deal"] == "إيجار"]
     sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
-    all_candidates = rent_aq[:50] + rent_os[:35] + sale_aq[:50] + sale_os[:35]
-    print(f"[Extra Radar] Candidates -> AqarMap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)} | Inspecting: {len(all_candidates)}")
+    all_candidates = rent_os[:80] + sale_os[:80] + rent_aq[:80] + sale_aq[:80]
+    print(f"[Extra Radar v9.3] Candidates -> AqarMap: {len(aq_candidates)} | OpenSooq: {len(os_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added = 0
     os_added = 0
@@ -806,7 +906,7 @@ def run_extra_radar():
                 print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] {ai_reason}")
                 continue
 
-            now_ts = int(time.time())
+            real_post_ts = int(info.get("real_ts") or time.time())
             now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             new_extra_ads.append({
                 "ad_id": uid,
@@ -829,20 +929,21 @@ def run_extra_radar():
                 "age": info["age_label"],
                 "fresh_tier": info["fresh_tier"],
                 "description": info["body_text"][:500],
-                "first_seen_ts": now_ts,
-                "timestamp": now_ts,
+                "first_seen_ts": real_post_ts,
+                "timestamp": real_post_ts,
                 "desc_verified_v2": True,
+                "verified_24h_v93": True,
                 "url": item["url"],
                 "link": item["url"],
                 "verified_v12": True,
                 "scraped_at": now_cairo,
-                "date": datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+                "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
             })
             if item["source"] == "عقارماب":
                 aq_added += 1
             else:
                 os_added += 1
-            print(f"  [{idx}/{total_c}] [+ ACCEPTED OWNER] {en_s} | Ads: {info['pub_ads']} | Price: {info['price_num']:,} EGP")
+            print(f"  [{idx}/{total_c}] [+ ACCEPTED <=24H OWNER] {en_s} ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | Price: {info['price_num']:,} EGP")
             time.sleep(random.uniform(0.6, 1.0))
         except Exception:
             continue
@@ -889,7 +990,7 @@ def run_extra_radar():
         "os_added": os_added
     }
     ai_advice, sys_health = monitor_system_with_ai(ai_stats_payload)
-    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Total DB: {len(merged_ads)} (Dubizzle: {dub_total}, AqarMap: {aq_total}, OpenSooq: {os_total}) ===")
+    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Purged Old: {purged_old_extra} | Total DB: {len(merged_ads)} (Dubizzle: {dub_total}, AqarMap: {aq_total}, OpenSooq: {os_total}) ===")
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
     run_report.update({
@@ -915,10 +1016,11 @@ def run_extra_radar():
         new_Alert_ads = [a for a in new_extra_ads if a.get("fresh_tier") == 3 and a.get("ad_id") not in notified_ids]
         for ad in new_Alert_ads[:10]:
             msg = (
-                f"<b>صيد جديد مفحوص بالذكاء الاصطناعي ({ad.get('deal')}) من {ad.get('source')}</b>\n"
+                f"<b>صيد جديد <=24 ساعة ({ad.get('deal')}) من {ad.get('source')}</b>\n"
                 f"المنطقة: <b>{ad.get('zone')}</b> ({ad.get('cat')})\n"
                 f"السعر: <b>{ad.get('price')}</b>\n"
                 f"المساحة: {ad.get('area') or 'غير محدد'} م2 | الغرف: {ad.get('rooms') or 'غير محدد'}\n"
+                f"وقت النشر الرسمي: <b>{ad.get('age')}</b>\n"
                 f"العنوان: {ad.get('title')}\n"
                 f"الناشر: {ad.get('publisher')} ({ad.get('pub_ads', 1)} إعلان)\n"
                 f"<a href=\"{ad.get('url')}\">اضغط هنا لفتح الإعلان الأصلي</a>"
@@ -955,17 +1057,17 @@ def run_extra_radar():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    if not os.environ.get("GITHUB_ACTIONS") and (aq_added > 0 or os_added > 0):
+    if not os.environ.get("GITHUB_ACTIONS") and (aq_added > 0 or os_added > 0 or purged_old_extra > 0):
         try:
             fix_git_identity_for_vercel()
             subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
-            subprocess.run(["git", "commit", "-m", f"Extra Radar Sync (+{aq_added} AqarMap, +{os_added} OpenSooq)"], cwd=BASE_DIR, capture_output=True, timeout=15)
+            subprocess.run(["git", "commit", "-m", f"Extra Radar Sync (+{aq_added} AqarMap, +{os_added} OpenSooq, -{purged_old_extra} Old)"], cwd=BASE_DIR, capture_output=True, timeout=15)
             p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
             if p_res.returncode != 0:
                 clear_git_locks()
                 subprocess.run(["git", "pull", "--rebase", "--autostash", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
                 subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
-            print(f"    --> [LIVE SYNC] Pushed +{aq_added} AqarMap & +{os_added} OpenSooq owners to GitHub & Vercel!")
+            print(f"    --> [LIVE SYNC] Pushed +{aq_added} AqarMap, +{os_added} OpenSooq (Purged {purged_old_extra} Old) to GitHub & Vercel!")
         except Exception as e:
             print(f"    --> [LOCAL SAVE] {e}")
 
@@ -973,7 +1075,7 @@ def main():
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
-    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.2 (Auto-Discovery | Clean Logs) ===")
+    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.3 (Strict <=24h Official Time | Clean Publisher) ===")
     cycle = 1
     while True:
         print(f"\n>>> Starting AqarMap & OpenSooq Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
