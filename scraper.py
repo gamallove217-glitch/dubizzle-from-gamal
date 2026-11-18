@@ -65,21 +65,6 @@ def normalize_ar(text):
     t = re.sub(r'ى', 'ي', t)
     return re.sub(r'\s+', ' ', t).strip()
 
-def os_single_right_box_click(screen_x, screen_y):
-    if not sys.platform.startswith("win"): return
-    try:
-        u32 = ctypes.windll.user32
-        sx, sy = int(screen_x), int(screen_y)
-        if sx <= 10 or sy <= 10: return
-        u32.SetCursorPos(sx - 12, sy - 6)
-        time.sleep(0.05)
-        u32.SetCursorPos(sx, sy)
-        time.sleep(0.06)
-        u32.mouse_event(0x0002, 0, 0, 0, 0)
-        time.sleep(0.06)
-        u32.mouse_event(0x0004, 0, 0, 0, 0)
-    except Exception: pass
-
 def inspect_local_frontend_schema():
     idx_path = os.path.join(BASE_DIR, "index.html")
     if os.path.exists(idx_path):
@@ -319,7 +304,10 @@ class SmartHybridEngine:
         if not self.page: return
         try:
             with BROWSER_LOCK:
-                self.page.set.window.mini()
+                try: self.page.run_cdp("Emulation.setFocusEmulationEnabled", enabled=True)
+                except Exception: pass
+                try: self.page.set.window.mini()
+                except Exception: pass
         except Exception: pass
 
     def hard_refresh_anchor(self, target_url=None):
@@ -329,6 +317,8 @@ class SmartHybridEngine:
             with BROWSER_LOCK:
                 try: self.page.set.load_mode.normal()
                 except Exception: pass
+                try: self.page.run_cdp("Emulation.setFocusEmulationEnabled", enabled=True)
+                except Exception: pass
                 self.page.get(u, timeout=18)
             self.last_refresh_ts = time.time()
             time.sleep(3.5)
@@ -337,22 +327,21 @@ class SmartHybridEngine:
     def cdp_press_key(self, key_name, vk_code, code_str, char_txt=""):
         try:
             self.page.run_cdp("Input.dispatchKeyEvent", type="rawKeyDown", windowsVirtualKeyCode=vk_code, nativeVirtualKeyCode=vk_code, key=key_name, code=code_str)
-            time.sleep(0.04)
+            time.sleep(0.05)
             if char_txt:
                 self.page.run_cdp("Input.dispatchKeyEvent", type="char", windowsVirtualKeyCode=vk_code, key=key_name, code=code_str, text=char_txt, unmodifiedText=char_txt)
-                time.sleep(0.04)
+                time.sleep(0.05)
             self.page.run_cdp("Input.dispatchKeyEvent", type="keyUp", windowsVirtualKeyCode=vk_code, nativeVirtualKeyCode=vk_code, key=key_name, code=code_str)
         except Exception: pass
 
-    def cdp_human_click(self, vx, vy):
+    def cdp_internal_focus_point(self, vx, vy):
         try:
             x, y = int(vx), int(vy)
             if x <= 10 or y <= 10: return
-            for step in (35, 14, 0):
-                self.page.run_cdp("Input.dispatchMouseEvent", type="mouseMoved", x=x - step, y=y - (step // 3))
-                time.sleep(0.03)
+            self.page.run_cdp("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y)
+            time.sleep(0.03)
             self.page.run_cdp("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
-            time.sleep(0.07)
+            time.sleep(0.05)
             self.page.run_cdp("Input.dispatchMouseEvent", type="mouseReleased", x=x, y=y, button="left", clickCount=1)
         except Exception: pass
 
@@ -360,69 +349,46 @@ class SmartHybridEngine:
         if not self.page: return "no_page"
         try:
             with BROWSER_LOCK:
-                try: self.page.set.window.normal()
+                try: self.page.run_cdp("Emulation.setFocusEmulationEnabled", enabled=True)
                 except Exception: pass
-                time.sleep(0.4)
-                focused_above = self.page.run_js("""
-                    let targetEl = null;
+                box = self.page.run_js("""
+                    let targetEl = null, topR = null, botR = null;
                     for (const el of document.querySelectorAll('p, div, span, h1, h2')) {
                         const r = el.getBoundingClientRect();
-                        if (r.height < 8 || r.height > 260 || r.width < 50) continue;
+                        if (r.height < 8 || r.height > 280 || r.width < 50) continue;
                         const t = (el.innerText || '').trim();
-                        if (t.includes('المربع') || t.includes('زائر حقيقي') || t.includes('التحقق الأمني')) {
-                            if (!targetEl || r.height < targetEl.getBoundingClientRect().height) targetEl = el;
+                        if (t.includes('المربع') || t.includes('زائر حقيقي')) {
+                            if (!topR || r.height < topR.height) { topR = r; targetEl = el; }
                         }
+                        if (t.includes('لماذا') && (!botR || r.height < botR.height)) botR = r;
                     }
                     if (targetEl) {
                         targetEl.setAttribute('tabindex', '0');
                         targetEl.focus();
-                        return true;
-                    }
-                    if (document.body) {
+                    } else if (document.body) {
                         document.body.setAttribute('tabindex', '0');
                         document.body.focus();
-                    }
-                    return false;
-                """)
-                tabs_to_press = 1 if (focused_above and attempt_idx == 0) else ((attempt_idx % 3) + 1)
-                for _ in range(tabs_to_press):
-                    self.cdp_press_key("Tab", 9, "Tab")
-                    time.sleep(0.22)
-                self.cdp_press_key(" ", 32, "Space", " ")
-                time.sleep(0.18)
-                box = self.page.run_js("""
-                    const dpr = window.devicePixelRatio || 1;
-                    const chromeTop = window.outerHeight - Math.round(window.innerHeight * dpr);
-                    let topR = null, botR = null;
-                    for (const el of document.querySelectorAll('p, div, span, h1, h2')) {
-                        const r = el.getBoundingClientRect();
-                        if (r.height < 8 || r.height > 280 || r.width < 60) continue;
-                        const t = (el.innerText || '').trim();
-                        if ((t.includes('المربع') || t.includes('زائر حقيقي')) && (!topR || r.height < topR.height)) topR = r;
-                        if (t.includes('لماذا') && (!botR || r.height < botR.height)) botR = r;
                     }
                     let cx = (window.innerWidth || 640) / 2, ty = ((window.innerHeight || 700) / 2) + 25;
                     if (topR && botR) { cx = (topR.left + topR.right) / 2; ty = (topR.bottom + botR.top) / 2; }
                     else if (topR) { cx = (topR.left + topR.right) / 2; ty = topR.bottom + 52; }
-                    const vx = Math.round(cx + 120), vy = Math.round(ty);
-                    return {
-                        hasModal: Boolean(topR || botR),
-                        vx: vx, vy: vy,
-                        sx: Math.round((window.screenX || 0) + (vx * dpr)),
-                        sy: Math.round((window.screenY || 0) + chromeTop + (vy * dpr))
-                    };
+                    return { cx: Math.round(cx), ty: Math.round(ty), hasTarget: Boolean(targetEl) };
                 """)
+                if box and isinstance(box, dict) and not box.get("hasTarget"):
+                    self.cdp_internal_focus_point(box["cx"], max(30, box["ty"] - 65))
+                    time.sleep(0.15)
+                for step in range(3):
+                    self.cdp_press_key("Tab", 9, "Tab")
+                    time.sleep(0.28)
+                    self.cdp_press_key(" ", 32, "Space", " ")
+                    time.sleep(0.28)
                 if box and isinstance(box, dict):
-                    if not box.get("hasModal"):
-                        return "blank_turnstile"
-                    self.cdp_human_click(box["vx"], box["vy"])
-                    if attempt_idx >= 1:
-                        os_single_right_box_click(box["sx"], box["sy"])
-                        time.sleep(0.15)
-                        self.cdp_press_key(" ", 32, "Space", " ")
-                return f"AutoSolve(Tabx{tabs_to_press}+Space+RightBox)"
+                    self.cdp_internal_focus_point(box["cx"] + 120, box["ty"])
+                    time.sleep(0.15)
+                    self.cdp_press_key(" ", 32, "Space", " ")
+                return "Background(Tab+Space)"
         except Exception: pass
-        return "AutoSolve(Tab+Space)"
+        return "Background(Tab+Space)"
 
     def wait_until_turnstile_cleared(self, max_wait_loops=35, expect_ads=False):
         if not self.page: return False
@@ -436,7 +402,7 @@ class SmartHybridEngine:
                     if expect_ads:
                         if dom_now.count("/ad/") >= 8:
                             if was_turnstile:
-                                print("[Security Solver] Turnstile cleared! Stabilizing 3.5s & auto-minimizing Chrome...")
+                                print("[Security Solver] Turnstile cleared via Tab+Space! Stabilizing 3.5s...")
                                 time.sleep(3.5)
                             self.minimize_chrome_safely()
                             return True
@@ -455,13 +421,8 @@ class SmartHybridEngine:
                     continue
                 if is_turnstile_in_html(dom_now) and attempt in (0, 2, 4, 7, 10, 14, 18, 23, 28):
                     status = self.try_auto_solve_turnstile(attempt_idx=(attempt // 2))
-                    if status == "blank_turnstile" and not refreshed_once and attempt >= 2:
-                        print("[Self-Healing] Blank verification screen detected -> Reloading in normal mode...")
-                        refreshed_once = True
-                        self.hard_refresh_anchor()
-                        continue
                     if attempt in (0, 4, 10):
-                        print(f"[Security Solver] Turnstile detected -> Executed {status}...")
+                        print(f"[Security Solver] Turnstile detected -> Executed {status} (Zero Mouse / Minimized)...")
                 time.sleep(2.2)
             self.minimize_chrome_safely()
             return not is_turnstile_in_html(self.get_live_dom())
@@ -484,6 +445,7 @@ class SmartHybridEngine:
                 print(f"[Browser Port 9555 Info] {e}")
                 return False
         try:
+            self.minimize_chrome_safely()
             try: self.page.set.load_mode.normal()
             except Exception: pass
             dom_now = self.get_live_dom()
@@ -495,7 +457,8 @@ class SmartHybridEngine:
                     links_now = extract_dubizzle_links_from_html(test_h, prefilter_cards=False)
                     print(f"[Engine] Existing Live Session Verified & Minimized! ({len(links_now)} ads visible)")
                     return True
-            self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
+            if "dubizzle.com.eg" not in cur_u or "notfound" in cur_u or (not is_turnstile_in_html(dom_now) and dom_now.count("/ad/") < 8):
+                self.hard_refresh_anchor(DUBIZZLE_SOURCES[0]["url"])
             self.wait_until_turnstile_cleared(max_wait_loops=40, expect_ads=True)
             links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
             if len(links_now) == 0:
@@ -503,7 +466,7 @@ class SmartHybridEngine:
                 self.wait_until_turnstile_cleared(max_wait_loops=35, expect_ads=True)
                 links_now = extract_dubizzle_links_from_html(self.get_live_dom(), prefilter_cards=False)
             self.minimize_chrome_safely()
-            print(f"[Engine] Live Session Ready & Chrome Auto-Minimized! ({len(links_now)} ads visible)")
+            print(f"[Engine] Live Session Ready & Chrome Parked in Taskbar! ({len(links_now)} ads visible)")
             return True
         except Exception as e:
             print(f"[Engine Init Info] {e}")
@@ -846,7 +809,7 @@ def run_single_cycle(engine, cycle_num=1):
     if not os.path.exists(RESET_FLAG_FILE):
         safe_write_json(SEEN_FILE, [])
         with open(RESET_FLAG_FILE, "w") as f: f.write("ok")
-        print("[Clean-Retry v8.4] Initialized clean seen links!")
+        print("[Clean-Retry v8.6] Initialized clean seen links!")
     engine.warmup()
     raw_existing = load_json_list(DATA_FILE)
     current_ads, seen_u = [], set()
@@ -884,7 +847,7 @@ def run_single_cycle(engine, cycle_num=1):
         print("\n[Up-to-Date] All current fresh ads have already been inspected! Waiting for newly posted ads...")
         return
 
-    print(f"\n[Inspector v8.4] Launching v8.0-Engine Fast Background Scan for ({total_cand}) non-agency <=24h ads...")
+    print(f"\n[Inspector v8.6] Launching 100% Minimized Scan for ({total_cand}) non-agency <=24h ads...")
     total_added, completed_idx = 0, 0
     for batch_start in range(0, total_cand, 40):
         batch = candidates[batch_start:batch_start + 40]
@@ -921,7 +884,7 @@ def run_single_cycle(engine, cycle_num=1):
     print(f"\n=== Cycle Complete: Added ({total_added}) New Owners | Total Owners in DB: ({len(current_ads)}) | Blacklisted Brokers: ({len(blacklist_dict)}) ===")
 
 def main():
-    print("=== Starting 24/7 Dubizzle Owner Radar v8.4 (v8.0 Normal Load Mode | Fast Fetch | Auto-Minimize) ===")
+    print("=== Starting 24/7 Dubizzle Owner Radar v8.6 (Zero Mouse | Tab+Space Only | Always Minimized) ===")
     engine = SmartHybridEngine()
     cycle_num = 1
     while True:
