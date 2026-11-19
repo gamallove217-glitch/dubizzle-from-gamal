@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-19 16:09",
-  "total": 80,
+  "updated_at": "2026-11-19 16:11",
+  "total": 81,
   "ads": [
     {
       "ad_id": 504133142,
@@ -79,6 +79,32 @@
       "first_seen_ts": 1795095723,
       "timestamp": 1795095723,
       "date": "2026-11-19 15:42"
+    },
+    {
+      "ad_id": 209537190,
+      "id": "dub_209537190",
+      "title": "Townhouse Corner - Ready to Move",
+      "url": "https://www.dubizzle.com.eg/ad/townhouse-corner-ready-to-move-ID209537190.html",
+      "link": "https://www.dubizzle.com.eg/ad/townhouse-corner-ready-to-move-ID209537190.html",
+      "price": "8,850,000 ج.م",
+      "price_num": 8850000,
+      "cat": "فلل",
+      "category": "فلل",
+      "deal": "تمليك",
+      "type": "تمليك",
+      "zone": "القاهرة الجديدة",
+      "location": "القاهرة الجديدة",
+      "source": "دوبيزل",
+      "publisher": "Mark Ramzy",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "area": "160",
+      "rooms": "3",
+      "age": "منذ 28 دقيقة",
+      "description": "",
+      "first_seen_ts": 1795095710,
+      "timestamp": 1795095710,
+      "date": "2026-11-19 15:41"
     },
     {
       "ad_id": 209509469,
