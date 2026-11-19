@@ -122,8 +122,8 @@ def patch_ui_files_on_disk():
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search & Groups Radar v11.8", "version": "11.8",
-        "description": "Strict Hard-Proof Owner Filter + Group/Post Separator", "permissions": ["storage"],
+        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search Radar v12.0", "version": "12.0",
+        "description": "Direct Facebook Recent-Posts Owner Search Engine", "permissions": ["storage"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
         "content_scripts": [{"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}]
@@ -142,31 +142,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     content_js = r"""
 (function() {
-    if (window.__gamalFbRadarV118) return;
-    window.__gamalFbRadarV118 = true;
+    if (window.__gamalFbRadarV120) return;
+    window.__gamalFbRadarV120 = true;
     const RF = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
     const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RF;
     const Q_LIST = [
-        "من المالك التجمع الخامس", "من المالك القاهرة الجديدة", "بدون وسطاء التجمع الخامس", "بدون عمولة التجمع الخامس",
-        "شقة للايجار التجمع الخامس", "شقة للبيع التجمع الخامس", "شقة النرجس التجمع", "شقة اللوتس التجمع",
-        "شقة الياسمين التجمع", "شقة البنفسج التجمع", "شقة الاندلس التجمع", "شقة دار مصر التجمع",
-        "شقة سكن مصر التجمع", "شقة جنة التجمع", "شقة المستثمرين التجمع", "شقة الاكاديمية التجمع",
-        "شقة القرنفل التجمع", "شقة التجمع الثالث", "شقة التجمع الاول", "شقة القطامية"
+        "من المالك التجمع الخامس", "شقة للايجار من المالك التجمع الخامس", "شقة للبيع من المالك التجمع الخامس",
+        "من المالك مباشرة التجمع الخامس", "بدون وسطاء التجمع الخامس", "يمتنع الوسطاء التجمع الخامس",
+        "بدون عمولة التجمع الخامس", "من المالك النرجس التجمع", "من المالك اللوتس التجمع",
+        "من المالك الياسمين التجمع", "من المالك البنفسج التجمع", "من المالك الاندلس التجمع",
+        "من المالك دار مصر التجمع", "من المالك سكن مصر التجمع", "من المالك جنة التجمع",
+        "من المالك المستثمرين التجمع", "من المالك الاكاديمية التجمع", "من المالك القرنفل التجمع",
+        "من المالك التجمع الثالث", "من المالك التجمع الاول", "من المالك القطامية", "من المالك القاهرة الجديدة"
     ];
-    const TARGETS = [{name: "خلاصة كل جروباتك المجمعة", url: "https://www.facebook.com/groups/feed/", maxSec: 70}]
-        .concat(Q_LIST.map(q => ({name: "سيرش الأحدث: " + q, url: sUrl(q), maxSec: 48})))
-        .concat([{name: "الصفحة الرئيسية (الأحدث)", url: "https://www.facebook.com/?sk=h_chr", maxSec: 60}]);
-
+    const TARGETS = Q_LIST.map(q => ({name: "بحث الأحدث: " + q, url: sUrl(q), maxSec: 40}));
     const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن|من المالك|المالك مباشر|مدخل البيت|شارع)/i;
     const GROUP_WORDS_RE = /(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
     const UI_NOISE_RE = /^(انضمام|متابعة|متابعه|مراسلة|أعجبني|تعليق|مشاركة|عرض المزيد|See more|Join|Follow|Like|Comment|Share|\d+\s*تعليق.*|\d+\s*مشاركات.*)$/i;
 
-    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v118") || "[]");
-    let autoRotate = (localStorage.getItem("gamal_fb_autorotate_v118") !== "0");
-    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v118") || "0", 10) % TARGETS.length;
-    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v118") || "0", 10);
-    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v118") || "0", 10);
-    let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, lastLogMsg = "يفحص المنشورات الحديثة أول بأول...";
+    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v120") || "[]");
+    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v120") || "0", 10) % TARGETS.length;
+    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v120") || "0", 10);
+    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v120") || "0", 10);
+    let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, isResting = false;
+    let lastLogMsg = "يبحث في أحدث المنشورات مباشرة...";
     let shadowInfo = null;
     try {
         const host = document.createElement("span"), sh = host.attachShadow({mode: "closed"}), box = document.createElement("div");
@@ -176,16 +175,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function updateStatusUI(statusText) {
         try {
-            sessionStorage.setItem("gamal_fb_sc_v118", String(scannedCount));
-            sessionStorage.setItem("gamal_fb_ac_v118", String(acceptedCount));
+            sessionStorage.setItem("gamal_fb_sc_v120", String(scannedCount));
+            sessionStorage.setItem("gamal_fb_ac_v120", String(acceptedCount));
             document.title = "[فحص:" + scannedCount + " | ملاك:" + acceptedCount + "] " + statusText;
             if (shadowInfo) {
-                const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "الصفحة الحالية";
-                const rotText = autoRotate ? "السيرش التلقائي (22 مسار للملاك): مفعل (اضغط للإيقاف)" : "السيرش التلقائي: متوقف - يقلب هنا فقط (اضغط للتفعيل)";
-                const rotColor = autoRotate ? "#4ade80" : "#facc15";
-                shadowInfo.innerHTML = "<div><b>رادار فيسبوك الصارم v11.8</b> | " + statusText + "</div><div style='color:#38bdf8;'>المسار (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون فقط: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div><div style='margin-top:4px;'><span id='g_toggle_rot' style='color:" + rotColor + ";cursor:pointer;text-decoration:underline;font-weight:bold;'>" + rotText + "</span></div>";
-                const btn = shadowInfo.querySelector("#g_toggle_rot");
-                if (btn) btn.onclick = () => { autoRotate = !autoRotate; localStorage.setItem("gamal_fb_autorotate_v118", autoRotate ? "1" : "0"); updateStatusUI(autoRotate ? "تم تفعيل السيرش الشامل" : "وضع الصفحة الثابتة"); };
+                const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "بحث الأحدث";
+                shadowInfo.innerHTML = "<div><b>رادار بحث الملاك المباشر v12.0</b> | " + statusText + "</div><div style='color:#38bdf8;'>البحث الحالي (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div>";
             }
         } catch(e) {}
     }
@@ -194,7 +189,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!sentHashes.includes(h)) {
             sentHashes.push(h);
             if (sentHashes.length > 3500) sentHashes = sentHashes.slice(-3500);
-            localStorage.setItem("gamal_fb_sent_v118", JSON.stringify(sentHashes));
+            localStorage.setItem("gamal_fb_sent_v120", JSON.stringify(sentHashes));
         }
     }
 
@@ -235,7 +230,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 const bt = (b.innerText || "").trim();
                 if ((bt === "عرض المزيد" || bt === "See more" || bt === "… عرض المزيد") && !b.closest("ul") && !b.closest("form")) {
                     card._gExpanded = true;
-                    try { b.click(); await new Promise(r => setTimeout(r, 260)); } catch(e) {}
+                    try { b.click(); await new Promise(r => setTimeout(r, 250)); } catch(e) {}
                     break;
                 }
             }
@@ -326,33 +321,48 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             if (resp && resp.is_old) oldPostsHit++;
             if (resp && resp.accepted) { acceptedCount++; lastLogMsg = "مقبول مالك: " + preview; }
             else { lastLogMsg = "مرفوض (" + ((resp && resp.reason) || "فلتر") + "): " + preview; }
-            updateStatusUI("يفحص أول بأول");
+            updateStatusUI("يبحث في الأحدث");
         }
     }
 
     function advanceToNextTarget(reasonMsg) {
         const nextIdx = (targetIdx + 1) % TARGETS.length;
-        localStorage.setItem("gamal_fb_tidx_v118", String(nextIdx));
-        const waitNextMs = Math.floor(9000 + Math.random() * 5000);
-        updateStatusUI(reasonMsg + " -> انتقال بعد " + Math.round(waitNextMs / 1000) + "ث");
+        localStorage.setItem("gamal_fb_tidx_v120", String(nextIdx));
+        if (nextIdx === 0) {
+            isResting = true;
+            let restSec = 240;
+            const iv = setInterval(() => {
+                restSec -= 5;
+                updateStatusUI("استراحة أمان بعد مسح كل المناطق (" + Math.max(0, restSec) + "ث)");
+                if (restSec <= 0) { clearInterval(iv); location.href = TARGETS[0].url; }
+            }, 5000);
+            return;
+        }
+        const waitNextMs = Math.floor(8500 + Math.random() * 4500);
+        updateStatusUI(reasonMsg + " -> المنطقة التالية بعد " + Math.round(waitNextMs / 1000) + "ث");
         setTimeout(() => { location.href = TARGETS[nextIdx].url; }, waitNextMs);
     }
 
     async function mainLoop() {
+        if (isResting) return;
+        if (!location.pathname.startsWith("/search/posts")) {
+            updateStatusUI("ينتقل فوراً لخانة بحث أحدث المنشورات...");
+            location.href = TARGETS[targetIdx].url;
+            return;
+        }
         await scanVisibleArticles();
         const elapsedSec = (Date.now() - pageStartTs) / 1000;
-        const curTarget = TARGETS[targetIdx] || {maxSec: 50};
-        if (autoRotate) {
-            if (oldPostsHit >= 3 && elapsedSec > 14) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
-            if (consecutiveSeen >= 9 && elapsedSec > 16) { advanceToNextTarget("تم مسح كل الجديد في هذا المسار"); return; }
-            if (elapsedSec >= curTarget.maxSec) { advanceToNextTarget("اكتمل فحص المسار"); return; }
-        }
-        window.scrollBy({top: Math.floor(520 + Math.random() * 250), behavior: "smooth"});
-        updateStatusUI("يقلب بسرعة (" + Math.round(elapsedSec) + "ث)");
-        setTimeout(mainLoop, Math.floor(2500 + Math.random() * 1300));
+        const curTarget = TARGETS[targetIdx] || {maxSec: 40};
+        if (oldPostsHit >= 3 && elapsedSec > 10) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
+        if (consecutiveSeen >= 8 && elapsedSec > 12) { advanceToNextTarget("تم مسح كل الجديد هنا"); return; }
+        if (elapsedSec >= curTarget.maxSec) { advanceToNextTarget("اكتمل فحص المنطقة"); return; }
+
+        window.scrollBy({top: Math.floor(540 + Math.random() * 240), behavior: "smooth"});
+        updateStatusUI("يفحص نتائج البحث (" + Math.round(elapsedSec) + "ث)");
+        setTimeout(mainLoop, Math.floor(2400 + Math.random() * 1100));
     }
-    updateStatusUI("بدأ الفحص الصارم...");
-    setTimeout(mainLoop, 2000);
+    updateStatusUI("بدأ رادار البحث المباشر...");
+    setTimeout(mainLoop, 1200);
 })();
 """.strip()
 
@@ -590,7 +600,7 @@ def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Strict Owner Receiver v11.8] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Direct Search Receiver v12.0] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -1027,7 +1037,7 @@ def run_extra_radar():
 
     save_persistent_seen_ids(extra_checked)
     all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
-    print(f"\n[AqarMap + Facebook Radar v11.8] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    print(f"\n[AqarMap + Facebook Radar v12.0] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added, total_c = 0, len(all_candidates)
     for idx, item in enumerate(all_candidates, 1):
@@ -1080,7 +1090,7 @@ def main():
         return
     start_fb_local_server()
     guard_extra_ads_during_sleep(force_push=True)
-    print("=== Starting 24/7 AqarMap + Facebook Strict Owner Radar v11.8 ===")
+    print("=== Starting 24/7 AqarMap + Facebook Direct Search Owner Radar v12.0 ===")
     print(f"[FB Extension Folder Ready] -> {FB_EXT_DIR}")
     cycle = 1
     while True:
