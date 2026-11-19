@@ -25,11 +25,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 EXTRA_SEEN_FILE = os.path.join(BASE_DIR, "seen_extra_local.json")
 AQ_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "aqarmap_live_ads.json")
-CLEAN_V100_FLAG = os.path.join(BASE_DIR, "clean_aq_v100.flag")
+EXTRA_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "extra_live_ads.json")
+CLEAN_OS_V101_FLAG = os.path.join(BASE_DIR, "clean_os_v101.flag")
 TG_CONFIG_TOPIC = "gamal_vip_tg_9941_sec"
 WARP_PROXY = "socks5h://127.0.0.1:40000"
 MIN_CASH_SALE_PRICE = 1200000
 MAX_AGE_DAYS = 2
+MAX_OWNER_ADS_OS = 5
+MAX_OWNER_ADS_AQ = 7
 AUTO_LOOP_MINUTES = 45
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
 BIDI_REGEX = re.compile(r'[\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]')
@@ -67,7 +70,7 @@ EXCLUDED_CITIES = [
     "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب",
     "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
     "التجمع السادس", "sixth settlement", "كابيتال جاردنز", "capital gardens", "سراي", "sarai", "البروج", "alburouj",
-    "طلالة", "talala", "دي جويا", "dejoya", "محور الأمل",
+    "طلالة", "talala", "دي جويا", "dejoya", "محور الأمل", "تاج سيتي", "تاج سيتى", "taj city", "تاج سلطان",
     "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي",
     "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس",
     "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك",
@@ -78,7 +81,7 @@ EXCLUDED_CITIES = [
 
 INSTALLMENT_SUBSTRINGS = [
     "قسط", "تقسيط", "بالتقسيط", "لتقسيط", "اقساط", "أقساط", "باقساط", "بأقساط", "تكملة أقساط", "تكمله اقساط",
-    "مقدم", "بمقدم", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "أنظمة سداد", "انظمه سداد",
+    "مقدم", "بمقدم", "بقدم ", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "أنظمة سداد", "انظمه سداد",
     "بدون فوائد", "متبقي", "المتبقي", "والباقي", "أوفر", "اوفر", "امكانية التقسيط", "متاح تقسيط", "ويوجد تقسيط",
     "سنة التسليم 2027", "سنة التسليم 2028", "سنة التسليم 2029", "سنة التسليم 2030", "قيد الإنشاء", "قيد الانشاء",
     "down payment", "downpayment", "installment", "installments", "payment plan"
@@ -97,7 +100,7 @@ BROKER_NAME_WORDS = [
     "capital", "consult", "consultant", "consulting", "company", "egypt", "marketing", "lounge", "scouts", "hub",
     "prime", "elite", "empire", "avenue", "landmark", "residence", "towers", "tower", "vertex", "redefine",
     "irtkaz", "ebtkar", "imkan", "falcon", "views", "aura", "inspiration", "insider", "meer", "deal", "ghp",
-    "kayan", "watad", "for you", "4u", "realtors",
+    "kayan", "watad", "for you", "4u", "realtors", "trusted home", "vib",
     "شركة", "شركه", "مكتب", "تسويق", "للتسويق", "ماركتنج", "عقارات", "للعقارات", "سمسار", "وسيط",
     "استشاري", "مستشار", "للاستشارات", "تطوير", "للتطوير", "استثمار", "للاستثمار", "جروب", "هومز", "هاوس",
     "كابيتال", "بروكر", "ريال استيت", "استيت", "فيرتكس", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار",
@@ -109,35 +112,36 @@ BROKER_TEXT_PHRASES = [
     "انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى",
     "سمسار", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "عمولة شهر", "عموله شهر", "عمولة نصف شهر",
     "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "نسبة العمولة",
-    "عمولة 1.5%", "عمولة 2%", "عموله 1.5%", "عموله 2%", "يوجد عمولة", "يوجد عموله",
+    "عمولة 1.5%", "عمولة 2%", "عموله 1.5%", "عموله 2%", "يوجد عمولة", "يوجد عموله", "بعموله", "بعمولة",
     "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق",
     "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري",
     "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء",
-    "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا",
+    "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك", "فرصة استثمارية",
+    "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل", "وحدات تجارية", "وحدات إدارية",
     "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي",
-    "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من",
+    "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات",
     "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات",
     "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "الشركة العالمية للعقارات"
 ]
 
 AQARMAP_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "شقق", "deal": "إيجار", "en": "Furnished Apts (Rent)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-rent/furnished-apartment/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Administrative (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/administrative/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Medical (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/medical/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "أراضي", "deal": "إيجار", "en": "Buildings (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/building/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "أراضي", "deal": "إيجار", "en": "Lands (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/land/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Cash Sale)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?payment_method=1&sort=publishedAt"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (All Sale)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Cash Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?payment_method=1&sort=publishedAt"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (All Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Administrative (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/administrative/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Medical (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/medical/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?sort=publishedAt"},
-    {"cat": "أراضي", "deal": "تمليك", "en": "Buildings (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/building/cairo/new-cairo/?sort=publishedAt"},
+    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "شقق", "deal": "إيجار", "en": "Furnished Apts (Rent)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-rent/furnished-apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Administrative (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "إيجار", "en": "Medical (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "أراضي", "deal": "إيجار", "en": "Buildings (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/building/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "أراضي", "deal": "إيجار", "en": "Lands (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/land/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Cash Sale)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"},
+    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (All Sale)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Cash Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"},
+    {"cat": "فلل", "deal": "تمليك", "en": "Villas (All Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Administrative (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "تجاري", "deal": "تمليك", "en": "Medical (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+    {"cat": "أراضي", "deal": "تمليك", "en": "Buildings (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/building/cairo/new-cairo/?sort=publishedAt&direction=desc"},
 ]
 
 def strip_bidi(text):
@@ -174,30 +178,37 @@ def fetch_remote_ads_list():
             d = json.loads(res.stdout)
             if isinstance(d, dict) and isinstance(d.get("ads"), list):
                 return d["ads"]
-    except Exception:
-        pass
+    except Exception: pass
     return []
 
-def load_aqarmap_live_backup():
-    if os.path.exists(AQ_LIVE_BACKUP_FILE):
-        try:
-            with open(AQ_LIVE_BACKUP_FILE, "r", encoding="utf-8") as f:
-                arr = json.load(f)
-                if isinstance(arr, list):
-                    return [a for a in arr if is_valid_existing_extra_ad(a)]
-        except Exception:
-            pass
-    return []
-
-def save_aqarmap_live_backup(aq_ads_list):
-    try:
-        if os.path.exists(AQ_LIVE_BACKUP_FILE):
-            try: os.chmod(AQ_LIVE_BACKUP_FILE, stat.S_IWRITE)
+def load_extra_live_backup():
+    combined = []
+    for fpath in [EXTRA_LIVE_BACKUP_FILE, AQ_LIVE_BACKUP_FILE]:
+        if os.path.exists(fpath):
+            try:
+                with open(fpath, "r", encoding="utf-8") as f:
+                    arr = json.load(f)
+                    if isinstance(arr, list):
+                        for a in arr:
+                            if is_valid_existing_extra_ad(a):
+                                combined.append(a)
             except Exception: pass
-        with open(AQ_LIVE_BACKUP_FILE, "w", encoding="utf-8") as f:
-            json.dump(aq_ads_list[:150], f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    dedup, seen_u = [], set()
+    for a in combined:
+        u = a.get("url") or a.get("link") or str(a.get("ad_id"))
+        if u and u not in seen_u:
+            seen_u.add(u)
+            dedup.append(a)
+    return dedup
+
+def save_extra_live_backup(extra_ads_list):
+    try:
+        if os.path.exists(EXTRA_LIVE_BACKUP_FILE):
+            try: os.chmod(EXTRA_LIVE_BACKUP_FILE, stat.S_IWRITE)
+            except Exception: pass
+        with open(EXTRA_LIVE_BACKUP_FILE, "w", encoding="utf-8") as f:
+            json.dump(extra_ads_list[:200], f, ensure_ascii=False, indent=2)
+    except Exception: pass
 
 def atomic_write_and_git_push(data_payload, commit_msg):
     fix_git_identity_for_vercel()
@@ -217,20 +228,11 @@ def atomic_write_and_git_push(data_payload, commit_msg):
             if p_res.returncode == 0:
                 return True, "OK"
         except Exception as e:
-            if attempt == 3:
-                return False, str(e)
+            if attempt == 3: return False, str(e)
             time.sleep(3)
-    return False, "Push failed after 3 attempts"
+    return False, "Push failed"
 
 def load_persistent_seen_ids():
-    if not os.path.exists(CLEAN_V100_FLAG):
-        try:
-            with open(CLEAN_V100_FLAG, "w") as f: f.write("ok")
-        except Exception: pass
-        save_persistent_seen_ids(set())
-        save_aqarmap_live_backup([])
-        print("[AqarMap Full-Power Reset v10.0] Cleared old cache & broken links to scan all 17 AqarMap sources fresh!")
-        return set()
     seen_set = set()
     if os.path.exists(EXTRA_SEEN_FILE):
         try:
@@ -241,6 +243,13 @@ def load_persistent_seen_ids():
                         try: seen_set.add(int(x))
                         except Exception: pass
         except Exception: pass
+    if not os.path.exists(CLEAN_OS_V101_FLAG):
+        seen_set = {x for x in seen_set if not str(x).startswith("92")}
+        try:
+            with open(CLEAN_OS_V101_FLAG, "w") as f: f.write("ok")
+        except Exception: pass
+        save_persistent_seen_ids(seen_set)
+        print("[OpenSooq Full-Power v10.1] Kept AqarMap memory & cleared OpenSooq cache for fresh <=2d scan!")
     return seen_set
 
 def save_persistent_seen_ids(seen_set):
@@ -249,15 +258,13 @@ def save_persistent_seen_ids(seen_set):
             try: os.chmod(EXTRA_SEEN_FILE, stat.S_IWRITE)
             except Exception: pass
         with open(EXTRA_SEEN_FILE, "w", encoding="utf-8") as f:
-            json.dump(list(seen_set)[-18000:], f)
+            json.dump(list(seen_set)[-20000:], f)
     except Exception: pass
 
 def is_warp_up():
     try:
-        with socket.create_connection(("127.0.0.1", 40000), timeout=0.8):
-            return True
-    except Exception:
-        return False
+        with socket.create_connection(("127.0.0.1", 40000), timeout=0.8): return True
+    except Exception: return False
 
 class SmartFetcher:
     def __init__(self):
@@ -269,106 +276,141 @@ class SmartFetcher:
             "Upgrade-Insecure-Requests": "1"
         }
         self.warp_sess = cffi_requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY}) if self.warp_active else None
-        if self.warp_sess:
-            self.warp_sess.headers.update(base_headers)
+        if self.warp_sess: self.warp_sess.headers.update(base_headers)
         self.direct_sess = cffi_requests.Session(impersonate="chrome120")
         self.direct_sess.headers.update(base_headers)
 
     def _is_valid_html(self, html, req_regex=None):
-        if not html or len(html) < 1500:
-            return False
-        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html:
-            return False
-        if req_regex and not re.search(req_regex, html):
-            return False
+        if not html or len(html) < 1500: return False
+        if "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html: return False
+        if req_regex and not re.search(req_regex, html): return False
         return True
 
-    def get_html(self, raw_url, req_regex=None, require_listing_url=False):
+    def get_html(self, raw_url, req_regex=None, require_path_sub=None):
         url = urllib.parse.quote(urllib.parse.unquote(raw_url), safe=":/?&=#%")
         statuses = []
         if self.warp_active and self.warp_sess:
             try:
                 r = self.warp_sess.get(url, timeout=18, allow_redirects=True)
                 final_u = str(r.url or url)
-                if require_listing_url and "/ar/listing/" not in final_u:
+                if require_path_sub and require_path_sub not in final_u:
                     return "", "Redirected_To_Search", final_u
                 if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                     return r.text, "200 (WARP)", final_u
                 statuses.append(f"WARP:{r.status_code}")
-            except Exception:
-                statuses.append("WARP:ERR")
+            except Exception: statuses.append("WARP:ERR")
 
         try:
             r = self.direct_sess.get(url, timeout=18, allow_redirects=True)
             final_u = str(r.url or url)
-            if require_listing_url and "/ar/listing/" not in final_u:
+            if require_path_sub and require_path_sub not in final_u:
                 return "", "Redirected_To_Search", final_u
             if r.status_code == 200 and self._is_valid_html(r.text, req_regex):
                 return r.text, "200 (Direct)", final_u
             statuses.append(f"Direct:{r.status_code}")
-        except Exception:
-            statuses.append("Direct:ERR")
+        except Exception: statuses.append("Direct:ERR")
 
         return "", " | ".join(statuses), url
 
+    def _classify_opensooq_link(self, h, seen_urls, seen_buckets):
+        dec = urllib.parse.unquote(h).split("?")[0].strip()
+        if "/ar/search/" in dec or "/ar/mid/" in dec or "/ar/find" in dec: return None
+        if not any(loc in dec for loc in ("التجمع-الخامس", "القاهرة-الجديدة", "التجمع-الأول", "التجمع-الاول")): return None
+        if not any(k in dec for k in ("شقق", "فلل", "عقارات", "تجاري", "أراضي", "اراضي", "سكني", "محلات", "مكاتب", "عمارات")): return None
+        if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة", "غرف-وسكن", "فندقية", "فندقي", "بالتقسيط", "يومي", "أجنبية")): return None
+        full_u = h.split("?")[0] if h.startswith("http") else "https://eg.opensooq.com" + dec
+        if full_u in seen_urls: return None
+        is_rent = ("ايجار" in dec or "إيجار" in dec)
+        deal, deal_en = ("إيجار", "Rent") if is_rent else ("تمليك", "Sale")
+        if "فلل" in dec or "قصور" in dec or "بيوت" in dec: cat, cat_en = "فلل", "Villas"
+        elif any(c in dec for c in ("تجار", "مكاتب", "محلات", "مخازن", "عيادات", "معارض", "مطاعم")): cat, cat_en = "تجاري", "Commercial"
+        elif "أراض" in dec or "اراض" in dec or "عمارات" in dec or "عمارة" in dec: cat, cat_en = "أراضي", "Lands-Buildings"
+        elif "شقق" in dec: cat, cat_en = "شقق", "Apartments"
+        elif "سكني" in dec: cat, cat_en = "شقق", "Residential-All"
+        else: cat, cat_en = "شقق", "RealEstate-All"
+        loc_en = "5th Settlement" if "التجمع-الخامس" in dec else ("1st Settlement" if "التجمع" in dec else "New Cairo")
+        bucket_key = f"{deal_en}_{cat_en}_{loc_en}"
+        if bucket_key in seen_buckets: return None
+        seen_urls.add(full_u)
+        seen_buckets.add(bucket_key)
+        return {"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_u}
+
+    def discover_opensooq_sources(self):
+        sources, seen_urls, seen_buckets = [], set(), set()
+        html, st, _ = self.get_html("https://eg.opensooq.com/ar")
+        print(f"[OpenSooq Auto-Discovery] https://eg.opensooq.com/ar -> {st}")
+        if html:
+            for h in set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', html)):
+                item = self._classify_opensooq_link(h, seen_urls, seen_buckets)
+                if item: sources.append(item)
+
+        seed_urls = []
+        for d_type in ["تمليك", "إيجار"]:
+            for l_type in ["5th Settlement", "New Cairo"]:
+                matches = [s["url"] for s in sources if s["deal"] == d_type and l_type in s["en"]]
+                if matches: seed_urls.append(matches[0])
+        for s in sources[:6]:
+            if len(seed_urls) < 5 and s["url"] not in seed_urls:
+                seed_urls.append(s["url"])
+
+        for exp_u in seed_urls[:5]:
+            sub_html, _, _ = self.get_html(exp_u)
+            if not sub_html: continue
+            for h in set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', sub_html)):
+                item = self._classify_opensooq_link(h, seen_urls, seen_buckets)
+                if item: sources.append(item)
+
+        sale_final = [s for s in sources if s["deal"] != "إيجار"]
+        rent_final = [s for s in sources if s["deal"] == "إيجار"]
+        return (sale_final[:8] + rent_final[:8])
+
 def is_company_name(name):
     norm = normalize_ar(name)
-    if not norm or norm.startswith(normalize_ar("مالك مباشر")):
-        return False
+    if not norm or norm.startswith(normalize_ar("مالك مباشر")): return False
     for bw in BROKER_NAME_WORDS:
         nk = normalize_ar(bw)
         if len(nk) <= 3:
-            if re.search(rf'\b{re.escape(nk)}\b', norm):
-                return True
-        elif nk in norm:
-            return True
+            if re.search(rf'\b{re.escape(nk)}\b', norm): return True
+        elif nk in norm: return True
     return False
 
 def clean_publisher_name(name):
     default_lbl = "مالك مباشر"
-    if not name:
-        return default_lbl
+    if not name: return default_lbl
     s = strip_bidi(re.sub(r'<[^>]+>', ' ', str(name)))
-    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عرض\s*جميع\s*الإعلانات.*|عرض\s*جميع\s*الاعلانات.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|شارك|إبلاغ|تابِع|تابع|التقييم.*)', ' ', s, flags=re.I)
+    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عرض\s*جميع\s*الإعلانات.*|عرض\s*جميع\s*الاعلانات.*|عضو\s*في\s*السوق.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|شارك|إبلاغ|بلغ\s*عن.*|عرض\s*على\s*الخريطة|اسأل\s*عن\s*الموقع|تابِع|تابع|الردّ?\s*على.*|التقييم.*|مستخدم\s*موثق|نشاط\s*تجاري\s*موثق)', ' ', s, flags=re.I)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,><.★⭐•·+")
     norm_s = normalize_ar(s)
     if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه", "القاهره", "التجمع", "الجيزه")):
         return default_lbl
-    if not s or len(s) < 2 or len(s) > 38 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s):
-        return default_lbl
+    if not s or len(s) < 2 or len(s) > 38 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s): return default_lbl
     return s
 
 def detect_zone(title, body_text):
     raw_core = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {body_text[:2000]}")
     core = normalize_ar(raw_core)
     for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in core:
-            return None
+        if normalize_ar(city) in core: return None
     for z_name, keywords in ZONES:
         for kw in keywords:
-            if normalize_ar(kw) in core:
-                return z_name
+            if normalize_ar(kw) in core: return z_name
     return "القاهرة الجديدة"
 
 def is_strict_cash_sale(title, desc_text, price_num):
-    if int(price_num or 0) < MIN_CASH_SALE_PRICE:
-        return False
+    if int(price_num or 0) < MIN_CASH_SALE_PRICE: return False
     raw_combined = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {desc_text[:3000]}")
     full_text = normalize_ar(raw_combined)
     for neg in SAFE_CASH_NEGATIONS:
         full_text = full_text.replace(normalize_ar(neg), " ")
     for kw in INSTALLMENT_SUBSTRINGS:
-        if normalize_ar(kw) in full_text:
-            return False
-    if re.search(r'\b\d+\s*%\s*(?:مقدم|تعاقد|دفعه|down)', full_text):
-        return False
+        if normalize_ar(kw) in full_text: return False
+    if re.search(r'\b\d+\s*%\s*(?:مقدم|تعاقد|دفعه|down)', full_text): return False
     return True
 
 def has_broker_copywriting(title, desc_text):
     norm_body = normalize_ar(f"{title} {desc_text[:3500]}")
     for bp in BROKER_TEXT_PHRASES:
-        if normalize_ar(bp) in norm_body:
-            return True, f"Broker Phrase ({bp})"
+        if normalize_ar(bp) in norm_body: return True, f"Broker Phrase ({bp})"
     if re.search(r'\b(?:code|كود)\s*[:\-]?\s*[a-z0-9]{2,10}\b', norm_body, re.I) or re.search(r'\bmsr\d{2,5}\b', norm_body, re.I):
         return True, "Broker Inventory Code"
     return False, ""
@@ -378,9 +420,7 @@ def parse_aqarmap_strict_2days_date(text_block):
     now_ts = int(now_dt.timestamp())
     clean_t = strip_bidi(text_block)
     for m_ar_cal in re.finditer(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)\s+(202\d)\b', clean_t[:3000]):
-        d_val = int(m_ar_cal.group(1))
-        m_name = m_ar_cal.group(2)
-        y_val = int(m_ar_cal.group(3))
+        d_val, m_name, y_val = int(m_ar_cal.group(1)), m_ar_cal.group(2), int(m_ar_cal.group(3))
         m_val = ARABIC_MONTHS.get(m_name, 0)
         if m_val > 0:
             try:
@@ -388,123 +428,206 @@ def parse_aqarmap_strict_2days_date(text_block):
                 d_diff = (now_dt.date() - ad_d).days
                 if d_diff < 0 or d_diff > MAX_AGE_DAYS:
                     return False, f"Old AqarMap Ad ({d_val} {m_name} {y_val} > {MAX_AGE_DAYS}d)", 0, 0
-                if d_diff == 0:
-                    return True, f"اليوم ({d_val} {m_name})", 3, now_ts - 3600
-                elif d_diff == 1:
-                    return True, f"منذ يوم ({d_val} {m_name})", 3, now_ts - 72000
-                else:
-                    return True, f"منذ يومين ({d_val} {m_name})", 2, now_ts - 150000
-            except Exception:
-                return False, "Invalid AqarMap Date", 0, 0
+                if d_diff == 0: return True, f"اليوم ({d_val} {m_name})", 3, now_ts - 3600
+                elif d_diff == 1: return True, f"منذ يوم ({d_val} {m_name})", 3, now_ts - 72000
+                else: return True, f"منذ يومين ({d_val} {m_name})", 2, now_ts - 150000
+            except Exception: return False, "Invalid AqarMap Date", 0, 0
     return False, "Unverified AqarMap Date", 0, 0
+
+def parse_opensooq_strict_2days_date(raw_html_before_similar, text_block, card_age_label="", card_ts=0):
+    now_dt = datetime.now(CAIRO_TZ)
+    now_ts = int(now_dt.timestamp())
+    clean_t = strip_bidi(text_block)
+    norm_t = normalize_ar(clean_t)
+
+    for m_pub_d in re.finditer(r'تاريخ\s*النشر\s*[:\-]?\s*(\d{2})-(\d{2})-(202\d)', strip_bidi(raw_html_before_similar)):
+        d_val, m_val, y_val = int(m_pub_d.group(1)), int(m_pub_d.group(2)), int(m_pub_d.group(3))
+        if 1 <= m_val <= 12 and 1 <= d_val <= 31:
+            try:
+                ad_d = date(y_val, m_val, d_val)
+                d_diff = (now_dt.date() - ad_d).days
+                if d_diff < 0 or d_diff > MAX_AGE_DAYS:
+                    return False, f"Old OpenSooq Ad ({d_val:02d}-{m_val:02d}-{y_val} > {MAX_AGE_DAYS}d)", 0, 0
+                if d_diff == 0: return True, f"اليوم ({d_val:02d}-{m_val:02d})", 3, now_ts - 3600
+                elif d_diff == 1: return True, f"منذ يوم ({d_val:02d}-{m_val:02d})", 3, now_ts - 72000
+                else: return True, f"منذ يومين ({d_val:02d}-{m_val:02d})", 2, now_ts - 150000
+            except Exception: return False, "Invalid OpenSooq Date", 0, 0
+
+    if re.search(r'(?:منذ|قبل)\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات)', norm_t):
+        return False, "Old OpenSooq Ad (>1w)", 0, 0
+    m_days_old = re.search(r'(?:منذ|قبل)\s*([3-9]|\d{2,})\s*(?:يوم|ايام)', norm_t)
+    if m_days_old: return False, f"Old OpenSooq Ad ({m_days_old.group(1)}d > {MAX_AGE_DAYS}d)", 0, 0
+
+    m_min = re.search(r'(?:منذ|قبل)\s*(\d{1,3})\s*(?:دقيقه|دقائق|دقايق)', norm_t)
+    if m_min:
+        mins = max(1, int(m_min.group(1)))
+        return True, f"منذ {mins} دقيقة", 3, now_ts - (mins * 60)
+    if re.search(r'(?:منذ|قبل)\s*(?:دقيقه|دقيقتين)\b|تاريخ\s*النشر\s*[:\-]?\s*الان\b', norm_t):
+        return True, "منذ 5 دقائق", 3, now_ts - 300
+
+    m_hr = re.search(r'(?:منذ|قبل)\s*(\d{1,2})\s*(?:ساعه|ساعات)', norm_t)
+    if m_hr:
+        hrs = int(m_hr.group(1))
+        if hrs > (MAX_AGE_DAYS * 24): return False, f"Old OpenSooq Ad ({hrs}h > {MAX_AGE_DAYS}d)", 0, 0
+        return True, f"منذ {hrs} ساعة", 3, now_ts - (hrs * 3600)
+    if re.search(r'(?:منذ|قبل)\s*(?:ساعتين|ساعتان)\b', norm_t): return True, "منذ 2 ساعة", 3, now_ts - 7200
+    if re.search(r'(?:منذ|قبل)\s*ساعه\b', norm_t): return True, "منذ 1 ساعة", 3, now_ts - 3600
+    if re.search(r'تاريخ\s*النشر\s*[:\-]?\s*(?:امس|قبل\s*يوم|منذ\s*يوم)\b', norm_t): return True, "منذ يوم", 3, now_ts - 72000
+    if re.search(r'(?:منذ|قبل)\s*(?:يومين|2\s*يوم|2\s*ايام)\b', norm_t): return True, "منذ يومين", 2, now_ts - 150000
+    if card_age_label and card_ts > 0:
+        return True, card_age_label, (2 if "يومين" in card_age_label else 3), card_ts
+    return False, f"Unverified OpenSooq Date (>{MAX_AGE_DAYS}d)", 0, 0
+
+def parse_opensooq_card_date_badge(card_txt):
+    now_dt = datetime.now(CAIRO_TZ)
+    now_ts = int(now_dt.timestamp())
+    clean_c = strip_bidi(card_txt)
+    norm_c = normalize_ar(clean_c)
+
+    for m_cd in re.finditer(r'\b(\d{2})-(\d{2})-(202\d)\b', clean_c):
+        d_val, m_val, y_val = int(m_cd.group(1)), int(m_cd.group(2)), int(m_cd.group(3))
+        if 1 <= m_val <= 12 and 1 <= d_val <= 31:
+            try:
+                ad_d = date(y_val, m_val, d_val)
+                d_diff = (now_dt.date() - ad_d).days
+                if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old Card Date ({d_val:02d}-{m_val:02d}-{y_val})", 0
+                if d_diff == 0: return True, f"اليوم ({d_val:02d}-{m_val:02d})", now_ts - 3600
+                elif d_diff == 1: return True, f"منذ يوم ({d_val:02d}-{m_val:02d})", now_ts - 72000
+                else: return True, f"منذ يومين ({d_val:02d}-{m_val:02d})", now_ts - 150000
+            except Exception: return False, "Invalid Card Date", 0
+
+    m_min = re.search(r'قبل\s*(\d{1,3})\s*(?:دقيقه|دقائق|دقايق)', norm_c)
+    if m_min:
+        mins = max(1, int(m_min.group(1)))
+        return True, f"منذ {mins} دقيقة", now_ts - (mins * 60)
+    if re.search(r'قبل\s*(?:دقيقه|دقيقتين)\b|\bالان\b', norm_c[:80]): return True, "منذ 5 دقائق", now_ts - 300
+    m_hr = re.search(r'قبل\s*(\d{1,2})\s*(?:ساعه|ساعات)', norm_c)
+    if m_hr:
+        hrs = int(m_hr.group(1))
+        if hrs <= (MAX_AGE_DAYS * 24): return True, f"منذ {hrs} ساعة", now_ts - (hrs * 3600)
+        return False, f"Old Card Hours ({hrs}h)", 0
+    if re.search(r'قبل\s*(?:ساعتين|ساعتان)\b', norm_c): return True, "منذ 2 ساعة", now_ts - 7200
+    if re.search(r'قبل\s*ساعه\b', norm_c): return True, "منذ 1 ساعة", now_ts - 3600
+    if re.search(r'\b(?:امس|قبل\s*يوم)\b', norm_c[:120]): return True, "منذ يوم", now_ts - 72000
+    if re.search(r'قبل\s*(?:يومين|2\s*يوم)\b', norm_c[:120]): return True, "منذ يومين", now_ts - 150000
+    return None, "", 0
+
+def extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids):
+    out = []
+    if not html: return out
+    cut_similar = html.find("إعلانات مقترحة")
+    search_html = html[:cut_similar] if cut_similar > 2000 else html
+    soup = BeautifulSoup(search_html, "html.parser")
+    cards_by_id = {}
+
+    for a in soup.find_all("a", href=re.compile(r'/ar/search/\d{7,12}')):
+        m = re.search(r'/ar/search/(\d{7,12})', str(a.get("href", "")))
+        if not m: continue
+        num_str = m.group(1)
+        card = a
+        for _ in range(4):
+            p = card.parent
+            if not p: break
+            if len(set(re.findall(r'/ar/search/(\d{7,12})', str(p)))) > 1: break
+            card = p
+        c_txt = strip_bidi(card.get_text(" ", strip=True))
+        if num_str not in cards_by_id or len(c_txt) > len(cards_by_id[num_str]):
+            cards_by_id[num_str] = c_txt[:650]
+
+    for num_str, card_txt in cards_by_id.items():
+        uid = int("92" + num_str)
+        if uid in seen_ids or uid in extra_checked or uid in banned_ids: continue
+        norm_c = normalize_ar(card_txt)
+        if "نشاط تجاري موثق" in norm_c or "شقق واجنحه فندقيه" in norm_c or "للايجار اليومي" in norm_c:
+            extra_checked.add(uid)
+            continue
+        if any(normalize_ar(city) in norm_c for city in EXCLUDED_CITIES):
+            extra_checked.add(uid)
+            continue
+        if src["deal"] != "إيجار" and any(normalize_ar(k) in norm_c for k in INSTALLMENT_SUBSTRINGS):
+            extra_checked.add(uid)
+            continue
+        is_f, c_age, c_ts = parse_opensooq_card_date_badge(card_txt)
+        if is_f is False:
+            extra_checked.add(uid)
+            continue
+        seen_ids.add(uid)
+        out.append({
+            "ad_id": uid, "num_str": num_str, "source": "السوق المفتوح", "en_src": "OpenSooq",
+            "url": f"https://eg.opensooq.com/ar/search/{num_str}", "cat": src["cat"], "deal": src["deal"],
+            "hint_age": (c_age if is_f else ""), "hint_ts": (c_ts if is_f else 0)
+        })
+    return out
 
 def extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids):
     out = []
-    if not html:
-        return out
+    if not html: return out
     soup = BeautifulSoup(html, "html.parser")
     seen_local = set()
     for a in soup.find_all("a", href=re.compile(r'/ar/listing/\d{5,12}')):
         href_str = str(a.get("href", "")).split("?")[0].strip()
         m = re.search(r'^(/ar/listing/(\d{5,12})[^"\'\s<>\\]*)$', href_str)
-        if not m:
-            continue
+        if not m: continue
         path, num_str = m.group(1), m.group(2)
         uid = int("91" + num_str)
-        if uid in seen_local or uid in seen_ids or uid in extra_checked or uid in banned_ids:
-            continue
+        if uid in seen_local or uid in seen_ids or uid in extra_checked or uid in banned_ids: continue
         seen_local.add(uid)
-
         card = a
         for _ in range(4):
-            if not card.parent:
-                break
-            p_txt = card.parent.get_text(" ", strip=True)
-            if len(p_txt) > 650:
-                break
+            if not card.parent or len(card.parent.get_text(" ", strip=True)) > 650: break
             card = card.parent
-
         has_company_logo = False
         for img in card.find_all("img"):
             alt_t = strip_bidi(img.get("alt") or "").strip().lower()
             src_i = str(img.get("src") or "").lower()
-            if "/companies/" in src_i or "company-logo" in src_i:
+            if "/companies/" in src_i or "company-logo" in src_i or ("logo" in alt_t and "user logo" not in alt_t and "aqarmap" not in alt_t):
                 has_company_logo = True
                 break
-            if "logo" in alt_t and "user logo" not in alt_t and "aqarmap" not in alt_t:
-                has_company_logo = True
-                break
-
         if has_company_logo:
             extra_checked.add(uid)
             continue
-
-        card_txt = strip_bidi(card.get_text(" ", strip=True))
-        norm_c = normalize_ar(card_txt)
+        norm_c = normalize_ar(card.get_text(" ", strip=True))
         if any(normalize_ar(city) in norm_c for city in EXCLUDED_CITIES):
             extra_checked.add(uid)
             continue
         if src["deal"] != "إيجار" and any(k in norm_c for k in ("بالتقسيط", "قسط علي", "تكمله اقساط")):
             extra_checked.add(uid)
             continue
-
         seen_ids.add(uid)
         out.append({
-            "ad_id": uid,
-            "num_str": num_str,
-            "source": "عقارماب",
-            "en_src": "AqarMap",
-            "url": "https://aqarmap.com.eg" + path,
-            "cat": src["cat"],
-            "deal": src["deal"]
+            "ad_id": uid, "num_str": num_str, "source": "عقارماب", "en_src": "AqarMap",
+            "url": "https://aqarmap.com.eg" + path, "cat": src["cat"], "deal": src["deal"],
+            "hint_age": "", "hint_ts": 0
         })
     return out
 
 def extract_aqarmap_details(html, deal, expected_num_str, final_url):
-    if "/ar/listing/" not in str(final_url):
-        return None, "Redirected to Search Page"
-
+    if "/ar/listing/" not in str(final_url): return None, "Redirected to Search Page"
     soup_full = BeautifulSoup(html, "html.parser")
     canonical_url = final_url
     can_tag = soup_full.find("link", {"rel": "canonical"}) or soup_full.find("meta", {"property": "og:url"})
     if can_tag:
         c_href = (can_tag.get("href") or can_tag.get("content") or "").strip()
         if c_href.startswith("http"):
-            if "/ar/listing/" not in c_href:
-                return None, "Canonical URL is Search Page (Deleted Ad)"
+            if "/ar/listing/" not in c_href: return None, "Canonical URL is Search Page"
             canonical_url = c_href
-
-    for tag in soup_full.find_all(["header", "nav", "footer", "script", "style", "noscript"]):
-        tag.decompose()
-
+    for tag in soup_full.find_all(["header", "nav", "footer", "script", "style", "noscript"]): tag.decompose()
     h1 = soup_full.find("h1")
     title = strip_bidi((h1.get_text(" ", strip=True) if h1 else "").split("|")[0]).strip()
-    if not title or len(title) < 5:
-        return None, "Empty title"
-
+    if not title or len(title) < 5: return None, "Empty title"
     full_txt = strip_bidi(soup_full.get_text(" ", strip=True))
     specs_start = full_txt.find("تفاصيل الإعلان")
     desc_start = full_txt.find("وصف الإعلان")
-    seller_start = full_txt.rfind("تواصل مع المعلن")
-
-    if specs_start == -1 or desc_start == -1:
-        return None, "Redirected to Search Page (Missing Specs Table)"
-
-    header_and_specs = full_txt[:specs_start + 1200]
-    is_fresh_2d, age_label, fresh_tier, official_ts = parse_aqarmap_strict_2days_date(header_and_specs)
-    if not is_fresh_2d:
-        return None, age_label
-
+    if specs_start == -1 or desc_start == -1: return None, "Redirected to Search Page (Missing Specs)"
+    is_fresh_2d, age_label, fresh_tier, official_ts = parse_aqarmap_strict_2days_date(full_txt[:specs_start + 1200])
+    if not is_fresh_2d: return None, age_label
     specs_txt = full_txt[specs_start:desc_start]
     norm_specs = normalize_ar(specs_txt)
-
     if expected_num_str and f"eg-{expected_num_str}" not in norm_specs:
-        return None, f"Mismatched/Redirected Listing ID (Expected EG-{expected_num_str})"
-
+        return None, f"Mismatched Listing ID (Expected EG-{expected_num_str})"
     if re.search(r'نوع\s*المعلن\s*[:\-]?\s*(?:مسوق|مطور|شركه|وسيط|broker|developer)', norm_specs):
         return None, "AqarMap Role: Broker/Developer"
-    if "مالك عقار" not in norm_specs:
-        return None, "AqarMap Role: Not Verified Private Owner (مالك عقار)"
+    if "مالك عقار" not in norm_specs: return None, "AqarMap Role: Not Verified Owner"
     if re.search(r'(?:سنه\s*التسليم|سنه\s*البناء)\s*[:\-]?\s*20(?:27|28|29|30)\b', norm_specs):
         return None, "Off-Plan Future Delivery (2027+)"
 
@@ -512,32 +635,22 @@ def extract_aqarmap_details(html, deal, expected_num_str, final_url):
     desc_cut = len(desc_raw)
     for marker in ["أظهر المزيد", "مزايا العقار", "وقت الوصول", "الموقع على الخريطة", "تواصل مع المعلن"]:
         idx_m = desc_raw.find(marker)
-        if idx_m != -1 and idx_m < desc_cut:
-            desc_cut = idx_m
+        if idx_m != -1 and idx_m < desc_cut: desc_cut = idx_m
     pure_desc = desc_raw[:min(2500, desc_cut)].strip()
 
-    pub_name = "مالك مباشر"
-    pub_ads = 1
+    pub_name, pub_ads = "مالك مباشر", 1
     for m_sel in re.finditer(r'تواصل\s*مع\s*المعلن', html):
-        idx_s = m_sel.start()
-        seller_html = html[idx_s:idx_s + 4000]
-        s_soup = BeautifulSoup(seller_html, "html.parser")
-        s_block = strip_bidi(s_soup.get_text(" | ", strip=True))
+        seller_html = html[m_sel.start():m_sel.start() + 4000]
+        s_block = strip_bidi(BeautifulSoup(seller_html, "html.parser").get_text(" | ", strip=True))
         norm_s = normalize_ar(s_block)
-        if not re.search(r'(?:0\s*عقار|عقار\s*واحد|عقارين|\d+\s*عقارات|\d+\s*عقار)', norm_s):
-            continue
-        if "company-img" in seller_html or "/companies/" in seller_html.lower():
-            return None, "Company Account in Seller Box"
-        if re.search(r'\b[345]\.[0-9]\b', norm_s):
-            return None, "Subscribed Broker Rating Badge"
-        if "0 عقار" in norm_s or "عقار واحد" in norm_s:
-            pub_ads = 1
-        elif "عقارين" in norm_s:
-            pub_ads = 2
+        if not re.search(r'(?:0\s*عقار|عقار\s*واحد|عقارين|\d+\s*عقارات|\d+\s*عقار)', norm_s): continue
+        if "company-img" in seller_html or "/companies/" in seller_html.lower(): return None, "Company Account"
+        if re.search(r'\b[345]\.[0-9]\b', norm_s): return None, "Subscribed Broker Rating Badge"
+        if "0 عقار" in norm_s or "عقار واحد" in norm_s: pub_ads = 1
+        elif "عقارين" in norm_s: pub_ads = 2
         else:
             m_cnt = re.search(r'\b(\d{1,5})\s*(?:عقارات|عقار)\b', norm_s)
-            if m_cnt:
-                pub_ads = int(m_cnt.group(1))
+            if m_cnt: pub_ads = int(m_cnt.group(1))
         parts = [p.strip() for p in s_block.split("|") if p.strip() and "تواصل مع المعلن" not in p]
         for idx_p, p in enumerate(parts[:10]):
             norm_p = normalize_ar(p)
@@ -547,122 +660,205 @@ def extract_aqarmap_details(html, deal, expected_num_str, final_url):
                     pub_name = cand_prev
                     break
             cand = clean_publisher_name(p)
-            if cand != "مالك مباشر":
-                pub_name = cand
+            if cand != "مالك مباشر": pub_name = cand
         break
 
-    if is_company_name(pub_name):
-        return None, f"Company/Broker Name ({pub_name})"
-    if pub_ads > 7:
-        return None, f"Broker Count ({pub_ads} > 7 properties)"
-
+    if is_company_name(pub_name): return None, f"Company/Broker Name ({pub_name})"
+    if pub_ads > MAX_OWNER_ADS_AQ: return None, f"Broker Count ({pub_ads} > {MAX_OWNER_ADS_AQ})"
     is_brk_txt, brk_reason = has_broker_copywriting(title, pure_desc)
-    if is_brk_txt:
-        return None, brk_reason
-
+    if is_brk_txt: return None, brk_reason
     zone = detect_zone(title, pure_desc)
-    if not zone:
-        return None, "Excluded Zone"
+    if not zone: return None, "Excluded Zone"
 
     price_context = full_txt[:1500] + " " + specs_txt
     if deal != "إيجار" and re.search(r'ج\.?م\s*(?:بالتقسيط|تكمله\s*اقساط)', normalize_ar(price_context)):
         return None, "Installment Price Badge"
-
-    price_num = 0
-    price_str = "السعر بالتفاصيل"
+    price_num, price_str = 0, "السعر بالتفاصيل"
     for m_p in re.findall(r'([\d,]{4,15})\s*(?:جنيه|ج\.?م|EGP)', price_context, re.I):
         val = int(re.sub(r'[^\d]', '', m_p))
         if (deal == "إيجار" and 2500 <= val <= 4000000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 1500000000):
-            price_num = val
-            price_str = f"{val:,} ج.م"
+            price_num, price_str = val, f"{val:,} ج.م"
             break
-
-    if price_num == 0:
-        return None, "Missing/Zero Price"
-
+    if price_num == 0: return None, "Missing/Zero Price"
     if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num):
         return None, f"Installment or Downpayment ({price_num:,})"
 
     top_specs_blob = full_txt[:2200] + " " + specs_txt + " " + pure_desc
     area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', top_specs_blob, re.I)
-    area_val = int(area_m.group(1)) if area_m else None
     rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', top_specs_blob)
-    rooms_val = int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None
-
     return {
         "title": title, "body_text": pure_desc[:2000], "zone": zone,
         "pub_name": pub_name, "pub_ads": max(1, pub_ads),
         "price_num": price_num, "price_str": price_str,
-        "area": area_val, "rooms": rooms_val,
+        "area": (int(area_m.group(1)) if area_m else None),
+        "rooms": (int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None),
+        "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts, "canonical_url": canonical_url
+    }, "OK"
+
+def extract_opensooq_details(html, deal, expected_num_str, final_url, hint_age="", hint_ts=0):
+    if "/ar/search/" not in str(final_url): return None, "Redirected to Search Page"
+    raw_stripped = strip_bidi(html)
+    if "not available" in raw_stripped[:6000].lower() or "بلغ عن إساءة" not in raw_stripped:
+        return None, "Expired or Deleted OpenSooq Ad"
+    clean_html = raw_stripped
+    h1_end = clean_html.lower().find("</h1>")
+    cut_start = (h1_end + 1500) if h1_end > 0 else 45000
+    for marker in ["إعلانات مشابهة", "إعلانات المتجر", "بيع كل شئ على السوق المفتوح", "الأسئلة الشائعة"]:
+        idx_m = clean_html.find(marker, cut_start)
+        if idx_m > cut_start: clean_html = clean_html[:idx_m]
+
+    norm_raw_clean = normalize_ar(clean_html)
+    if re.search(r'(?:المعلن|advertiser|seller_type)["\'\s:\-]{0,25}(?:الوسيط|وسيط|مكتب|broker|agent)', norm_raw_clean, re.I):
+        return None, "OpenSooq Role: Broker (الوسيط)"
+
+    soup = BeautifulSoup(clean_html, "html.parser")
+    for tag in soup.find_all(["header", "nav", "footer", "script", "style", "noscript"]): tag.decompose()
+    h1 = soup.find("h1")
+    title = strip_bidi((h1.get_text(" ", strip=True) if h1 else "").split("|")[0]).strip()
+    if not title or len(title) < 5: return None, "Empty title"
+
+    full_body_txt = strip_bidi(soup.get_text(" ", strip=True))
+    h1_pos = full_body_txt.find(title[:18])
+    pre_h1_and_post_txt = full_body_txt[max(0, h1_pos - 400):] if h1_pos > 0 else full_body_txt
+    post_txt = full_body_txt[h1_pos:] if h1_pos > 0 else full_body_txt
+    norm_post = normalize_ar(post_txt)
+
+    if "اعلانات المتجر" in norm_post or "نشاط تجاري موثق" in norm_post[:2200]:
+        return None, "OpenSooq Commercial Store Account"
+    if re.search(r'مده\s*الايجار\s*[:\-]?\s*(?:يومي|اسبوعي)|القسم\s*الفرعي\s*[:\-]?\s*شقق\s*واجنحه\s*فندقيه', norm_post):
+        return None, "Daily/Hotel Furnished Rental"
+
+    is_fresh_2d, age_label, fresh_tier, official_ts = parse_opensooq_strict_2days_date(
+        clean_html, post_txt[:2500], card_age_label=hint_age, card_ts=hint_ts
+    )
+    if not is_fresh_2d: return None, age_label
+    if re.search(r'المعلن\s*[:\-]?\s*(?:الوسيط|مكتب|شركه|مطور)', norm_post): return None, "OpenSooq Role: Broker (الوسيط)"
+    if deal != "إيجار" and re.search(r'طريقه\s*الدفع\s*[:\-]?\s*(?:اقساط|بالتقسيط)', norm_post):
+        return None, "OpenSooq Payment Spec: Installment"
+    if re.search(r'عمر\s*البناء\s*[:\-]?\s*قيد\s*الانشاء', norm_post): return None, "OpenSooq Under Construction"
+
+    pub_ads = 1
+    m_cnt = re.search(r'(?:شاهد|عرض)\s*(?:كل|جميع)\s*الاعلانات\s*\(?\s*(\d{1,5})\s*\)?|view\s*all\s*ads\s*\(?\s*(\d{1,5})\s*\)?', norm_post, re.I)
+    if m_cnt: pub_ads = int(m_cnt.group(1) or m_cnt.group(2))
+    else:
+        m_jcnt = re.search(r'"(?:count_posts|posts_count|ads_count|total_posts|member_posts_count)"\s*:\s*"?(\d{1,5})"?', raw_stripped, re.I)
+        if m_jcnt: pub_ads = int(m_jcnt.group(1))
+
+    pub_name = "مالك مباشر"
+    m_sh = re.search(r'(?:شارك|مشاركة)\s*[.\|·•]?\s*(?:مستخدم\s*موثق\s*[.\|·•]?\s*)?(?:Avatar\s*[.\|·•]?\s*)?([^\r\n\|·•]{2,38}?)\s*(?:الردّ?\s*على|عضو\s*في|تابِع|تابع|\+\s*تابع|التقييم|عضو\s*منذ)', post_txt, re.I)
+    if m_sh:
+        cand = clean_publisher_name(m_sh.group(1))
+        if cand != "مالك مباشر": pub_name = cand
+    if pub_name == "مالك مباشر":
+        for a_m in soup.find_all("a", href=re.compile(r'/ar/mid/|/ar/member/|/ar/users/', re.I)):
+            cand = clean_publisher_name(a_m.get_text(" ", strip=True))
+            if cand != "مالك مباشر":
+                pub_name = cand
+                break
+    if pub_name == "مالك مباشر":
+        m_jn = re.search(r'"(?:member_name|seller_name|owner_name|full_name|user_name)"\s*:\s*"([^"]{2,40})"', raw_stripped, re.I)
+        if m_jn:
+            cand = clean_publisher_name(m_jn.group(1))
+            if cand != "مالك مباشر": pub_name = cand
+
+    if is_company_name(pub_name): return None, f"Company/Broker Name ({pub_name})"
+    if pub_ads > MAX_OWNER_ADS_OS: return None, f"Broker Count ({pub_name}: {pub_ads} > {MAX_OWNER_ADS_OS} ads)"
+
+    meta_d = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
+    meta_desc = strip_bidi(meta_d.get("content") or "").strip() if meta_d else ""
+    desc_end_idx = len(post_txt)
+    for end_m in ["بلغ عن إساءة", "وسائل الراحة", "نصائح عامة", "اسأل البائع", "اسأل المعلن"]:
+        pos_e = post_txt.find(end_m)
+        if 80 < pos_e < desc_end_idx: desc_end_idx = pos_e
+    pure_desc = f"{meta_desc} {post_txt[:min(3500, desc_end_idx)]}".strip()
+
+    if pub_ads >= 3 and re.search(r'(?:انظمه\s*سداد|مساحات\s*خضراء|امن\s*و\s*حراسه\s*24|دقايق\s*من\s*المحاور|عائد\s*ايجاري)', normalize_ar(pure_desc)):
+        return None, f"Compound/Mall Sales Rep ({pub_ads} ads)"
+    is_brk_txt, brk_reason = has_broker_copywriting(title, pure_desc)
+    if is_brk_txt: return None, brk_reason
+    zone = detect_zone(title, pure_desc)
+    if not zone: return None, "Excluded Zone"
+
+    price_num, price_str = 0, "السعر بالتفاصيل"
+    price_candidates = (
+        re.findall(r'([\d,]{4,15})\s*جنيه\s*[.\s]*أخبرني', pre_h1_and_post_txt[:3500])
+        + re.findall(r'([\d,]{4,15})\s*(?:EGP|جنيه|ج\.?م)', pre_h1_and_post_txt[:3000], re.I)
+        + re.findall(r'"(?:price|price_amount|raw_price)"\s*:\s*"?(\d[\d,]{3,12})"?', clean_html[:60000], re.I)
+    )
+    for m_p in price_candidates:
+        val = int(re.sub(r'[^\d]', '', str(m_p)))
+        if (deal == "إيجار" and 2500 <= val <= 4000000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 1500000000):
+            price_num, price_str = val, f"{val:,} ج.م"
+            break
+    if price_num == 0: return None, "Missing/Zero Price"
+    if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num):
+        return None, f"Installment or Downpayment ({price_num:,})"
+
+    m_area = re.search(r'المساحه\s*[:\-]?\s*(\d{2,5})\s*م|(\d{2,4})\s*(?:متر|م²|م2|sqm)', normalize_ar(post_txt[:2200]))
+    area_raw = (m_area.group(1) or m_area.group(2)) if m_area else None
+    m_rooms = re.search(r'عدد\s*الغرف\s*[:\-]?\s*(\d{1,2})|(\d{1,2})\s*(?:غرف|غرفه)', normalize_ar(post_txt[:2200]))
+    rooms_raw = (m_rooms.group(1) or m_rooms.group(2)) if m_rooms else None
+    return {
+        "title": title, "body_text": pure_desc[:2000], "zone": zone,
+        "pub_name": pub_name, "pub_ads": max(1, pub_ads),
+        "price_num": price_num, "price_str": price_str,
+        "area": (int(area_raw) if (area_raw and 20 <= int(area_raw) <= 15000) else None),
+        "rooms": (int(rooms_raw) if (rooms_raw and 1 <= int(rooms_raw) <= 20) else None),
         "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts,
-        "canonical_url": canonical_url
+        "canonical_url": f"https://eg.opensooq.com/ar/search/{expected_num_str}"
     }, "OK"
 
 def is_valid_existing_extra_ad(ad):
     src = ad.get("source") or "دوبيزل"
-    if src == "دوبيزل":
-        return True
-    if src != "عقارماب":
-        return False
-    if not ad.get("verified_aq_v100"):
-        return False
+    if src == "دوبيزل": return True
     u = str(ad.get("url") or ad.get("link") or "")
-    if "/ar/listing/" not in u:
-        return False
+    if src == "عقارماب":
+        if not ad.get("verified_aq_v100") or "/ar/listing/" not in u: return False
+    elif src == "السوق المفتوح":
+        if not ad.get("verified_os_v101") or "/ar/search/" not in u: return False
+    else: return False
     now_ts = int(datetime.now(CAIRO_TZ).timestamp())
     ad_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or 0)
-    if ad_ts <= 0 or (now_ts - ad_ts) > ((MAX_AGE_DAYS + 1) * 86400):
-        return False
-    pub = ad.get("publisher", "")
-    title = ad.get("title", "")
-    desc = ad.get("description", "")
-    zone = ad.get("zone", "")
-    deal = ad.get("deal", "تمليك")
-    price_num = int(ad.get("price_num", 0) or 0)
-    if price_num <= 0:
-        return False
+    if ad_ts <= 0 or (now_ts - ad_ts) > ((MAX_AGE_DAYS + 1) * 86400): return False
+    pub, title, desc, zone = ad.get("publisher", ""), ad.get("title", ""), ad.get("description", ""), ad.get("zone", "")
+    deal, price_num = ad.get("deal", "تمليك"), int(ad.get("price_num", 0) or 0)
+    if price_num <= 0: return False
     pub_ads = int(ad.get("pub_ads", 1) or 1)
-    if pub_ads > 7 or is_company_name(pub):
-        return False
+    max_allowed = MAX_OWNER_ADS_OS if src == "السوق المفتوح" else MAX_OWNER_ADS_AQ
+    if pub_ads > max_allowed or is_company_name(pub): return False
     is_brk, _ = has_broker_copywriting(title, desc)
-    if is_brk:
-        return False
+    if is_brk: return False
     norm_all = normalize_ar(f"{title} {zone}")
     for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in norm_all:
-            return False
-    if deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num):
-        return False
+        if normalize_ar(city) in norm_all: return False
+    if deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num): return False
     return True
 
-def sync_ads_to_github_now(data_obj, new_aq_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, msg_label):
+def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, msg_label):
     disk_ads = []
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
                 d_disk = json.load(f)
-                if isinstance(d_disk, dict) and isinstance(d_disk.get("ads"), list):
-                    disk_ads = d_disk["ads"]
-        except Exception:
-            pass
+                if isinstance(d_disk, dict) and isinstance(d_disk.get("ads"), list): disk_ads = d_disk["ads"]
+        except Exception: pass
 
-    all_pool = new_aq_ads + load_aqarmap_live_backup() + disk_ads + existing_ads + fetch_remote_ads_list()
+    all_pool = new_extra_ads + load_extra_live_backup() + disk_ads + existing_ads + fetch_remote_ads_list()
     merged_ads, seen_u = [], set()
     for ad in all_pool:
-        if not is_valid_existing_extra_ad(ad):
-            continue
+        if not is_valid_existing_extra_ad(ad): continue
         u = ad.get("url") or ad.get("link") or str(ad.get("ad_id"))
-        if not u or u in seen_u:
-            continue
+        if not u or u in seen_u: continue
         seen_u.add(u)
         merged_ads.append(ad)
 
     merged_ads.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
     merged_ads = merged_ads[:450]
+    extra_live = [a for a in merged_ads if a.get("source") in ("عقارماب", "السوق المفتوح")]
+    save_extra_live_backup(extra_live)
 
-    aq_live = [a for a in merged_ads if a.get("source") == "عقارماب"]
-    save_aqarmap_live_backup(aq_live)
-
+    aq_cnt = sum(1 for a in extra_live if a.get("source") == "عقارماب")
+    os_cnt = sum(1 for a in extra_live if a.get("source") == "السوق المفتوح")
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
     data_obj["updated_at"] = now_str
     data_obj["total"] = len(merged_ads)
@@ -673,28 +869,25 @@ def sync_ads_to_github_now(data_obj, new_aq_ads, existing_ads, extra_checked, tg
     data_obj["telegram_notified_ids"] = list(notified_ids)[-5000:]
 
     if not os.environ.get("GITHUB_ACTIONS"):
-        ok_p, p_info = atomic_write_and_git_push(data_obj, f"{msg_label} (AqarMap Live: {len(aq_live)})")
+        ok_p, p_info = atomic_write_and_git_push(data_obj, f"{msg_label} (AqarMap: {aq_cnt}, OpenSooq: {os_cnt})")
         if ok_p:
-            print(f"    --> [LIVE SYNC] {msg_label} | AqarMap Live Owners on Site: ({len(aq_live)})!")
+            print(f"    --> [LIVE SYNC] {msg_label} | Live on Site -> AqarMap: ({aq_cnt}) | OpenSooq: ({os_cnt})!")
         else:
             print(f"    --> [LOCAL SAVE] {p_info}")
-    return merged_ads, len(aq_live)
+    return merged_ads, aq_cnt, os_cnt
 
-def guard_aqarmap_ads_during_sleep():
-    aq_backup = load_aqarmap_live_backup()
-    if not aq_backup or not os.path.exists(DATA_FILE):
-        return
+def guard_extra_ads_during_sleep():
+    extra_backup = load_extra_live_backup()
+    if not extra_backup or not os.path.exists(DATA_FILE): return
     try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            d = json.load(f)
-        if not isinstance(d, dict) or not isinstance(d.get("ads"), list):
-            return
+        with open(DATA_FILE, "r", encoding="utf-8") as f: d = json.load(f)
+        if not isinstance(d, dict) or not isinstance(d.get("ads"), list): return
         cur_ads = d["ads"]
-        cur_aq_ids = {a.get("ad_id") for a in cur_ads if a.get("source") == "عقارماب" and is_valid_existing_extra_ad(a)}
-        backup_ids = {a.get("ad_id") for a in aq_backup}
-        has_invalid_extra = any((a.get("source") or "دوبيزل") != "دوبيزل" and not is_valid_existing_extra_ad(a) for a in cur_ads)
-        if not backup_ids.issubset(cur_aq_ids) or has_invalid_extra:
-            clean_pool = aq_backup + [a for a in cur_ads if is_valid_existing_extra_ad(a)]
+        cur_extra_ids = {a.get("ad_id") for a in cur_ads if a.get("source") in ("عقارماب", "السوق المفتوح") and is_valid_existing_extra_ad(a)}
+        backup_ids = {a.get("ad_id") for a in extra_backup}
+        has_invalid = any((a.get("source") or "دوبيزل") != "دوبيزل" and not is_valid_existing_extra_ad(a) for a in cur_ads)
+        if not backup_ids.issubset(cur_extra_ids) or has_invalid:
+            clean_pool = extra_backup + [a for a in cur_ads if is_valid_existing_extra_ad(a)]
             merged, seen_u = [], set()
             for ad in clean_pool:
                 u = ad.get("url") or ad.get("link") or str(ad.get("ad_id"))
@@ -704,10 +897,11 @@ def guard_aqarmap_ads_during_sleep():
             merged.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
             d["ads"] = merged[:450]
             d["total"] = len(d["ads"])
-            atomic_write_and_git_push(d, f"Auto-Restored Verified AqarMap Owners ({len(aq_backup)})")
-            print(f"    --> [Anti-Overwrite Guard] Restored ({len(aq_backup)}) verified AqarMap owners to GitHub & Vercel!")
-    except Exception:
-        pass
+            aq_c = sum(1 for a in extra_backup if a.get("source") == "عقارماب")
+            os_c = sum(1 for a in extra_backup if a.get("source") == "السوق المفتوح")
+            atomic_write_and_git_push(d, f"Auto-Restored Extra Owners (AqarMap: {aq_c}, OpenSooq: {os_c})")
+            print(f"    --> [Anti-Overwrite Guard] Restored AqarMap ({aq_c}) & OpenSooq ({os_c}) owners to GitHub & Vercel!")
+    except Exception: pass
 
 def sync_telegram_config(current_cfg):
     cfg = dict(current_cfg or {})
@@ -721,38 +915,26 @@ def sync_telegram_config(current_cfg):
                     b64_part = msg.replace("TG_CFG:", "").strip()
                     decoded = json.loads(base64.b64decode(b64_part).decode("utf-8"))
                     if decoded.get("tok") and decoded.get("cid"):
-                        cfg["tok"] = decoded["tok"].strip()
-                        cfg["cid"] = str(decoded["cid"]).strip()
-    except Exception:
-        pass
+                        cfg["tok"], cfg["cid"] = decoded["tok"].strip(), str(decoded["cid"]).strip()
+    except Exception: pass
     return cfg
 
 def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source):
     url = "https://gamal216.pythonanywhere.com/analyze"
     payload = {
-        "text": f"{title} {visible_text[:2000]}",
-        "title": title,
-        "description": visible_text[:2000],
-        "publisher": pub_name,
-        "deal": deal,
-        "cat": cat,
-        "price_num": price_num,
-        "source": source,
-        "active_ads_count": 1
+        "text": f"{title} {visible_text[:2000]}", "title": title, "description": visible_text[:2000],
+        "publisher": pub_name, "deal": deal, "cat": cat, "price_num": price_num, "source": source, "active_ads_count": 1
     }
     try:
         response = std_requests.post(url, json=payload, timeout=12)
         if response.status_code == 200:
             result = response.json()
             if result.get("status") == "success":
-                if result.get("decision") == "مرفوض":
-                    return False, "AI Rejected"
+                if result.get("decision") == "مرفوض": return False, "AI Rejected"
                 analysis = result.get("analysis", "")
-                if "سمسار" in analysis and "مالك حقيقي" not in analysis:
-                    return False, "AI Detected Broker"
+                if "سمسار" in analysis and "مالك حقيقي" not in analysis: return False, "AI Detected Broker"
                 return True, "Owner"
-    except Exception:
-        pass
+    except Exception: pass
     if deal != "إيجار":
         ok = is_strict_cash_sale(title, visible_text, price_num)
         return ok, ("Owner" if ok else "Installment Suspect")
@@ -761,17 +943,12 @@ def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source)
 def run_extra_radar():
     if os.path.exists(DATA_FILE):
         try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception:
-            data = {"ads": []}
-    else:
-        data = {"ads": []}
+            with open(DATA_FILE, "r", encoding="utf-8") as f: data = json.load(f)
+        except Exception: data = {"ads": []}
+    else: data = {"ads": []}
+    if not isinstance(data, dict): data = {"ads": data if isinstance(data, list) else []}
 
-    if not isinstance(data, dict):
-        data = {"ads": data if isinstance(data, list) else []}
-
-    raw_existing = data.get("ads", []) + fetch_remote_ads_list()
+    raw_existing = load_extra_live_backup() + data.get("ads", []) + fetch_remote_ads_list()
     extra_checked = load_persistent_seen_ids()
     banned_ids = set(data.get("banned_ad_ids", []))
     notified_ids = set(data.get("telegram_notified_ids", []))
@@ -779,33 +956,29 @@ def run_extra_radar():
     run_report = data.get("last_run_report", {})
 
     fetcher = SmartFetcher()
-
     existing_ads, seen_existing_u = [], set()
-    purged_count = 0
     for ad in raw_existing:
         u = ad.get("url") or ad.get("link") or str(ad.get("ad_id"))
-        if not u or u in seen_existing_u:
-            continue
+        if not u or u in seen_existing_u: continue
         if is_valid_existing_extra_ad(ad):
-            if ad.get("source") == "عقارماب":
-                html_chk, st_chk, final_u_chk = fetcher.get_html(u, require_listing_url=True)
-                if st_chk == "Redirected_To_Search" or "/ar/listing/" not in final_u_chk:
-                    purged_count += 1
-                    print(f"[Purged Deleted/Redirected AqarMap Ad] {ad.get('title', '')[:40]}")
-                    continue
             seen_existing_u.add(u)
             existing_ads.append(ad)
-        else:
-            purged_count += 1
-
-    if purged_count > 0:
-        print(f"[Instant Cleanup] Purged ({purged_count}) broken/redirected ads -> Pushing clean state to site now...")
-        existing_ads, _ = sync_ads_to_github_now(data, [], existing_ads, extra_checked, tg_cfg, notified_ids, run_report, "Purged Broken AqarMap Links")
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
-    new_aq_ads = []
-    aq_candidates = []
+    new_extra_ads = []
 
+    os_candidates = []
+    os_sources = fetcher.discover_opensooq_sources()
+    for src in os_sources:
+        for page in range(1, 4):
+            page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
+            html, status_info, _ = fetcher.get_html(page_url, req_regex=r'/ar/search/\d+')
+            found_os = extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
+            os_candidates.extend(found_os)
+            print(f"[OpenSooq] {src['en']} p.{page} -> {status_info} (Fresh <=2d Candidates: {len(found_os)})")
+            time.sleep(random.uniform(0.4, 0.8))
+
+    aq_candidates = []
     for src in AQARMAP_SOURCES:
         max_p = src.get("max_p", 3)
         for page in range(1, max_p + 1):
@@ -813,115 +986,100 @@ def run_extra_radar():
             html, status_info, _ = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
             found_aq = extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
             aq_candidates.extend(found_aq)
-            print(f"[AqarMap] {src['en']} p.{page} -> {status_info} (Non-Company Candidates: {len(found_aq)})")
+            print(f"[AqarMap] {src['en']} p.{page} -> {status_info} (Unchecked Non-Company Candidates: {len(found_aq)})")
             time.sleep(random.uniform(0.4, 0.8))
 
     save_persistent_seen_ids(extra_checked)
 
+    rent_os = [x for x in os_candidates if x["deal"] == "إيجار"]
+    sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
     rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
     sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
-    all_candidates = rent_aq[:180] + sale_aq[:180]
-    print(f"\n[AqarMap Full-Power v10.0] Total Non-Company Candidates: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    all_candidates = rent_os[:120] + sale_os[:120] + rent_aq[:140] + sale_aq[:140]
+    print(f"\n[Extra Radar v10.1] New Candidates -> OpenSooq: {len(os_candidates)} | AqarMap: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
-    aq_added = 0
+    aq_added, os_added = 0, 0
     total_c = len(all_candidates)
 
     for idx, item in enumerate(all_candidates, 1):
         uid = item["ad_id"]
         num_str = item.get("num_str", "")
+        en_s = item["en_src"]
+        req_sub = "/ar/listing/" if item["source"] == "عقارماب" else "/ar/search/"
         try:
-            html, st_ad, final_url = fetcher.get_html(item["url"], require_listing_url=True)
+            html, st_ad, final_url = fetcher.get_html(item["url"], require_path_sub=req_sub)
             if st_ad == "Redirected_To_Search":
                 extra_checked.add(uid)
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] Redirected to Search Page (Deleted Ad)")
+                print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] Redirected to Search Page (Deleted Ad)")
                 continue
-            if not html:
-                continue
+            if not html: continue
 
-            info, reason = extract_aqarmap_details(html, item["deal"], num_str, final_url)
+            if item["source"] == "عقارماب":
+                info, reason = extract_aqarmap_details(html, item["deal"], num_str, final_url)
+            else:
+                info, reason = extract_opensooq_details(
+                    html, item["deal"], num_str, final_url,
+                    hint_age=item.get("hint_age", ""), hint_ts=item.get("hint_ts", 0)
+                )
 
             if reason != "Empty title":
                 extra_checked.add(uid)
-                if idx % 15 == 0:
-                    save_persistent_seen_ids(extra_checked)
+                if idx % 15 == 0: save_persistent_seen_ids(extra_checked)
 
             if not info:
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] {reason}")
+                print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] {reason}")
                 continue
 
             is_owner, ai_reason = analyze_with_ai(
                 info["title"], info["body_text"], info["pub_name"],
-                item["deal"], item["cat"], info["price_num"], "عقارماب"
+                item["deal"], item["cat"], info["price_num"], item["source"]
             )
             if not is_owner:
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] {ai_reason}")
+                print(f"  [{idx}/{total_c}] [- REJECTED {en_s}] {ai_reason}")
                 continue
 
             real_post_ts = int(info.get("real_ts") or time.time())
             now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             verified_url = info.get("canonical_url") or final_url
-            new_aq_ads.append({
-                "ad_id": uid,
-                "id": f"ext_{uid}",
-                "source": "عقارماب",
-                "title": info["title"],
-                "price": info["price_str"],
-                "price_num": info["price_num"],
-                "zone": info["zone"],
-                "location": info["zone"],
-                "cat": item["cat"],
-                "category": item["cat"],
-                "deal": item["deal"],
-                "type": item["deal"],
-                "area": info["area"],
-                "rooms": info["rooms"],
-                "publisher": info["pub_name"],
-                "pub_ads": info["pub_ads"],
-                "active_ads_count": info["pub_ads"],
-                "age": info["age_label"],
-                "fresh_tier": info["fresh_tier"],
-                "description": info["body_text"][:500],
-                "first_seen_ts": real_post_ts,
-                "timestamp": real_post_ts,
-                "desc_verified_v2": True,
-                "verified_24h_v93": True,
-                "verified_aq_v98": True,
-                "verified_aq_v100": True,
-                "url": verified_url,
-                "link": verified_url,
-                "verified_v12": True,
-                "scraped_at": now_cairo,
-                "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+            new_extra_ads.append({
+                "ad_id": uid, "id": f"ext_{uid}", "source": item["source"],
+                "title": info["title"], "price": info["price_str"], "price_num": info["price_num"],
+                "zone": info["zone"], "location": info["zone"], "cat": item["cat"], "category": item["cat"],
+                "deal": item["deal"], "type": item["deal"], "area": info["area"], "rooms": info["rooms"],
+                "publisher": info["pub_name"], "pub_ads": info["pub_ads"], "active_ads_count": info["pub_ads"],
+                "age": info["age_label"], "fresh_tier": info["fresh_tier"], "description": info["body_text"][:500],
+                "first_seen_ts": real_post_ts, "timestamp": real_post_ts, "desc_verified_v2": True,
+                "verified_24h_v93": True, "verified_aq_v100": True, "verified_os_v101": True,
+                "url": verified_url, "link": verified_url, "verified_v12": True,
+                "scraped_at": now_cairo, "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
             })
-            aq_added += 1
-            print(f"  [{idx}/{total_c}] [+ ACCEPTED <=2D AQARMAP OWNER] ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | Price: {info['price_num']:,} EGP | ID: EG-{num_str}")
-            if aq_added == 1 or aq_added % 2 == 0:
-                existing_ads, _ = sync_ads_to_github_now(data, new_aq_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"Added +{aq_added} Verified AqarMap Owners")
+            if item["source"] == "عقارماب": aq_added += 1
+            else: os_added += 1
+            print(f"  [{idx}/{total_c}] [+ ACCEPTED <=2D {en_s} OWNER] ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | Price: {info['price_num']:,} EGP")
+            if (aq_added + os_added) == 1 or (aq_added + os_added) % 2 == 0:
+                existing_ads, _, _ = sync_ads_to_github_now(data, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"Added +{aq_added} AqarMap & +{os_added} OpenSooq")
             time.sleep(random.uniform(0.5, 0.8))
-        except Exception:
-            continue
+        except Exception: continue
 
     save_persistent_seen_ids(extra_checked)
-    merged_ads, aq_total = sync_ads_to_github_now(data, new_aq_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"AqarMap Cycle Complete (+{aq_added} New)")
-    print(f"=== AqarMap Cycle Complete: Added +{aq_added} New Owners | Total Verified AqarMap Owners on Site: {aq_total} ===")
+    merged_ads, aq_total, os_total = sync_ads_to_github_now(data, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"Cycle Complete (+{aq_added} AQ, +{os_added} OS)")
+    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Live on Site -> AqarMap: {aq_total} | OpenSooq: {os_total} ===")
 
 def main():
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
-    print("=== Starting 24/7 Dedicated AqarMap Full-Power Radar v10.0 (Anti-Redirect + EG-ID Verified + <=2 Days) ===")
+    print("=== Starting 24/7 AqarMap & OpenSooq Full-Power Radar v10.1 (Strict <=2 Days + Anti-Redirect + Live Guard) ===")
     cycle = 1
     while True:
-        print(f"\n>>> Starting AqarMap Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
-        try:
-            run_extra_radar()
-        except Exception as e:
-            print(f"[AqarMap Radar Error] {e}")
+        print(f"\n>>> Starting AqarMap & OpenSooq Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
+        try: run_extra_radar()
+        except Exception as e: print(f"[Extra Radar Error] {e}")
         cycle += 1
         print(f"[Auto-Loop] Sleeping for {AUTO_LOOP_MINUTES} minutes (with 30s Anti-Overwrite Guard active)...")
         for _ in range(AUTO_LOOP_MINUTES * 2):
             time.sleep(30)
-            guard_aqarmap_ads_during_sleep()
+            guard_extra_ads_during_sleep()
 
 if __name__ == "__main__":
     main()
