@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-19 17:08",
-  "total": 77,
+  "updated_at": "2026-11-19 05:17 PM",
+  "total": 75,
   "ads": [
     {
       "ad_id": 209474666,
@@ -783,40 +783,6 @@
       "date": "2026-11-18 21:27"
     },
     {
-      "ad_id": 916970725,
-      "id": "ext_916970725",
-      "source": "عقارماب",
-      "title": "شقه للايجار كمبوند جنه القاهرة الجديدة بالتجمع التالت  Janna New Cairo",
-      "price": "13,000 ج.م",
-      "price_num": 13000,
-      "zone": "القاهرة الجديدة",
-      "location": "القاهرة الجديدة",
-      "cat": "شقق",
-      "category": "شقق",
-      "deal": "إيجار",
-      "type": "إيجار",
-      "area": 130,
-      "rooms": 3,
-      "publisher": "مالك مباشر",
-      "pub_ads": 1,
-      "active_ads_count": 1,
-      "age": "منذ يوم (18 نوفمبر)",
-      "fresh_tier": 3,
-      "description": "شقه للإيجار 130 متر تشطيب كامل جاهزه علي الفرش , مطبخ كلادينج جديد , باب مصفح جديد , معاد تشطيبها بالكامل و معاد تاسيس السباكه و الكهرباء و النقاشه , مطلوب 14000 غير قابل للتفاوض الوسطاء يمتنعون , يقع الكمبوند في موقع متميز جدا , 3 دقائق من شارع",
-      "first_seen_ts": 1795027700,
-      "timestamp": 1795027700,
-      "desc_verified_v2": true,
-      "verified_24h_v93": true,
-      "verified_os_v96": true,
-      "verified_os_v97": true,
-      "verified_aq_v98": true,
-      "url": "https://aqarmap.com.eg/ar/listing/6970725-for-rent-cairo-new-cairo-compounds-janna-compound/",
-      "link": "https://aqarmap.com.eg/ar/listing/6970725-for-rent-cairo-new-cairo-compounds-janna-compound/",
-      "verified_v12": true,
-      "scraped_at": "2026-11-19 04:48 PM",
-      "date": "2026-11-18 20:48"
-    },
-    {
       "ad_id": 209522153,
       "id": "dub_209522153",
       "title": "شقه للبيع من المالك في التجمع الخامس في كمبوند تاون ريزيدنس الأندلس",
@@ -1231,40 +1197,6 @@
       "first_seen_ts": 1794996389,
       "timestamp": 1794996389,
       "date": "2026-11-18 12:06"
-    },
-    {
-      "ad_id": 916520662,
-      "id": "ext_916520662",
-      "source": "عقارماب",
-      "title": "للبيع شقة 140 متر في التجمع الخامس النرجس عمارات",
-      "price": "4,750,000 ج.م",
-      "price_num": 4750000,
-      "zone": "التجمع الخامس",
-      "location": "التجمع الخامس",
-      "cat": "شقق",
-      "category": "شقق",
-      "deal": "تمليك",
-      "type": "تمليك",
-      "area": 140,
-      "rooms": 3,
-      "publisher": "مالك مباشر",
-      "pub_ads": 1,
-      "active_ads_count": 1,
-      "age": "منذ يومين (17 نوفمبر)",
-      "fresh_tier": 2,
-      "description": "140 متر النرجس عمارات الدور الثانى - خلفى جانبى اسنسير تشطيب كامل رسيبشن كبير 3 قطع حرف L + بلكونه 3 غرف نوم 1 حمام مطبخ جراج غرفه مخزن",
-      "first_seen_ts": 1794949798,
-      "timestamp": 1794949798,
-      "desc_verified_v2": true,
-      "verified_24h_v93": true,
-      "verified_os_v96": true,
-      "verified_os_v97": true,
-      "verified_aq_v98": true,
-      "url": "https://aqarmap.com.eg/ar/listing/6520662-for-sale-cairo-new-cairo-el-narges-el-narges-omarat-mohamed-sabry-abu-alam-st/",
-      "link": "https://aqarmap.com.eg/ar/listing/6520662-for-sale-cairo-new-cairo-el-narges-el-narges-omarat-mohamed-sabry-abu-alam-st/",
-      "verified_v12": true,
-      "scraped_at": "2026-11-19 04:49 PM",
-      "date": "2026-11-17 23:09"
     },
     {
       "ad_id": 194712665,
@@ -2020,5 +1952,9 @@
       "timestamp": 1794821542,
       "date": "2026-11-16 11:32"
     }
-  ]
+  ],
+  "last_run_report": {},
+  "extra_checked_ids": [],
+  "telegram_config": {},
+  "telegram_notified_ids": []
 }
