@@ -40,108 +40,26 @@ AUTO_LOOP_MINUTES = 45
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
 BIDI_REGEX = re.compile(r'[\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]')
 SYNC_LOCK = threading.Lock()
-
-ARABIC_MONTHS = {
-    "يناير": 1, "فبراير": 2, "مارس": 3, "ابريل": 4, "أبريل": 4, "إبريل": 4,
-    "مايو": 5, "يونيو": 6, "يونية": 6, "يوليو": 7, "يوليه": 7,
-    "اغسطس": 8, "أغسطس": 8, "سبتمبر": 9, "اكتوبر": 10, "أكتوبر": 10,
-    "نوفمبر": 11, "ديسمبر": 12
-}
+ARABIC_MONTHS = {"يناير": 1, "فبراير": 2, "مارس": 3, "ابريل": 4, "أبريل": 4, "إبريل": 4, "مايو": 5, "يونيو": 6, "يونية": 6, "يوليو": 7, "يوليه": 7, "اغسطس": 8, "أغسطس": 8, "سبتمبر": 9, "اكتوبر": 10, "أكتوبر": 10, "نوفمبر": 11, "ديسمبر": 12}
 
 ZONES = [
-    ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement", "ميفيدا", "mivida", "هايد بارك", "ماونتن فيو", "كايرو فيستفال", "كايرو فيستيفال", "الباتيو", "فيلت", "سوديك", "ستون ريزيدنس", "ستون بارك", "ايست تاون", "ليك فيو", "بالم هيلز التجمع", "الحي الاول", "الحي الثاني", "الحي الثالث", "الحي الرابع", "الحي الخامس", "غرب الجولف"]),
+    ("التجمع الخامس", ["التجمع الخامس", "fifth settlement", "5th settlement", "ميفيدا", "mivida", "هايد بارك", "ماونتن فيو", "كايرو فيستفال", "كايرو فيستيفال", "الباتيو", "فيلت", "سوديك", "ستون ريزيدنس", "ستون بارك", "ايست تاون", "ليك فيو", "بالم هيلز التجمع", "الحي الاول", "الحي الثاني", "الحي الثالث", "الحي الرابع", "الحي الخامس", "غرب الجولف", "الجامعه الامريكيه", "الجامعة الامريكية", "auc", "فاطمه الشربتلي", "فاطمة الشربتلي", "مسجد الشرطه", "مسجد الشرطة", "بوينت 90", "كونكورد"]),
     ("التجمع الأول", ["التجمع الأول", "التجمع الاول", "first settlement", "1st settlement", "مجاورة"]),
     ("التجمع الثالث", ["التجمع الثالث", "third settlement", "3rd settlement", "أربيلا", "اربيلا", "أرابيلا", "ارابيلا", "غرب ارابيلا", "الهايكستب", "المحلية", "المحليه", "اسكان الشباب", "إسكان الشباب"]),
-    ("اللوتس", ["اللوتس", "lotus"]),
-    ("النرجس", ["النرجس", "narges", "narjis"]),
-    ("الياسمين", ["الياسمين", "yasmeen", "jasmine"]),
-    ("البنفسج", ["البنفسج", "banafseg"]),
-    ("الأندلس", ["الأندلس", "الاندلس", "andalus"]),
-    ("جنوب الأكاديمية", ["جنوب الأكاديمية", "جنوب الاكاديمية", "الأكاديمية", "الاكاديميه"]),
-    ("شرق الأكاديمية", ["شرق الأكاديمية", "شرق الاكاديمية"]),
-    ("المستثمرين", ["المستثمرين", "investors"]),
-    ("الشويفات", ["الشويفات", "choueifat"]),
-    ("القرنفل", ["القرنفل", "koronfel"]),
-    ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
-    ("أبو الهول", ["أبو الهول", "ابو الهول", "جاردينيا هايتس", "جاردينيا"]),
-    ("دار مصر", ["دار مصر", "سكن مصر", "جنة مصر", "جنه مصر", "فرجينيا"]),
-    ("القطامية", ["القطامية", "القطاميه", "katameya"]),
-    ("شارع التسعين", ["التسعين", "90th"]),
+    ("اللوتس", ["اللوتس", "lotus"]), ("النرجس", ["النرجس", "narges", "narjis"]), ("الياسمين", ["الياسمين", "yasmeen", "jasmine"]), ("البنفسج", ["البنفسج", "banafseg"]),
+    ("الأندلس", ["الأندلس", "الاندلس", "andalus"]), ("جنوب الأكاديمية", ["جنوب الأكاديمية", "جنوب الاكاديمية", "الأكاديمية", "الاكاديميه"]), ("شرق الأكاديمية", ["شرق الأكاديمية", "شرق الاكاديمية"]),
+    ("المستثمرين", ["المستثمرين", "investors"]), ("الشويفات", ["الشويفات", "choueifat"]), ("القرنفل", ["القرنفل", "koronfel"]), ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
+    ("أبو الهول", ["أبو الهول", "ابو الهول", "جاردينيا هايتس", "جاردينيا"]), ("دار مصر", ["دار مصر", "سكن مصر", "جنة مصر", "جنه مصر", "فرجينيا"]), ("القطامية", ["القطامية", "القطاميه", "katameya"]), ("شارع التسعين", ["التسعين", "90th"]),
 ]
 
-EXCLUDED_CITIES = [
-    "الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty",
-    "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب",
-    "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه",
-    "التجمع السادس", "sixth settlement", "كابيتال جاردنز", "capital gardens", "سراي", "sarai", "البروج", "alburouj",
-    "طلالة", "talala", "دي جويا", "dejoya", "محور الأمل", "تاج سيتي", "تاج سيتى", "taj city", "تاج سلطان",
-    "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي",
-    "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس",
-    "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك",
-    "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام",
-    "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "الجونة", "الغردقة", "شرم الشيخ",
-    "الإسكندرية", "الاسكندرية", "المستقبل", "mostakbal", "سمات", "مقبرة", "مقابر", "مدفن", "مدافن"
-]
-
-INSTALLMENT_SUBSTRINGS = [
-    "قسط", "تقسيط", "بالتقسيط", "لتقسيط", "اقساط", "أقساط", "باقساط", "بأقساط", "تكملة أقساط", "تكمله اقساط",
-    "مقدم", "بمقدم", "بقدم ", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "أنظمة سداد", "انظمه سداد",
-    "بدون فوائد", "متبقي", "المتبقي", "والباقي", "أوفر", "اوفر", "امكانية التقسيط", "متاح تقسيط", "ويوجد تقسيط",
-    "سنة التسليم 2027", "سنة التسليم 2028", "سنة التسليم 2029", "سنة التسليم 2030", "قيد الإنشاء", "قيد الانشاء",
-    "down payment", "downpayment", "installment", "installments", "payment plan"
-]
-
-SAFE_CASH_NEGATIONS = [
-    "بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط",
-    "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن",
-    "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط",
-    "مسدد بالكامل", "مسددة بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش نهائي"
-]
-
-SAFE_OWNER_BROKER_NEGATIONS = [
-    "بدون وسيط", "بدون وسطاء", "ممنوع الوسطاء", "يمتنع الوسطاء", "لغير الوسطاء", "عدم تدخل الوسطاء",
-    "عدم التعامل مع الوسطاء", "لا للوسطاء", "بدون سمسار", "بدون سماسرة", "بدون سماسره", "ممنوع السماسرة",
-    "ممنوع السماسره", "يمتنع السماسرة", "يمتنع السماسره", "بدون بروكر", "ممنوع البروكر", "يمتنع البروكر",
-    "بدون عمولة", "بدون عموله", "بدون اي عمولة", "بدون اي عموله", "بدون اى عموله", "من غير سمسار", "من غير وسيط",
-    "من المالك مباشره", "من المالك مباشر", "المالك مباشره", "المالك مباشر", "التواصل مباشر مع المالك",
-    "التعامل مباشر مع المالك", "مباشر من المالك", "انا المالك"
-]
-
-BROKER_NAME_WORDS = [
-    "zone", "real estate", "realestate", "realty", "property", "properties", "homes", "agency",
-    "agencies", "broker", "brokers", "brokerage", "investment", "investments", "development", "developments",
-    "consult", "consultant", "consulting", "company", "marketing", "scouts",
-    "vertex", "redefine", "irtkaz", "ebtkar", "imkan", "falcon", "realtors", "trusted home",
-    "شركة", "شركه", "مكتب", "تسويق", "للتسويق", "ماركتنج", "سمسار", "وسيط",
-    "استشاري", "مستشار", "للاستشارات", "تطوير", "للتطوير", "للاستثمار", "هومز",
-    "بروكر", "ريال استيت", "استيت", "فيرتكس", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار",
-    "دار البناء", "للمقاولات", "للإنشاءات", "للانشاءات", "اللوتس العقارية", "البيت المصري", "ادارة املاك", "إدارة أملاك"
-]
-
-BROKER_TEXT_PHRASES = [
-    "انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى",
-    "وسيط من المالك", "وسيط مع المالك", "انا بروكر", "م بروكر", "للتواصل مع البروكر",
-    "سمسار", "سماسرة", "سماسره", "بروكر", "broker", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "ادارة املاك",
-    "عمولة شهر", "عموله شهر", "عمولة نصف شهر", "عموله نصف شهر", "عمولة المكتب", "عموله المكتب",
-    "عمولة الشركة", "عموله الشركه", "بعموله", "بعمولة", "نسبة العمولة", "يوجد عمولة", "يوجد عموله",
-    "عمولة 1", "عموله 1", "عمولة 2", "عموله 2", "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات",
-    "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري",
-    "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء",
-    "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك",
-    "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل",
-    "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي",
-    "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات",
-    "متاح عروض اخري", "متاح عروض أخرى", "يوجد عروض اخري", "متاح شقق اخري", "متاح مساحات مختلفة",
-    "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات", "باقل سعر بالمشروع",
-    "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "مطلوب وموجود", "مطلوب ومعروض"
-]
-
-FB_WANTED_PHRASES = [
-    "مطلوب شقه", "مطلوب شقة", "مطلوب فيلا", "مطلوب للايجار", "مطلوب للإيجار", "مطلوب للشراء", "مطلوب للبيع",
-    "مطلوب من المالك", "بدور علي شقه", "بدور على شقة", "بدور علي فيلا", "محتاج شقه", "محتاج شقة", "محتاجه شقه",
-    "محتاجة شقة", "عايز شقه", "عايز شقة", "عايزة شقة", "عايزه شقه", "ابحث عن شقه", "أبحث عن شقة",
-    "حد عنده شقه", "حد عنده شقة", "مطلوب عاجل", "مطلوب فورا", "مطلوب شريك", "مطلوب شريكة", "مطلوب روم ميت"
-]
+EXCLUDED_CITIES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "التجمع السادس", "sixth settlement", "كابيتال جاردنز", "capital gardens", "سراي", "sarai", "البروج", "alburouj", "طلالة", "talala", "دي جويا", "dejoya", "محور الأمل", "تاج سيتي", "تاج سيتى", "taj city", "تاج سلطان", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "الجونة", "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المستقبل", "mostakbal", "سمات", "مقبرة", "مقابر", "مدفن", "مدافن"]
+INSTALLMENT_SUBSTRINGS = ["قسط", "تقسيط", "بالتقسيط", "لتقسيط", "اقساط", "أقساط", "باقساط", "بأقساط", "تكملة أقساط", "تكمله اقساط", "مقدم", "بمقدم", "بقدم ", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "أنظمة سداد", "انظمه سداد", "بدون فوائد", "متبقي", "المتبقي", "والباقي", "أوفر", "اوفر", "امكانية التقسيط", "متاح تقسيط", "ويوجد تقسيط", "سنة التسليم 2027", "سنة التسليم 2028", "سنة التسليم 2029", "سنة التسليم 2030", "قيد الإنشاء", "قيد الانشاء", "down payment", "downpayment", "installment", "installments", "payment plan"]
+SAFE_CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط", "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن", "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش نهائي"]
+SAFE_OWNER_BROKER_NEGATIONS = ["بدون وسيط", "بدون وسطاء", "ممنوع الوسطاء", "يمتنع الوسطاء", "لغير الوسطاء", "عدم تدخل الوسطاء", "عدم التعامل مع الوسطاء", "لا للوسطاء", "بدون سمسار", "بدون سماسرة", "بدون سماسره", "ممنوع السماسرة", "ممنوع السماسره", "يمتنع السماسرة", "يمتنع السماسره", "بدون بروكر", "ممنوع البروكر", "يمتنع البروكر", "بدون عمولة", "بدون عموله", "بدون اي عمولة", "بدون اي عموله", "بدون اى عموله", "من غير سمسار", "من غير وسيط", "من المالك مباشره", "من المالك مباشر", "المالك مباشره", "المالك مباشر", "التواصل مباشر مع المالك", "التعامل مباشر مع المالك", "مباشر من المالك", "انا المالك"]
+BROKER_NAME_WORDS = ["zone", "real estate", "realestate", "realty", "property", "properties", "homes", "agency", "agencies", "broker", "brokers", "brokerage", "investment", "investments", "development", "developments", "consult", "consultant", "consulting", "company", "marketing", "scouts", "vertex", "redefine", "irtkaz", "ebtkar", "imkan", "falcon", "realtors", "trusted home", "شركة", "شركه", "مكتب", "تسويق", "للتسويق", "ماركتنج", "سمسار", "وسيط", "استشاري", "مستشار", "للاستشارات", "تطوير", "للتطوير", "للاستثمار", "هومز", "بروكر", "ريال استيت", "استيت", "فيرتكس", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار", "دار البناء", "للمقاولات", "للإنشاءات", "للانشاءات", "اللوتس العقارية", "البيت المصري", "ادارة املاك", "إدارة أملاك"]
+BROKER_TEXT_PHRASES = ["انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى", "وسيط من المالك", "وسيط مع المالك", "انا بروكر", "م بروكر", "للتواصل مع البروكر", "سمسار", "سماسرة", "سماسره", "بروكر", "broker", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "ادارة املاك", "عمولة شهر", "عموله شهر", "عمولة نصف شهر", "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "بعموله", "بعمولة", "نسبة العمولة", "يوجد عمولة", "يوجد عموله", "عمولة 1", "عموله 1", "عمولة 2", "عموله 2", "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري", "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك", "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل", "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي", "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات", "متاح عروض اخري", "متاح عروض أخرى", "يوجد عروض اخري", "متاح شقق اخري", "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات", "باقل سعر بالمشروع", "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "مطلوب وموجود", "مطلوب ومعروض"]
+FB_SOFT_BROKER_HINTS = ["للتواصل فون او واتس", "فون او واتساب", "للمعاينه والاستفسار", "للمعاينة والاستفسار", "باقل سعر", "ارخص شقه", "لقطه", "فرصه لا تعوض", "متاح شقه", "متاح فيلا", "متاح دوبلكس", "متاح ارضي", "متاح روف", "متاح ستوديو", "الترا سوبر لوكس", "برايم لوكيشن", "prime location"]
+FB_WANTED_PHRASES = ["مطلوب شقه", "مطلوب شقة", "مطلوب فيلا", "مطلوب للايجار", "مطلوب للإيجار", "مطلوب للشراء", "مطلوب للبيع", "مطلوب من المالك", "بدور علي شقه", "بدور على شقة", "بدور علي فيلا", "محتاج شقه", "محتاج شقة", "محتاجه شقه", "محتاجة شقة", "عايز شقه", "عايز شقة", "عايزة شقة", "عايزه شقه", "ابحث عن شقه", "أبحث عن شقة", "حد عنده شقه", "حد عنده شقة", "مطلوب عاجل", "مطلوب فورا", "مطلوب شريك", "مطلوب شريكة", "مطلوب روم ميت"]
 
 AQARMAP_SOURCES = [
     {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
@@ -163,17 +81,11 @@ AQARMAP_SOURCES = [
     {"cat": "أراضي", "deal": "تمليك", "en": "Buildings (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/building/cairo/new-cairo/?sort=publishedAt&direction=desc"},
 ]
 
-def strip_bidi(text):
-    if not text: return ""
-    return BIDI_REGEX.sub("", str(text)).translate(HINDI_MAP)
-
+def strip_bidi(text): return BIDI_REGEX.sub("", str(text)).translate(HINDI_MAP) if text else ""
 def normalize_ar(text):
-    t = strip_bidi(text).lower()
-    t = re.sub(r'[\u0640\u064B-\u065F]', '', t)
+    t = re.sub(r'[\u0640\u064B-\u065F]', '', strip_bidi(text).lower())
     t = re.sub(r'[إأآا]', 'ا', t)
-    t = re.sub(r'ة', 'ه', t)
-    t = re.sub(r'ى', 'ي', t)
-    return re.sub(r'\s+', ' ', t).strip()
+    return re.sub(r'\s+', ' ', re.sub(r'ى', 'ي', re.sub(r'ة', 'ه', t))).strip()
 
 def clear_git_locks():
     git_dir = os.path.join(BASE_DIR, ".git")
@@ -200,224 +112,261 @@ def patch_index_html_for_facebook():
                 subprocess.run(["git", "add", "-f", "index.html"], cwd=BASE_DIR, capture_output=True, timeout=15)
                 subprocess.run(["git", "commit", "-m", "Replace OpenSooq with Facebook in UI"], cwd=BASE_DIR, capture_output=True, timeout=15)
                 subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, timeout=60)
-                print("[UI Auto-Update] Replaced OpenSooq tab with (فيسبوك) on your website!")
     except Exception: pass
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3,
-        "name": "Gamal Stealth Facebook Main-Page Reader v11.3",
-        "version": "11.3",
-        "description": "Zero-DOM-Injection & Safe Main-Feed Reader",
-        "permissions": ["storage"],
+        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search & Groups Radar v11.7", "version": "11.7",
+        "description": "Strict Group/Post Separator + 22 Real-Time New Cairo Owner Searches", "permissions": ["storage"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
-        "content_scripts": [{
-            "matches": ["https://www.facebook.com/*"],
-            "js": ["content.js"],
-            "run_at": "document_idle"
-        }]
+        "background": {"service_worker": "background.js"},
+        "content_scripts": [{"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}]
     }
+    background_js = r"""
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg && msg.type === "FB_POST_INGEST") {
+        fetch("http://127.0.0.1:5005/fb_ingest", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(msg.payload)})
+        .then(r => r.json())
+        .then(d => sendResponse({ok: true, accepted: !!(d && d.accepted), reason: (d && d.reason) || "", is_old: !!(d && d.is_old)}))
+        .catch(e => sendResponse({ok: false, accepted: false, reason: String(e), is_old: false}));
+        return true;
+    }
+});
+""".strip()
+
     content_js = r"""
 (function() {
-    if (window.__gamalFbStealthV113) return;
-    window.__gamalFbStealthV113 = true;
-
-    const SERVER_URL = "http://127.0.0.1:5005/fb_ingest";
-    const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ريسبشن)/i;
-    const ZONE_RE = /(التجمع|القاهره الجديده|القاهرة الجديدة|النرجس|اللوتس|الياسمين|البنفسج|الاندلس|الأندلس|الاكاديميه|الأكاديمية|المستثمرين|الشويفات|القرنفل|تمر حنه|تمر حنة|ابو الهول|أبو الهول|جاردينيا|دار مصر|سكن مصر|جنه|جنة|القطاميه|القطامية|التسعين|اربيلا|أربيلا|ارابيلا|أرابيلا|غرب الجولف|المحليه|المحلية|اسكان الشباب|إسكان الشباب|ميفيدا|هايد بارك|ماونتن فيو|ستون)/i;
+    if (window.__gamalFbRadarV117) return;
+    window.__gamalFbRadarV117 = true;
+    const RECENT_FILTER = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
+    const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RECENT_FILTER;
+    const TARGETS = [
+        {name: "خلاصة كل جروباتك المجمعة", url: "https://www.facebook.com/groups/feed/", maxSec: 70},
+        {name: "سيرش الأحدث: من المالك التجمع الخامس", url: sUrl("من المالك التجمع الخامس"), maxSec: 50},
+        {name: "سيرش الأحدث: من المالك القاهرة الجديدة", url: sUrl("من المالك القاهرة الجديدة"), maxSec: 45},
+        {name: "سيرش الأحدث: بدون وسطاء التجمع الخامس", url: sUrl("بدون وسطاء التجمع الخامس"), maxSec: 45},
+        {name: "سيرش الأحدث: بدون عمولة التجمع الخامس", url: sUrl("بدون عمولة التجمع الخامس"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة للايجار التجمع الخامس", url: sUrl("شقة للايجار التجمع الخامس"), maxSec: 55},
+        {name: "سيرش الأحدث: شقة للبيع التجمع الخامس", url: sUrl("شقة للبيع التجمع الخامس"), maxSec: 50},
+        {name: "سيرش الأحدث: شقة النرجس التجمع", url: sUrl("شقة النرجس التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة اللوتس التجمع", url: sUrl("شقة اللوتس التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة الياسمين التجمع", url: sUrl("شقة الياسمين التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة البنفسج التجمع", url: sUrl("شقة البنفسج التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة الاندلس التجمع", url: sUrl("شقة الاندلس التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة دار مصر التجمع", url: sUrl("شقة دار مصر التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة سكن مصر التجمع", url: sUrl("شقة سكن مصر التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة جنة التجمع", url: sUrl("شقة جنة التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة المستثمرين التجمع", url: sUrl("شقة المستثمرين التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة الاكاديمية التجمع", url: sUrl("شقة الاكاديمية التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة القرنفل التجمع", url: sUrl("شقة القرنفل التجمع"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة التجمع الثالث", url: sUrl("شقة التجمع الثالث"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة التجمع الاول", url: sUrl("شقة التجمع الاول"), maxSec: 45},
+        {name: "سيرش الأحدث: شقة القطامية", url: sUrl("شقة القطامية"), maxSec: 45},
+        {name: "الصفحة الرئيسية (الأحدث)", url: "https://www.facebook.com/?sk=h_chr", maxSec: 60}
+    ];
+    const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن|من المالك|المالك مباشر|مدخل البيت|شارع)/i;
     const GROUP_WORDS_RE = /(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
+    const UI_NOISE_RE = /^(انضمام|متابعة|متابعه|مراسلة|أعجبني|تعليق|مشاركة|عرض المزيد|See more|Join|Follow|Like|Comment|Share|\d+\s*تعليق.*|\d+\s*مشاركات.*)$/i;
 
-    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v113") || "[]");
-    let isFirstSweep = (sentHashes.length < 15);
-    let mode = "SCROLLING";
-    let stateStartTs = Date.now();
-    let consecutiveSeen = 0;
+    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v117") || "[]");
+    let autoRotate = (localStorage.getItem("gamal_fb_autorotate_v117") !== "0");
+    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v117") || "0", 10) % TARGETS.length;
+    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v117") || "0", 10);
+    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v117") || "0", 10);
+    let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, lastLogMsg = "يفحص المنشورات الحديثة أول بأول...";
+    let shadowInfo = null;
+    try {
+        const host = document.createElement("span"), sh = host.attachShadow({mode: "closed"}), box = document.createElement("div");
+        box.style.cssText = "position:fixed;bottom:10px;left:10px;z-index:2147483647;background:#0f172a;color:#e2e8f0;padding:10px 14px;border-radius:10px;font-family:Tahoma,sans-serif;font-size:12px;border:1px solid #0ea5e9;box-shadow:0 4px 16px rgba(0,0,0,0.65);direction:rtl;max-width:450px;line-height:1.6;";
+        sh.appendChild(box); document.documentElement.appendChild(host); shadowInfo = box;
+    } catch(e) {}
+
+    function updateStatusUI(statusText) {
+        try {
+            sessionStorage.setItem("gamal_fb_sc_v117", String(scannedCount));
+            sessionStorage.setItem("gamal_fb_ac_v117", String(acceptedCount));
+            document.title = "[فحص:" + scannedCount + " | ملاك:" + acceptedCount + "] " + statusText;
+            if (shadowInfo) {
+                const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "الصفحة الحالية";
+                const rotText = autoRotate ? "السيرش التلقائي (22 مسار للملاك): مفعل (اضغط للإيقاف)" : "السيرش التلقائي: متوقف - يقلب هنا فقط (اضغط للتفعيل)";
+                const rotColor = autoRotate ? "#4ade80" : "#facc15";
+                shadowInfo.innerHTML = "<div><b>رادار فيسبوك الدقيق v11.7</b> | " + statusText + "</div><div style='color:#38bdf8;'>المسار (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك حقيقيون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div><div style='margin-top:4px;'><span id='g_toggle_rot' style='color:" + rotColor + ";cursor:pointer;text-decoration:underline;font-weight:bold;'>" + rotText + "</span></div>";
+                const btn = shadowInfo.querySelector("#g_toggle_rot");
+                if (btn) btn.onclick = () => { autoRotate = !autoRotate; localStorage.setItem("gamal_fb_autorotate_v117", autoRotate ? "1" : "0"); updateStatusUI(autoRotate ? "تم تفعيل السيرش الشامل" : "وضع الصفحة الثابتة"); };
+            }
+        } catch(e) {}
+    }
 
     function saveHash(h) {
         if (!sentHashes.includes(h)) {
             sentHashes.push(h);
-            if (sentHashes.length > 2000) sentHashes = sentHashes.slice(-2000);
-            localStorage.setItem("gamal_fb_sent_v113", JSON.stringify(sentHashes));
+            if (sentHashes.length > 3500) sentHashes = sentHashes.slice(-3500);
+            localStorage.setItem("gamal_fb_sent_v117", JSON.stringify(sentHashes));
         }
     }
 
-    function hashStr(s) {
-        let h = 0;
-        for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i) | 0;
-        return "fb_" + Math.abs(h);
-    }
-
-    function isMainFeedPage() {
-        const p = location.pathname;
-        return (p === "/" || p === "/home.php" || p.startsWith("/groups/feed"));
-    }
+    function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i) | 0; return "fb_" + Math.abs(h); }
 
     function stripCommentsSection(rawText) {
         const cutMarkers = ["\nأعجبني\n", "\nتعليق\n", "\nمشاركة\n", "\nLike\n", "\nComment\n", "\nShare\n", "عرض مزيد من التعليقات", "اكتب تعليق", "تفاعل: أعجبني"];
         let t = rawText;
-        for (const m of cutMarkers) {
-            const idx = t.indexOf(m);
-            if (idx > 30) t = t.substring(0, idx);
-        }
+        for (const m of cutMarkers) { const idx = t.indexOf(m); if (idx > 20) t = t.substring(0, idx); }
         return t.trim();
     }
 
-    async function extractPostData(article) {
-        if (article.parentElement && article.parentElement.closest('div[role="article"]')) return null;
-        let preClean = stripCommentsSection(article.innerText || "");
-        if (preClean.length < 28 || !PROP_RE.test(preClean)) return null;
+    function collectCandidatePostCards() {
+        const cardSet = new Set();
+        document.querySelectorAll('div[role="article"], div[data-pagelet*="FeedUnit"]').forEach(el => {
+            if (!el.parentElement || !el.parentElement.closest('div[role="article"]')) cardSet.add(el);
+        });
+        document.querySelectorAll('div[data-ad-preview="message"], div[data-ad-comet-preview="message"], div[dir="auto"]').forEach(node => {
+            const txt = (node.innerText || "").trim();
+            if (txt.length < 22 || !PROP_RE.test(txt)) return;
+            let cur = node;
+            for (let i = 0; i < 9; i++) {
+                if (!cur.parentElement) break;
+                cur = cur.parentElement;
+                const cTxt = (cur.innerText || ""), linksCnt = cur.querySelectorAll("a[href]").length;
+                if (cTxt.length >= 50 && cTxt.length <= 4200 && linksCnt >= 1) { cardSet.add(cur); break; }
+            }
+        });
+        return Array.from(cardSet);
+    }
 
-        if (!article._gExpanded) {
-            const btns = article.querySelectorAll('div[role="button"], span[role="button"]');
+    async function extractPostData(card) {
+        let preClean = stripCommentsSection(card.innerText || "");
+        if (preClean.length < 22 || !PROP_RE.test(preClean)) return null;
+        if (!card._gExpanded) {
+            const btns = card.querySelectorAll('div[role="button"], span[role="button"]');
             for (const b of btns) {
                 const bt = (b.innerText || "").trim();
-                if (bt === "عرض المزيد" || bt === "See more" || bt === "… عرض المزيد") {
-                    if (!b.closest("ul") && !b.closest("form")) {
-                        article._gExpanded = true;
-                        try {
-                            b.click();
-                            await new Promise(r => setTimeout(r, 550));
-                        } catch(e) {}
-                        break;
-                    }
+                if ((bt === "عرض المزيد" || bt === "See more" || bt === "… عرض المزيد") && !b.closest("ul") && !b.closest("form")) {
+                    card._gExpanded = true;
+                    try { b.click(); await new Promise(r => setTimeout(r, 260)); } catch(e) {}
+                    break;
                 }
             }
         }
+        const fullClean = stripCommentsSection(card.innerText || "");
+        if (fullClean.length < 22 || !PROP_RE.test(fullClean)) return null;
 
-        const fullClean = stripCommentsSection(article.innerText || "");
-        if (!PROP_RE.test(fullClean) || !ZONE_RE.test(fullClean)) return null;
-
-        let postUrl = "";
-        let headerTimeHint = "";
-        let authorFromUserLink = "";
-        const links = article.querySelectorAll("a[href]");
-        for (const a of links) {
-            const href = a.href || "";
-            const aTxt = (a.innerText || a.getAttribute("aria-label") || "").trim();
-            if (!authorFromUserLink && href.includes("/user/") && aTxt.length >= 2 && aTxt.length <= 42 && !GROUP_WORDS_RE.test(aTxt)) {
-                authorFromUserLink = aTxt.split("\n")[0].trim();
+        let postUrl = "", groupName = "", headerTimeHint = "", authorFromLink = "";
+        const headerTextsToStrip = new Set();
+        card.querySelectorAll("a[href]").forEach(a => {
+            const href = a.href || "", aTxt = (a.innerText || a.getAttribute("aria-label") || "").trim(), firstLineTxt = aTxt.split("\n")[0].trim();
+            if (href.includes("/groups/") && !href.includes("/user/") && !href.includes("/posts/") && !href.includes("/permalink/") && !href.includes("story_fbid=")) {
+                if (firstLineTxt.length >= 3 && firstLineTxt.length <= 85) { if (!groupName) groupName = firstLineTxt; headerTextsToStrip.add(firstLineTxt); }
+            }
+            if (href.includes("/user/") || href.includes("profile.php") || (!href.includes("/groups/") && !href.includes("/posts/") && !href.includes("/hashtag/") && !href.includes("/photo"))) {
+                if (firstLineTxt.length >= 2 && firstLineTxt.length <= 45 && !GROUP_WORDS_RE.test(firstLineTxt) && firstLineTxt !== groupName) {
+                    if (!authorFromLink) authorFromLink = firstLineTxt;
+                    headerTextsToStrip.add(firstLineTxt);
+                }
             }
             if (!postUrl && (href.includes("/posts/") || href.includes("/permalink/") || href.includes("story_fbid=") || href.includes("multi_permalinks="))) {
                 postUrl = href.includes("story_fbid=") ? href : href.split("?")[0];
             }
-            if (!headerTimeHint && aTxt && aTxt.length <= 28 && /(الآن|توًا|\b\d+\s*[دسيه]|\bدقيقة|\bدقائق|\bساعة|\bساعات|\bأمس|\bيوم|\bيومين|\b\d+\s*[mhd]\b|يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)/i.test(aTxt)) {
-                headerTimeHint = aTxt;
+            if (!headerTimeHint && aTxt && aTxt.length <= 32 && /(الآن|توًا|\b\d+\s*[دسيه]|\bدقيقة|\bدقائق|\bساعة|\bساعات|\bأمس|\bيوم|\bيومين|\b\d+\s*[mhd]\b|يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)/i.test(aTxt)) {
+                headerTimeHint = aTxt; headerTextsToStrip.add(firstLineTxt);
             }
-        }
+        });
+
+        card.querySelectorAll("h2, h3, h4").forEach(hNode => {
+            (hNode.innerText || "").split("\n").map(x => x.trim()).filter(Boolean).forEach(x => headerTextsToStrip.add(x));
+        });
 
         const lines = fullClean.split("\n").map(x => x.trim()).filter(x => x.length > 0);
-        let authorName = "مشارك مجهول الهوية";
-        let isAnon = false;
+        let authorName = authorFromLink || "مالك مباشر";
         for (let i = 0; i < Math.min(5, lines.length); i++) {
             if (lines[i].includes("مجهول الهوية") || lines[i].toLowerCase().includes("anonymous")) {
-                isAnon = true;
-                authorName = "مشارك مجهول الهوية";
-                break;
-            }
-        }
-        if (!isAnon) {
-            if (authorFromUserLink) {
-                authorName = authorFromUserLink;
-            } else {
-                for (let i = 0; i < Math.min(3, lines.length); i++) {
-                    const cand = lines[i];
-                    if (cand.length >= 2 && cand.length <= 38 && !GROUP_WORDS_RE.test(cand) && !/\d{3,}/.test(cand) && !PROP_RE.test(cand)) {
-                        authorName = cand;
-                        break;
-                    }
-                }
-                if (authorName === "مشارك مجهول الهوية") authorName = "مالك مباشر";
+                authorName = "مشارك مجهول الهوية"; headerTextsToStrip.add(lines[i]); break;
             }
         }
 
-        let msgNode = article.querySelector('div[data-ad-preview="message"], div[data-ad-comet-preview="message"]');
-        let bodyText = msgNode ? (msgNode.innerText || "").trim() : lines.slice(1).join(" ").trim();
-        if (bodyText.length < 25) bodyText = lines.join(" ").trim();
+        let msgNode = card.querySelector('div[data-ad-preview="message"], div[data-ad-comet-preview="message"]');
+        let bodyText = msgNode ? (msgNode.innerText || "").trim() : "";
+        if (!bodyText) {
+            const bodyCandidates = [];
+            card.querySelectorAll('div[dir="auto"], span[dir="auto"]').forEach(dn => {
+                if (dn.closest("h2, h3, h4, a, button, ul, form")) return;
+                const dTxt = (dn.innerText || "").trim();
+                if (dTxt.length >= 18 && !headerTextsToStrip.has(dTxt) && !UI_NOISE_RE.test(dTxt)) bodyCandidates.push(dTxt);
+            });
+            if (bodyCandidates.length > 0) bodyText = Array.from(new Set(bodyCandidates)).join("\n").trim();
+        }
+        if (!bodyText || bodyText.length < 20) {
+            const pureLines = [];
+            for (let i = 0; i < lines.length; i++) {
+                const ln = lines[i];
+                if (headerTextsToStrip.has(ln) || ln === groupName || ln === authorName || UI_NOISE_RE.test(ln)) continue;
+                if (i <= 2 && GROUP_WORDS_RE.test(ln) && ln.length < 65) { if (!groupName) groupName = ln; continue; }
+                if (i <= 3 && ln.length <= 25 && /(الآن|\b\d+\s*[دسيه]|\bدقيقة|\bساعة|\bأمس|\bيوم)/i.test(ln)) { if (!headerTimeHint) headerTimeHint = ln; continue; }
+                pureLines.push(ln);
+            }
+            bodyText = pureLines.join("\n").trim();
+        }
+        if (groupName && bodyText.startsWith(groupName)) bodyText = bodyText.substring(groupName.length).trim();
+        if (authorName && bodyText.startsWith(authorName)) bodyText = bodyText.substring(authorName.length).trim();
+        if (!bodyText || bodyText.length < 22 || !PROP_RE.test(bodyText)) return null;
 
-        const headerLines = lines.slice(0, 5).join(" | ");
-        const keyHash = hashStr((postUrl || "") + "_" + bodyText.substring(0, 100));
-        return {
-            hash: keyHash,
-            url: postUrl || location.href,
-            author: authorName,
-            header_time: headerTimeHint || headerLines,
-            text: bodyText.substring(0, 2600),
-            full_card_text: fullClean.substring(0, 2800)
-        };
+        const searchQ = new URLSearchParams(location.search).get("q") || "";
+        const keyHash = hashStr(bodyText.replace(/\s+/g, " ").substring(0, 95));
+        return {hash: keyHash, url: postUrl || location.href, author: authorName, group_name: groupName, search_query: searchQ, header_time: headerTimeHint || lines.slice(0, 5).join(" | "), text: bodyText.substring(0, 2600)};
+    }
+
+    function sendToBackgroundBridge(data) {
+        return new Promise(resolve => {
+            try { chrome.runtime.sendMessage({type: "FB_POST_INGEST", payload: data}, resp => resolve(resp || {ok: false, accepted: false, reason: "No response", is_old: false})); }
+            catch(e) { resolve({ok: false, accepted: false, reason: String(e), is_old: false}); }
+        });
     }
 
     async function scanVisibleArticles() {
-        const articles = document.querySelectorAll('div[role="article"]');
-        for (const art of articles) {
-            const data = await extractPostData(art);
+        const cards = collectCandidatePostCards();
+        for (const card of cards) {
+            const data = await extractPostData(card);
             if (!data) continue;
-            if (sentHashes.includes(data.hash)) {
-                if (!art._gSeen) {
-                    art._gSeen = true;
-                    consecutiveSeen++;
-                }
-                continue;
-            }
-            consecutiveSeen = 0;
-            art._gSeen = true;
-            saveHash(data.hash);
-            try {
-                await fetch(SERVER_URL, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(data)
-                });
-            } catch(e) {}
+            if (sentHashes.includes(data.hash)) { if (!card._gSeen) { card._gSeen = true; consecutiveSeen++; } continue; }
+            consecutiveSeen = 0; card._gSeen = true; saveHash(data.hash); scannedCount++;
+            const preview = data.text.replace(/\s+/g, " ").substring(0, 42);
+            const resp = await sendToBackgroundBridge(data);
+            if (resp && resp.is_old) oldPostsHit++;
+            if (resp && resp.accepted) { acceptedCount++; lastLogMsg = "مقبول مالك: " + preview; }
+            else { lastLogMsg = "مرفوض (" + ((resp && resp.reason) || "فلتر") + "): " + preview; }
+            updateStatusUI("يفحص أول بأول");
         }
+    }
+
+    function advanceToNextTarget(reasonMsg) {
+        const nextIdx = (targetIdx + 1) % TARGETS.length;
+        localStorage.setItem("gamal_fb_tidx_v117", String(nextIdx));
+        const waitNextMs = Math.floor(9000 + Math.random() * 5000);
+        updateStatusUI(reasonMsg + " -> انتقال بعد " + Math.round(waitNextMs / 1000) + "ث");
+        setTimeout(() => { location.href = TARGETS[nextIdx].url; }, waitNextMs);
     }
 
     async function mainLoop() {
-        if (!isMainFeedPage()) {
-            setTimeout(mainLoop, 10000);
-            return;
+        await scanVisibleArticles();
+        const elapsedSec = (Date.now() - pageStartTs) / 1000;
+        const curTarget = TARGETS[targetIdx] || {maxSec: 50};
+        if (autoRotate) {
+            if (oldPostsHit >= 3 && elapsedSec > 14) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
+            if (consecutiveSeen >= 9 && elapsedSec > 16) { advanceToNextTarget("تم مسح كل الجديد في هذا المسار"); return; }
+            if (elapsedSec >= curTarget.maxSec) { advanceToNextTarget("اكتمل فحص المسار"); return; }
         }
-        const elapsedSec = (Date.now() - stateStartTs) / 1000;
-        const maxScrollSec = isFirstSweep ? 900 : 480;
-        const restDurationSec = Math.floor(240 + Math.random() * 120);
-
-        if (mode === "SCROLLING") {
-            await scanVisibleArticles();
-            if ((!isFirstSweep && consecutiveSeen >= 10 && elapsedSec > 60) || elapsedSec >= maxScrollSec) {
-                isFirstSweep = false;
-                mode = "RESTING";
-                stateStartTs = Date.now();
-                consecutiveSeen = 0;
-                setTimeout(mainLoop, 10000);
-                return;
-            }
-            const stepPx = Math.floor(300 + Math.random() * 260);
-            window.scrollBy({top: stepPx, behavior: "smooth"});
-            if (Math.random() < 0.15) {
-                setTimeout(() => window.scrollBy({top: -65, behavior: "smooth"}), 2200);
-            }
-            setTimeout(mainLoop, Math.floor(8500 + Math.random() * 6500));
-        } else {
-            if (elapsedSec >= restDurationSec) {
-                mode = "SCROLLING";
-                stateStartTs = Date.now();
-                consecutiveSeen = 0;
-                window.scrollTo({top: 0, behavior: "smooth"});
-                setTimeout(mainLoop, 7000);
-                return;
-            }
-            setTimeout(mainLoop, 10000);
-        }
+        window.scrollBy({top: Math.floor(520 + Math.random() * 250), behavior: "smooth"});
+        updateStatusUI("يقلب بسرعة (" + Math.round(elapsedSec) + "ث)");
+        setTimeout(mainLoop, Math.floor(2500 + Math.random() * 1300));
     }
-
-    setTimeout(mainLoop, 4500);
+    updateStatusUI("بدأ الفحص الدقيق...");
+    setTimeout(mainLoop, 2000);
 })();
 """.strip()
 
-    with open(os.path.join(FB_EXT_DIR, "manifest.json"), "w", encoding="utf-8") as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=2)
-    with open(os.path.join(FB_EXT_DIR, "content.js"), "w", encoding="utf-8") as f:
-        f.write(content_js)
+    with open(os.path.join(FB_EXT_DIR, "manifest.json"), "w", encoding="utf-8") as f: json.dump(manifest, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(FB_EXT_DIR, "background.js"), "w", encoding="utf-8") as f: f.write(background_js)
+    with open(os.path.join(FB_EXT_DIR, "content.js"), "w", encoding="utf-8") as f: f.write(content_js)
 
 def load_fb_memory():
     if os.path.exists(FB_MEMORY_FILE):
@@ -430,48 +379,65 @@ def load_fb_memory():
 
 def save_fb_memory(mem):
     try:
-        mem["seen_hashes"] = mem.get("seen_hashes", [])[-3000:]
-        with open(FB_MEMORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(mem, f, ensure_ascii=False)
+        mem["seen_hashes"] = mem.get("seen_hashes", [])[-4000:]
+        with open(FB_MEMORY_FILE, "w", encoding="utf-8") as f: json.dump(mem, f, ensure_ascii=False)
     except Exception: pass
 
 def has_broker_copywriting(title, desc_text):
     norm_body = normalize_ar(f"{title} {desc_text[:3500]}")
-    for safe_neg in SAFE_OWNER_BROKER_NEGATIONS:
-        norm_body = norm_body.replace(normalize_ar(safe_neg), " ")
+    for safe_neg in SAFE_OWNER_BROKER_NEGATIONS: norm_body = norm_body.replace(normalize_ar(safe_neg), " ")
     for bp in BROKER_TEXT_PHRASES:
-        if normalize_ar(bp) in norm_body:
-            return True, f"Broker Phrase ({bp})"
+        if normalize_ar(bp) in norm_body: return True, f"Broker Phrase ({bp})"
     if re.search(r'(?:code|كود)\s*[:\-]?\s*[a-z]{0,3}\d{2,7}\b', norm_body, re.I) or re.search(r'\bmsr\d{2,5}\b', norm_body, re.I):
         return True, "Broker Inventory Code"
     return False, ""
+
+def is_verified_fb_owner_post(pure_raw_text, norm_pure_text, is_anon, phones, pub_name, deal, cat, price_num):
+    explicit_owner_re = r'(?:من\s*المالك|المالك\s*مباشر|انا\s*المالك|مالك\s*العقار|مالك\s*الشقه|شقتي|فيلتي|بيتي|ملكي|بتاعتي|بدون\s*وسيط|بدون\s*وسطاء|ممنوع\s*الوسطاء|يمتنع\s*الوسطاء|لغير\s*الوسطاء|لا\s*للوسطاء|عدم\s*تدخل\s*الوسطاء|بدون\s*سمسار|بدون\s*سماسره|ممنوع\s*السماسره|بدون\s*بروكر|ممنوع\s*البروكر|بدون\s*عموله|بدون\s*اي\s*عموله)'
+    if re.search(explicit_owner_re, norm_pure_text): return True, "مالك مباشر صريح"
+    address_utility_re = r'(?:شارع\s*(?!90\b)\d{1,3}|عماره\s*\d{1,4}|فيلا\s*رقم\s*\d{1,4}|قطعه\s*\d{1,4}|مدخل\s*البيت|مدخل\s*العماره|عداد\s*كهرباء|عداد\s*قديم|فواتير\s*مش\s*كروت|تليفون\s*ارضي|خالصه\s*الثمن|مسدده\s*بالكامل|لدواعي\s*السفر|لظروف\s*السفر|بداعي\s*السفر)'
+    if re.search(address_utility_re, norm_pure_text): return True, "عنوان/تفاصيل مالك مباشر"
+    for sbh in FB_SOFT_BROKER_HINTS:
+        if normalize_ar(sbh) in norm_pure_text: return False, f"صيغة تسويق ({sbh})"
+    if len(phones) == 0 and (is_anon or len(pure_raw_text) <= 420): return True, "بيان مالك سادة (تواصل خاص)"
+    if len(phones) == 1 and len(pure_raw_text) <= 380:
+        ok_ai, ai_msg = analyze_with_ai("", pure_raw_text, pub_name, deal, cat, price_num, "فيسبوك")
+        return (True, "مالك مؤكد بالذكاء الاصطناعي") if ok_ai else (False, ai_msg)
+    return False, "لا يوجد دليل مالك صريح في البوست"
 
 def parse_fb_strict_2days_header_time(header_str):
     now_dt = datetime.now(CAIRO_TZ)
     clean_h = strip_bidi(header_str)
     norm_h = normalize_ar(clean_h)
-    if re.search(r'\b(?:202[0-5])\b', norm_h): return False, "Old FB Year (<2026)"
-    if re.search(r'(?:منذ|قبل)?\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات|\d+\s*w\b|\d+\s*أ\b)', norm_h):
-        return False, "Old FB Post (>1w)"
+    if re.search(r'\b(?:202[0-5])\b', norm_h): return False, "Old FB Year (<2026)", ""
+    if re.search(r'(?:منذ|قبل)?\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات|\d+\s*w\b|\d+\s*أ\b)', norm_h): return False, "Old FB Post (>1w)", ""
     m_old_d = re.search(r'\b([3-9]|\d{2,})\s*(?:يوم|ايام|ي\b|d\b)', norm_h)
-    if m_old_d: return False, f"Old FB Post ({m_old_d.group(1)}d > 2d)"
-
+    if m_old_d: return False, f"Old FB Post ({m_old_d.group(1)}d > 2d)", ""
     for m_cal in re.finditer(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)(?:\s+(202\d))?\b', clean_h):
         d_val, m_name = int(m_cal.group(1)), m_cal.group(2)
         y_val = int(m_cal.group(3)) if m_cal.group(3) else now_dt.year
         m_val = ARABIC_MONTHS.get(m_name, 0)
         if m_val > 0:
             try:
-                ad_d = date(y_val, m_val, d_val)
-                d_diff = (now_dt.date() - ad_d).days
-                if d_diff < 0 or d_diff > MAX_AGE_DAYS:
-                    return False, f"Old FB Date ({d_val} {m_name} > 2d)"
-            except Exception: return False, "Invalid FB Date"
-    return True, "OK"
+                d_diff = (now_dt.date() - date(y_val, m_val, d_val)).days
+                if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old FB Date ({d_val} {m_name} > 2d)", ""
+                return True, "OK", ("اليوم" if d_diff == 0 else f"منذ {d_diff} يوم")
+            except Exception: return False, "Invalid FB Date", ""
+    if re.search(r'\b(?:الان|توا|حالا|just now)\b', norm_h): return True, "OK", "الآن"
+    m_min = re.search(r'\b(\d{1,2})\s*(?:دقيقه|دقائق|دقايق|د\b|m\b|mins?\b)', norm_h)
+    if m_min: return True, "OK", f"منذ {m_min.group(1)} د"
+    if re.search(r'\b(?:دقيقه|دقيقتين)\b', norm_h): return True, "OK", "منذ دقائق"
+    m_hr = re.search(r'\b(\d{1,2})\s*(?:ساعه|ساعات|س\b|h\b|hrs?\b)', norm_h)
+    if m_hr:
+        hrs = int(m_hr.group(1))
+        return (False, f"Old FB Hours ({hrs}h)", "") if hrs > 48 else (True, "OK", f"منذ {hrs} س")
+    if re.search(r'\b(?:ساعه|ساعتين)\b', norm_h): return True, "OK", "منذ ساعة"
+    if re.search(r'\b(?:امس|الامس|امبارح|yesterday|1\s*ي\b|1\s*d\b|منذ\s*يوم|قبل\s*يوم)\b', norm_h): return True, "OK", "منذ يوم"
+    if re.search(r'\b(?:منذ\s*يومين|قبل\s*يومين|2\s*ي\b|2\s*d\b|يومين)\b', norm_h): return True, "OK", "منذ يومين"
+    return False, "Unverified or Old FB Date", ""
 
 def parse_facebook_colloquial_price(text, deal):
-    clean_t = strip_bidi(text)
-    norm_t = normalize_ar(clean_t)
+    clean_t, norm_t = strip_bidi(text), normalize_ar(text)
     if deal != "إيجار":
         m_mil_k = re.search(r'(\d{1,2})\s*مليون\s*(?:و\s*)?(\d{2,3})\s*الف', norm_t)
         if m_mil_k:
@@ -486,46 +452,53 @@ def parse_facebook_colloquial_price(text, deal):
             val = int(float(m_mil_dec.group(1)) * 1000000)
             if val >= MIN_CASH_SALE_PRICE: return val, f"{val:,} ج.م"
     else:
-        m_k = re.search(r'(?:السعر|الايجار|إيجار|بـ|ب|مطلوب)\s*(\d{1,3})\s*(?:الف|ألف|تلاف)', norm_t)
-        if not m_k: m_k = re.search(r'\b(\d{1,2}(?:\.\d)?)\s*(?:الف|ألف)\s*(?:جنيه|ج|شهريا|في الشهر)?', norm_t)
+        m_k = re.search(r'(?:السعر|الايجار|إيجار|بـ|ب|مطلوب)\s*(\d{1,3})\s*(?:الف|ألف|تلاف)', norm_t) or re.search(r'\b(\d{1,2}(?:\.\d)?)\s*(?:الف|ألف)\s*(?:جنيه|ج|شهريا|في الشهر)?', norm_t)
         if m_k:
             val = int(float(m_k.group(1)) * 1000)
             if 3000 <= val <= 400000: return val, f"{val:,} ج.م"
-
     for m_num in re.findall(r'([\d,]{4,12})\s*(?:جنيه|ج\.?م|ج\b|شهريا|كاش)', clean_t):
         val = int(re.sub(r'[^\d]', '', m_num))
-        if (deal == "إيجار" and 3000 <= val <= 500000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 500000000):
-            return val, f"{val:,} ج.م"
-    if deal == "إيجار": return 1, "السعر بالتفاصيل (خاص)"
-    return MIN_CASH_SALE_PRICE, "كاش (السعر بالتفاصيل)"
+        if (deal == "إيجار" and 3000 <= val <= 500000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 500000000): return val, f"{val:,} ج.م"
+    return (1, "السعر بالتفاصيل (خاص)") if deal == "إيجار" else (MIN_CASH_SALE_PRICE, "كاش (السعر بالتفاصيل)")
+
+def parse_rooms_ar(norm_t):
+    rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفه|نوم|وصاله)', norm_t)
+    if rooms_m and 1 <= int(rooms_m.group(1)) <= 15: return int(rooms_m.group(1))
+    if re.search(r'\b(?:ثلاث|ثلاثه|تلات|تلاته)\s*(?:غرف|غرفه|نوم)', norm_t): return 3
+    if re.search(r'\b(?:غرفتين|اثنين\s*غرفه)\b', norm_t): return 2
+    if re.search(r'\b(?:اربع|اربعه)\s*(?:غرف|غرفه|نوم)', norm_t): return 4
+    if re.search(r'\b(?:خمس|خمسه)\s*(?:غرف|غرفه|نوم)', norm_t): return 5
+    return None
 
 def process_facebook_post_payload(payload):
-    raw_text = strip_bidi(payload.get("text") or "").strip()
-    full_card = strip_bidi(payload.get("full_card_text") or raw_text).strip()
+    pure_raw_text = strip_bidi(payload.get("text") or "").strip()
+    group_name = strip_bidi(payload.get("group_name") or "").strip()
+    search_query = strip_bidi(payload.get("search_query") or "").strip()
     author_raw = strip_bidi(payload.get("author") or "مشارك مجهول الهوية").strip()
     header_time = strip_bidi(payload.get("header_time") or "")
     post_url = (payload.get("url") or "").strip()
     post_hash = payload.get("hash") or ""
-    if len(raw_text) < 25: return False, "Short Post"
+    if group_name and pure_raw_text.startswith(group_name): pure_raw_text = pure_raw_text[len(group_name):].strip()
+    short_preview = re.sub(r'\s+', ' ', pure_raw_text)[:55]
+    if len(pure_raw_text) < 22: return False, "نص قصير", False
 
     mem = load_fb_memory()
-    if post_hash and post_hash in mem.get("seen_hashes", []): return False, "Already Processed"
+    if post_hash and post_hash in mem.get("seen_hashes", []): return False, "مفحوص سابقا", False
+    is_fresh, time_reason, orig_age_hint = parse_fb_strict_2days_header_time(header_time)
     if post_hash: mem.setdefault("seen_hashes", []).append(post_hash)
-
-    is_fresh, time_reason = parse_fb_strict_2days_header_time(header_time)
     if not is_fresh:
         save_fb_memory(mem)
-        print(f"  [- REJECTED FB] {time_reason}")
-        return False, time_reason
+        print(f"  [FB SCAN] [- REJECTED FB] {time_reason} | {short_preview}")
+        return False, "منشور قديم (>يومين)", ("Old FB" in time_reason)
 
-    norm_t = normalize_ar(raw_text)
+    norm_t = normalize_ar(pure_raw_text)
     for wp in FB_WANTED_PHRASES:
         if normalize_ar(wp) in norm_t[:180]:
             save_fb_memory(mem)
-            print(f"  [- REJECTED FB] Wanted/Request Post ({wp})")
-            return False, "Wanted Post"
+            print(f"  [FB SCAN] [- REJECTED FB] Wanted Post ({wp}) | {short_preview}")
+            return False, "طلب وليس عرض", False
 
-    phones = list(set(re.findall(r'\b01[0125]\d{8}\b', re.sub(r'[\s\-]', '', raw_text))))
+    phones = list(set(re.findall(r'\b01[0125]\d{8}\b', re.sub(r'[\s\-]', '', pure_raw_text))))
     for ph in phones:
         ph_posts = mem.setdefault("phones", {}).setdefault(ph, [])
         if post_hash and post_hash not in ph_posts: ph_posts.append(post_hash)
@@ -539,89 +512,69 @@ def process_facebook_post_payload(payload):
         if post_hash and post_hash not in au_posts: au_posts.append(post_hash)
         if len(au_posts) > 2:
             save_fb_memory(mem)
-            print(f"  [- REJECTED FB] Repeated Author Broker ({pub_name}: {len(au_posts)} posts)")
-            return False, "Repeated Author Broker"
+            print(f"  [FB SCAN] [- REJECTED FB] Repeated Author Broker ({pub_name}: {len(au_posts)} posts)")
+            return False, "سمسار مكرر المنشورات", False
     save_fb_memory(mem)
 
-    if len(phones) >= 2:
-        print(f"  [- REJECTED FB] Multi-Phone Sales Post ({len(phones)} phones)")
-        return False, "Multi-Phone Broker"
+    if len(phones) >= 2: return False, "أرقام مبيعات متعددة", False
     for ph in phones:
-        if len(mem.get("phones", {}).get(ph, [])) > 2:
-            print(f"  [- REJECTED FB] Repeated Phone Broker ({ph} seen in {len(mem['phones'][ph])} posts)")
-            return False, "Repeated Phone Broker"
-    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name):
-        print(f"  [- REJECTED FB] Broker Account Name ({pub_name})")
-        return False, "Broker Name"
-    if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه)', norm_t):
-        print("  [- REJECTED FB] Daily/Hotel Rental")
-        return False, "Daily Rental"
+        if len(mem.get("phones", {}).get(ph, [])) > 2: return False, "رقم سمسار مكرر", False
+    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name): return False, "حساب شركة/سمسار", False
+    if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه)', norm_t): return False, "إيجار يومي/فندقي", False
 
-    is_brk, brk_reason = has_broker_copywriting("", raw_text)
-    if is_brk:
-        print(f"  [- REJECTED FB] {brk_reason}")
-        return False, brk_reason
+    is_brk, brk_reason = has_broker_copywriting("", pure_raw_text)
+    if is_brk: return False, "صيغة سمسار", False
 
-    zone = detect_zone("", raw_text)
-    if not zone:
-        return False, "Excluded City"
+    zone = detect_zone("", pure_raw_text)
+    if not zone: return False, "مدينة مستبعدة", False
     if zone == "القاهرة الجديدة":
-        zone_from_card = detect_zone("", full_card)
-        if zone_from_card and zone_from_card != "القاهرة الجديدة":
-            zone = zone_from_card
-        elif not any(k in normalize_ar(full_card) for k in ("التجمع", "القاهره الجديده")):
-            return False, "Outside New Cairo Zones"
+        context_zone = detect_zone("", f"{group_name} {search_query}")
+        if not context_zone: return False, "مدينة مستبعدة", False
+        if context_zone != "القاهرة الجديدة": zone = context_zone
+        elif any(k in normalize_ar(f"{pure_raw_text} {group_name} {search_query}") for k in ("التجمع", "القاهره الجديده")): zone = "التجمع الخامس"
+        else: return False, "خارج مناطق التجمع", False
 
     is_rent = any(k in norm_t for k in ("للايجار", "ايجار", "مفروش", "شهريا", "في الشهر"))
     deal = "إيجار" if is_rent else "تمليك"
-    if "فيلا" in norm_t or "تاون هاوس" in norm_t or "توين هاوس" in norm_t: cat = "فلل"
-    elif any(k in norm_t for k in ("محل", "مكتب", "عياده", "مقر اداري", "تجاري")): cat = "تجاري"
-    elif "ارض " in norm_t or "قطعه ارض" in norm_t or "عماره" in norm_t: cat = "أراضي"
-    else: cat = "شقق"
+    cat = "فلل" if ("فيلا" in norm_t or "تاون هاوس" in norm_t or "توين هاوس" in norm_t) else ("تجاري" if any(k in norm_t for k in ("محل", "مكتب", "عياده", "مقر اداري", "تجاري")) else ("أراضي" if ("ارض " in norm_t or "قطعه ارض" in norm_t or "عماره" in norm_t) else "شقق"))
 
-    price_num, price_str = parse_facebook_colloquial_price(raw_text, deal)
-    if deal != "إيجار" and not is_strict_cash_sale("", raw_text, price_num):
-        print("  [- REJECTED FB] Installment or Downpayment Ad")
-        return False, "Installment"
+    price_num, price_str = parse_facebook_colloquial_price(pure_raw_text, deal)
+    if deal != "إيجار" and not is_strict_cash_sale("", pure_raw_text, price_num): return False, "تقسيط/مقدم", False
 
-    first_line = raw_text.split("\n")[0].strip()[:85]
+    is_true_owner, owner_proof_label = is_verified_fb_owner_post(pure_raw_text, norm_t, is_anon, phones, pub_name, deal, cat, price_num)
+    if not is_true_owner:
+        print(f"  [FB SCAN] [- REJECTED FB] Not Verified Owner ({owner_proof_label}) | {short_preview}")
+        return False, owner_proof_label, False
+
+    clean_lines = [ln.strip() for ln in pure_raw_text.split("\n") if ln.strip() and ln.strip() != group_name]
+    first_line = (clean_lines[0] if clean_lines else pure_raw_text)[:85]
     title = first_line if len(first_line) >= 12 else f"{cat} ({deal}) في {zone} - {pub_name}"
-
     area_m = re.search(r'(\d{2,4})\s*(?:متر|م2|م²|\bم\b)', norm_t)
     area_val = int(area_m.group(1)) if (area_m and 25 <= int(area_m.group(1)) <= 5000) else None
-    rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفه|نوم)', norm_t)
-    rooms_val = int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 15) else None
+    rooms_val = parse_rooms_ar(norm_t)
 
     now_dt = datetime.now(CAIRO_TZ)
     entry_ts = int(now_dt.timestamp())
-    entry_clock = now_dt.strftime("%I:%M %p")
-    entry_age_label = f"دخل الرادار {entry_clock}"
-    now_cairo = now_dt.strftime("%Y-%m-%d %I:%M %p")
-
-    uid = int("93" + str(abs(hash(post_hash or raw_text[:100])) % 1000000000))
-    final_link = post_url if "facebook.com" in post_url else "https://www.facebook.com/?sk=h_chr"
-    phone_note = f" | ت: {phones[0]}" if phones else " | (تواصل خاص/بوست)"
+    entry_age_label = f"دخل الرادار {now_dt.strftime('%I:%M %p')}" + (f" (نُشر {orig_age_hint})" if orig_age_hint else "")
+    uid = int("93" + str(abs(hash(post_hash or pure_raw_text[:100])) % 1000000000))
+    final_link = post_url if "facebook.com" in post_url else "https://www.facebook.com/groups/feed/"
+    phone_note = f" | ت: {phones[0]} [{owner_proof_label}]" if phones else f" | [{owner_proof_label}]"
 
     fb_ad = {
-        "ad_id": uid, "id": f"fb_{uid}", "source": "فيسبوك",
-        "title": title, "price": price_str, "price_num": price_num,
-        "zone": zone, "location": zone, "cat": cat, "category": cat,
-        "deal": deal, "type": deal, "area": area_val, "rooms": rooms_val,
-        "publisher": pub_name + phone_note, "pub_ads": 1, "active_ads_count": 1,
-        "age": entry_age_label, "fresh_tier": 3, "description": raw_text[:550],
-        "first_seen_ts": entry_ts, "timestamp": entry_ts,
-        "desc_verified_v2": True, "verified_24h_v93": True, "verified_fb_v110": True,
-        "url": final_link, "link": final_link, "verified_v12": True,
-        "scraped_at": now_cairo, "date": now_dt.strftime("%Y-%m-%d %H:%M")
+        "ad_id": uid, "id": f"fb_{uid}", "source": "فيسبوك", "title": title, "price": price_str, "price_num": price_num,
+        "zone": zone, "location": zone, "cat": cat, "category": cat, "deal": deal, "type": deal, "area": area_val, "rooms": rooms_val,
+        "publisher": pub_name + phone_note, "pub_ads": 1, "active_ads_count": 1, "age": entry_age_label, "fresh_tier": 3,
+        "description": pure_raw_text[:600], "first_seen_ts": entry_ts, "timestamp": entry_ts, "desc_verified_v2": True,
+        "verified_24h_v93": True, "verified_fb_v110": True, "url": final_link, "link": final_link, "verified_v12": True,
+        "scraped_at": now_dt.strftime("%Y-%m-%d %I:%M %p"), "date": now_dt.strftime("%Y-%m-%d %H:%M")
     }
-
     with SYNC_LOCK:
         extra_live = load_extra_live_backup()
         extra_live.insert(0, fb_ad)
         save_extra_live_backup(extra_live)
-        print(f"  [+ ACCEPTED FB OWNER] ({entry_age_label}) | {pub_name}{phone_note} | {zone} | {price_str}")
+        print(f"\n  >>> [FB LIVE] [+ ACCEPTED FB OWNER] ({entry_age_label}) | {pub_name}{phone_note} | {zone} | {price_str} <<<")
         guard_extra_ads_during_sleep(force_push=True)
-    return True, "OK"
+    return True, "OK", False
 
 class FacebookIngestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args): pass
@@ -634,24 +587,22 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
         self.end_headers()
     def do_OPTIONS(self): self._send_cors(200)
     def do_POST(self):
-        if self.path != "/fb_ingest":
-            self._send_cors(404)
-            return
+        if self.path != "/fb_ingest": self._send_cors(404); return
         try:
             length = int(self.headers.get("Content-Length", 0))
             payload = json.loads(self.rfile.read(length).decode("utf-8", errors="replace"))
-            ok, reason = process_facebook_post_payload(payload)
+            ok, reason, is_old = process_facebook_post_payload(payload)
             self._send_cors(200)
-            self.wfile.write(json.dumps({"accepted": ok, "reason": reason}).encode("utf-8"))
+            self.wfile.write(json.dumps({"accepted": ok, "reason": reason, "is_old": is_old}).encode("utf-8"))
         except Exception as e:
             self._send_cors(200)
-            self.wfile.write(json.dumps({"accepted": False, "reason": str(e)}).encode("utf-8"))
+            self.wfile.write(json.dumps({"accepted": False, "reason": str(e), "is_old": False}).encode("utf-8"))
 
 def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Stealth Receiver v11.3] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Real-Time Search Receiver v11.7] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -681,9 +632,7 @@ def load_extra_live_backup():
     dedup, seen_u = [], set()
     for a in combined:
         u = str(a.get("ad_id") or a.get("url") or a.get("link"))
-        if u and u not in seen_u:
-            seen_u.add(u)
-            dedup.append(a)
+        if u and u not in seen_u: seen_u.add(u); dedup.append(a)
     return dedup
 
 def save_extra_live_backup(extra_ads_list):
@@ -691,8 +640,7 @@ def save_extra_live_backup(extra_ads_list):
         if os.path.exists(EXTRA_LIVE_BACKUP_FILE):
             try: os.chmod(EXTRA_LIVE_BACKUP_FILE, stat.S_IWRITE)
             except Exception: pass
-        with open(EXTRA_LIVE_BACKUP_FILE, "w", encoding="utf-8") as f:
-            json.dump(extra_ads_list[:220], f, ensure_ascii=False, indent=2)
+        with open(EXTRA_LIVE_BACKUP_FILE, "w", encoding="utf-8") as f: json.dump(extra_ads_list[:220], f, ensure_ascii=False, indent=2)
     except Exception: pass
 
 def atomic_write_and_git_push(data_payload, commit_msg):
@@ -705,8 +653,7 @@ def atomic_write_and_git_push(data_payload, commit_msg):
             if os.path.exists(DATA_FILE):
                 try: os.chmod(DATA_FILE, stat.S_IWRITE)
                 except Exception: pass
-            with open(DATA_FILE, "w", encoding="utf-8") as f:
-                json.dump(data_payload, f, ensure_ascii=False, indent=2)
+            with open(DATA_FILE, "w", encoding="utf-8") as f: json.dump(data_payload, f, ensure_ascii=False, indent=2)
             subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
             subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=15)
             p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
@@ -734,8 +681,7 @@ def save_persistent_seen_ids(seen_set):
         if os.path.exists(EXTRA_SEEN_FILE):
             try: os.chmod(EXTRA_SEEN_FILE, stat.S_IWRITE)
             except Exception: pass
-        with open(EXTRA_SEEN_FILE, "w", encoding="utf-8") as f:
-            json.dump(list(seen_set)[-20000:], f)
+        with open(EXTRA_SEEN_FILE, "w", encoding="utf-8") as f: json.dump(list(seen_set)[-20000:], f)
     except Exception: pass
 
 def is_warp_up():
@@ -746,12 +692,7 @@ def is_warp_up():
 class SmartFetcher:
     def __init__(self):
         self.warp_active = is_warp_up()
-        base_headers = {
-            "Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Referer": "https://www.google.com/",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Upgrade-Insecure-Requests": "1"
-        }
+        base_headers = {"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7", "Referer": "https://www.google.com/", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8", "Upgrade-Insecure-Requests": "1"}
         self.warp_sess = cffi_requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY}) if self.warp_active else None
         if self.warp_sess: self.warp_sess.headers.update(base_headers)
         self.direct_sess = cffi_requests.Session(impersonate="chrome120")
@@ -800,8 +741,7 @@ def clean_publisher_name(name):
     s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|شارك|إبلاغ|تابِع|تابع|التقييم.*)', ' ', s, flags=re.I)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,><.★⭐•·+")
     norm_s = normalize_ar(s)
-    if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه", "جروب", "مجموعه", "عقارات التجمع", "شقق التجمع")):
-        return default_lbl
+    if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه", "جروب", "مجموعه", "عقارات التجمع", "شقق التجمع")): return default_lbl
     if not s or len(s) < 2 or len(s) > 38 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s): return default_lbl
     return s
 
@@ -834,8 +774,7 @@ def parse_aqarmap_strict_2days_date(text_block):
         m_val = ARABIC_MONTHS.get(m_name, 0)
         if m_val > 0:
             try:
-                ad_d = date(y_val, m_val, d_val)
-                d_diff = (now_dt.date() - ad_d).days
+                d_diff = (now_dt.date() - date(y_val, m_val, d_val)).days
                 if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old AqarMap Ad ({d_val} {m_name} {y_val} > {MAX_AGE_DAYS}d)", 0, 0
                 if d_diff == 0: return True, f"اليوم ({d_val} {m_name})", 3, now_ts - 3600
                 elif d_diff == 1: return True, f"منذ يوم ({d_val} {m_name})", 3, now_ts - 72000
@@ -860,23 +799,11 @@ def extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_check
         for _ in range(4):
             if not card.parent or len(card.parent.get_text(" ", strip=True)) > 650: break
             card = card.parent
-        has_company_logo = False
-        for img in card.find_all("img"):
-            alt_t = strip_bidi(img.get("alt") or "").strip().lower()
-            src_i = str(img.get("src") or "").lower()
-            if "/companies/" in src_i or "company-logo" in src_i or ("logo" in alt_t and "user logo" not in alt_t and "aqarmap" not in alt_t):
-                has_company_logo = True
-                break
-        if has_company_logo:
-            extra_checked.add(uid)
-            continue
+        has_company_logo = any("/companies/" in str(img.get("src") or "").lower() or "company-logo" in str(img.get("src") or "").lower() or ("logo" in strip_bidi(img.get("alt") or "").lower() and "user logo" not in strip_bidi(img.get("alt") or "").lower() and "aqarmap" not in strip_bidi(img.get("alt") or "").lower()) for img in card.find_all("img"))
+        if has_company_logo: extra_checked.add(uid); continue
         norm_c = normalize_ar(card.get_text(" ", strip=True))
-        if any(normalize_ar(city) in norm_c for city in EXCLUDED_CITIES):
-            extra_checked.add(uid)
-            continue
-        if src["deal"] != "إيجار" and any(k in norm_c for k in ("بالتقسيط", "قسط علي", "تكمله اقساط")):
-            extra_checked.add(uid)
-            continue
+        if any(normalize_ar(city) in norm_c for city in EXCLUDED_CITIES): extra_checked.add(uid); continue
+        if src["deal"] != "إيجار" and any(k in norm_c for k in ("بالتقسيط", "قسط علي", "تكمله اقساط")): extra_checked.add(uid); continue
         seen_ids.add(uid)
         out.append({"ad_id": uid, "num_str": num_str, "source": "عقارماب", "en_src": "AqarMap", "url": "https://aqarmap.com.eg" + path, "cat": src["cat"], "deal": src["deal"]})
     return out
@@ -896,8 +823,7 @@ def extract_aqarmap_details(html, deal, expected_num_str, final_url):
     title = strip_bidi((h1.get_text(" ", strip=True) if h1 else "").split("|")[0]).strip()
     if not title or len(title) < 5: return None, "Empty title"
     full_txt = strip_bidi(soup_full.get_text(" ", strip=True))
-    specs_start = full_txt.find("تفاصيل الإعلان")
-    desc_start = full_txt.find("وصف الإعلان")
+    specs_start, desc_start = full_txt.find("تفاصيل الإعلان"), full_txt.find("وصف الإعلان")
     if specs_start == -1 or desc_start == -1: return None, "Redirected to Search Page (Missing Specs)"
     is_fresh_2d, age_label, fresh_tier, official_ts = parse_aqarmap_strict_2days_date(full_txt[:specs_start + 1200])
     if not is_fresh_2d: return None, age_label
@@ -933,9 +859,7 @@ def extract_aqarmap_details(html, deal, expected_num_str, final_url):
             norm_p = normalize_ar(p)
             if re.search(r'^(?:0\s*عقار|عقار\s*واحد|(?:\d+\s*)?عقارين|\d+\s*عقارات|\d+\s*عقار)$', norm_p) and idx_p >= 1:
                 cand_prev = clean_publisher_name(parts[idx_p - 1])
-                if cand_prev != "مالك مباشر":
-                    pub_name = cand_prev
-                    break
+                if cand_prev != "مالك مباشر": pub_name = cand_prev; break
             cand = clean_publisher_name(p)
             if cand != "مالك مباشر": pub_name = cand
         break
@@ -953,43 +877,32 @@ def extract_aqarmap_details(html, deal, expected_num_str, final_url):
     for m_p in re.findall(r'([\d,]{4,15})\s*(?:جنيه|ج\.?م|EGP)', price_context, re.I):
         val = int(re.sub(r'[^\d]', '', m_p))
         if (deal == "إيجار" and 2500 <= val <= 4000000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 1500000000):
-            price_num, price_str = val, f"{val:,} ج.م"
-            break
+            price_num, price_str = val, f"{val:,} ج.م"; break
     if price_num == 0: return None, "Missing/Zero Price"
     if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num): return None, f"Installment or Downpayment ({price_num:,})"
 
     top_specs_blob = full_txt[:2200] + " " + specs_txt + " " + pure_desc
     area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', top_specs_blob, re.I)
     rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', top_specs_blob)
-    return {
-        "title": title, "body_text": pure_desc[:2000], "zone": zone, "pub_name": pub_name, "pub_ads": max(1, pub_ads),
-        "price_num": price_num, "price_str": price_str, "area": (int(area_m.group(1)) if area_m else None),
-        "rooms": (int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None),
-        "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts, "canonical_url": canonical_url
-    }, "OK"
+    return {"title": title, "body_text": pure_desc[:2000], "zone": zone, "pub_name": pub_name, "pub_ads": max(1, pub_ads), "price_num": price_num, "price_str": price_str, "area": (int(area_m.group(1)) if area_m else None), "rooms": (int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None), "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts, "canonical_url": canonical_url}, "OK"
 
 def is_valid_existing_extra_ad(ad):
     src = ad.get("source") or "دوبيزل"
     if src == "دوبيزل": return True
     u = str(ad.get("url") or ad.get("link") or "")
-    if src == "عقارماب":
-        if not ad.get("verified_aq_v100") or "/ar/listing/" not in u: return False
-    elif src == "فيسبوك":
-        if not ad.get("verified_fb_v110"): return False
-    else: return False
+    if src == "عقارماب" and (not ad.get("verified_aq_v100") or "/ar/listing/" not in u): return False
+    if src == "فيسبوك" and not ad.get("verified_fb_v110"): return False
+    if src not in ("عقارماب", "فيسبوك"): return False
     now_ts = int(datetime.now(CAIRO_TZ).timestamp())
     ad_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or 0)
     if ad_ts <= 0 or (now_ts - ad_ts) > ((MAX_AGE_DAYS + 1) * 86400): return False
     pub, title, desc, zone = ad.get("publisher", ""), ad.get("title", ""), ad.get("description", ""), ad.get("zone", "")
     deal, price_num = ad.get("deal", "تمليك"), int(ad.get("price_num", 0) or 0)
-    if price_num <= 0: return False
-    pub_ads = int(ad.get("pub_ads", 1) or 1)
-    if pub_ads > MAX_OWNER_ADS_AQ or is_company_name(pub): return False
+    if price_num <= 0 or int(ad.get("pub_ads", 1) or 1) > MAX_OWNER_ADS_AQ or is_company_name(pub): return False
     is_brk, _ = has_broker_copywriting(title, desc)
     if is_brk: return False
     norm_all = normalize_ar(f"{title} {zone}")
-    for city in EXCLUDED_CITIES:
-        if normalize_ar(city) in norm_all: return False
+    if any(normalize_ar(city) in norm_all for city in EXCLUDED_CITIES): return False
     if deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num): return False
     return True
 
@@ -1008,16 +921,14 @@ def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked,
             if not is_valid_existing_extra_ad(ad): continue
             u = str(ad.get("ad_id") or ad.get("url") or ad.get("link"))
             if not u or u in seen_u: continue
-            seen_u.add(u)
-            merged_ads.append(ad)
+            seen_u.add(u); merged_ads.append(ad)
         merged_ads.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
         merged_ads = merged_ads[:450]
         extra_live = [a for a in merged_ads if a.get("source") in ("عقارماب", "فيسبوك")]
         save_extra_live_backup(extra_live)
         aq_cnt = sum(1 for a in extra_live if a.get("source") == "عقارماب")
         fb_cnt = sum(1 for a in extra_live if a.get("source") == "فيسبوك")
-        now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-        data_obj["updated_at"] = now_str
+        data_obj["updated_at"] = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
         data_obj["total"] = len(merged_ads)
         data_obj["last_run_report"] = run_report
         data_obj["ads"] = merged_ads
@@ -1046,8 +957,7 @@ def guard_extra_ads_during_sleep(force_push=False):
             for ad in clean_pool:
                 u = str(ad.get("ad_id") or ad.get("url") or ad.get("link"))
                 if not u or u in seen_u: continue
-                seen_u.add(u)
-                merged.append(ad)
+                seen_u.add(u); merged.append(ad)
             merged.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
             d["ads"] = merged[:450]
             d["total"] = len(d["ads"])
@@ -1066,19 +976,14 @@ def sync_telegram_config(current_cfg):
                 if not line: continue
                 msg = json.loads(line).get("message", "")
                 if msg.startswith("TG_CFG:"):
-                    b64_part = msg.replace("TG_CFG:", "").strip()
-                    decoded = json.loads(base64.b64decode(b64_part).decode("utf-8"))
-                    if decoded.get("tok") and decoded.get("cid"):
-                        cfg["tok"], cfg["cid"] = decoded["tok"].strip(), str(decoded["cid"]).strip()
+                    decoded = json.loads(base64.b64decode(msg.replace("TG_CFG:", "").strip()).decode("utf-8"))
+                    if decoded.get("tok") and decoded.get("cid"): cfg["tok"], cfg["cid"] = decoded["tok"].strip(), str(decoded["cid"]).strip()
     except Exception: pass
     return cfg
 
 def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source):
     url = "https://gamal216.pythonanywhere.com/analyze"
-    payload = {
-        "text": f"{title} {visible_text[:2000]}", "title": title, "description": visible_text[:2000],
-        "publisher": pub_name, "deal": deal, "cat": cat, "price_num": price_num, "source": source, "active_ads_count": 1
-    }
+    payload = {"text": f"{title} {visible_text[:2000]}", "title": title, "description": visible_text[:2000], "publisher": pub_name, "deal": deal, "cat": cat, "price_num": price_num, "source": source, "active_ads_count": 1}
     try:
         response = std_requests.post(url, json=payload, timeout=12)
         if response.status_code == 200:
@@ -1113,29 +1018,24 @@ def run_extra_radar():
     existing_ads, seen_existing_u = [], set()
     for ad in raw_existing:
         u = str(ad.get("ad_id") or ad.get("url") or ad.get("link"))
-        if not u or u in seen_existing_u: continue
-        if is_valid_existing_extra_ad(ad):
-            seen_existing_u.add(u)
-            existing_ads.append(ad)
+        if u and u not in seen_existing_u and is_valid_existing_extra_ad(ad):
+            seen_existing_u.add(u); existing_ads.append(ad)
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
     new_extra_ads, aq_candidates = [], []
 
     for src in AQARMAP_SOURCES:
-        max_p = src.get("max_p", 3)
-        for page in range(1, max_p + 1):
+        for page in range(1, src.get("max_p", 3) + 1):
             page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
             html, status_info, _ = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
             found_aq = extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
             aq_candidates.extend(found_aq)
-            print(f"[AqarMap] {src['en']} p.{page} -> {status_info} (Unchecked Non-Company Candidates: {len(found_aq)})")
+            print(f"[AqarMap] {src['en']} p.{page} -> {status_info} (Candidates: {len(found_aq)})")
             time.sleep(random.uniform(0.4, 0.8))
 
     save_persistent_seen_ids(extra_checked)
-    rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
-    sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
-    all_candidates = rent_aq[:160] + sale_aq[:160]
-    print(f"\n[AqarMap + Facebook Radar v11.3] AqarMap Unchecked Candidates: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
+    print(f"\n[AqarMap + Facebook Radar v11.7] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added, total_c = 0, len(all_candidates)
     for idx, item in enumerate(all_candidates, 1):
@@ -1144,7 +1044,7 @@ def run_extra_radar():
             html, st_ad, final_url = fetcher.get_html(item["url"], require_path_sub="/ar/listing/")
             if st_ad == "Redirected_To_Search":
                 extra_checked.add(uid)
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] Redirected to Search Page (Deleted Ad)")
+                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] Redirected to Search Page")
                 continue
             if not html: continue
             info, reason = extract_aqarmap_details(html, item["deal"], num_str, final_url)
@@ -1162,16 +1062,12 @@ def run_extra_radar():
             now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             verified_url = info.get("canonical_url") or final_url
             new_extra_ads.append({
-                "ad_id": uid, "id": f"ext_{uid}", "source": "عقارماب",
-                "title": info["title"], "price": info["price_str"], "price_num": info["price_num"],
-                "zone": info["zone"], "location": info["zone"], "cat": item["cat"], "category": item["cat"],
-                "deal": item["deal"], "type": item["deal"], "area": info["area"], "rooms": info["rooms"],
-                "publisher": info["pub_name"], "pub_ads": info["pub_ads"], "active_ads_count": info["pub_ads"],
-                "age": info["age_label"], "fresh_tier": info["fresh_tier"], "description": info["body_text"][:500],
-                "first_seen_ts": real_post_ts, "timestamp": real_post_ts, "desc_verified_v2": True,
-                "verified_24h_v93": True, "verified_aq_v100": True, "url": verified_url, "link": verified_url,
-                "verified_v12": True, "scraped_at": now_cairo,
-                "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+                "ad_id": uid, "id": f"ext_{uid}", "source": "عقارماب", "title": info["title"], "price": info["price_str"], "price_num": info["price_num"],
+                "zone": info["zone"], "location": info["zone"], "cat": item["cat"], "category": item["cat"], "deal": item["deal"], "type": item["deal"],
+                "area": info["area"], "rooms": info["rooms"], "publisher": info["pub_name"], "pub_ads": info["pub_ads"], "active_ads_count": info["pub_ads"],
+                "age": info["age_label"], "fresh_tier": info["fresh_tier"], "description": info["body_text"][:500], "first_seen_ts": real_post_ts, "timestamp": real_post_ts,
+                "desc_verified_v2": True, "verified_24h_v93": True, "verified_aq_v100": True, "url": verified_url, "link": verified_url, "verified_v12": True,
+                "scraped_at": now_cairo, "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
             })
             aq_added += 1
             print(f"  [{idx}/{total_c}] [+ ACCEPTED <=2D AQARMAP OWNER] ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | Price: {info['price_num']:,} EGP")
@@ -1191,7 +1087,7 @@ def main():
         run_extra_radar()
         return
     start_fb_local_server()
-    print("=== Starting 24/7 AqarMap + Facebook Stealth Main-Page Radar v11.3 ===")
+    print("=== Starting 24/7 AqarMap + Facebook Real-Time Owner Radar v11.7 ===")
     print(f"[FB Extension Folder Ready] -> {FB_EXT_DIR}")
     cycle = 1
     while True:
