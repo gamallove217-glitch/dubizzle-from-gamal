@@ -300,7 +300,7 @@ class SmartFetcher:
     def discover_opensooq_sources(self):
         sources, seen_urls = [], set()
         seed_pages = ["https://eg.opensooq.com/ar"]
-        cairo_ hubs = []
+        cairo_hubs = []
 
         for seed in seed_pages:
             html, st = self.get_html(seed)
