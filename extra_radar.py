@@ -24,7 +24,7 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 EXTRA_SEEN_FILE = os.path.join(BASE_DIR, "seen_extra_local.json")
-OS_RESET_FLAG = os.path.join(BASE_DIR, "os_clean_v95.flag")
+CLEAN_V96_FLAG = os.path.join(BASE_DIR, "clean_v96.flag")
 TG_CONFIG_TOPIC = "gamal_vip_tg_9941_sec"
 WARP_PROXY = "socks5h://127.0.0.1:40000"
 MIN_CASH_SALE_PRICE = 1200000
@@ -103,14 +103,17 @@ BROKER_NAME_WORDS = [
 ]
 
 BROKER_TEXT_PHRASES = [
-    "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "مكتب عقارات", "مكتب تسويق",
-    "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري",
-    "استشاري عقاري", "مستشار عقاري", "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات",
-    "فريق من الخبراء", "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا",
+    "انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى",
+    "سمسار", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "عمولة شهر", "عموله شهر", "عمولة نصف شهر",
+    "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "نسبة العمولة",
+    "عمولة 1.5%", "عمولة 2%", "عموله 1.5%", "عموله 2%", "يوجد عمولة", "يوجد عموله",
+    "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق",
+    "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري",
+    "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء",
+    "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا",
     "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا",
     "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من",
     "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات",
-    "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "نسبة العمولة", "عمولة 1.5%", "عمولة 2%",
     "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "الشركة العالمية للعقارات"
 ]
 
@@ -137,31 +140,51 @@ def fix_git_identity_for_vercel():
     subprocess.run(["git", "config", "user.name", "gamallove217-glitch"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["git", "config", "user.email", "gamallove217@gmail.com"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def reliable_git_push(commit_msg):
+def fetch_remote_ads_list():
+    try:
+        clear_git_locks()
+        subprocess.run(["git", "fetch", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
+        res = subprocess.run(["git", "show", "origin/main:ads.json"], cwd=BASE_DIR, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=15)
+        if res.returncode == 0 and res.stdout:
+            d = json.loads(res.stdout)
+            if isinstance(d, dict) and isinstance(d.get("ads"), list):
+                return d["ads"]
+    except Exception:
+        pass
+    return []
+
+def atomic_write_and_git_push(data_payload, commit_msg):
     fix_git_identity_for_vercel()
-    subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=20)
-    subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=20)
     for attempt in range(1, 4):
         try:
             clear_git_locks()
+            subprocess.run(["git", "fetch", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+            subprocess.run(["git", "reset", "--mixed", "origin/main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
+            if os.path.exists(DATA_FILE):
+                try: os.chmod(DATA_FILE, stat.S_IWRITE)
+                except Exception: pass
+            with open(DATA_FILE, "w", encoding="utf-8") as f:
+                json.dump(data_payload, f, ensure_ascii=False, indent=2)
+            subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
+            subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=15)
             p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
             if p_res.returncode == 0:
                 return True, "OK"
-            subprocess.run(["git", "pull", "--rebase", "--autostash", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
-            p_res2 = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
-            if p_res2.returncode == 0:
-                return True, "OK (After Rebase)"
         except Exception as e:
             if attempt == 3:
                 return False, str(e)
             time.sleep(3)
-    return False, "Push failed after 3 retries"
+    return False, "Push failed after 3 attempts"
 
 def load_persistent_seen_ids(data_dict):
-    seen_set = set()
-    for x in data_dict.get("extra_checked_ids", []):
-        try: seen_set.add(int(x))
+    if not os.path.exists(CLEAN_V96_FLAG):
+        try:
+            with open(CLEAN_V96_FLAG, "w") as f: f.write("ok")
         except Exception: pass
+        save_persistent_seen_ids(set())
+        print("[Memory Reset v9.6] Cleared extra seen cache once to recover AqarMap ads & re-verify OpenSooq!")
+        return set()
+    seen_set = set()
     if os.path.exists(EXTRA_SEEN_FILE):
         try:
             with open(EXTRA_SEEN_FILE, "r", encoding="utf-8") as f:
@@ -171,13 +194,6 @@ def load_persistent_seen_ids(data_dict):
                         try: seen_set.add(int(x))
                         except Exception: pass
         except Exception: pass
-    if not os.path.exists(OS_RESET_FLAG):
-        seen_set = {x for x in seen_set if not str(x).startswith("92")}
-        try:
-            with open(OS_RESET_FLAG, "w") as f: f.write("ok")
-            print("[OpenSooq Memory Reset] Cleared previously skipped OpenSooq IDs for fresh v9.5 inspection!")
-        except Exception: pass
-        save_persistent_seen_ids(seen_set)
     return seen_set
 
 def save_persistent_seen_ids(seen_set):
@@ -392,7 +408,7 @@ def clean_publisher_name(name):
     if not name:
         return default_lbl
     s = re.sub(r'<[^>]+>', ' ', str(name))
-    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|إبلاغ|تابِع|تابع|الرد\s*على.*|التقييم.*)', ' ', s, flags=re.I)
+    s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|شاهد\s*كل\s*الاعلانات.*|شاهد\s*كل\s*الإعلانات.*|عرض\s*جميع\s*الإعلانات.*|عرض\s*جميع\s*الاعلانات.*|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|إبلاغ|تابِع|تابع|الرد\s*على.*|التقييم.*)', ' ', s, flags=re.I)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,><.★⭐•·")
     norm_s = normalize_ar(s)
     if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه")):
@@ -402,7 +418,7 @@ def clean_publisher_name(name):
     return s
 
 def detect_zone(title, body_text):
-    raw_core = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {body_text[:1500]}")
+    raw_core = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {body_text[:2000]}")
     core = normalize_ar(raw_core)
     for city in EXCLUDED_CITIES:
         if normalize_ar(city) in core:
@@ -416,7 +432,7 @@ def detect_zone(title, body_text):
 def is_strict_cash_sale(title, desc_text, price_num):
     if 0 < int(price_num or 0) < MIN_CASH_SALE_PRICE:
         return False
-    raw_combined = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {desc_text[:2500]}")
+    raw_combined = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {desc_text[:3000]}")
     full_text = normalize_ar(raw_combined)
     for neg in SAFE_CASH_NEGATIONS:
         full_text = full_text.replace(normalize_ar(neg), " ")
@@ -428,10 +444,10 @@ def is_strict_cash_sale(title, desc_text, price_num):
     return True
 
 def has_broker_copywriting(title, desc_text):
-    norm_body = normalize_ar(f"{title} {desc_text[:2500]}")
+    norm_body = normalize_ar(f"{title} {desc_text[:3500]}")
     for bp in BROKER_TEXT_PHRASES:
         if normalize_ar(bp) in norm_body:
-            return True, "Broker Copywriting Phrase"
+            return True, f"Broker Phrase ({bp})"
     if re.search(r'\b(?:code|كود)\s*[:\-]?\s*[a-z0-9]{2,10}\b', norm_body, re.I) or re.search(r'\bmsr\d{2,5}\b', norm_body, re.I):
         return True, "Broker Inventory Code"
     return False, ""
@@ -712,6 +728,10 @@ def extract_opensooq_details(html, deal, hint_age="", hint_ts=0):
         if idx_m > cut_start:
             clean_html = clean_html[:idx_m]
 
+    norm_raw_clean = normalize_ar(clean_html)
+    if re.search(r'(?:المعلن|advertiser|seller_type)["\'\s:\-]{1,30}(?:الوسيط|وسيط|مكتب|broker|agent)', norm_raw_clean, re.I):
+        return None, "OpenSooq Role: Broker (الوسيط)"
+
     soup = BeautifulSoup(clean_html, "html.parser")
     for tag in soup.find_all(["header", "nav", "footer", "script", "style", "noscript"]):
         tag.decompose()
@@ -730,7 +750,7 @@ def extract_opensooq_details(html, deal, hint_age="", hint_ts=0):
         post_txt = post_txt[h1_pos:]
     norm_post = normalize_ar(post_txt)
 
-    if "اعلانات المتجر" in norm_post or "نشاط تجاري موثق" in norm_post[:1500]:
+    if "اعلانات المتجر" in norm_post or "نشاط تجاري موثق" in norm_post[:1800]:
         return None, "OpenSooq Commercial Store Account"
 
     is_fresh_24h, age_label, fresh_tier, official_ts = parse_strict_24h_official_time(
@@ -747,7 +767,7 @@ def extract_opensooq_details(html, deal, hint_age="", hint_ts=0):
         return None, "OpenSooq Under Construction"
 
     pub_ads = 1
-    m_cnt = re.search(r'شاهد\s*كل\s*الاعلانات\s*\(\s*(\d{1,5})\s*\)|view\s*all\s*ads\s*\(\s*(\d{1,5})\s*\)', norm_post, re.I)
+    m_cnt = re.search(r'(?:شاهد|عرض)\s*(?:كل|جميع)\s*الاعلانات\s*\(\s*(\d{1,5})\s*\)|view\s*all\s*ads\s*\(\s*(\d{1,5})\s*\)', norm_post, re.I)
     if m_cnt:
         pub_ads = int(m_cnt.group(1) or m_cnt.group(2))
 
@@ -767,12 +787,17 @@ def extract_opensooq_details(html, deal, hint_age="", hint_ts=0):
     if is_company_name(pub_name):
         return None, f"Company/Broker Name ({pub_name})"
     if pub_ads > 8:
-        return None, f"Broker Count ({pub_ads} > 8 ads)"
+        return None, f"Broker Count ({pub_name}: {pub_ads} > 8 ads)"
 
     meta_d = soup.find("meta", {"property": "og:description"}) or soup.find("meta", {"name": "description"})
-    pure_desc = (meta_d.get("content") or "").strip() if meta_d else ""
-    if len(pure_desc) < 30:
-        pure_desc = post_txt[:1800]
+    meta_desc = (meta_d.get("content") or "").strip() if meta_d else ""
+    desc_end_idx = len(post_txt)
+    for end_m in ["وسائل الراحة", "مشاركة", "نصائح عامة", "اسأل البائع"]:
+        pos_e = post_txt.find(end_m)
+        if pos_e > 100 and pos_e < desc_end_idx:
+            desc_end_idx = pos_e
+    full_page_desc = post_txt[:min(3200, desc_end_idx)]
+    pure_desc = f"{meta_desc} {full_page_desc}".strip()
 
     if pub_ads >= 4 and re.search(r'(?:انظمه\s*سداد|مساحات\s*خضراء|امن\s*و\s*حراسه\s*24|دقايق\s*من\s*المحاور)', normalize_ar(pure_desc)):
         return None, f"Compound Sales Rep ({pub_ads} ads)"
@@ -817,23 +842,29 @@ def is_valid_existing_extra_ad(ad):
     src = ad.get("source") or "دوبيزل"
     if src == "دوبيزل":
         return True
+    if src == "السوق المفتوح" and not ad.get("verified_os_v96"):
+        return False
     if not ad.get("verified_24h_v93"):
         return False
     pub = ad.get("publisher", "")
     if "اتصل" in pub or "السعر" in pub or pub in ("مالك (عقارماب)", "مالك (السوق المفتوح)", "مالك"):
         return False
     title = ad.get("title", "")
+    desc = ad.get("description", "")
     zone = ad.get("zone", "")
     deal = ad.get("deal", "تمليك")
     price_num = int(ad.get("price_num", 0) or 0)
     pub_ads = int(ad.get("pub_ads", 1) or 1)
     if pub_ads > 8 or is_company_name(pub):
         return False
+    is_brk, _ = has_broker_copywriting(title, desc)
+    if is_brk:
+        return False
     norm_all = normalize_ar(f"{title} {zone}")
     for city in EXCLUDED_CITIES:
         if normalize_ar(city) in norm_all:
             return False
-    if deal != "إيجار" and not is_strict_cash_sale(title, "", price_num):
+    if deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num):
         return False
     return True
 
@@ -922,17 +953,21 @@ def run_extra_radar():
     if not isinstance(data, dict):
         data = {"ads": data if isinstance(data, list) else []}
 
-    raw_existing = data.get("ads", [])
+    raw_existing = data.get("ads", []) + fetch_remote_ads_list()
     extra_checked = load_persistent_seen_ids(data)
     banned_ids = set(data.get("banned_ad_ids", []))
     notified_ids = set(data.get("telegram_notified_ids", []))
     tg_cfg = sync_telegram_config(data.get("telegram_config", {}))
     run_report = data.get("last_run_report", {})
 
-    existing_ads = []
+    existing_ads, seen_existing_u = [], set()
     purged_old_extra = 0
     for ad in raw_existing:
+        u = ad.get("url") or ad.get("link") or str(ad.get("ad_id"))
+        if not u or u in seen_existing_u:
+            continue
         if is_valid_existing_extra_ad(ad):
+            seen_existing_u.add(u)
             existing_ads.append(ad)
         else:
             purged_old_extra += 1
@@ -987,8 +1022,8 @@ def run_extra_radar():
     sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
     rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
     sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
-    all_candidates = rent_os[:100] + sale_os[:100] + rent_aq[:100] + sale_aq[:100]
-    print(f"[Extra Radar v9.5] New Candidates -> OpenSooq: {len(os_candidates)} | AqarMap: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    all_candidates = rent_os[:100] + sale_os[:100] + rent_aq[:120] + sale_aq[:120]
+    print(f"[Extra Radar v9.6] New Candidates -> OpenSooq: {len(os_candidates)} | AqarMap: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added = 0
     os_added = 0
@@ -1055,6 +1090,7 @@ def run_extra_radar():
                 "timestamp": real_post_ts,
                 "desc_verified_v2": True,
                 "verified_24h_v93": True,
+                "verified_os_v96": True,
                 "url": item["url"],
                 "link": item["url"],
                 "verified_v12": True,
@@ -1073,17 +1109,21 @@ def run_extra_radar():
     fetcher.close()
     save_persistent_seen_ids(extra_checked)
 
+    disk_ads = []
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
                 latest_disk = json.load(f)
                 if isinstance(latest_disk, dict) and isinstance(latest_disk.get("ads"), list):
-                    existing_ads = [a for a in latest_disk["ads"] if is_valid_existing_extra_ad(a)]
+                    disk_ads = latest_disk["ads"]
         except Exception:
             pass
 
+    all_pool = new_extra_ads + disk_ads + existing_ads + fetch_remote_ads_list()
     merged_ads, seen_u = [], set()
-    for ad in (new_extra_ads + existing_ads):
+    for ad in all_pool:
+        if not is_valid_existing_extra_ad(ad):
+            continue
         u = ad.get("url") or ad.get("link") or str(ad.get("ad_id"))
         if not u or u in seen_u:
             continue
@@ -1165,24 +1205,21 @@ def run_extra_radar():
     data["telegram_config"] = tg_cfg
     data["telegram_notified_ids"] = list(notified_ids)[-5000:]
 
-    if os.path.exists(DATA_FILE):
-        try: os.chmod(DATA_FILE, stat.S_IWRITE)
-        except Exception: pass
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
     if not os.environ.get("GITHUB_ACTIONS"):
-        ok_push, push_info = reliable_git_push(f"Extra Radar Sync (AqarMap: {aq_total}, OpenSooq: {os_total})")
+        ok_push, push_info = atomic_write_and_git_push(data, f"Extra Radar Sync (AqarMap: {aq_total}, OpenSooq: {os_total})")
         if ok_push:
             print(f"    --> [LIVE SYNC] Pushed AqarMap ({aq_total}) & OpenSooq ({os_total}) owners to GitHub & Vercel!")
         else:
             print(f"    --> [LOCAL SAVE] {push_info}")
+    else:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
 def main():
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
-    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.5 (OpenSooq Reset + 120s Push Retry) ===")
+    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.6 (Full Desc + Display All Ads Count + Atomic Push) ===")
     cycle = 1
     while True:
         print(f"\n>>> Starting AqarMap & OpenSooq Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
