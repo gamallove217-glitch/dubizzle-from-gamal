@@ -25,6 +25,7 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 INDEX_HTML_FILE = os.path.join(BASE_DIR, "index.html")
+ADMIN_HTML_FILE = os.path.join(BASE_DIR, "admin.html")
 EXTRA_SEEN_FILE = os.path.join(BASE_DIR, "seen_extra_local.json")
 AQ_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "aqarmap_live_ads.json")
 EXTRA_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "extra_live_ads.json")
@@ -58,28 +59,29 @@ SAFE_CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "مم�
 SAFE_OWNER_BROKER_NEGATIONS = ["بدون وسيط", "بدون وسطاء", "ممنوع الوسطاء", "يمتنع الوسطاء", "لغير الوسطاء", "عدم تدخل الوسطاء", "عدم التعامل مع الوسطاء", "لا للوسطاء", "بدون سمسار", "بدون سماسرة", "بدون سماسره", "ممنوع السماسرة", "ممنوع السماسره", "يمتنع السماسرة", "يمتنع السماسره", "بدون بروكر", "ممنوع البروكر", "يمتنع البروكر", "بدون عمولة", "بدون عموله", "بدون اي عمولة", "بدون اي عموله", "بدون اى عموله", "من غير سمسار", "من غير وسيط", "من المالك مباشره", "من المالك مباشر", "المالك مباشره", "المالك مباشر", "التواصل مباشر مع المالك", "التعامل مباشر مع المالك", "مباشر من المالك", "انا المالك"]
 BROKER_NAME_WORDS = ["zone", "real estate", "realestate", "realty", "property", "properties", "homes", "agency", "agencies", "broker", "brokers", "brokerage", "investment", "investments", "development", "developments", "consult", "consultant", "consulting", "company", "marketing", "scouts", "vertex", "redefine", "irtkaz", "ebtkar", "imkan", "falcon", "realtors", "trusted home", "شركة", "شركه", "مكتب", "تسويق", "للتسويق", "ماركتنج", "سمسار", "وسيط", "استشاري", "مستشار", "للاستشارات", "تطوير", "للتطوير", "للاستثمار", "هومز", "بروكر", "ريال استيت", "استيت", "فيرتكس", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار", "دار البناء", "للمقاولات", "للإنشاءات", "للانشاءات", "اللوتس العقارية", "البيت المصري", "ادارة املاك", "إدارة أملاك"]
 BROKER_TEXT_PHRASES = ["انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى", "وسيط من المالك", "وسيط مع المالك", "انا بروكر", "م بروكر", "للتواصل مع البروكر", "سمسار", "سماسرة", "سماسره", "بروكر", "broker", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "ادارة املاك", "عمولة شهر", "عموله شهر", "عمولة نصف شهر", "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "بعموله", "بعمولة", "نسبة العمولة", "يوجد عمولة", "يوجد عموله", "عمولة 1", "عموله 1", "عمولة 2", "عموله 2", "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري", "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك", "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل", "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي", "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات", "متاح عروض اخري", "متاح عروض أخرى", "يوجد عروض اخري", "متاح شقق اخري", "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات", "باقل سعر بالمشروع", "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "مطلوب وموجود", "مطلوب ومعروض"]
-FB_SOFT_BROKER_HINTS = ["للتواصل فون او واتس", "فون او واتساب", "للمعاينه والاستفسار", "للمعاينة والاستفسار", "باقل سعر", "ارخص شقه", "لقطه", "فرصه لا تعوض", "متاح شقه", "متاح فيلا", "متاح دوبلكس", "متاح ارضي", "متاح روف", "متاح ستوديو", "الترا سوبر لوكس", "برايم لوكيشن", "prime location"]
 FB_WANTED_PHRASES = ["مطلوب شقه", "مطلوب شقة", "مطلوب فيلا", "مطلوب للايجار", "مطلوب للإيجار", "مطلوب للشراء", "مطلوب للبيع", "مطلوب من المالك", "بدور علي شقه", "بدور على شقة", "بدور علي فيلا", "محتاج شقه", "محتاج شقة", "محتاجه شقه", "محتاجة شقة", "عايز شقه", "عايز شقة", "عايزة شقة", "عايزه شقه", "ابحث عن شقه", "أبحث عن شقة", "حد عنده شقه", "حد عنده شقة", "مطلوب عاجل", "مطلوب فورا", "مطلوب شريك", "مطلوب شريكة", "مطلوب روم ميت"]
 
-AQARMAP_SOURCES = [
-    {"cat": "شقق", "deal": "إيجار", "en": "Apartments (Rent)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-rent/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "شقق", "deal": "إيجار", "en": "Furnished Apts (Rent)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-rent/furnished-apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "فلل", "deal": "إيجار", "en": "Villas (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Commercial (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Administrative (Rent)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-rent/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "إيجار", "en": "Medical (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "أراضي", "deal": "إيجار", "en": "Buildings (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/building/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "أراضي", "deal": "إيجار", "en": "Lands (Rent)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-rent/land/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (Cash Sale)", "max_p": 5, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"},
-    {"cat": "شقق", "deal": "تمليك", "en": "Apartments (All Sale)", "max_p": 4, "url": "https://aqarmap.com.eg/ar/for-sale/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (Cash Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"},
-    {"cat": "فلل", "deal": "تمليك", "en": "Villas (All Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Commercial (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Administrative (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "تجاري", "deal": "تمليك", "en": "Medical (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "أراضي", "deal": "تمليك", "en": "Lands (Sale)", "max_p": 3, "url": "https://aqarmap.com.eg/ar/for-sale/land/cairo/new-cairo/?sort=publishedAt&direction=desc"},
-    {"cat": "أراضي", "deal": "تمليك", "en": "Buildings (Sale)", "max_p": 2, "url": "https://aqarmap.com.eg/ar/for-sale/building/cairo/new-cairo/?sort=publishedAt&direction=desc"},
+_AQ_BASE = "https://aqarmap.com.eg/ar/"
+_AQ_SPECS = [
+    ("شقق", "إيجار", "Apartments (Rent)", 5, "for-rent/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("شقق", "إيجار", "Furnished Apts (Rent)", 4, "for-rent/furnished-apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("فلل", "إيجار", "Villas (Rent)", 3, "for-rent/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "إيجار", "Commercial (Rent)", 3, "for-rent/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "إيجار", "Administrative (Rent)", 3, "for-rent/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "إيجار", "Medical (Rent)", 2, "for-rent/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("أراضي", "إيجار", "Buildings (Rent)", 2, "for-rent/building/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("أراضي", "إيجار", "Lands (Rent)", 2, "for-rent/land/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("شقق", "تمليك", "Apartments (Cash Sale)", 5, "for-sale/apartment/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"),
+    ("شقق", "تمليك", "Apartments (All Sale)", 4, "for-sale/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("فلل", "تمليك", "Villas (Cash Sale)", 3, "for-sale/villa/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"),
+    ("فلل", "تمليك", "Villas (All Sale)", 3, "for-sale/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "تمليك", "Commercial (Sale)", 3, "for-sale/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "تمليك", "Administrative (Sale)", 3, "for-sale/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("تجاري", "تمليك", "Medical (Sale)", 2, "for-sale/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("أراضي", "تمليك", "Lands (Sale)", 3, "for-sale/land/cairo/new-cairo/?sort=publishedAt&direction=desc"),
+    ("أراضي", "تمليك", "Buildings (Sale)", 2, "for-sale/building/cairo/new-cairo/?sort=publishedAt&direction=desc"),
 ]
+AQARMAP_SOURCES = [{"cat": c, "deal": d, "en": e, "max_p": m, "url": _AQ_BASE + p} for c, d, e, m, p in _AQ_SPECS]
 
 def strip_bidi(text): return BIDI_REGEX.sub("", str(text)).translate(HINDI_MAP) if text else ""
 def normalize_ar(text):
@@ -94,31 +96,34 @@ def clear_git_locks():
         if os.path.exists(p):
             try: os.remove(p)
             except Exception: pass
+    if os.path.exists(os.path.join(git_dir, "rebase-merge")) or os.path.exists(os.path.join(git_dir, "rebase-apply")):
+        subprocess.run(["git", "rebase", "--abort"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if os.path.exists(os.path.join(git_dir, "MERGE_HEAD")):
+        subprocess.run(["git", "merge", "--abort"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def fix_git_identity_for_vercel():
     clear_git_locks()
     subprocess.run(["git", "config", "user.name", "gamallove217-glitch"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["git", "config", "user.email", "gamallove217@gmail.com"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def patch_index_html_for_facebook():
-    if not os.path.exists(INDEX_HTML_FILE): return
-    try:
-        with open(INDEX_HTML_FILE, "r", encoding="utf-8") as f: html_c = f.read()
-        if "السوق المفتوح" in html_c or "السوق:" in html_c:
-            new_c = html_c.replace("السوق المفتوح", "فيسبوك").replace("السوق:", "فيسبوك:")
-            if new_c != html_c:
-                with open(INDEX_HTML_FILE, "w", encoding="utf-8") as f: f.write(new_c)
-                fix_git_identity_for_vercel()
-                subprocess.run(["git", "add", "-f", "index.html"], cwd=BASE_DIR, capture_output=True, timeout=15)
-                subprocess.run(["git", "commit", "-m", "Replace OpenSooq with Facebook in UI"], cwd=BASE_DIR, capture_output=True, timeout=15)
-                subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, timeout=60)
-    except Exception: pass
+def patch_ui_files_on_disk():
+    patched = []
+    for fpath, fname in [(INDEX_HTML_FILE, "index.html"), (ADMIN_HTML_FILE, "admin.html")]:
+        if os.path.exists(fpath):
+            try:
+                with open(fpath, "r", encoding="utf-8") as f: c = f.read()
+                nc = c.replace("السوق المفتوح", "فيسبوك").replace("السوق:", "فيسبوك:")
+                if nc != c:
+                    with open(fpath, "w", encoding="utf-8") as f: f.write(nc)
+                    patched.append(fname)
+            except Exception: pass
+    return patched
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search & Groups Radar v11.7", "version": "11.7",
-        "description": "Strict Group/Post Separator + 22 Real-Time New Cairo Owner Searches", "permissions": ["storage"],
+        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search & Groups Radar v11.8", "version": "11.8",
+        "description": "Strict Hard-Proof Owner Filter + Group/Post Separator", "permissions": ["storage"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
         "content_scripts": [{"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}]
@@ -137,43 +142,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     content_js = r"""
 (function() {
-    if (window.__gamalFbRadarV117) return;
-    window.__gamalFbRadarV117 = true;
-    const RECENT_FILTER = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
-    const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RECENT_FILTER;
-    const TARGETS = [
-        {name: "خلاصة كل جروباتك المجمعة", url: "https://www.facebook.com/groups/feed/", maxSec: 70},
-        {name: "سيرش الأحدث: من المالك التجمع الخامس", url: sUrl("من المالك التجمع الخامس"), maxSec: 50},
-        {name: "سيرش الأحدث: من المالك القاهرة الجديدة", url: sUrl("من المالك القاهرة الجديدة"), maxSec: 45},
-        {name: "سيرش الأحدث: بدون وسطاء التجمع الخامس", url: sUrl("بدون وسطاء التجمع الخامس"), maxSec: 45},
-        {name: "سيرش الأحدث: بدون عمولة التجمع الخامس", url: sUrl("بدون عمولة التجمع الخامس"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة للايجار التجمع الخامس", url: sUrl("شقة للايجار التجمع الخامس"), maxSec: 55},
-        {name: "سيرش الأحدث: شقة للبيع التجمع الخامس", url: sUrl("شقة للبيع التجمع الخامس"), maxSec: 50},
-        {name: "سيرش الأحدث: شقة النرجس التجمع", url: sUrl("شقة النرجس التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة اللوتس التجمع", url: sUrl("شقة اللوتس التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة الياسمين التجمع", url: sUrl("شقة الياسمين التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة البنفسج التجمع", url: sUrl("شقة البنفسج التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة الاندلس التجمع", url: sUrl("شقة الاندلس التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة دار مصر التجمع", url: sUrl("شقة دار مصر التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة سكن مصر التجمع", url: sUrl("شقة سكن مصر التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة جنة التجمع", url: sUrl("شقة جنة التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة المستثمرين التجمع", url: sUrl("شقة المستثمرين التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة الاكاديمية التجمع", url: sUrl("شقة الاكاديمية التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة القرنفل التجمع", url: sUrl("شقة القرنفل التجمع"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة التجمع الثالث", url: sUrl("شقة التجمع الثالث"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة التجمع الاول", url: sUrl("شقة التجمع الاول"), maxSec: 45},
-        {name: "سيرش الأحدث: شقة القطامية", url: sUrl("شقة القطامية"), maxSec: 45},
-        {name: "الصفحة الرئيسية (الأحدث)", url: "https://www.facebook.com/?sk=h_chr", maxSec: 60}
+    if (window.__gamalFbRadarV118) return;
+    window.__gamalFbRadarV118 = true;
+    const RF = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
+    const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RF;
+    const Q_LIST = [
+        "من المالك التجمع الخامس", "من المالك القاهرة الجديدة", "بدون وسطاء التجمع الخامس", "بدون عمولة التجمع الخامس",
+        "شقة للايجار التجمع الخامس", "شقة للبيع التجمع الخامس", "شقة النرجس التجمع", "شقة اللوتس التجمع",
+        "شقة الياسمين التجمع", "شقة البنفسج التجمع", "شقة الاندلس التجمع", "شقة دار مصر التجمع",
+        "شقة سكن مصر التجمع", "شقة جنة التجمع", "شقة المستثمرين التجمع", "شقة الاكاديمية التجمع",
+        "شقة القرنفل التجمع", "شقة التجمع الثالث", "شقة التجمع الاول", "شقة القطامية"
     ];
+    const TARGETS = [{name: "خلاصة كل جروباتك المجمعة", url: "https://www.facebook.com/groups/feed/", maxSec: 70}]
+        .concat(Q_LIST.map(q => ({name: "سيرش الأحدث: " + q, url: sUrl(q), maxSec: 48})))
+        .concat([{name: "الصفحة الرئيسية (الأحدث)", url: "https://www.facebook.com/?sk=h_chr", maxSec: 60}]);
+
     const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن|من المالك|المالك مباشر|مدخل البيت|شارع)/i;
     const GROUP_WORDS_RE = /(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
     const UI_NOISE_RE = /^(انضمام|متابعة|متابعه|مراسلة|أعجبني|تعليق|مشاركة|عرض المزيد|See more|Join|Follow|Like|Comment|Share|\d+\s*تعليق.*|\d+\s*مشاركات.*)$/i;
 
-    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v117") || "[]");
-    let autoRotate = (localStorage.getItem("gamal_fb_autorotate_v117") !== "0");
-    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v117") || "0", 10) % TARGETS.length;
-    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v117") || "0", 10);
-    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v117") || "0", 10);
+    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v118") || "[]");
+    let autoRotate = (localStorage.getItem("gamal_fb_autorotate_v118") !== "0");
+    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v118") || "0", 10) % TARGETS.length;
+    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v118") || "0", 10);
+    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v118") || "0", 10);
     let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, lastLogMsg = "يفحص المنشورات الحديثة أول بأول...";
     let shadowInfo = null;
     try {
@@ -184,16 +176,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function updateStatusUI(statusText) {
         try {
-            sessionStorage.setItem("gamal_fb_sc_v117", String(scannedCount));
-            sessionStorage.setItem("gamal_fb_ac_v117", String(acceptedCount));
+            sessionStorage.setItem("gamal_fb_sc_v118", String(scannedCount));
+            sessionStorage.setItem("gamal_fb_ac_v118", String(acceptedCount));
             document.title = "[فحص:" + scannedCount + " | ملاك:" + acceptedCount + "] " + statusText;
             if (shadowInfo) {
                 const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "الصفحة الحالية";
                 const rotText = autoRotate ? "السيرش التلقائي (22 مسار للملاك): مفعل (اضغط للإيقاف)" : "السيرش التلقائي: متوقف - يقلب هنا فقط (اضغط للتفعيل)";
                 const rotColor = autoRotate ? "#4ade80" : "#facc15";
-                shadowInfo.innerHTML = "<div><b>رادار فيسبوك الدقيق v11.7</b> | " + statusText + "</div><div style='color:#38bdf8;'>المسار (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك حقيقيون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div><div style='margin-top:4px;'><span id='g_toggle_rot' style='color:" + rotColor + ";cursor:pointer;text-decoration:underline;font-weight:bold;'>" + rotText + "</span></div>";
+                shadowInfo.innerHTML = "<div><b>رادار فيسبوك الصارم v11.8</b> | " + statusText + "</div><div style='color:#38bdf8;'>المسار (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون فقط: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div><div style='margin-top:4px;'><span id='g_toggle_rot' style='color:" + rotColor + ";cursor:pointer;text-decoration:underline;font-weight:bold;'>" + rotText + "</span></div>";
                 const btn = shadowInfo.querySelector("#g_toggle_rot");
-                if (btn) btn.onclick = () => { autoRotate = !autoRotate; localStorage.setItem("gamal_fb_autorotate_v117", autoRotate ? "1" : "0"); updateStatusUI(autoRotate ? "تم تفعيل السيرش الشامل" : "وضع الصفحة الثابتة"); };
+                if (btn) btn.onclick = () => { autoRotate = !autoRotate; localStorage.setItem("gamal_fb_autorotate_v118", autoRotate ? "1" : "0"); updateStatusUI(autoRotate ? "تم تفعيل السيرش الشامل" : "وضع الصفحة الثابتة"); };
             }
         } catch(e) {}
     }
@@ -202,7 +194,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!sentHashes.includes(h)) {
             sentHashes.push(h);
             if (sentHashes.length > 3500) sentHashes = sentHashes.slice(-3500);
-            localStorage.setItem("gamal_fb_sent_v117", JSON.stringify(sentHashes));
+            localStorage.setItem("gamal_fb_sent_v118", JSON.stringify(sentHashes));
         }
     }
 
@@ -340,7 +332,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function advanceToNextTarget(reasonMsg) {
         const nextIdx = (targetIdx + 1) % TARGETS.length;
-        localStorage.setItem("gamal_fb_tidx_v117", String(nextIdx));
+        localStorage.setItem("gamal_fb_tidx_v118", String(nextIdx));
         const waitNextMs = Math.floor(9000 + Math.random() * 5000);
         updateStatusUI(reasonMsg + " -> انتقال بعد " + Math.round(waitNextMs / 1000) + "ث");
         setTimeout(() => { location.href = TARGETS[nextIdx].url; }, waitNextMs);
@@ -359,7 +351,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         updateStatusUI("يقلب بسرعة (" + Math.round(elapsedSec) + "ث)");
         setTimeout(mainLoop, Math.floor(2500 + Math.random() * 1300));
     }
-    updateStatusUI("بدأ الفحص الدقيق...");
+    updateStatusUI("بدأ الفحص الصارم...");
     setTimeout(mainLoop, 2000);
 })();
 """.strip()
@@ -392,18 +384,14 @@ def has_broker_copywriting(title, desc_text):
         return True, "Broker Inventory Code"
     return False, ""
 
-def is_verified_fb_owner_post(pure_raw_text, norm_pure_text, is_anon, phones, pub_name, deal, cat, price_num):
+def is_verified_fb_owner_post(norm_pure_text):
     explicit_owner_re = r'(?:من\s*المالك|المالك\s*مباشر|انا\s*المالك|مالك\s*العقار|مالك\s*الشقه|شقتي|فيلتي|بيتي|ملكي|بتاعتي|بدون\s*وسيط|بدون\s*وسطاء|ممنوع\s*الوسطاء|يمتنع\s*الوسطاء|لغير\s*الوسطاء|لا\s*للوسطاء|عدم\s*تدخل\s*الوسطاء|بدون\s*سمسار|بدون\s*سماسره|ممنوع\s*السماسره|بدون\s*بروكر|ممنوع\s*البروكر|بدون\s*عموله|بدون\s*اي\s*عموله)'
-    if re.search(explicit_owner_re, norm_pure_text): return True, "مالك مباشر صريح"
-    address_utility_re = r'(?:شارع\s*(?!90\b)\d{1,3}|عماره\s*\d{1,4}|فيلا\s*رقم\s*\d{1,4}|قطعه\s*\d{1,4}|مدخل\s*البيت|مدخل\s*العماره|عداد\s*كهرباء|عداد\s*قديم|فواتير\s*مش\s*كروت|تليفون\s*ارضي|خالصه\s*الثمن|مسدده\s*بالكامل|لدواعي\s*السفر|لظروف\s*السفر|بداعي\s*السفر)'
-    if re.search(address_utility_re, norm_pure_text): return True, "عنوان/تفاصيل مالك مباشر"
-    for sbh in FB_SOFT_BROKER_HINTS:
-        if normalize_ar(sbh) in norm_pure_text: return False, f"صيغة تسويق ({sbh})"
-    if len(phones) == 0 and (is_anon or len(pure_raw_text) <= 420): return True, "بيان مالك سادة (تواصل خاص)"
-    if len(phones) == 1 and len(pure_raw_text) <= 380:
-        ok_ai, ai_msg = analyze_with_ai("", pure_raw_text, pub_name, deal, cat, price_num, "فيسبوك")
-        return (True, "مالك مؤكد بالذكاء الاصطناعي") if ok_ai else (False, ai_msg)
-    return False, "لا يوجد دليل مالك صريح في البوست"
+    if re.search(explicit_owner_re, norm_pure_text):
+        return True, "مالك مباشر صريح"
+    address_utility_re = r'(?:شارع\s*(?!90\b)\d{1,3}|عماره\s*\d{1,4}|فيلا\s*رقم\s*\d{1,4}|قطعه\s*\d{1,4}|مدخل\s*البيت|مدخل\s*العماره|عداد\s*كهرباء|عداد\s*قديم|فواتير\s*مش\s*كروت|تليفون\s*ارضي)'
+    if re.search(address_utility_re, norm_pure_text):
+        return True, "عنوان/تفاصيل مالك مباشر"
+    return False, "بدون دليل مالك صريح"
 
 def parse_fb_strict_2days_header_time(header_str):
     now_dt = datetime.now(CAIRO_TZ)
@@ -525,6 +513,11 @@ def process_facebook_post_payload(payload):
     is_brk, brk_reason = has_broker_copywriting("", pure_raw_text)
     if is_brk: return False, "صيغة سمسار", False
 
+    is_true_owner, owner_proof_label = is_verified_fb_owner_post(norm_t)
+    if not is_true_owner:
+        print(f"  [FB SCAN] [- REJECTED FB] {owner_proof_label} | {short_preview}")
+        return False, owner_proof_label, False
+
     zone = detect_zone("", pure_raw_text)
     if not zone: return False, "مدينة مستبعدة", False
     if zone == "القاهرة الجديدة":
@@ -540,11 +533,6 @@ def process_facebook_post_payload(payload):
 
     price_num, price_str = parse_facebook_colloquial_price(pure_raw_text, deal)
     if deal != "إيجار" and not is_strict_cash_sale("", pure_raw_text, price_num): return False, "تقسيط/مقدم", False
-
-    is_true_owner, owner_proof_label = is_verified_fb_owner_post(pure_raw_text, norm_t, is_anon, phones, pub_name, deal, cat, price_num)
-    if not is_true_owner:
-        print(f"  [FB SCAN] [- REJECTED FB] Not Verified Owner ({owner_proof_label}) | {short_preview}")
-        return False, owner_proof_label, False
 
     clean_lines = [ln.strip() for ln in pure_raw_text.split("\n") if ln.strip() and ln.strip() != group_name]
     first_line = (clean_lines[0] if clean_lines else pure_raw_text)[:85]
@@ -565,7 +553,7 @@ def process_facebook_post_payload(payload):
         "zone": zone, "location": zone, "cat": cat, "category": cat, "deal": deal, "type": deal, "area": area_val, "rooms": rooms_val,
         "publisher": pub_name + phone_note, "pub_ads": 1, "active_ads_count": 1, "age": entry_age_label, "fresh_tier": 3,
         "description": pure_raw_text[:600], "first_seen_ts": entry_ts, "timestamp": entry_ts, "desc_verified_v2": True,
-        "verified_24h_v93": True, "verified_fb_v110": True, "url": final_link, "link": final_link, "verified_v12": True,
+        "verified_24h_v93": True, "verified_fb_v118": True, "url": final_link, "link": final_link, "verified_v12": True,
         "scraped_at": now_dt.strftime("%Y-%m-%d %I:%M %p"), "date": now_dt.strftime("%Y-%m-%d %H:%M")
     }
     with SYNC_LOCK:
@@ -602,7 +590,7 @@ def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Real-Time Search Receiver v11.7] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Strict Owner Receiver v11.8] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -650,11 +638,13 @@ def atomic_write_and_git_push(data_payload, commit_msg):
             clear_git_locks()
             subprocess.run(["git", "fetch", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
             subprocess.run(["git", "reset", "--mixed", "origin/main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
+            patched_ui = patch_ui_files_on_disk()
             if os.path.exists(DATA_FILE):
                 try: os.chmod(DATA_FILE, stat.S_IWRITE)
                 except Exception: pass
             with open(DATA_FILE, "w", encoding="utf-8") as f: json.dump(data_payload, f, ensure_ascii=False, indent=2)
-            subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
+            add_cmd = ["git", "add", "-f", "ads.json"] + patched_ui
+            subprocess.run(add_cmd, cwd=BASE_DIR, capture_output=True, timeout=15)
             subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=15)
             p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
             if p_res.returncode == 0: return True, "OK"
@@ -891,7 +881,7 @@ def is_valid_existing_extra_ad(ad):
     if src == "دوبيزل": return True
     u = str(ad.get("url") or ad.get("link") or "")
     if src == "عقارماب" and (not ad.get("verified_aq_v100") or "/ar/listing/" not in u): return False
-    if src == "فيسبوك" and not ad.get("verified_fb_v110"): return False
+    if src == "فيسبوك" and not ad.get("verified_fb_v118"): return False
     if src not in ("عقارماب", "فيسبوك"): return False
     now_ts = int(datetime.now(CAIRO_TZ).timestamp())
     ad_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or 0)
@@ -943,7 +933,7 @@ def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked,
 
 def guard_extra_ads_during_sleep(force_push=False):
     extra_backup = load_extra_live_backup()
-    if not extra_backup or not os.path.exists(DATA_FILE): return
+    if not os.path.exists(DATA_FILE): return
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f: d = json.load(f)
         if not isinstance(d, dict) or not isinstance(d.get("ads"), list): return
@@ -961,10 +951,12 @@ def guard_extra_ads_during_sleep(force_push=False):
             merged.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
             d["ads"] = merged[:450]
             d["total"] = len(d["ads"])
+            d["updated_at"] = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             aq_c = sum(1 for a in extra_backup if a.get("source") == "عقارماب")
             fb_c = sum(1 for a in extra_backup if a.get("source") == "فيسبوك")
-            atomic_write_and_git_push(d, f"Live Sync Extra Owners (AqarMap: {aq_c}, Facebook: {fb_c})")
-            print(f"    --> [Live Guard] Synced AqarMap ({aq_c}) & Facebook ({fb_c}) owners to GitHub & Vercel!")
+            ok_p, p_info = atomic_write_and_git_push(d, f"Live Sync Extra Owners (AqarMap: {aq_c}, Facebook: {fb_c})")
+            if ok_p: print(f"    --> [Live Guard] Synced AqarMap ({aq_c}) & Facebook ({fb_c}) owners to GitHub & Vercel!")
+            else: print(f"    --> [Live Guard Notice] {p_info}")
     except Exception: pass
 
 def sync_telegram_config(current_cfg):
@@ -1035,7 +1027,7 @@ def run_extra_radar():
 
     save_persistent_seen_ids(extra_checked)
     all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
-    print(f"\n[AqarMap + Facebook Radar v11.7] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    print(f"\n[AqarMap + Facebook Radar v11.8] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added, total_c = 0, len(all_candidates)
     for idx, item in enumerate(all_candidates, 1):
@@ -1082,12 +1074,13 @@ def run_extra_radar():
 
 def main():
     generate_facebook_main_extension()
-    patch_index_html_for_facebook()
+    patch_ui_files_on_disk()
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
     start_fb_local_server()
-    print("=== Starting 24/7 AqarMap + Facebook Real-Time Owner Radar v11.7 ===")
+    guard_extra_ads_during_sleep(force_push=True)
+    print("=== Starting 24/7 AqarMap + Facebook Strict Owner Radar v11.8 ===")
     print(f"[FB Extension Folder Ready] -> {FB_EXT_DIR}")
     cycle = 1
     while True:
