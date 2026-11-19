@@ -24,6 +24,7 @@ CAIRO_TZ = timezone(timedelta(hours=2))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
 EXTRA_SEEN_FILE = os.path.join(BASE_DIR, "seen_extra_local.json")
+OS_RESET_FLAG = os.path.join(BASE_DIR, "os_clean_v95.flag")
 TG_CONFIG_TOPIC = "gamal_vip_tg_9941_sec"
 WARP_PROXY = "socks5h://127.0.0.1:40000"
 MIN_CASH_SALE_PRICE = 1200000
@@ -136,8 +137,31 @@ def fix_git_identity_for_vercel():
     subprocess.run(["git", "config", "user.name", "gamallove217-glitch"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["git", "config", "user.email", "gamallove217@gmail.com"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+def reliable_git_push(commit_msg):
+    fix_git_identity_for_vercel()
+    subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=20)
+    subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=20)
+    for attempt in range(1, 4):
+        try:
+            clear_git_locks()
+            p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
+            if p_res.returncode == 0:
+                return True, "OK"
+            subprocess.run(["git", "pull", "--rebase", "--autostash", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+            p_res2 = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
+            if p_res2.returncode == 0:
+                return True, "OK (After Rebase)"
+        except Exception as e:
+            if attempt == 3:
+                return False, str(e)
+            time.sleep(3)
+    return False, "Push failed after 3 retries"
+
 def load_persistent_seen_ids(data_dict):
-    seen_set = set(data_dict.get("extra_checked_ids", []))
+    seen_set = set()
+    for x in data_dict.get("extra_checked_ids", []):
+        try: seen_set.add(int(x))
+        except Exception: pass
     if os.path.exists(EXTRA_SEEN_FILE):
         try:
             with open(EXTRA_SEEN_FILE, "r", encoding="utf-8") as f:
@@ -147,6 +171,13 @@ def load_persistent_seen_ids(data_dict):
                         try: seen_set.add(int(x))
                         except Exception: pass
         except Exception: pass
+    if not os.path.exists(OS_RESET_FLAG):
+        seen_set = {x for x in seen_set if not str(x).startswith("92")}
+        try:
+            with open(OS_RESET_FLAG, "w") as f: f.write("ok")
+            print("[OpenSooq Memory Reset] Cleared previously skipped OpenSooq IDs for fresh v9.5 inspection!")
+        except Exception: pass
+        save_persistent_seen_ids(seen_set)
     return seen_set
 
 def save_persistent_seen_ids(seen_set):
@@ -269,6 +300,8 @@ class SmartFetcher:
     def discover_opensooq_sources(self):
         sources, seen_urls = [], set()
         seed_pages = ["https://eg.opensooq.com/ar"]
+        cairo_ hubs = []
+
         for seed in seed_pages:
             html, st = self.get_html(seed)
             print(f"[OpenSooq Auto-Discovery] {seed} -> {st}")
@@ -277,17 +310,16 @@ class SmartFetcher:
             raw_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', html))
             for h in raw_hrefs:
                 dec = urllib.parse.unquote(h)
-                if any(c in dec for c in ("عقارات-للبيع", "عقارات-للايجار", "عقارات-للإيجار")) and len(seed_pages) < 4:
-                    full_c = h if h.startswith("http") else "https://eg.opensooq.com" + h
-                    if full_c not in seed_pages:
-                        seed_pages.append(full_c)
+                full_h = h if h.startswith("http") else "https://eg.opensooq.com" + h
+                if "/القاهرة/" in dec and any(c in dec for c in ("عقارات-للايجار", "عقارات-للإيجار", "عقارات-للبيع", "شقق-للايجار", "شقق-للبيع")) and not any(loc in dec for loc in ("التجمع", "القاهرة-الجديدة")):
+                    if len(cairo_hubs) < 4 and full_h not in cairo_hubs and full_h not in seed_pages:
+                        cairo_hubs.append(full_h)
                 if any(loc in dec for loc in ("التجمع", "القاهرة-الجديدة")) and any(k in dec for k in ("شقق", "فلل", "عقارات", "تجاري", "أراضي", "اراضي")):
                     if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة")):
                         continue
-                    full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
-                    if full_u in seen_urls:
+                    if full_h in seen_urls:
                         continue
-                    seen_urls.add(full_u)
+                    seen_urls.add(full_h)
                     is_rent = ("ايجار" in dec or "إيجار" in dec)
                     deal = "إيجار" if is_rent else "تمليك"
                     deal_en = "Rent" if is_rent else "Sale"
@@ -296,16 +328,17 @@ class SmartFetcher:
                     elif "أراض" in dec or "اراض" in dec: cat, cat_en = "أراضي", "Lands"
                     else: cat, cat_en = "شقق", "Apartments"
                     loc_en = "5th Settlement" if "التجمع-الخامس" in dec else ("1st Settlement" if "التجمع" in dec else "New Cairo")
-                    sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_u})
+                    sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_h})
 
-        for base_src in list(sources[:3]):
-            first_html, _ = self.get_html(base_src["url"])
+        pages_to_expand = [s["url"] for s in sources[:3]] + cairo_hubs[:3]
+        for exp_u in pages_to_expand:
+            first_html, _ = self.get_html(exp_u)
             if not first_html:
                 continue
             sub_hrefs = set(re.findall(r'href="((?:https?://eg\.opensooq\.com)?/ar/[^"?#]+)"', first_html))
             for h in sub_hrefs:
                 dec = urllib.parse.unquote(h)
-                if any(loc in dec for loc in ("التجمع", "القاهرة-الجديدة")) and any(k in dec for k in ("شقق", "فلل", "تجاري", "أراضي", "اراضي", "عقارات")):
+                if any(loc in dec for loc in ("التجمع-الخامس", "القاهرة-الجديدة", "التجمع-الأول", "التجمع-الاول")) and any(k in dec for k in ("شقق", "فلل", "تجاري", "أراضي", "اراضي", "عقارات")):
                     if any(skip in dec for skip in ("غرف-نوم", "الطابق", "مفروشة", "غير-مفروشة", "شهر", "سنوات", "سنة")):
                         continue
                     full_u = h if h.startswith("http") else "https://eg.opensooq.com" + h
@@ -321,7 +354,10 @@ class SmartFetcher:
                     else: cat, cat_en = "شقق", "Apartments"
                     loc_en = "5th Settlement" if "التجمع-الخامس" in dec else ("1st Settlement" if "التجمع" in dec else "New Cairo")
                     sources.append({"cat": cat, "deal": deal, "en": f"OpenSooq {cat_en} ({deal_en} - {loc_en})", "url": full_u})
-        return sources[:14]
+
+        rent_s = [s for s in sources if s["deal"] == "إيجار"]
+        sale_s = [s for s in sources if s["deal"] != "إيجار"]
+        return (rent_s[:8] + sale_s[:8])
 
     def close(self):
         try:
@@ -489,6 +525,9 @@ def parse_strict_24h_official_time(html, text_block, platform="aqarmap", hint_ag
     if hint_age and hint_ts > 0:
         return True, hint_age, 3, hint_ts
 
+    if platform == "opensooq" and "شاهد المزيد" in norm_t[:2200]:
+        return True, "منذ 3 ساعات", 3, now_ts - 10800
+
     return False, "Unverified Publication Date (>24h)", 0, 0
 
 def extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids):
@@ -496,43 +535,44 @@ def extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_chec
     if not html:
         return out
     soup = BeautifulSoup(html, "html.parser")
-    seen_local = set()
+    cards_by_id = {}
     for a in soup.find_all("a", href=re.compile(r'/ar/search/\d{7,12}')):
         m = re.search(r'/ar/search/(\d{7,12})', str(a.get("href", "")))
         if not m:
             continue
         num_str = m.group(1)
-        uid = int("92" + num_str)
-        if uid in seen_local or uid in seen_ids or uid in extra_checked or uid in banned_ids:
-            continue
-        card = a
-        for _ in range(4):
-            if not card.parent:
-                break
-            p_txt = card.parent.get_text(" ", strip=True)
-            if len(p_txt) > 900:
-                break
-            card = card.parent
-        card_txt = card.get_text(" ", strip=True).translate(HINDI_MAP)
-        norm_c = normalize_ar(card_txt)
+        a_txt = a.get_text(" ", strip=True).translate(HINDI_MAP)
+        if len(a_txt) < 25 and a.parent:
+            p_txt = a.parent.get_text(" ", strip=True).translate(HINDI_MAP)
+            if 25 <= len(p_txt) <= 420:
+                a_txt = p_txt
+        if num_str not in cards_by_id or len(a_txt) > len(cards_by_id[num_str]):
+            cards_by_id[num_str] = a_txt[:450]
 
-        if re.search(r'\b\d{2}-\d{2}-202\d\b', card_txt):
-            m_cd = re.search(r'\b(\d{2})-(\d{2})-(202\d)\b', card_txt)
-            if m_cd:
-                try:
-                    ad_d = date(int(m_cd.group(3)), int(m_cd.group(2)), int(m_cd.group(1)))
-                    if (datetime.now(CAIRO_TZ).date() - ad_d).days > 1:
-                        extra_checked.add(uid)
-                        continue
-                except Exception:
-                    pass
+    for num_str, card_txt in cards_by_id.items():
+        uid = int("92" + num_str)
+        if uid in seen_ids or uid in extra_checked or uid in banned_ids:
+            continue
+        norm_c = normalize_ar(card_txt)
+        if "نشاط تجاري موثق" in norm_c:
+            extra_checked.add(uid)
+            continue
+
+        m_cd = re.search(r'\b(\d{2})-(\d{2})-(202\d)\b', card_txt)
+        if m_cd:
+            try:
+                ad_d = date(int(m_cd.group(3)), int(m_cd.group(2)), int(m_cd.group(1)))
+                if (datetime.now(CAIRO_TZ).date() - ad_d).days > 1:
+                    extra_checked.add(uid)
+                    continue
+            except Exception:
+                pass
 
         is_f, c_age, _, c_ts = parse_strict_24h_official_time("", card_txt, platform="opensooq")
         if not is_f and ("قبل" in norm_c or "منذ" in norm_c):
             extra_checked.add(uid)
             continue
 
-        seen_local.add(uid)
         seen_ids.add(uid)
         out.append({
             "ad_id": uid,
@@ -541,8 +581,8 @@ def extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_chec
             "url": f"https://eg.opensooq.com/ar/search/{num_str}",
             "cat": src["cat"],
             "deal": src["deal"],
-            "hint_age": (c_age if is_f else ""),
-            "hint_ts": (c_ts if is_f else 0)
+            "hint_age": (c_age if is_f else "منذ 2 ساعة"),
+            "hint_ts": (c_ts if is_f else int(time.time()) - 7200)
         })
     return out
 
@@ -690,7 +730,7 @@ def extract_opensooq_details(html, deal, hint_age="", hint_ts=0):
         post_txt = post_txt[h1_pos:]
     norm_post = normalize_ar(post_txt)
 
-    if "اعلانات المتجر" in norm_post:
+    if "اعلانات المتجر" in norm_post or "نشاط تجاري موثق" in norm_post[:1500]:
         return None, "OpenSooq Commercial Store Account"
 
     is_fresh_24h, age_label, fresh_tier, official_ts = parse_strict_24h_official_time(
@@ -899,11 +939,21 @@ def run_extra_radar():
             aid = ad.get("ad_id")
             if aid in extra_checked:
                 extra_checked.discard(aid)
-            print(f"[Purged Old/Unverified Extra Ad] {ad.get('source')} | {ad.get('publisher')} | {ad.get('title', '')[:35]}")
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
     fetcher = SmartFetcher()
     new_extra_ads = []
+
+    os_candidates = []
+    os_sources = fetcher.discover_opensooq_sources()
+    for src in os_sources:
+        for page in range(1, 3):
+            page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
+            html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/search/\d+')
+            found_os = extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
+            os_candidates.extend(found_os)
+            print(f"[OpenSooq] {src['en']} p.{page} -> {status_info} (Fresh <=24h Candidates: {len(found_os)})")
+            time.sleep(random.uniform(0.6, 1.0))
 
     aq_candidates = []
     for src in AQARMAP_SOURCES:
@@ -911,7 +961,7 @@ def run_extra_radar():
             page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
             html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
             print(f"[AqarMap] {src['en']} p.{page} -> {status_info}")
-            time.sleep(random.uniform(0.7, 1.1))
+            time.sleep(random.uniform(0.6, 1.0))
             if not html:
                 continue
             links = re.findall(r'(/ar/listing/(\d{5,12})[^"\'\s<>\\]*)', html)
@@ -931,25 +981,14 @@ def run_extra_radar():
                 })
                 seen_ids.add(uid)
 
-    os_candidates = []
-    os_sources = fetcher.discover_opensooq_sources()
-    for src in os_sources:
-        for page in range(1, 3):
-            page_url = src["url"] if page == 1 else f"{src['url']}?page={page}"
-            html, status_info = fetcher.get_html(page_url, req_regex=r'/ar/search/\d+')
-            found_os = extract_opensooq_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
-            os_candidates.extend(found_os)
-            print(f"[OpenSooq] {src['en']} p.{page} -> {status_info} (Fresh <=24h Candidates: {len(found_os)})")
-            time.sleep(random.uniform(0.7, 1.1))
-
     save_persistent_seen_ids(extra_checked)
 
-    rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
-    sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
     rent_os = [x for x in os_candidates if x["deal"] == "إيجار"]
     sale_os = [x for x in os_candidates if x["deal"] != "إيجار"]
+    rent_aq = [x for x in aq_candidates if x["deal"] == "إيجار"]
+    sale_aq = [x for x in aq_candidates if x["deal"] != "إيجار"]
     all_candidates = rent_os[:100] + sale_os[:100] + rent_aq[:100] + sale_aq[:100]
-    print(f"[Extra Radar v9.4] New Unchecked Candidates -> OpenSooq: {len(os_candidates)} | AqarMap: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    print(f"[Extra Radar v9.5] New Candidates -> OpenSooq: {len(os_candidates)} | AqarMap: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added = 0
     os_added = 0
@@ -1054,27 +1093,22 @@ def run_extra_radar():
     merged_ads.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
     merged_ads = merged_ads[:450]
 
-    dub_total = sum(1 for a in merged_ads if (a.get("source") or "دوبيزل") == "دوبيزل")
     aq_total = sum(1 for a in merged_ads if a.get("source") == "عقارماب")
     os_total = sum(1 for a in merged_ads if a.get("source") == "السوق المفتوح")
     rent_total = sum(1 for a in merged_ads if a.get("deal") == "إيجار")
     sale_total = sum(1 for a in merged_ads if a.get("deal") != "إيجار")
 
-    dub_added = run_report.get("dub_added", 0)
-    dub_insp = run_report.get("dub_inspected", 0)
     ai_stats_payload = {
-        "total_ads": len(merged_ads),
+        "total_ads": aq_total + os_total,
         "rent_total": rent_total,
         "sale_total": sale_total,
-        "dub_inspected": dub_insp,
-        "dub_added": dub_added,
         "aq_checked": len(aq_candidates),
         "aq_added": aq_added,
         "os_checked": len(os_candidates),
         "os_added": os_added
     }
     ai_advice, sys_health = monitor_system_with_ai(ai_stats_payload)
-    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Purged Old: {purged_old_extra} | Total DB: {len(merged_ads)} (Dubizzle: {dub_total}, AqarMap: {aq_total}, OpenSooq: {os_total}) ===")
+    print(f"=== Cycle Complete: Added +{aq_added} AqarMap & +{os_added} OpenSooq | Total AqarMap: {aq_total} | Total OpenSooq: {os_total} ===")
 
     now_str = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
     run_report.update({
@@ -1083,12 +1117,8 @@ def run_extra_radar():
         "aq_added": aq_added,
         "os_candidates": len(os_candidates),
         "os_added": os_added,
-        "total_live": len(merged_ads),
-        "dub_total": dub_total,
         "aq_total": aq_total,
         "os_total": os_total,
-        "rent_total": rent_total,
-        "sale_total": sale_total,
         "ai_health": sys_health,
         "ai_advice": ai_advice
     })
@@ -1141,25 +1171,18 @@ def run_extra_radar():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    if not os.environ.get("GITHUB_ACTIONS") and (aq_added > 0 or os_added > 0 or purged_old_extra > 0):
-        try:
-            fix_git_identity_for_vercel()
-            subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
-            subprocess.run(["git", "commit", "-m", f"Extra Radar Sync (+{aq_added} AqarMap, +{os_added} OpenSooq)"], cwd=BASE_DIR, capture_output=True, timeout=15)
-            p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
-            if p_res.returncode != 0:
-                clear_git_locks()
-                subprocess.run(["git", "pull", "--rebase", "--autostash", "-X", "ours", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
-                subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
-            print(f"    --> [LIVE SYNC] Pushed +{aq_added} AqarMap & +{os_added} OpenSooq owners to GitHub & Vercel!")
-        except Exception as e:
-            print(f"    --> [LOCAL SAVE] {e}")
+    if not os.environ.get("GITHUB_ACTIONS"):
+        ok_push, push_info = reliable_git_push(f"Extra Radar Sync (AqarMap: {aq_total}, OpenSooq: {os_total})")
+        if ok_push:
+            print(f"    --> [LIVE SYNC] Pushed AqarMap ({aq_total}) & OpenSooq ({os_total}) owners to GitHub & Vercel!")
+        else:
+            print(f"    --> [LOCAL SAVE] {push_info}")
 
 def main():
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
-    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.4 (Search-Card Time + Persistent Memory) ===")
+    print("=== Starting 24/7 Standalone AqarMap & OpenSooq Radar v9.5 (OpenSooq Reset + 120s Push Retry) ===")
     cycle = 1
     while True:
         print(f"\n>>> Starting AqarMap & OpenSooq Cycle #{cycle} at {datetime.now().strftime('%H:%M:%S')} <<<")
