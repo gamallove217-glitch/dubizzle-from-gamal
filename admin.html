@@ -389,17 +389,12 @@
       btn.textContent = "جاري الدخول...";
       savedAdminPass = pass;
 
-      const ok = await loadCodes();
+      await loadCodes();
       btn.disabled = false;
       btn.textContent = "دخول للوحة القيادة";
 
-      if (ok) {
-        document.getElementById("authGate").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-      } else {
-        err.textContent = "فشل الاتصال بالخادم";
-        err.style.display = "block";
-      }
+      document.getElementById("authGate").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
     }
 
     function refreshAll() {
@@ -441,75 +436,81 @@
       document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | فيسبوك: ${fbCnt}`;
     }
 
+    async function loadDirectAdsFallback(bannedIdsSet) {
+      try {
+        const r = await fetch("/ads.json?t=" + Date.now());
+        if (r.ok) {
+          const d = await r.json();
+          if (d && Array.isArray(d.ads)) {
+            adminAllAds = d.ads.filter(a => !bannedIdsSet.has(String(a.ad_id)));
+            document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (d.updated_at || "-");
+            updateCountersUI();
+            populateAdminZones();
+            renderAdminCards();
+          }
+        }
+      } catch (e) {}
+    }
+
     async function loadCodes() {
+      let bannedIds = new Set();
       try {
         const res = await apiAdmin({ action: "list" });
-        if (!res.ok) return false;
-        const data = await res.json();
+        if (res.ok) {
+          const data = await res.json();
+          const subs = data.subscriptions || [];
+          document.getElementById("stTotalSubs").textContent = subs.length;
+          document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
 
-        const subs = data.subscriptions || [];
-        document.getElementById("stTotalSubs").textContent = subs.length;
-        document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
+          bannedIds = new Set((data.bannedAds || []).map(b => String(b.adId)));
+          const rawList = data.adsList || [];
+          if (rawList.length > 0) {
+            adminAllAds = rawList.filter(a => !bannedIds.has(String(a.ad_id)));
+            document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
+            updateCountersUI();
+          } else {
+            await loadDirectAdsFallback(bannedIds);
+          }
 
-        let rawAdsList = data.adsList || [];
-        let updatedAtStr = data.adsUpdatedAt || "-";
+          const tbody = document.getElementById("subsTableBody");
+          tbody.innerHTML = subs.map(s => {
+            let stBadge = `<span class="status-unused">غير مفعل</span>`;
+            if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
+            if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
+            if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
 
-        if (rawAdsList.length === 0) {
-          try {
-            const directRes = await fetch("/ads.json?t=" + Date.now());
-            if (directRes.ok) {
-              const directData = await directRes.json();
-              if (directData && Array.isArray(directData.ads)) {
-                rawAdsList = directData.ads;
-                updatedAtStr = directData.updated_at || updatedAtStr;
-              }
-            }
-          } catch (e) {}
+            const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
+            const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
+            const hasLock = Boolean(lockedDev || s.status === "banned");
+
+            return `
+              <tr>
+                <td><span class="code-pill">${s.code}</span></td>
+                <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
+                <td>${stBadge}</td>
+                <td>${expDate}</td>
+                <td style="font-size:11.5px;color:#94a3b8">
+                  ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
+                  IP: ${s.boundIp || "-"}
+                </td>
+                <td>
+                  <div class="action-btns">
+                    ${hasLock ? `<button class="btn btn-sm btn-success fx-btn" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
+                    <button class="btn btn-sm btn-danger fx-btn" onclick="deleteCode('${s.code}')">حذف الكود</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join("");
+
+          populateAdminZones();
+          renderAdminCards();
+          return true;
         }
+      } catch (e) {}
 
-        const bannedIds = new Set((data.bannedAds || []).map(b => String(b.adId)));
-        adminAllAds = rawAdsList.filter(a => !bannedIds.has(String(a.ad_id)));
-
-        document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + updatedAtStr;
-        updateCountersUI();
-
-        const tbody = document.getElementById("subsTableBody");
-        tbody.innerHTML = subs.map(s => {
-          let stBadge = `<span class="status-unused">غير مفعل</span>`;
-          if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
-          if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
-          if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
-
-          const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
-          const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
-          const hasLock = Boolean(lockedDev || s.status === "banned");
-
-          return `
-            <tr>
-              <td><span class="code-pill">${s.code}</span></td>
-              <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
-              <td>${stBadge}</td>
-              <td>${expDate}</td>
-              <td style="font-size:11.5px;color:#94a3b8">
-                ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
-                IP: ${s.boundIp || "-"}
-              </td>
-              <td>
-                <div class="action-btns">
-                  ${hasLock ? `<button class="btn btn-sm btn-success fx-btn" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
-                  <button class="btn btn-sm btn-danger fx-btn" onclick="deleteCode('${s.code}')">حذف الكود</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        populateAdminZones();
-        renderAdminCards();
-        return true;
-      } catch (e) {
-        return false;
-      }
+      await loadDirectAdsFallback(bannedIds);
+      return true;
     }
 
     function populateAdminZones() {
