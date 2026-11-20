@@ -437,4 +437,234 @@
       document.getElementById("stTotalAds").textContent = adminAllAds.length;
       const dubCnt = adminAllAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
       const aqCnt = adminAllAds.filter(a => a.source === "عقارماب").length;
-      const fbCnt = adminAllAds.filter(a => a.source === "فيسبوك").le
+      const fbCnt = adminAllAds.filter(a => a.source === "فيسبوك").length;
+      document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | فيسبوك: ${fbCnt}`;
+    }
+
+    async function loadCodes() {
+      try {
+        const res = await apiAdmin({ action: "list" });
+        if (!res.ok) return false;
+        const data = await res.json();
+
+        const subs = data.subscriptions || [];
+        document.getElementById("stTotalSubs").textContent = subs.length;
+        document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
+
+        let rawAdsList = data.adsList || [];
+        let updatedAtStr = data.adsUpdatedAt || "-";
+
+        if (rawAdsList.length === 0) {
+          try {
+            const directRes = await fetch("/ads.json?t=" + Date.now());
+            if (directRes.ok) {
+              const directData = await directRes.json();
+              if (directData && Array.isArray(directData.ads)) {
+                rawAdsList = directData.ads;
+                updatedAtStr = directData.updated_at || updatedAtStr;
+              }
+            }
+          } catch (e) {}
+        }
+
+        const bannedIds = new Set((data.bannedAds || []).map(b => String(b.adId)));
+        adminAllAds = rawAdsList.filter(a => !bannedIds.has(String(a.ad_id)));
+
+        document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + updatedAtStr;
+        updateCountersUI();
+
+        const tbody = document.getElementById("subsTableBody");
+        tbody.innerHTML = subs.map(s => {
+          let stBadge = `<span class="status-unused">غير مفعل</span>`;
+          if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
+          if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
+          if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
+
+          const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
+          const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
+          const hasLock = Boolean(lockedDev || s.status === "banned");
+
+          return `
+            <tr>
+              <td><span class="code-pill">${s.code}</span></td>
+              <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
+              <td>${stBadge}</td>
+              <td>${expDate}</td>
+              <td style="font-size:11.5px;color:#94a3b8">
+                ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
+                IP: ${s.boundIp || "-"}
+              </td>
+              <td>
+                <div class="action-btns">
+                  ${hasLock ? `<button class="btn btn-sm btn-success fx-btn" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
+                  <button class="btn btn-sm btn-danger fx-btn" onclick="deleteCode('${s.code}')">حذف الكود</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        populateAdminZones();
+        renderAdminCards();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function populateAdminZones() {
+      const sel = document.getElementById("admZone");
+      const current = sel.value;
+      const zones = [...new Set(adminAllAds.map(a => a.zone).filter(Boolean))].sort();
+      sel.innerHTML = `<option value="ALL">كل المناطق (${adminAllAds.length})</option>` +
+        zones.map(z => `<option value="${z}">${z}</option>`).join("");
+      if (zones.includes(current)) sel.value = current;
+    }
+
+    function renderAdminCards() {
+      const q = document.getElementById("admSearch").value.trim().toLowerCase();
+      const deal = document.getElementById("admDeal").value;
+      const cat = document.getElementById("admCat").value;
+      const zone = document.getElementById("admZone").value;
+      const src = document.getElementById("admSource").value;
+      const sort = document.getElementById("admSort").value;
+
+      let list = adminAllAds.filter(a => {
+        if (deal !== "ALL" && a.deal !== deal) return false;
+        if (cat !== "ALL" && a.cat !== cat) return false;
+        if (zone !== "ALL" && a.zone !== zone) return false;
+        if (src !== "ALL" && (a.source || "دوبيزل") !== src) return false;
+        if (q) {
+          const hay = `${a.title || ""} ${a.zone || ""} ${a.publisher || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if (sort === "NEWEST") {
+        list.sort((a, b) => {
+          const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+          if (tsDiff !== 0) return tsDiff;
+          return (b.ad_id || 0) - (a.ad_id || 0);
+        });
+      } else if (sort === "PRICE_ASC") {
+        list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
+      } else if (sort === "PRICE_DESC") {
+        list.sort((a, b) => (b.price_num || 0) - (a.price_num || 0));
+      }
+
+      document.getElementById("adminShownCount").textContent = list.length;
+      const grid = document.getElementById("adminAdsGrid");
+
+      grid.innerHTML = list.map(a => {
+        const srcName = a.source || "دوبيزل";
+        const key = String(a.ad_id);
+        return `
+          <div class="card" id="adm-card-${key}">
+            <div>
+              <div class="card-top">
+                <div class="badges-wrap">
+                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
+                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
+                </div>
+                <span class="time-badge">${formatAddedTime(a)}</span>
+              </div>
+              <div class="card-title">${a.title}</div>
+              <div class="price-box">
+                <span class="price-lbl">السعر المطلوب</span>
+                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
+                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
+                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
+                <div class="meta-item"><span>الناشر</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary fx-btn">فتح الإعلان الأصلي</a>
+              <div class="card-actions-row">
+                <button class="btn-card del-only fx-btn" onclick="deleteAdOnly('${key}')">حذف الإعلان</button>
+                <button class="btn-card ban fx-btn" onclick="banPublisherOnly('${key}')">حظر الناشر</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function deleteAdOnly(adIdStr) {
+      if (!confirm("تأكيد حذف هذا الإعلان فقط بدون حظر الناشر؟")) return;
+      adminAllAds = adminAllAds.filter(a => String(a.ad_id) !== String(adIdStr));
+      updateCountersUI();
+      renderAdminCards();
+      await apiAdmin({ action: "delete_ad", adId: adIdStr });
+    }
+
+    async function banPublisherOnly(adIdStr) {
+      const target = adminAllAds.find(a => String(a.ad_id) === String(adIdStr));
+      const rawPub = target ? (target.publisher || "مالك") : "مالك";
+      const cleanPub = rawPub.split("|")[0].trim();
+      if (!confirm(`تأكيد حظر الناشر (${cleanPub}) وحذف إعلاناته نهائيا من الرادار؟`)) return;
+
+      const samePubAds = adminAllAds.filter(a => (a.publisher || "").split("|")[0].trim() === cleanPub);
+      const sameIds = samePubAds.map(a => String(a.ad_id));
+      if (!sameIds.includes(String(adIdStr))) sameIds.push(String(adIdStr));
+
+      adminAllAds = adminAllAds.filter(a => !sameIds.includes(String(a.ad_id)));
+      updateCountersUI();
+      renderAdminCards();
+      await apiAdmin({ action: "ban_publisher", adId: adIdStr, adIds: sameIds, publisher: cleanPub });
+    }
+
+    async function createNewCode() {
+      const clientName = document.getElementById("newClientName").value.trim();
+      const clientPhone = document.getElementById("newClientPhone").value.trim();
+      const durationDays = document.getElementById("newDuration").value;
+
+      const res = await apiAdmin({ action: "create", clientName, clientPhone, durationDays });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById("newCodeText").textContent = data.code;
+        document.getElementById("generatedCodeBox").style.display = "block";
+        document.getElementById("newClientName").value = "";
+        document.getElementById("newClientPhone").value = "";
+        loadCodes();
+      }
+    }
+
+    function copyNewCode() {
+      const code = document.getElementById("newCodeText").textContent;
+      navigator.clipboard.writeText(code);
+      alert("تم نسخ الكود: " + code);
+    }
+
+    async function unbanCode(code) {
+      if (!confirm("هل تريد تصفير الجهاز المربوط بهذا الكود ليتمكن السمسار من الدخول على جهاز جديد؟")) return;
+      await apiAdmin({ action: "unban", code });
+      loadCodes();
+    }
+
+    async function deleteCode(code) {
+      if (!confirm("تأكيد حذف الكود نهائيا؟")) return;
+      await apiAdmin({ action: "delete_code", code });
+      loadCodes();
+    }
+
+    async function saveTelegramConfig() {
+      const botToken = document.getElementById("tgBotToken").value.trim();
+      const chatId = document.getElementById("tgChatId").value.trim();
+      if (!botToken || !chatId) {
+        alert("يرجى إدخال التوكن والـ Chat ID");
+        return;
+      }
+      const res = await apiAdmin({ action: "save_telegram", botToken, chatId });
+      if (res.ok) {
+        alert("تم حفظ إعدادات تليجرام وإرسال رسالة تأكيد لبوتك بنجاح!");
+      } else {
+        alert("حدث خطأ أثناء الحفظ");
+      }
+    }
+  </script>
+</body>
+</html>
