@@ -17,6 +17,73 @@
       padding-bottom: 70px;
     }
 
+    .fx-btn {
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease, opacity 0.2s ease;
+    }
+    .fx-btn:active {
+      transform: scale(0.94) translateY(1px) !important;
+    }
+    .fx-btn::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -120%;
+      width: 65%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+      transform: skewX(-22deg);
+      pointer-events: none;
+      transition: left 0.55s ease;
+    }
+    .fx-btn:hover::after { left: 140%; }
+    .btn-ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(255, 255, 255, 0.42);
+      pointer-events: none;
+      animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(3.4); opacity: 0; }
+    }
+    @keyframes cardFadeOut {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.88) translateY(10px); }
+    }
+    @keyframes cardBanShake {
+      0% { transform: translateX(0); border-color: #ef4444; }
+      20% { transform: translateX(-6px); border-color: #ef4444; }
+      40% { transform: translateX(6px); border-color: #ef4444; }
+      100% { opacity: 0; transform: scale(0.86); border-color: #ef4444; }
+    }
+    .card-deleting {
+      pointer-events: none;
+      border-color: #f59e0b !important;
+      animation: cardFadeOut 0.34s ease forwards;
+    }
+    .card-banning {
+      pointer-events: none;
+      background: rgba(239, 68, 68, 0.14) !important;
+      animation: cardBanShake 0.42s ease forwards;
+    }
+
+    #toastBox {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(90px);
+      z-index: 9999; padding: 12px 22px; border-radius: 14px;
+      font-size: 13.5px; font-weight: 800; color: #fff;
+      background: rgba(15, 23, 42, 0.96); border: 1px solid #38bdf8;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
+      opacity: 0; pointer-events: none;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    }
+    #toastBox.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toastBox.ok { border-color: #10b981; color: #6ee7b7; }
+    #toastBox.warn { border-color: #f59e0b; color: #fde68a; }
+    #toastBox.err { border-color: #ef4444; color: #fca5a5; }
+
     #authGate {
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -77,15 +144,20 @@
       border: 1px solid #1e293b; background: #060911; color: #fff;
       font-size: 14px; font-weight: 700; outline: none; transition: 0.2s;
     }
-    .input:focus { border-color: #f59e0b; }
+    .input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14); }
     .btn {
       padding: 12px 20px; border-radius: 12px; border: none;
-      font-size: 14px; font-weight: 900; cursor: pointer; transition: 0.2s;
+      font-size: 14px; font-weight: 900; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
-    .btn-emerald { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #060911; }
+    .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25); }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(245, 158, 11, 0.38); }
+    .btn-emerald { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #060911; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25); }
+    .btn-emerald:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(16, 185, 129, 0.38); }
     .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.28); border-color: #ef4444; transform: translateY(-1px); }
     .btn-success { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .btn-success:hover { background: rgba(16, 185, 129, 0.28); border-color: #10b981; transform: translateY(-1px); }
     .btn-sm { padding: 7px 13px; font-size: 12px; border-radius: 9px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
@@ -113,7 +185,7 @@
       background: #060911; border: 1px solid #1e293b; color: #f8fafc;
       padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none;
     }
-    .filter-control:focus { border-color: #f59e0b; }
+    .filter-control:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14); }
 
     .grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;
@@ -133,9 +205,9 @@
     }
     .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
     .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
-    .tag.src-aq { background: rgba(59, 130, 246, 0.14); color: #93c5fd; }
-    .tag.src-os { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; }
+    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag.src-aq { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag.src-fb { background: rgba(24, 119, 242, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.45); }
     .time-badge { font-size: 11px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 9px; border-radius: 7px; }
     .card-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; line-height: 1.5; color: #fff; }
     .price-box {
@@ -154,23 +226,56 @@
     .meta-item { display: flex; flex-direction: column; gap: 2px; }
     .meta-item span { font-size: 10.5px; color: #64748b; font-weight: 700; }
     .meta-item b { color: #f1f5f9; font-size: 12.5px; font-weight: 800; }
-    .card-actions { display: flex; gap: 8px; margin-top: auto; }
-    .btn-card {
-      flex: 1; text-align: center; padding: 11px; border-radius: 10px;
-      font-size: 13px; font-weight: 900; text-decoration: none; cursor: pointer; border: none;
+
+    .card-actions-wrap {
+      display: flex; flex-direction: column; gap: 8px; margin-top: auto;
     }
-    .btn-card.primary { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
-    .btn-card.ban { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .card-actions-sub {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .btn-card {
+      width: 100%; text-align: center; padding: 11px 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 900; text-decoration: none; cursor: pointer;
+      border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-card.primary {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+    }
+    .btn-card.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(245, 158, 11, 0.38); }
+    .btn-card.del-ad {
+      background: rgba(245, 158, 11, 0.14); color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+    .btn-card.del-ad:hover {
+      background: rgba(245, 158, 11, 0.26); border-color: #f59e0b; transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.22);
+    }
+    .btn-card.ban-pub {
+      background: rgba(239, 68, 68, 0.16); color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
+    .btn-card.ban-pub:hover {
+      background: rgba(239, 68, 68, 0.3); border-color: #ef4444; transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.28);
+    }
+    .btn-card.ban-pub.is-generic {
+      opacity: 0.48;
+      border-style: dashed;
+    }
+    .btn-ico { width: 15px; height: 15px; flex-shrink: 0; }
   </style>
 </head>
 <body>
+
+  <div id="toastBox"></div>
 
   <div id="authGate">
     <div class="gate-box">
       <h2>بوابة القيادة السرية</h2>
       <p>أدخل كلمة مرور المدير للتحكم الكامل في الاشتراكات والرادار</p>
       <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;font-size:18px;letter-spacing:2px;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
-      <button class="btn btn-gold" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة القيادة</button>
+      <button class="btn btn-gold fx-btn" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة القيادة</button>
       <div id="authErr" style="color:#f87171;font-size:13px;font-weight:700;margin-top:12px;display:none;"></div>
     </div>
   </div>
@@ -182,8 +287,8 @@
         <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
       </div>
       <div style="display:flex;gap:10px;">
-        <button class="btn btn-gold btn-sm" onclick="refreshAll()">تحديث البيانات الآن</button>
-        <a href="/" target="_blank" class="btn btn-sm" style="background:#1e293b;color:#fff;text-decoration:none;">فتح واجهة السماسرة</a>
+        <button class="btn btn-gold btn-sm fx-btn" onclick="refreshAll()">تحديث البيانات الآن</button>
+        <a href="/" target="_blank" class="btn btn-sm fx-btn" style="background:#1e293b;color:#fff;text-decoration:none;">فتح واجهة السماسرة</a>
       </div>
     </header>
 
@@ -221,11 +326,11 @@
             <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">مدة الاشتراك (بالأيام)</label>
             <input type="number" id="newDuration" class="input" value="30" />
           </div>
-          <button class="btn btn-gold" onclick="createNewCode()">توليد كود VIP الآن</button>
+          <button class="btn btn-gold fx-btn" onclick="createNewCode()">توليد كود VIP الآن</button>
         </div>
         <div id="generatedCodeBox" style="margin-top:16px;display:none;padding:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;border-radius:12px;">
           تم توليد الكود بنجاح: <span class="code-pill" id="newCodeText"></span>
-          <button class="btn btn-sm btn-gold" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
+          <button class="btn btn-sm btn-gold fx-btn" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
         </div>
       </div>
 
@@ -259,13 +364,13 @@
             <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">Admin Chat ID</label>
             <input type="text" id="tgChatId" class="input" placeholder="مثال: 987654321" />
           </div>
-          <button class="btn btn-emerald" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
+          <button class="btn btn-emerald fx-btn" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
         </div>
       </div>
 
       <div class="box">
         <h3>
-          <span>جميع إعلانات الرادار الحية (نفس عرض السماسرة + تحكم الحظر الفوري)</span>
+          <span>جميع إعلانات الرادار الحية (حذف الإعلان منفصل عن حظر الناشر)</span>
           <span style="font-size:14px;color:#34d399;">المعروض حاليا: <b id="adminShownCount">0</b> إعلان</span>
         </h3>
 
@@ -304,294 +409,11 @@
               <option value="ALL">كل المنصات</option>
               <option value="دوبيزل">دوبيزل</option>
               <option value="عقارماب">عقارماب</option>
-              <option value="السوق المفتوح">السوق المفتوح</option>
+              <option value="فيسبوك">فيسبوك</option>
             </select>
           </div>
           <div class="filter-group">
             <label>الترتيب</label>
             <select id="admSort" class="filter-control" onchange="renderAdminCards()">
               <option value="NEWEST">الأحدث إضافة للرادار أولا</option>
-              <option value="PRICE_ASC">السعر: الأقل أولا</option>
-              <option value="PRICE_DESC">السعر: الأعلى أولا</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid" id="adminAdsGrid"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let savedAdminPass = "";
-    let adminAllAds = [];
-    const MASTER_HASH = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
-
-    async function sha256Hex(str) {
-      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
-    async function verifyAdmin() {
-      const pass = document.getElementById("adminPassInput").value.trim();
-      const err = document.getElementById("authErr");
-      const btn = document.getElementById("authBtn");
-      err.style.display = "none";
-
-      if (!pass) {
-        err.textContent = "يرجى إدخال كلمة المرور";
-        err.style.display = "block";
-        return;
-      }
-
-      const hash = await sha256Hex(pass);
-      if (hash !== MASTER_HASH && pass !== "292004") {
-        err.textContent = "كلمة المرور غير صحيحة!";
-        err.style.display = "block";
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "جاري الدخول...";
-      savedAdminPass = pass;
-
-      const ok = await loadCodes();
-      btn.disabled = false;
-      btn.textContent = "دخول للوحة القيادة";
-
-      if (ok) {
-        document.getElementById("authGate").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-      } else {
-        err.textContent = "فشل الاتصال بالخادم";
-        err.style.display = "block";
-      }
-    }
-
-    function refreshAll() {
-      loadCodes();
-    }
-
-    async function apiAdmin(bodyObj) {
-      return await fetch("/api/admin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-password": savedAdminPass
-        },
-        body: JSON.stringify(bodyObj)
-      });
-    }
-
-    function formatAddedTime(ad) {
-      if (ad.first_seen_ts) {
-        const diffSec = Math.max(0, Math.floor(Date.now() / 1000) - Number(ad.first_seen_ts));
-        if (diffSec < 3600) return `أضيف منذ ${Math.max(1, Math.floor(diffSec / 60))} دقيقة`;
-        if (diffSec < 86400) return `أضيف منذ ${Math.floor(diffSec / 3600)} ساعة`;
-        return `أضيف منذ ${Math.floor(diffSec / 86400)} يوم`;
-      }
-      return ad.age || "حديث";
-    }
-
-    function getSourceBadgeClass(src) {
-      if (src === "عقارماب") return "src-aq";
-      if (src === "السوق المفتوح") return "src-os";
-      return "src-dub";
-    }
-
-    async function loadCodes() {
-      try {
-        const res = await apiAdmin({ action: "list" });
-        if (!res.ok) return false;
-        const data = await res.json();
-
-        const subs = data.subscriptions || [];
-        document.getElementById("stTotalSubs").textContent = subs.length;
-        document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
-
-        const bannedIds = new Set((data.bannedAds || []).map(b => Number(b.adId)));
-        adminAllAds = (data.adsList || []).filter(a => !bannedIds.has(Number(a.ad_id)));
-
-        document.getElementById("stTotalAds").textContent = adminAllAds.length;
-        document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
-
-        const dubCnt = adminAllAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
-        const aqCnt = adminAllAds.filter(a => a.source === "عقارماب").length;
-        const osCnt = adminAllAds.filter(a => a.source === "السوق المفتوح").length;
-        document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | السوق: ${osCnt}`;
-
-        const tbody = document.getElementById("subsTableBody");
-        tbody.innerHTML = subs.map(s => {
-          let stBadge = `<span class="status-unused">غير مفعل</span>`;
-          if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
-          if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
-          if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
-
-          const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
-          const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
-          const hasLock = Boolean(lockedDev || s.status === "banned");
-
-          return `
-            <tr>
-              <td><span class="code-pill">${s.code}</span></td>
-              <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
-              <td>${stBadge}</td>
-              <td>${expDate}</td>
-              <td style="font-size:11.5px;color:#94a3b8">
-                ${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>
-                IP: ${s.boundIp || "-"}
-              </td>
-              <td>
-                <div class="action-btns">
-                  ${hasLock ? `<button class="btn btn-sm btn-success" onclick="unbanCode('${s.code}')">تصفير الجهاز / فك القفل</button>` : ""}
-                  <button class="btn btn-sm btn-danger" onclick="deleteCode('${s.code}')">حذف الكود</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        populateAdminZones();
-        renderAdminCards();
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-
-    function populateAdminZones() {
-      const sel = document.getElementById("admZone");
-      const current = sel.value;
-      const zones = [...new Set(adminAllAds.map(a => a.zone).filter(Boolean))].sort();
-      sel.innerHTML = `<option value="ALL">كل المناطق (${adminAllAds.length})</option>` +
-        zones.map(z => `<option value="${z}">${z}</option>`).join("");
-      if (zones.includes(current)) sel.value = current;
-    }
-
-    function renderAdminCards() {
-      const q = document.getElementById("admSearch").value.trim().toLowerCase();
-      const deal = document.getElementById("admDeal").value;
-      const cat = document.getElementById("admCat").value;
-      const zone = document.getElementById("admZone").value;
-      const src = document.getElementById("admSource").value;
-      const sort = document.getElementById("admSort").value;
-
-      let list = adminAllAds.filter(a => {
-        if (deal !== "ALL" && a.deal !== deal) return false;
-        if (cat !== "ALL" && a.cat !== cat) return false;
-        if (zone !== "ALL" && a.zone !== zone) return false;
-        if (src !== "ALL" && (a.source || "دوبيزل") !== src) return false;
-        if (q) {
-          const hay = `${a.title || ""} ${a.zone || ""} ${a.publisher || ""}`.toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        return true;
-      });
-
-      if (sort === "NEWEST") {
-        list.sort((a, b) => {
-          const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
-          if (tsDiff !== 0) return tsDiff;
-          return (b.ad_id || 0) - (a.ad_id || 0);
-        });
-      } else if (sort === "PRICE_ASC") {
-        list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
-      } else if (sort === "PRICE_DESC") {
-        list.sort((a, b) => (b.price_num || 0) - (a.price_num || 0));
-      }
-
-      document.getElementById("adminShownCount").textContent = list.length;
-      const grid = document.getElementById("adminAdsGrid");
-
-      grid.innerHTML = list.map(a => {
-        const srcName = a.source || "دوبيزل";
-        const safePub = (a.publisher || "مالك").replace(/'/g, "\\'");
-        return `
-          <div class="card" id="adm-card-${a.ad_id}">
-            <div>
-              <div class="card-top">
-                <div class="badges-wrap">
-                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
-                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
-                </div>
-                <span class="time-badge">${formatAddedTime(a)}</span>
-              </div>
-              <div class="card-title">${a.title}</div>
-              <div class="price-box">
-                <span class="price-lbl">السعر المطلوب</span>
-                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
-              </div>
-              <div class="meta-grid">
-                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
-                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
-                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
-                <div class="meta-item"><span>الناشر</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
-              </div>
-            </div>
-            <div class="card-actions">
-              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary">فتح الإعلان الأصلي</a>
-              <button class="btn-card ban" onclick="banAdAndPublisher(${a.ad_id}, '${safePub}')">حظر الإعلان والناشر</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function createNewCode() {
-      const clientName = document.getElementById("newClientName").value.trim();
-      const clientPhone = document.getElementById("newClientPhone").value.trim();
-      const durationDays = document.getElementById("newDuration").value;
-
-      const res = await apiAdmin({ action: "create", clientName, clientPhone, durationDays });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById("newCodeText").textContent = data.code;
-        document.getElementById("generatedCodeBox").style.display = "block";
-        document.getElementById("newClientName").value = "";
-        document.getElementById("newClientPhone").value = "";
-        loadCodes();
-      }
-    }
-
-    function copyNewCode() {
-      const code = document.getElementById("newCodeText").textContent;
-      navigator.clipboard.writeText(code);
-      alert("تم نسخ الكود: " + code);
-    }
-
-    async function unbanCode(code) {
-      if (!confirm("هل تريد تصفير الجهاز المربوط بهذا الكود ليتمكن السمسار من الدخول على جهاز جديد؟")) return;
-      await apiAdmin({ action: "unban", code });
-      loadCodes();
-    }
-
-    async function deleteCode(code) {
-      if (!confirm("تأكيد حذف الكود نهائيا؟")) return;
-      await apiAdmin({ action: "delete_code", code });
-      loadCodes();
-    }
-
-    async function banAdAndPublisher(adId, publisher) {
-      if (!confirm("تأكيد حظر هذا الإعلان وناشره نهائيا من الرادار؟")) return;
-      adminAllAds = adminAllAds.filter(a => Number(a.ad_id) !== Number(adId));
-      renderAdminCards();
-      await apiAdmin({ action: "ban_ad", adId, publisher });
-    }
-
-    async function saveTelegramConfig() {
-      const botToken = document.getElementById("tgBotToken").value.trim();
-      const chatId = document.getElementById("tgChatId").value.trim();
-      if (!botToken || !chatId) {
-        alert("يرجى إدخال التوكن والـ Chat ID");
-        return;
-      }
-      const res = await apiAdmin({ action: "save_telegram", botToken, chatId });
-      if (res.ok) {
-        alert("تم حفظ إعدادات تليجرام وإرسال رسالة تأكيد لبوتك بنجاح!");
-      } else {
-        alert("حدث خطأ أثناء الحفظ");
-      }
-    }
-  </script>
-</body>
-</html>
+              <option value="PR
