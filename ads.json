@@ -1,7 +1,39 @@
 {
-  "updated_at": "2026-11-21 01:16 AM",
-  "total": 117,
+  "updated_at": "2026-11-21 01:22 AM",
+  "total": 118,
   "ads": [
+    {
+      "ad_id": 9322302883,
+      "id": "fb_9322302883",
+      "source": "فيسبوك",
+      "title": "شقة 140 متر للبيع من المالك فيو جاردن كامل الشقة , عدادات مياه كهرباء غاز و انترنت دو",
+      "price": "كاش (السعر بالتفاصيل)",
+      "price_num": 1200000,
+      "zone": "القرنفل",
+      "location": "القرنفل",
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "تمليك",
+      "type": "تمليك",
+      "area": 140,
+      "rooms": null,
+      "publisher": "مالك مباشر",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "age": "سحب فوري 01:21 AM",
+      "fresh_tier": 3,
+      "description": "شقة 140 متر للبيع من المالك فيو جاردن كامل الشقة , عدادات مياه كهرباء غاز و انترنت دور متكرر عمارة قريبة من بوابة 2 بوابة الكترونية للعمارة الشقة تحتاج وش نظافة , معاينة يوم السبت , التواصل اتصال او رسالة \n+971 55 968 0072",
+      "first_seen_ts": 1795216900,
+      "timestamp": 1795216900,
+      "desc_verified_v2": true,
+      "verified_24h_v93": true,
+      "verified_fb_v160": true,
+      "url": "https://www.facebook.com/groups/1446095442638593/permalink/2257225164858946/?rdid=MfNzy0ccwKLSNZVW#",
+      "link": "https://www.facebook.com/groups/1446095442638593/permalink/2257225164858946/?rdid=MfNzy0ccwKLSNZVW#",
+      "verified_v12": true,
+      "scraped_at": "2026-11-21 01:21 AM",
+      "date": "2026-11-21 01:21"
+    },
     {
       "ad_id": 209549375,
       "id": "dub_209549375",
@@ -3093,5 +3125,38 @@
       "date": "2026-11-16 11:32"
     }
   ],
-  "pending_ads": []
+  "pending_ads": [
+    {
+      "ad_id": 93450104197,
+      "id": "fb_93450104197",
+      "source": "فيسبوك",
+      "title": "من المالك مباشرااستيديو للإيجار بمدخل خاص اول سكن في جاردينيا هايتس 1 بجوار جمله مارك",
+      "price": "السعر بالتفاصيل (خاص)",
+      "price_num": 1,
+      "zone": "أبو الهول",
+      "location": "أبو الهول",
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "area": null,
+      "rooms": null,
+      "publisher": "مالك مباشر",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "age": "دخل الرادار 01:17 AM (نُشر الآن)",
+      "fresh_tier": 3,
+      "description": "من المالك مباشرااستيديو للإيجار بمدخل خاص اول سكن في جاردينيا هايتس 1 بجوار جمله ماركت وجميع الخدمات شامل جميع الخدمات ميه وكهرباء ونت للتواصل 01033448482",
+      "first_seen_ts": 1795216653,
+      "timestamp": 1795216653,
+      "desc_verified_v2": true,
+      "verified_24h_v93": true,
+      "verified_fb_v160": true,
+      "url": "https://www.facebook.com/permalink.php?story_fbid=29732982396325968",
+      "link": "https://www.facebook.com/permalink.php?story_fbid=29732982396325968",
+      "verified_v12": true,
+      "scraped_at": "2026-11-21 01:17 AM",
+      "date": "2026-11-21 01:17"
+    }
+  ]
 }
