@@ -33,6 +33,7 @@ AUTO_LOOP_MINUTES = 45
 FB_PENDING_BATCH_COUNT = 0
 DIRECT_PULL_QUEUE = []
 PROCESSED_CMD_IDS = set()
+STARTUP_TS = int(time.time()) - 120
 HINDI_MAP = str.maketrans({"٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9", "٬": ",", "،": ",", "٫": "."})
 BIDI_REGEX = re.compile(r'[\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]')
 SYNC_LOCK = threading.Lock()
@@ -79,25 +80,58 @@ def fix_git_identity_for_vercel():
 
 def is_direct_fb_post_permalink(url_str):
     u = str(url_str or "").strip()
-    if "facebook.com" not in u: return False
-    return bool(re.search(r'(?:/share/[pv]/[A-Za-z0-9._\-]+|/posts/(?:\d+|pfbid[A-Za-z0-9]+)|/permalink/\d+|story_fbid=(?:\d+|pfbid[A-Za-z0-9]+)|multi_permalinks=\d+|/photo/?\?fbid=\d+|/groups/[^/]+/user/\d+|/groups/[^/]+/search/\?q=)', u))
+    return "facebook.com" in u
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Direct Home Feed & Link Puller v16.0", "version": "16.0",
-        "description": "Home Feed Pending Approval Queue + Remote Link Puller + Auto-Like",
+        "manifest_version": 3, "name": "Gamal Direct Home Feed & Link Puller v16.2", "version": "16.2",
+        "description": "Home Feed Pending Approval Queue + Tab-ID Remote Link Puller + Auto-Like",
         "permissions": ["storage", "tabs", "clipboardRead", "clipboardWrite"],
-        "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
+        "host_permissions": ["https://www.facebook.com/*", "https://m.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
         "content_scripts": [
-            {"matches": ["https://www.facebook.com/*"], "js": ["main_world_hook.js"], "run_at": "document_start", "world": "MAIN"},
-            {"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}
+            {"matches": ["https://www.facebook.com/*", "https://m.facebook.com/*"], "js": ["main_world_hook.js"], "run_at": "document_start", "world": "MAIN"},
+            {"matches": ["https://www.facebook.com/*", "https://m.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}
         ]
     }
     background_js = r"""
 let activePullTabId = null;
+let activePullOrigUrl = "";
+
+function checkLocalPullTask() {
+    if (activePullTabId !== null) return;
+    fetch("http://127.0.0.1:5005/fb_poll_task")
+    .then(r => r.json())
+    .then(d => {
+        if (d && d.url) {
+            activePullOrigUrl = d.url;
+            chrome.tabs.create({url: d.url, active: true}, tab => {
+                if (tab && tab.id) {
+                    activePullTabId = tab.id;
+                    setTimeout(() => {
+                        if (activePullTabId === tab.id) {
+                            try { chrome.tabs.remove(tab.id); } catch(e) {}
+                            activePullTabId = null;
+                        }
+                    }, 22000);
+                }
+            });
+        }
+    }).catch(() => {});
+}
+
 chrome.runtime.onMessage.addListener((m, sender, sr) => {
+    if (m && m.type === "AM_I_DIRECT_PULL_TAB") {
+        const isPull = !!(sender && sender.tab && sender.tab.id && sender.tab.id === activePullTabId);
+        sr({isPullTab: isPull, origUrl: activePullOrigUrl});
+        return false;
+    }
+    if (m && m.type === "PING_PULL_QUEUE") {
+        checkLocalPullTask();
+        sr({ok: true});
+        return false;
+    }
     if (m && m.type === "FB_POST_INGEST") {
         fetch("http://127.0.0.1:5005/fb_ingest", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(m.payload)})
         .then(r => r.json()).then(d => sr({ok: true, accepted: !!(d && d.accepted), reason: (d && d.reason) || ""}))
@@ -110,9 +144,10 @@ chrome.runtime.onMessage.addListener((m, sender, sr) => {
         return true;
     }
     if (m && m.type === "FB_DIRECT_PULL_RESULT") {
-        if (sender && sender.tab && sender.tab.id) {
-            try { chrome.tabs.remove(sender.tab.id); } catch(e) {}
-            if (activePullTabId === sender.tab.id) activePullTabId = null;
+        const tid = sender && sender.tab && sender.tab.id;
+        if (tid) {
+            if (activePullTabId === tid) activePullTabId = null;
+            try { chrome.tabs.remove(tid); } catch(e) {}
         }
         fetch("http://127.0.0.1:5005/fb_direct_ingest", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(m.payload)})
         .then(r => r.json()).then(() => sr({ok: true})).catch(() => sr({ok: false}));
@@ -120,34 +155,13 @@ chrome.runtime.onMessage.addListener((m, sender, sr) => {
     }
 });
 
-setInterval(() => {
-    if (activePullTabId !== null) return;
-    fetch("http://127.0.0.1:5005/fb_poll_task")
-    .then(r => r.json())
-    .then(d => {
-        if (d && d.url) {
-            const sep = d.url.includes("?") ? "&" : "?";
-            const targetUrl = d.url + sep + "g_direct_pull=1";
-            chrome.tabs.create({url: targetUrl, active: true}, tab => {
-                if (tab && tab.id) {
-                    activePullTabId = tab.id;
-                    setTimeout(() => {
-                        if (activePullTabId === tab.id) {
-                            try { chrome.tabs.remove(tab.id); } catch(e) {}
-                            activePullTabId = null;
-                        }
-                    }, 18000);
-                }
-            });
-        }
-    }).catch(() => {});
-}, 2500);
+setInterval(checkLocalPullTask, 2200);
 """.strip()
 
     main_world_hook_js = r"""
 (function(){
-if(window.__gamalMainHookV160)return;
-window.__gamalMainHookV160=true;
+if(window.__gamalMainHookV162)return;
+window.__gamalMainHookV162=true;
 const D_RE=/https?:\/\/(?:www\.|m\.)?facebook\.com\/(?:share\/[pv]\/[A-Za-z0-9._\-]+|groups\/[^\/?#]+\/(?:posts|permalink)\/(?:\d+|pfbid[A-Za-z0-9]+)|permalink\.php\?story_fbid=[^&"'\s]+|story\.php\?story_fbid=[^&"'\s]+|[^\/?#]+\/posts\/(?:\d+|pfbid[A-Za-z0-9]+)|photo\/?\?fbid=\d+[^"'\s]*)/i;
 try{
 if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -275,46 +289,58 @@ setInterval(stamp,350);
 
     content_js = r"""
 (function(){
-if(window.__gamalFbRadarV160)return;
-window.__gamalFbRadarV160=true;
+if(window.__gamalFbRadarV162)return;
+window.__gamalFbRadarV162=true;
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 const H_MAP={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
 const normD=s=>String(s||"").replace(/[٠-٩]/g,c=>H_MAP[c]||c);
 
-if(location.search.includes("g_direct_pull=1")){
-setTimeout(async()=>{
-try{
-await slp(2200);
+async function runDirectPullExtraction(origUrl){
+await slp(2800);
 const btns=document.querySelectorAll('div[role="button"],span[role="button"]');
 for(const b of btns){
 const bt=(b.innerText||"").trim();
 if((bt==="عرض المزيد"||bt==="See more"||bt.includes("عرض المزيد"))&&!b.closest("ul")&&!b.closest("form")){
-try{b.click();await slp(500);}catch(e){}
+try{b.click();await slp(550);}catch(e){}
 }
 }
-const msgNodes=document.querySelectorAll('div[data-ad-preview="message"],div[data-ad-comet-preview="message"],div[data-ad-rendering-role="story_message"],div[dir="auto"]');
+const dialogEl=document.querySelector('div[role="dialog"]');
+const rootScope=dialogEl||document;
 let bestTxt="";
-msgNodes.forEach(n=>{
-if(n.closest("ul")||n.closest("form")||n.closest("nav"))return;
+const primaryMsgs=rootScope.querySelectorAll('div[data-ad-preview="message"],div[data-ad-comet-preview="message"],div[data-ad-rendering-role="story_message"]');
+for(const n of primaryMsgs){
+if(n.closest("ul")||n.closest("form"))continue;
 const t=normD((n.innerText||"").trim());
-if(t.length>bestTxt.length&&t.length<3500)bestTxt=t;
-});
-if(!bestTxt)bestTxt=normD((document.body.innerText||"").substring(0,1800));
+if(t.length>=15){bestTxt=t;break;}
+}
+if(!bestTxt){
+const dirNodes=rootScope.querySelectorAll('div[dir="auto"]');
+for(const n of dirNodes){
+if(n.closest("ul")||n.closest("form")||n.closest("nav"))continue;
+const t=normD((n.innerText||"").trim());
+if(t.length>=25&&t.length<3500){bestTxt=t;break;}
+}
+}
+if(!bestTxt)bestTxt=normD((rootScope.innerText||document.body.innerText||"").substring(0,1800));
 let author="مالك مباشر",groupName="";
-document.querySelectorAll("h2 a,h3 a,h4 a,a[href*='/user/'],a[href*='/groups/']").forEach(a=>{
+rootScope.querySelectorAll("h2 a,h3 a,h4 a,a[href*='/user/'],a[href*='/groups/']").forEach(a=>{
 const t=(a.innerText||"").split("\n")[0].trim(),h=a.href||"";
 if(h.includes("/groups/")&&!h.includes("/user/")&&!h.includes("/posts/")&&!h.includes("/permalink/")&&t.length>=3&&!groupName)groupName=t;
 else if(t.length>=2&&t.length<=40&&author==="مالك مباشر"&&t!==groupName)author=t;
 });
-const cleanUrl=location.href.replace(/([?&])g_direct_pull=1(&|$)/,"$1").replace(/[?&]$/,"");
-chrome.runtime.sendMessage({type:"FB_DIRECT_PULL_RESULT",payload:{url:cleanUrl,text:bestTxt,author:author,group_name:groupName}});
-}catch(e){
-chrome.runtime.sendMessage({type:"FB_DIRECT_PULL_RESULT",payload:{url:location.href,text:"",author:"مالك مباشر",group_name:""}});
-}
-},1000);
-return;
+const finalUrl=(location.href&&location.href.includes("facebook.com"))?location.href:(origUrl||location.href);
+chrome.runtime.sendMessage({type:"FB_DIRECT_PULL_RESULT",payload:{url:finalUrl,text:bestTxt,author:author,group_name:groupName}});
 }
 
+chrome.runtime.sendMessage({type:"AM_I_DIRECT_PULL_TAB"},resp=>{
+if(resp&&resp.isPullTab){
+runDirectPullExtraction(resp.origUrl);
+return;
+}
+startHomeFeedRadar();
+});
+
+function startHomeFeedRadar(){
 const FEEDS=[
 {name:"صفحتك الرئيسية (Home Feed)",url:"https://www.facebook.com/"},
 {name:"الصفحة الرئيسية (الأحدث)",url:"https://www.facebook.com/?sk=h_chr"}
@@ -328,14 +354,14 @@ const G_NOISE=/(ضمن الأعضاء|أصدقاء ضمن الأعضاء|مجم�
 const G_WORDS=/(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
 const TIME_RE=/(الآن|توًا|حالا|just now|(?:^|\s)\d{1,2}\s*[دسيهأ](?:\s|$)|دقيقة|دقيقتين|دقائق|ساعة|ساعتين|ساعات|أمس|امس|الأمس|يوم|يومين|أيام|ايام|أسبوع|اسبوع|شهر|(?:^|\s)\d{1,2}\s*(?:m|h|d|w|mins?|hrs?)(?:\s|$)|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)/i;
 
-let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v160")||"[]");
-let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v160")||"0",10)%FEEDS.length;
-let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v160")||String(Date.now()),10);
-sessionStorage.setItem("gamal_fb_run_ts_v160",String(runStartTs));
-let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v160")||"0",10);
-let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v160")||"0",10);
+let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v162")||"[]");
+let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v162")||"0",10)%FEEDS.length;
+let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v162")||String(Date.now()),10);
+sessionStorage.setItem("gamal_fb_run_ts_v162",String(runStartTs));
+let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v162")||"0",10);
+let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v162")||"0",10);
 let pageLoadTs=Date.now(),consecutiveSeen=0,isResting=false;
-let lastLogMsg="يرسل إعلانات (من المالك) لغرفة موافقتك الخاصة + جاهز لسحب أي رابط...";
+let lastLogMsg="يرسل إعلانات (من المالك) لغرفة موافقتك + جاهز لسحب أي رابط...";
 let shadowInfo=null;
 try{
 const host=document.createElement("span"),sh=host.attachShadow({mode:"closed"}),box=document.createElement("div");
@@ -351,17 +377,17 @@ chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{e.target.innerText="تم
 
 function updateUI(st){
 try{
-sessionStorage.setItem("gamal_fb_sc_v160",String(scannedCount));
-sessionStorage.setItem("gamal_fb_ac_v160",String(acceptedCount));
+sessionStorage.setItem("gamal_fb_sc_v162",String(scannedCount));
+sessionStorage.setItem("gamal_fb_ac_v162",String(acceptedCount));
 const remMin=Math.max(0,Math.ceil((RUN_MS-(Date.now()-runStartTs))/60000));
 document.title="[فحص:"+scannedCount+" | بانتظار موافقتك:"+acceptedCount+"] "+st;
 if(shadowInfo){
 const curN=FEEDS[feedIdx]?FEEDS[feedIdx].name:"الصفحة الرئيسية";
-shadowInfo.innerHTML="<div><b>رادار غرفة الموافقة وسحب الروابط v16.0</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (باقي للرفع: "+remMin+" د) <button id='g_flush_btn' style='background:#10b981;color:#000;border:none;border-radius:5px;padding:2px 8px;cursor:pointer;font-weight:bold;margin-right:6px;'>إرسال للوحة الموافقة الآن</button></div><div>تم فحص: <b>"+scannedCount+"</b> | أُرسل لغرفة موافقتك (مع لايك): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
+shadowInfo.innerHTML="<div><b>رادار غرفة الموافقة وسحب الروابط v16.2</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (باقي للرفع: "+remMin+" د) <button id='g_flush_btn' style='background:#10b981;color:#000;border:none;border-radius:5px;padding:2px 8px;cursor:pointer;font-weight:bold;margin-right:6px;'>إرسال للوحة الموافقة الآن</button></div><div>تم فحص: <b>"+scannedCount+"</b> | أُرسل لغرفة موافقتك (مع لايك): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
 }
 }catch(e){}
 }
-function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v160",JSON.stringify(sentHashes));}}
+function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v162",JSON.stringify(sentHashes));}}
 function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i)|0;return"fb_"+Math.abs(h);}
 
 function cleanProfileHref(rawHref){
@@ -582,6 +608,7 @@ catch(e){res({ok:false,accepted:false,reason:String(e)});}
 }
 
 async function scanVisible(){
+try{chrome.runtime.sendMessage({type:"PING_PULL_QUEUE"},()=>{});}catch(e){}
 await expandAllSeeMoreInViewport();
 const cards=collectCards();
 for(const card of cards){
@@ -610,8 +637,9 @@ try{chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{});}catch(e){}
 let rSec=REST_SEC;
 const iv=setInterval(()=>{
 rSec-=5;
+try{chrome.runtime.sendMessage({type:"PING_PULL_QUEUE"},()=>{});}catch(e){}
 updateUI("تم الرفع للوحة الموافقة! استراحة 30 دقيقة ("+Math.ceil(Math.max(0,rSec)/60)+" د متبقية ثم Refresh)");
-if(rSec<=0){clearInterval(iv);sessionStorage.setItem("gamal_fb_run_ts_v160",String(Date.now()));location.href=FEEDS[0].url;}
+if(rSec<=0){clearInterval(iv);sessionStorage.setItem("gamal_fb_run_ts_v162",String(Date.now()));location.href=FEEDS[0].url;}
 },5000);
 }
 
@@ -620,7 +648,7 @@ if(isResting)return;
 if(location.pathname.startsWith("/search/")||location.pathname.startsWith("/groups/feed")){location.href=FEEDS[0].url;return;}
 if(Date.now()-runStartTs>=RUN_MS){startRestCycle();return;}
 if(Date.now()-pageLoadTs>=SWITCH_MS||consecutiveSeen>=24){
-feedIdx=(feedIdx+1)%FEEDS.length;localStorage.setItem("gamal_fb_fidx_v160",String(feedIdx));
+feedIdx=(feedIdx+1)%FEEDS.length;localStorage.setItem("gamal_fb_fidx_v162",String(feedIdx));
 updateUI("تحديث الصفحة الرئيسية لجلب أحدث الإعلانات...");location.href=FEEDS[feedIdx].url;return;
 }
 await scanVisible();
@@ -628,8 +656,9 @@ window.scrollBy({top:Math.floor(400+Math.random()*140),behavior:"smooth"});
 updateUI("فحص مباشر للصفحة الرئيسية");
 setTimeout(loop,Math.floor(1750+Math.random()*450));
 }
-updateUI("بدأ رادار غرفة الموافقة وسحب الروابط v16.0...");
+updateUI("بدأ رادار غرفة الموافقة وسحب الروابط v16.2...");
 setTimeout(loop,900);
+}
 })();
 """.strip()
 
@@ -856,7 +885,6 @@ def process_facebook_post_payload(payload):
     post_url = (payload.get("url") or "").strip()
     post_hash = payload.get("hash") or ""
     if group_name: pure_raw_text = pure_raw_text.replace(group_name, " ").strip()
-    short_preview = re.sub(r'\s+', ' ', pure_raw_text)[:55]
     if len(pure_raw_text) < 22: return False, "نص قصير", False
 
     norm_t = normalize_ar(pure_raw_text)
@@ -888,7 +916,7 @@ def process_facebook_post_payload(payload):
     if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name): return False, "حساب شركة/سمسار", False
     if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه|اسبوعي)', norm_t): return False, "إيجار يومي/فندقي", False
 
-    is_brk, brk_reason = has_broker_copywriting("", pure_raw_text)
+    is_brk, _ = has_broker_copywriting("", pure_raw_text)
     if is_brk: return False, "صيغة سمسار", False
 
     zone = detect_zone("", pure_raw_text)
@@ -931,6 +959,8 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
         if self.path == "/fb_poll_task":
             self._send_cors(200)
             url_task = DIRECT_PULL_QUEUE.pop(0) if DIRECT_PULL_QUEUE else ""
+            if url_task:
+                print(f"  --> [Chrome Extension Picked Up Link] Opening in Chrome now: {url_task}")
             self.wfile.write(json.dumps({"url": url_task}).encode("utf-8"))
             return
         self._send_cors(404)
@@ -949,7 +979,8 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
                 length = int(self.headers.get("Content-Length", 0))
                 payload = json.loads(self.rfile.read(length).decode("utf-8", errors="replace"))
                 process_direct_pulled_facebook_post(payload)
-            except Exception: pass
+            except Exception as e:
+                print(f"  [Direct Ingest Error] {e}")
             self._send_cors(200)
             self.wfile.write(b'{"ok":true}')
             return
@@ -972,71 +1003,71 @@ def handle_remote_admin_command(cmd_text):
         u = cmd.split("|", 1)[1].strip()
         if "facebook.com" in u and u not in DIRECT_PULL_QUEUE:
             DIRECT_PULL_QUEUE.append(u)
-            print(f"\n  >>> [ADMIN PHONE COMMAND] Received Facebook Link to Pull Live: {u} <<<")
+            print(f"\n  >>> [ADMIN PHONE COMMAND RECEIVED] Queued Facebook Link to Pull Live: {u} <<<")
     elif cmd.startswith("APPROVE|"):
         aid_str = cmd.split("|", 1)[1].strip()
         with SYNC_LOCK:
             pending = load_pending_fb_ads()
             extra_live = load_extra_live_backup()
-            approved_count = 0
-            rem_pending = []
+            approved_count, rem_pending = 0, []
             for p in pending:
                 if aid_str == "ALL" or str(p.get("ad_id")) == aid_str:
                     p["verified_fb_v160"] = True
                     extra_live.insert(0, p)
                     approved_count += 1
-                else:
-                    rem_pending.append(p)
+                else: rem_pending.append(p)
             if approved_count > 0:
                 save_pending_fb_ads(rem_pending)
                 save_extra_live_backup(extra_live)
-                print(f"\n  >>> [ADMIN APPROVED] Published +{approved_count} ad(s) from Pending Queue to Main Website! <<<")
+                print(f"\n  >>> [ADMIN APPROVED] Published +{approved_count} ad(s) to Main Website! <<<")
                 guard_extra_ads_during_sleep(force_push=True)
     elif cmd.startswith("REJECT|"):
         aid_str = cmd.split("|", 1)[1].strip()
         with SYNC_LOCK:
             pending = load_pending_fb_ads()
+            extra_live = load_extra_live_backup()
             mem = load_fb_memory()
-            rem_pending = []
-            rejected_count = 0
+            rem_pending, rejected_count = [], 0
             for p in pending:
                 if aid_str == "ALL" or str(p.get("ad_id")) == aid_str:
                     mem.setdefault("rejected_ids", []).append(int(p.get("ad_id") or 0))
                     rejected_count += 1
-                else:
-                    rem_pending.append(p)
+                else: rem_pending.append(p)
+            new_live = [a for a in extra_live if str(a.get("ad_id")) != aid_str]
+            if len(new_live) != len(extra_live):
+                save_extra_live_backup(new_live)
+                rejected_count += 1
             if rejected_count > 0:
                 save_fb_memory(mem)
                 save_pending_fb_ads(rem_pending)
-                print(f"\n  >>> [ADMIN REJECTED] Deleted {rejected_count} ad(s) from Pending Queue! <<<")
+                print(f"\n  >>> [ADMIN REJECTED/DELETED] Removed {rejected_count} ad(s)! <<<")
                 guard_extra_ads_during_sleep(force_push=True)
 
 def start_admin_command_listener():
     def _poll():
-        init_done = False
         while True:
             try:
-                since_p = "10s" if init_done else "30m"
-                r = std_requests.get(f"https://ntfy.sh/{ADMIN_CMD_TOPIC}/json?poll=1&since={since_p}", timeout=12)
+                r = std_requests.get(f"https://ntfy.sh/{ADMIN_CMD_TOPIC}/json?poll=1&since=30m", timeout=12)
                 if r.status_code == 200:
                     for line in r.text.strip().splitlines():
                         if not line: continue
                         obj = json.loads(line)
-                        cid, msg = obj.get("id"), obj.get("message", "")
+                        cid = obj.get("id")
+                        msg = obj.get("message", "")
+                        msg_ts = int(obj.get("time") or 0)
                         if cid and cid not in PROCESSED_CMD_IDS:
                             PROCESSED_CMD_IDS.add(cid)
-                            if init_done or msg.startswith(("APPROVE|", "REJECT|", "PULL_URL|")):
-                                handle_remote_admin_command(msg)
-                init_done = True
+                            if msg_ts >= STARTUP_TS and msg.startswith(("APPROVE|", "REJECT|", "PULL_URL|")):
+                                threading.Thread(target=handle_remote_admin_command, args=(msg,), daemon=True).start()
             except Exception: pass
-            time.sleep(3)
+            time.sleep(2.5)
     threading.Thread(target=_poll, daemon=True).start()
 
 def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Approval Queue & Link Puller v16.0] Listening on http://127.0.0.1:{FB_PORT}")
+            print(f"[Facebook Approval Queue & Link Puller v16.2] Listening on http://127.0.0.1:{FB_PORT}")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -1126,7 +1157,7 @@ def guard_extra_ads_during_sleep(force_push=False):
             aq_c = sum(1 for a in d["ads"] if a.get("source") == "عقارماب")
             fb_c = sum(1 for a in d["ads"] if a.get("source") == "فيسبوك")
             pend_c = len(d["pending_ads"])
-            ok_p, p_info = atomic_write_and_git_push(d, f"Sync v16.0 (Live FB: {fb_c}, Pending Approval: {pend_c}, AQ: {aq_c})")
+            ok_p, p_info = atomic_write_and_git_push(d, f"Sync v16.2 (Live FB: {fb_c}, Pending Approval: {pend_c}, AQ: {aq_c})")
             print(f"    --> [Sync Complete] Live FB: ({fb_c}) | Pending Approval: ({pend_c}) | AqarMap: ({aq_c})!" if ok_p else f"    --> [Sync Notice] {p_info}")
     except Exception: pass
 
@@ -1135,7 +1166,7 @@ def main():
     generate_facebook_main_extension()
     start_fb_local_server()
     start_admin_command_listener()
-    print("=== Starting Facebook Approval Queue & Instant Link Puller Radar v16.0 ===")
+    print("=== Starting Facebook Approval Queue & Instant Link Puller Radar v16.2 ===")
     with SYNC_LOCK:
         guard_extra_ads_during_sleep(force_push=True)
     print(f"[!] Reload extension once in Chrome -> {FB_EXT_DIR}")
