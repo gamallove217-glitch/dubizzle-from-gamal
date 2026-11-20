@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-20 19:15",
-  "total": 111,
+  "updated_at": "2026-11-20 07:35 PM",
+  "total": 112,
   "ads": [
     {
       "ad_id": 198706474,
@@ -27,6 +27,38 @@
       "first_seen_ts": 1795194079,
       "timestamp": 1795194079,
       "date": "2026-11-20 19:01"
+    },
+    {
+      "ad_id": 9380479109,
+      "id": "fb_9380479109",
+      "source": "فيسبوك",
+      "title": "شقة 140 متر للايجار من المالك فيو جاردن كامل الشقة , عدادات مياه كهرباء غاز و انترنت ",
+      "price": "السعر بالتفاصيل (خاص)",
+      "price_num": 1,
+      "zone": "القرنفل",
+      "location": "القرنفل",
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "area": 140,
+      "rooms": null,
+      "publisher": "مالك مباشر",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "age": "دخل الرادار 06:55 PM (نُشر منذ 7 س)",
+      "fresh_tier": 3,
+      "description": "شقة 140 متر للايجار من المالك فيو جاردن كامل الشقة , عدادات مياه كهرباء غاز و انترنت دور متكرر عمارة قريبة من بوابة 2 بوابة الكترونية للعمارة الشقة تحتاج وش نظافة , الس... عرض المزيد",
+      "first_seen_ts": 1795193726,
+      "timestamp": 1795193726,
+      "desc_verified_v2": true,
+      "verified_24h_v93": true,
+      "verified_fb_v130": true,
+      "url": "https://www.facebook.com/groups/1446095442638593/?multi_permalinks=2256910868223709&hoisted_section_header_type=recently_seen&__cft__[0]=AZiUrvwAAPsh_kVhEKr4KAbm0dVSH9iBQj-9AClinEwCxlg_l-n3xTWXxaudY4rtSpZLG-B5VV-4EKDpR_7bjs8iR7zHVgPPH3xdnjZA5egEPCAW-CBdk_brMk_Xqfm9561CuGkHJEZnbqSJ50aRUr7VZ5IFhPO1U11WwUeDBXZfW7pHCgDYrzc4_m1mlfHZG4Q-_Jn45XCTVliHi922XsaEm7wTJvae&__tn__=%2CO%2CP-R",
+      "link": "https://www.facebook.com/groups/1446095442638593/?multi_permalinks=2256910868223709&hoisted_section_header_type=recently_seen&__cft__[0]=AZiUrvwAAPsh_kVhEKr4KAbm0dVSH9iBQj-9AClinEwCxlg_l-n3xTWXxaudY4rtSpZLG-B5VV-4EKDpR_7bjs8iR7zHVgPPH3xdnjZA5egEPCAW-CBdk_brMk_Xqfm9561CuGkHJEZnbqSJ50aRUr7VZ5IFhPO1U11WwUeDBXZfW7pHCgDYrzc4_m1mlfHZG4Q-_Jn45XCTVliHi922XsaEm7wTJvae&__tn__=%2CO%2CP-R",
+      "verified_v12": true,
+      "scraped_at": "2026-11-20 06:55 PM",
+      "date": "2026-11-20 18:55"
     },
     {
       "ad_id": 209540078,
