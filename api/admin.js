@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 const GENERIC_PUBLISHERS = new Set([
-  "مالك", "مالك مباشر", "مشارك مجهول الهوية", "عضو مجهول الهوية", "غير معروف", "معلن", "owner", "anonymous"
+  "مالك", "مالك مباشر", "مشارك مجهول الهوية", "عضو مجهول الهوية", "غير معروف", "معلن"
 ]);
 
 function initFirebase() {
@@ -33,6 +33,34 @@ function makeSafeDocId(str) {
   return cleaned;
 }
 
+async function loadAdsJsonSafely(req) {
+  const candidates = [
+    path.join(process.cwd(), "ads.json"),
+    path.resolve("ads.json"),
+    path.join(path.dirname(new URL(import.meta.url).pathname), "..", "ads.json")
+  ];
+  for (const fp of candidates) {
+    try {
+      if (fs.existsSync(fp)) {
+        const parsed = JSON.parse(fs.readFileSync(fp, "utf8"));
+        if (parsed && Array.isArray(parsed.ads) && parsed.ads.length > 0) return parsed;
+      }
+    } catch (e) {}
+  }
+  try {
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    if (host) {
+      const r = await fetch(`${proto}://${host}/ads.json?t=${Date.now()}`);
+      if (r.ok) {
+        const parsed = await r.json();
+        if (parsed && Array.isArray(parsed.ads)) return parsed;
+      }
+    }
+  } catch (e) {}
+  return { ads: [], updated_at: "-" };
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -54,38 +82,16 @@ export default async function handler(req, res) {
       const subs = [];
       snap.forEach(doc => subs.push({ code: doc.id, ...doc.data() }));
 
-      const bannedSnap = await db.collection("banned_ads").limit(1000).get();
+      const bannedSnap = await db.collection("banned_ads").limit(500).get();
       const bannedAds = [];
       bannedSnap.forEach(doc => bannedAds.push(doc.data()));
 
-      const bannedPubSnap = await db.collection("banned_publishers").limit(1000).get();
-      const bannedPublishers = [];
-      bannedPubSnap.forEach(doc => {
-        const d = doc.data() || {};
-        if (d.publisher) bannedPublishers.push(d.publisher);
-        else if (doc.id) bannedPublishers.push(doc.id);
-      });
+      const adsJson = await loadAdsJsonSafely(req);
+      const adsList = adsJson.ads || [];
+      const adsCount = adsList.length;
+      const adsUpdatedAt = adsJson.updated_at || "-";
 
-      let adsCount = 0;
-      let adsUpdatedAt = "-";
-      let adsList = [];
-      try {
-        const filePath = path.join(process.cwd(), "ads.json");
-        const adsJson = JSON.parse(fs.readFileSync(filePath, "utf8"));
-        adsList = adsJson.ads || [];
-        adsCount = adsList.length;
-        adsUpdatedAt = adsJson.updated_at || "-";
-      } catch (e) {}
-
-      return res.status(200).json({
-        ok: true,
-        subscriptions: subs,
-        bannedAds,
-        bannedPublishers,
-        adsCount,
-        adsUpdatedAt,
-        adsList
-      });
+      return res.status(200).json({ ok: true, subscriptions: subs, bannedAds, adsCount, adsUpdatedAt, adsList });
     }
 
     if (action === "create") {
@@ -132,83 +138,45 @@ export default async function handler(req, res) {
 
     if (action === "delete_ad") {
       const { adId } = req.body;
-      if (!adId) return res.status(400).json({ error: "رقم الإعلان مطلوب" });
-
       await db.collection("banned_ads").doc(String(adId)).set({
         adId: Number(adId),
         publisher: "",
-        mode: "delete_ad_only",
         bannedAt: Date.now()
       });
-
       await fetch("https://ntfy.sh/gamal_vip_ban_9941_sec", {
         method: "POST",
         body: `BAN_AD:${adId}|`
       }).catch(() => {});
 
-      return res.status(200).json({ ok: true, mode: "delete_ad" });
+      return res.status(200).json({ ok: true });
     }
 
-    if (action === "ban_publisher") {
+    if (action === "ban_publisher" || action === "ban_ad") {
       const { adId, adIds, publisher } = req.body;
       const cleanPub = cleanPublisherBase(publisher);
 
-      if (!cleanPub || GENERIC_PUBLISHERS.has(cleanPub.toLowerCase())) {
-        return res.status(400).json({
-          error: "لا يمكن حظر اسم ناشر عام (مالك مباشر / مجهول الهوية) حتى لا يتم حظر باقي الملاك؛ استخدم زر حذف الإعلان فقط."
-        });
-      }
+      const idsToBan = new Set();
+      if (adId) idsToBan.add(String(adId));
+      if (Array.isArray(adIds)) adIds.forEach(id => { if (id) idsToBan.add(String(id)); });
 
-      const safeDocId = makeSafeDocId(cleanPub);
-      await db.collection("banned_publishers").doc(safeDocId).set({
-        publisher: cleanPub,
-        rawPublisher: String(publisher || cleanPub),
-        bannedAt: Date.now()
-      });
-
-      const idsToRemove = new Set();
-      if (adId) idsToRemove.add(String(adId));
-      if (Array.isArray(adIds)) {
-        for (const id of adIds) {
-          if (id) idsToRemove.add(String(id));
-        }
-      }
-
-      const nowTs = Date.now();
-      for (const idStr of idsToRemove) {
+      for (const idStr of idsToBan) {
         await db.collection("banned_ads").doc(idStr).set({
           adId: Number(idStr),
           publisher: cleanPub,
-          mode: "ban_publisher",
-          bannedAt: nowTs
+          bannedAt: Date.now()
         });
       }
 
-      await fetch("https://ntfy.sh/gamal_vip_ban_9941_sec", {
-        method: "POST",
-        body: `BAN_AD:${adId || ""}|${cleanPub}`
-      }).catch(() => {});
-
-      return res.status(200).json({ ok: true, mode: "ban_publisher", publisher: cleanPub, removedCount: idsToRemove.size });
-    }
-
-    if (action === "ban_ad") {
-      const { adId, publisher } = req.body;
-      const cleanPub = cleanPublisherBase(publisher);
-      await db.collection("banned_ads").doc(String(adId)).set({
-        adId: Number(adId),
-        publisher: cleanPub,
-        bannedAt: Date.now()
-      });
       if (cleanPub && !GENERIC_PUBLISHERS.has(cleanPub.toLowerCase())) {
         await db.collection("banned_publishers").doc(makeSafeDocId(cleanPub)).set({
           publisher: cleanPub,
           bannedAt: Date.now()
         });
       }
+
       await fetch("https://ntfy.sh/gamal_vip_ban_9941_sec", {
         method: "POST",
-        body: `BAN_AD:${adId}|${cleanPub}`
+        body: `BAN_AD:${adId || ""}|${cleanPub}`
       }).catch(() => {});
 
       return res.status(200).json({ ok: true });
@@ -220,7 +188,7 @@ export default async function handler(req, res) {
       const encoded = Buffer.from(JSON.stringify({ tok: botToken.trim(), cid: chatId.trim() })).toString("base64");
       await fetch("https://ntfy.sh/gamal_vip_tg_9941_sec", {
         method: "POST",
-        body: `TG_CFG:${encoded}`
+        body: encoded
       }).catch(() => {});
 
       await fetch(`https://api.telegram.org/bot${botToken.trim()}/sendMessage`, {
