@@ -33,34 +33,6 @@ function makeSafeDocId(str) {
   return cleaned;
 }
 
-async function loadAdsJsonSafely(req) {
-  const candidates = [
-    path.join(process.cwd(), "ads.json"),
-    path.resolve("ads.json"),
-    path.join(path.dirname(new URL(import.meta.url).pathname), "..", "ads.json")
-  ];
-  for (const fp of candidates) {
-    try {
-      if (fs.existsSync(fp)) {
-        const parsed = JSON.parse(fs.readFileSync(fp, "utf8"));
-        if (parsed && Array.isArray(parsed.ads) && parsed.ads.length > 0) return parsed;
-      }
-    } catch (e) {}
-  }
-  try {
-    const proto = req.headers["x-forwarded-proto"] || "https";
-    const host = req.headers["x-forwarded-host"] || req.headers.host;
-    if (host) {
-      const r = await fetch(`${proto}://${host}/ads.json?t=${Date.now()}`);
-      if (r.ok) {
-        const parsed = await r.json();
-        if (parsed && Array.isArray(parsed.ads)) return parsed;
-      }
-    }
-  } catch (e) {}
-  return { ads: [], updated_at: "-" };
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -82,14 +54,20 @@ export default async function handler(req, res) {
       const subs = [];
       snap.forEach(doc => subs.push({ code: doc.id, ...doc.data() }));
 
-      const bannedSnap = await db.collection("banned_ads").limit(500).get();
+      const bannedSnap = await db.collection("banned_ads").limit(400).get();
       const bannedAds = [];
       bannedSnap.forEach(doc => bannedAds.push(doc.data()));
 
-      const adsJson = await loadAdsJsonSafely(req);
-      const adsList = adsJson.ads || [];
-      const adsCount = adsList.length;
-      const adsUpdatedAt = adsJson.updated_at || "-";
+      let adsCount = 0;
+      let adsUpdatedAt = "-";
+      let adsList = [];
+      try {
+        const filePath = path.join(process.cwd(), "ads.json");
+        const adsJson = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        adsList = adsJson.ads || [];
+        adsCount = adsList.length;
+        adsUpdatedAt = adsJson.updated_at || "-";
+      } catch (e) {}
 
       return res.status(200).json({ ok: true, subscriptions: subs, bannedAds, adsCount, adsUpdatedAt, adsList });
     }
@@ -157,7 +135,11 @@ export default async function handler(req, res) {
 
       const idsToBan = new Set();
       if (adId) idsToBan.add(String(adId));
-      if (Array.isArray(adIds)) adIds.forEach(id => { if (id) idsToBan.add(String(id)); });
+      if (Array.isArray(adIds)) {
+        for (const id of adIds) {
+          if (id) idsToBan.add(String(id));
+        }
+      }
 
       for (const idStr of idsToBan) {
         await db.collection("banned_ads").doc(idStr).set({
