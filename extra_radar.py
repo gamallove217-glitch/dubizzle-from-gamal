@@ -54,7 +54,7 @@ SAFE_CASH_NEGATIONS = "بدون تقسيط|لا يوجد تقسيط|ممنوع �
 SAFE_OWNER_BROKER_NEGATIONS = "بدون وسيط|بدون وسطاء|ممنوع الوسطاء|يمتنع الوسطاء|لغير الوسطاء|عدم تدخل الوسطاء|عدم التعامل مع الوسطاء|لا للوسطاء|بدون سمسار|بدون سماسرة|بدون سماسره|ممنوع السماسرة|ممنوع السماسره|يمتنع السماسرة|يمتنع السماسره|بدون بروكر|ممنوع البروكر|يمتنع البروكر|من غير سمسار|من غير وسيط|من المالك مباشره|من المالك مباشر|المالك مباشره|المالك مباشر|من المالكه مباشره|من المالكه مباشر|المالكه مباشره|المالكه مباشر|التواصل مباشر مع المالك|التعامل مباشر مع المالك|مباشر من المالك|انا المالك|انا المالكه|بدون عموله|بدون عمولة|بدون عمولات".split("|")
 BROKER_NAME_WORDS = "zone|real estate|realestate|realty|property|properties|homes|agency|agencies|broker|brokers|brokerage|investment|investments|development|developments|consult|consultant|consulting|company|marketing|scouts|vertex|redefine|irtkaz|ebtkar|imkan|falcon|realtors|trusted home|remax|coldwell|era|prime|capital|house|group|taki|vita|شركة|شركه|مكتب|تسويق|للتسويق|ماركتنج|سمسار|وسيط|استشاري|مستشار|للاستشارات|تطوير|للتطوير|للاستثمار|هومز|بروكر|ريال استيت|استيت|فيرتكس|ريديفاين|ارتكاز|إرتكاز|ابتكار|إبتكار|دار البناء|للمقاولات|للإنشاءات|للانشاءات|اللوتس العقارية|البيت المصري|ادارة املاك|إدارة أملاك|عقاري|عقارات|للعقارات|العقاريه|تاكي".split("|")
 BROKER_TEXT_PHRASES = "انا وسيط|أنا وسيط|وسيط مش المالك|مش المالك|ليس المالك|وسيط عقاري|وسيط عقارى|وسيط من المالك|وسيط مع المالك|مباشر من المالك لدينا|انا بروكر|م بروكر|للتواصل مع البروكر|سمسار|سماسرة|سماسره|بروكر|broker|مكتب عقاري|مكتب عقارات|مكتب تسويق|ادارة املاك|عمولة شهر|عموله شهر|عمولة نصف شهر|عموله نصف شهر|عمولة المكتب|عموله المكتب|عمولة الشركة|عموله الشركه|بعموله|بعمولة|نسبة العمولة|يوجد عمولة|يوجد عموله|عمولة 1|عموله 1|عمولة 2|عموله 2|لماذا تختار شركتنا|شركتنا|شركة عقارات|شركه عقارات|شركة تسويق|شركه تسويق|للتسويق العقاري|للاستثمار العقاري|للتطوير العقاري|استشاري عقاري|مستشار عقاري|فريق المبيعات|قسم المبيعات|للتواصل مع قسم المبيعات|فريق من الخبراء|مجموعة متنوعة من الشقق|تقع عقاراتنا|زيارة معروضاتنا|سجل بياناتك|عائد إيجاري شهري مضمون|عائد ايجاري شهري مضمون|بعائد ايجاري يصل|كود الوحدة|كود الوحده|كود العقار|كود الشقة|كود الفيلا|الكود المرجعي|متاح لدينا|يتوفر لدينا|متوفر لدينا|لدينا أكثر من|متاح لدينا اكثر من|لدينا عقارات|متاح عروض اخري|متاح عروض أخرى|يوجد عروض اخري|متاح شقق اخري|متاح مساحات مختلفة|مساحات مختلفة|مساحات مختلفه|متوفر لدينا وحدات|متاح لدينا وحدات|باقل سعر بالمشروع|استمرار لعروضنا|والواقع يتحدث عنا|امتلك وحدتك|احجز وحدتك|اختار وحدتك|مطلوب وموجود|مطلوب ومعروض|متاح وحدات اخري|ضمن الاعضاء|اصدقاء ضمن الاعضاء|مجموعه عامه|مجموعه خاصه|معايا شقه|معايا شقة|معايا فيلا|بلوكيشن تحفه|بلوكيشن تحفة|ادفع بفاليو|مصاريف شراء".split("|")
-FB_WANTED_PHRASES = "مطلوب شقه|مطلوب شقة|مطلوب فيلا|مطلوب للايجار|مطلوب للإيجار|مطلوب للشراء|مطلوب للبيع|مطلوب من المالك|بدور علي شقه|بدور على شقة|بدور علي فيلا|محتاج شقه|محتاج شقة|محتاجه شقه|محتاجة شقة|عايز شقه|عايز شقة|عايزة شقة|عايزه شقه|ابحث عن شقه|أبحث عن شقة|حد عنده شقه|حد عنده شقة|مطلوب عاجل|مطلوب فورا|مطلوب شريك|مطلوب شريكة|مطلوب روم ميت".split("|")
+FB_WANTED_PHRASES = "مطلوب شقه|مطلوب شقة|مطلوب فيلا|مطلوب للايجار|مطلوب للإيجار|مطلوب للشراء|مطلوب للبيع|مطلوب من المالك|مطلوب مالك|بدور علي شقه|بدور على شقة|بدور علي فيلا|محتاج شقه|محتاج شقة|محتاجه شقه|محتاجة شقة|عايز شقه|عايز شقة|عايزة شقة|عايزه شقه|ابحث عن شقه|أبحث عن شقة|حد عنده شقه|حد عنده شقة|مطلوب عاجل|مطلوب فورا|مطلوب شريك|مطلوب شريكة|مطلوب روم ميت".split("|")
 
 def strip_bidi(text): return BIDI_REGEX.sub("", str(text)).translate(HINDI_MAP) if text else ""
 def normalize_ar(text):
@@ -79,15 +79,14 @@ def fix_git_identity_for_vercel():
     subprocess.run(["git", "config", "user.email", "gamallove217@gmail.com"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def is_direct_fb_post_permalink(url_str):
-    u = str(url_str or "").strip()
-    return "facebook.com" in u
+    return "facebook.com" in str(url_str or "").strip()
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Direct Home Feed & Link Puller v16.2", "version": "16.2",
-        "description": "Home Feed Pending Approval Queue + Tab-ID Remote Link Puller + Auto-Like",
-        "permissions": ["storage", "tabs", "clipboardRead", "clipboardWrite"],
+        "manifest_version": 3, "name": "Gamal Home Feed & Separate Window Link Puller v16.3", "version": "16.3",
+        "description": "Home Feed Owner/مالك/اونر Scanner + Separate Chrome Window Unfiltered Link Puller + End-of-Run Batch",
+        "permissions": ["storage", "tabs", "windows", "clipboardRead", "clipboardWrite"],
         "host_permissions": ["https://www.facebook.com/*", "https://m.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
         "content_scripts": [
@@ -96,35 +95,52 @@ def generate_facebook_main_extension():
         ]
     }
     background_js = r"""
-let activePullTabId = null;
-let activePullOrigUrl = "";
+const pullWinIds = new Set();
+const pullTabIds = new Set();
+const pullOrigUrls = new Map();
+let isOpeningWindow = false;
 
 function checkLocalPullTask() {
-    if (activePullTabId !== null) return;
+    if (isOpeningWindow || pullWinIds.size > 0) return;
     fetch("http://127.0.0.1:5005/fb_poll_task")
     .then(r => r.json())
     .then(d => {
         if (d && d.url) {
-            activePullOrigUrl = d.url;
-            chrome.tabs.create({url: d.url, active: true}, tab => {
-                if (tab && tab.id) {
-                    activePullTabId = tab.id;
+            isOpeningWindow = true;
+            chrome.windows.create({
+                url: d.url,
+                type: "popup",
+                width: 920,
+                height: 740,
+                focused: false
+            }, win => {
+                isOpeningWindow = false;
+                if (win && win.id) {
+                    pullWinIds.add(win.id);
+                    pullOrigUrls.set(win.id, d.url);
+                    if (win.tabs && win.tabs[0] && win.tabs[0].id) {
+                        pullTabIds.add(win.tabs[0].id);
+                        pullOrigUrls.set(win.tabs[0].id, d.url);
+                    }
                     setTimeout(() => {
-                        if (activePullTabId === tab.id) {
-                            try { chrome.tabs.remove(tab.id); } catch(e) {}
-                            activePullTabId = null;
+                        if (pullWinIds.has(win.id)) {
+                            pullWinIds.delete(win.id);
+                            try { chrome.windows.remove(win.id); } catch(e) {}
                         }
                     }, 22000);
                 }
             });
         }
-    }).catch(() => {});
+    }).catch(() => { isOpeningWindow = false; });
 }
 
 chrome.runtime.onMessage.addListener((m, sender, sr) => {
     if (m && m.type === "AM_I_DIRECT_PULL_TAB") {
-        const isPull = !!(sender && sender.tab && sender.tab.id && sender.tab.id === activePullTabId);
-        sr({isPullTab: isPull, origUrl: activePullOrigUrl});
+        const tid = sender && sender.tab && sender.tab.id;
+        const wid = sender && sender.tab && sender.tab.windowId;
+        const isPull = !!( (wid && pullWinIds.has(wid)) || (tid && pullTabIds.has(tid)) );
+        const origU = (wid && pullOrigUrls.get(wid)) || (tid && pullOrigUrls.get(tid)) || "";
+        sr({isPullTab: isPull, origUrl: origU});
         return false;
     }
     if (m && m.type === "PING_PULL_QUEUE") {
@@ -145,8 +161,12 @@ chrome.runtime.onMessage.addListener((m, sender, sr) => {
     }
     if (m && m.type === "FB_DIRECT_PULL_RESULT") {
         const tid = sender && sender.tab && sender.tab.id;
-        if (tid) {
-            if (activePullTabId === tid) activePullTabId = null;
+        const wid = sender && sender.tab && sender.tab.windowId;
+        if (tid) pullTabIds.delete(tid);
+        if (wid && pullWinIds.has(wid)) {
+            pullWinIds.delete(wid);
+            try { chrome.windows.remove(wid); } catch(e) {}
+        } else if (tid) {
             try { chrome.tabs.remove(tid); } catch(e) {}
         }
         fetch("http://127.0.0.1:5005/fb_direct_ingest", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(m.payload)})
@@ -160,8 +180,8 @@ setInterval(checkLocalPullTask, 2200);
 
     main_world_hook_js = r"""
 (function(){
-if(window.__gamalMainHookV162)return;
-window.__gamalMainHookV162=true;
+if(window.__gamalMainHookV163)return;
+window.__gamalMainHookV163=true;
 const D_RE=/https?:\/\/(?:www\.|m\.)?facebook\.com\/(?:share\/[pv]\/[A-Za-z0-9._\-]+|groups\/[^\/?#]+\/(?:posts|permalink)\/(?:\d+|pfbid[A-Za-z0-9]+)|permalink\.php\?story_fbid=[^&"'\s]+|story\.php\?story_fbid=[^&"'\s]+|[^\/?#]+\/posts\/(?:\d+|pfbid[A-Za-z0-9]+)|photo\/?\?fbid=\d+[^"'\s]*)/i;
 try{
 if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -289,14 +309,15 @@ setInterval(stamp,350);
 
     content_js = r"""
 (function(){
-if(window.__gamalFbRadarV162)return;
-window.__gamalFbRadarV162=true;
+if(window.__gamalFbRadarV163)return;
+window.__gamalFbRadarV163=true;
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 const H_MAP={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
 const normD=s=>String(s||"").replace(/[٠-٩]/g,c=>H_MAP[c]||c);
 
 async function runDirectPullExtraction(origUrl){
-await slp(2800);
+document.title="[سحب لينك المدير بدون فحص...]";
+await slp(2600);
 const btns=document.querySelectorAll('div[role="button"],span[role="button"]');
 for(const b of btns){
 const bt=(b.innerText||"").trim();
@@ -311,14 +332,14 @@ const primaryMsgs=rootScope.querySelectorAll('div[data-ad-preview="message"],div
 for(const n of primaryMsgs){
 if(n.closest("ul")||n.closest("form"))continue;
 const t=normD((n.innerText||"").trim());
-if(t.length>=15){bestTxt=t;break;}
+if(t.length>=12){bestTxt=t;break;}
 }
 if(!bestTxt){
 const dirNodes=rootScope.querySelectorAll('div[dir="auto"]');
 for(const n of dirNodes){
 if(n.closest("ul")||n.closest("form")||n.closest("nav"))continue;
 const t=normD((n.innerText||"").trim());
-if(t.length>=25&&t.length<3500){bestTxt=t;break;}
+if(t.length>=20&&t.length<3800){bestTxt=t;break;}
 }
 }
 if(!bestTxt)bestTxt=normD((rootScope.innerText||document.body.innerText||"").substring(0,1800));
@@ -328,7 +349,7 @@ const t=(a.innerText||"").split("\n")[0].trim(),h=a.href||"";
 if(h.includes("/groups/")&&!h.includes("/user/")&&!h.includes("/posts/")&&!h.includes("/permalink/")&&t.length>=3&&!groupName)groupName=t;
 else if(t.length>=2&&t.length<=40&&author==="مالك مباشر"&&t!==groupName)author=t;
 });
-const finalUrl=(location.href&&location.href.includes("facebook.com"))?location.href:(origUrl||location.href);
+const finalUrl=(origUrl&&origUrl.includes("facebook.com"))?origUrl:location.href;
 chrome.runtime.sendMessage({type:"FB_DIRECT_PULL_RESULT",payload:{url:finalUrl,text:bestTxt,author:author,group_name:groupName}});
 }
 
@@ -337,7 +358,15 @@ if(resp&&resp.isPullTab){
 runDirectPullExtraction(resp.origUrl);
 return;
 }
+const p=location.pathname;
+const isSpecificPost=/\/(?:share|posts|permalink|photo)\b/.test(p)||location.search.includes("story_fbid=");
+if(isSpecificPost&&window.outerWidth<=960){
+runDirectPullExtraction(location.href);
+return;
+}
+if(!isSpecificPost){
 startHomeFeedRadar();
+}
 });
 
 function startHomeFeedRadar(){
@@ -347,21 +376,22 @@ const FEEDS=[
 ];
 const RUN_MS=45*60*1000,REST_SEC=30*60,SWITCH_MS=16*60*1000;
 const REAL_PROP_RE=/(شقه|شقة|فيلا|فيله|فيلات|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|تاون\s*هاوس|توين\s*هاوس|شاليه|عماره|عمارة|محل|مكتب|عياده|عيادة|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار)/i;
-const STRICT_OWNER_RE=/(من\s*المالك[ةه]?|المالك[ةه]?\s*مباشر[ةه]?|للمالك[ةه]?\s*مباشر[ةه]?|[أاإ]نا\s*المالك[ةه]?|مالك[ةه]?\s*(?:[أاإ]صل[يى]|العقار|الشق[ةه]|الفيل[اآه]|مباشر[ةه]?)|شقت[يى]|فيلت[يى]|بيت[يى]|ملك[يى])/i;
-const BRK_FAST_RE=/(متاح\s*لدينا|يتوفر\s*لدينا|شركتنا|كود\s*الوحده|كود\s*الوحدة|عموله\s*شهر|عمولة\s*شهر|سمسار|بروكر|للتسويق\s*العقاري|مستشار\s*عقاري|مطلوب\s*شقه|مطلوب\s*شقة|مطلوب\s*للايجار|معايا\s*شقه|معايا\s*شقة|بلوكيشن\s*تحفه|بلوكيشن\s*تحفة|ادفع\s*بفاليو|تاكي|taki|valu)/i;
+const STRICT_OWNER_RE=/(المالك[ةه]?|(?:^|[\s،,.\-\/()])مالك[ةه]?(?:$|[\s،,.\-\/()])|[أاإ]ل?[أاإ]ونر|\bowner\b|شقت[يى]|فيلت[يى]|بيت[يى]|ملك[يى])/i;
+const WANTED_FAST_RE=/(مطلوب\s*شقه|مطلوب\s*شقة|مطلوب\s*فيلا|مطلوب\s*للايجار|مطلوب\s*للإيجار|مطلوب\s*للبيع|مطلوب\s*من\s*المالك|مطلوب\s*مالك|بدور\s*علي|بدور\s*على|محتاج\s*شقه|محتاج\s*شقة|عايز\s*شقه|عايز\s*شقة)/i;
+const BRK_FAST_RE=/(مش\s*المالك|ليس\s*المالك|وسيط\s*مع\s*المالك|وسيط\s*من\s*المالك|انا\s*وسيط|أنا\s*وسيط|متاح\s*لدينا|يتوفر\s*لدينا|شركتنا|كود\s*الوحده|كود\s*الوحدة|عموله\s*شهر|عمولة\s*شهر|سمسار|بروكر|للتسويق\s*العقاري|مستشار\s*عقاري|معايا\s*شقه|معايا\s*شقة|بلوكيشن\s*تحفه|بلوكيشن\s*تحفة|ادفع\s*بفاليو|تاكي|taki|valu)/i;
 const SPONSORED_RE=/(مُموَّل|ممول|Sponsored|إعلان\s*ممول)/i;
 const G_NOISE=/(ضمن الأعضاء|أصدقاء ضمن الأعضاء|مجموعة عامة|مجموعة خاصة|منشورًا في اليوم|منشورات في اليوم|انضمام إلى المجموعة)/i;
 const G_WORDS=/(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
 const TIME_RE=/(الآن|توًا|حالا|just now|(?:^|\s)\d{1,2}\s*[دسيهأ](?:\s|$)|دقيقة|دقيقتين|دقائق|ساعة|ساعتين|ساعات|أمس|امس|الأمس|يوم|يومين|أيام|ايام|أسبوع|اسبوع|شهر|(?:^|\s)\d{1,2}\s*(?:m|h|d|w|mins?|hrs?)(?:\s|$)|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)/i;
 
-let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v162")||"[]");
-let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v162")||"0",10)%FEEDS.length;
-let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v162")||String(Date.now()),10);
-sessionStorage.setItem("gamal_fb_run_ts_v162",String(runStartTs));
-let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v162")||"0",10);
-let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v162")||"0",10);
+let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v163")||"[]");
+let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v163")||"0",10)%FEEDS.length;
+let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v163")||String(Date.now()),10);
+sessionStorage.setItem("gamal_fb_run_ts_v163",String(runStartTs));
+let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v163")||"0",10);
+let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v163")||"0",10);
 let pageLoadTs=Date.now(),consecutiveSeen=0,isResting=false;
-let lastLogMsg="يرسل إعلانات (من المالك) لغرفة موافقتك + جاهز لسحب أي رابط...";
+let lastLogMsg="يلتقط (مالك / المالك / اونر / الاونر) ويخزن لنهاية الرن...";
 let shadowInfo=null;
 try{
 const host=document.createElement("span"),sh=host.attachShadow({mode:"closed"}),box=document.createElement("div");
@@ -369,25 +399,25 @@ box.style.cssText="position:fixed;bottom:10px;left:10px;z-index:2147483647;backg
 sh.appendChild(box);document.documentElement.appendChild(host);shadowInfo=box;
 box.addEventListener("click",e=>{
 if(e.target&&e.target.id==="g_flush_btn"){
-e.target.innerText="جاري الإرسال للوحة موافقتك...";
-chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{e.target.innerText="تم الإرسال للوحة موافقتك!";});
+e.target.innerText="جاري رفع كل المخزن الآن...";
+chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{e.target.innerText="تم رفع الدفعة بنجاح!";});
 }
 });
 }catch(e){}
 
 function updateUI(st){
 try{
-sessionStorage.setItem("gamal_fb_sc_v162",String(scannedCount));
-sessionStorage.setItem("gamal_fb_ac_v162",String(acceptedCount));
+sessionStorage.setItem("gamal_fb_sc_v163",String(scannedCount));
+sessionStorage.setItem("gamal_fb_ac_v163",String(acceptedCount));
 const remMin=Math.max(0,Math.ceil((RUN_MS-(Date.now()-runStartTs))/60000));
-document.title="[فحص:"+scannedCount+" | بانتظار موافقتك:"+acceptedCount+"] "+st;
+document.title="[فحص:"+scannedCount+" | مخزن:"+acceptedCount+"] "+st;
 if(shadowInfo){
 const curN=FEEDS[feedIdx]?FEEDS[feedIdx].name:"الصفحة الرئيسية";
-shadowInfo.innerHTML="<div><b>رادار غرفة الموافقة وسحب الروابط v16.2</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (باقي للرفع: "+remMin+" د) <button id='g_flush_btn' style='background:#10b981;color:#000;border:none;border-radius:5px;padding:2px 8px;cursor:pointer;font-weight:bold;margin-right:6px;'>إرسال للوحة الموافقة الآن</button></div><div>تم فحص: <b>"+scannedCount+"</b> | أُرسل لغرفة موافقتك (مع لايك): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
+shadowInfo.innerHTML="<div><b>رادار الملاك واللينكات المنفصلة v16.3</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (يرفع آخر الرن بعد: "+remMin+" د) <button id='g_flush_btn' style='background:#10b981;color:#000;border:none;border-radius:5px;padding:2px 8px;cursor:pointer;font-weight:bold;margin-right:6px;'>رفع المخزن الآن</button></div><div>تم فحص: <b>"+scannedCount+"</b> | مخزن لآخر الرن (مالك/اونر): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
 }
 }catch(e){}
 }
-function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v162",JSON.stringify(sentHashes));}}
+function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v163",JSON.stringify(sentHashes));}}
 function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i)|0;return"fb_"+Math.abs(h);}
 
 function cleanProfileHref(rawHref){
@@ -510,7 +540,7 @@ const hasPropWord=REAL_PROP_RE.test(bodyText);
 if(!hasExplicitOwner||!hasPropWord){
 if(!card._gS){
 card._gS=true;scannedCount++;
-lastLogMsg="تخطي (بدون المالك مباشر): "+bodyText.replace(/\s+/g," ").substring(0,38);
+lastLogMsg="تخطي (بدون مالك/اونر): "+bodyText.replace(/\s+/g," ").substring(0,38);
 updateUI("يفحص الصفحة الرئيسية");
 }
 return null;
@@ -524,9 +554,9 @@ return null;
 
 const topLines=(card.innerText||"").split("\n").slice(0,7).map(x=>x.trim()).filter(Boolean);
 const cardHeaderBlob=topLines.join(" ");
-if(SPONSORED_RE.test(cardHeaderBlob)||BRK_FAST_RE.test(bodyText)){
+if(SPONSORED_RE.test(cardHeaderBlob)||WANTED_FAST_RE.test(bodyText)||BRK_FAST_RE.test(bodyText)){
 card._gS=true;saveHash(keyHash);scannedCount++;
-lastLogMsg="تخطي سمسار/ممول: "+bodyText.replace(/\s+/g," ").substring(0,36);
+lastLogMsg="تخطي (مطلوب/سمسار/ممول): "+bodyText.replace(/\s+/g," ").substring(0,36);
 updateUI("يفحص الصفحة الرئيسية");
 return null;
 }
@@ -621,25 +651,25 @@ const resp=await sendBridge(data);
 if(resp&&resp.accepted){
 saveHash(data.hash);
 acceptedCount++;pressLikeOnOwnerCard(card);
-lastLogMsg="أُرسل لغرفة موافقتك + لايك ("+data.author+"): "+prv;
+lastLogMsg="خُزن لآخر الرن + لايك ("+data.author+"): "+prv;
 }else{
 saveHash(data.hash);
 lastLogMsg="مرفوض ("+((resp&&resp.reason)||"فلتر")+"): "+prv;
 }
-updateUI("يرسل الملاك لغرفة موافقتك");
+updateUI("يخزن الملاك لنهاية الرن");
 }
 }
 
 function startRestCycle(){
 isResting=true;
-updateUI("انتهت الرن (45د) -> جاري رفع الدفعة للوحة موافقتك...");
+updateUI("انتهت الرن (45د) -> جاري رفع اللينكات والملاك المخزنين دفعة واحدة...");
 try{chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{});}catch(e){}
 let rSec=REST_SEC;
 const iv=setInterval(()=>{
 rSec-=5;
 try{chrome.runtime.sendMessage({type:"PING_PULL_QUEUE"},()=>{});}catch(e){}
-updateUI("تم الرفع للوحة الموافقة! استراحة 30 دقيقة ("+Math.ceil(Math.max(0,rSec)/60)+" د متبقية ثم Refresh)");
-if(rSec<=0){clearInterval(iv);sessionStorage.setItem("gamal_fb_run_ts_v162",String(Date.now()));location.href=FEEDS[0].url;}
+updateUI("تم رفع الدفعة! استراحة 30 دقيقة ("+Math.ceil(Math.max(0,rSec)/60)+" د متبقية ثم Refresh)");
+if(rSec<=0){clearInterval(iv);sessionStorage.setItem("gamal_fb_run_ts_v163",String(Date.now()));location.href=FEEDS[0].url;}
 },5000);
 }
 
@@ -648,7 +678,7 @@ if(isResting)return;
 if(location.pathname.startsWith("/search/")||location.pathname.startsWith("/groups/feed")){location.href=FEEDS[0].url;return;}
 if(Date.now()-runStartTs>=RUN_MS){startRestCycle();return;}
 if(Date.now()-pageLoadTs>=SWITCH_MS||consecutiveSeen>=24){
-feedIdx=(feedIdx+1)%FEEDS.length;localStorage.setItem("gamal_fb_fidx_v162",String(feedIdx));
+feedIdx=(feedIdx+1)%FEEDS.length;localStorage.setItem("gamal_fb_fidx_v163",String(feedIdx));
 updateUI("تحديث الصفحة الرئيسية لجلب أحدث الإعلانات...");location.href=FEEDS[feedIdx].url;return;
 }
 await scanVisible();
@@ -656,7 +686,7 @@ window.scrollBy({top:Math.floor(400+Math.random()*140),behavior:"smooth"});
 updateUI("فحص مباشر للصفحة الرئيسية");
 setTimeout(loop,Math.floor(1750+Math.random()*450));
 }
-updateUI("بدأ رادار غرفة الموافقة وسحب الروابط v16.2...");
+updateUI("بدأ رادار الملاك واللينكات المنفصلة v16.3...");
 setTimeout(loop,900);
 }
 })();
@@ -747,9 +777,9 @@ def is_verified_fb_owner_post(norm_pure_text):
         return False, "كارت جروب أو إعلان ممول"
     if not re.search(r'(?:شقه|فيلا|فيله|فيلات|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|تاون\s*هاوس|توين\s*هاوس|شاليه|عماره|محل|مكتب|عياده|للايجار|للبيع|ايجار|تمليك)', norm_pure_text):
         return False, "ليس عقاراً"
-    strict_owner_re = r'(?:من\s*المالكه?|المالكه?\s*مباشره?|للمالكه?\s*مباشره?|انا\s*المالكه?|مالكه?\s*(?:اصلي|العقار|الشقه|الفيلا|مباشره?)|شقتي|فيلتي|بيتي|ملكي)'
-    if re.search(strict_owner_re, norm_pure_text): return True, "مكتوب من المالك/المالكة صراحة"
-    return False, "غير مكتوب فيه من المالك"
+    strict_owner_re = r'(?:المالكه?|\bمالكه?\b|ال?اونر|\bowner\b|شقتي|فيلتي|بيتي|ملكي)'
+    if re.search(strict_owner_re, norm_pure_text): return True, "مكتوب مالك/المالك/أونر"
+    return False, "غير مكتوب فيه مالك أو أونر"
 
 def parse_fb_strict_2days_header_time(header_str, fiber_ctime=0):
     now_dt = datetime.now(CAIRO_TZ)
@@ -845,7 +875,7 @@ def build_fb_ad_object(pure_raw_text, group_name, author_raw, post_url, orig_age
     rooms_val = parse_rooms_ar(norm_t)
     now_dt = datetime.now(CAIRO_TZ)
     entry_ts = int(now_dt.timestamp())
-    entry_age_label = f"سحب فوري {now_dt.strftime('%I:%M %p')}" if is_direct_admin else (f"دخل الرادار {now_dt.strftime('%I:%M %p')}" + (f" (نُشر {orig_age_hint})" if orig_age_hint else ""))
+    entry_age_label = f"لينك المدير {now_dt.strftime('%I:%M %p')}" if is_direct_admin else (f"دخل الرادار {now_dt.strftime('%I:%M %p')}" + (f" (نُشر {orig_age_hint})" if orig_age_hint else ""))
     uid = int("93" + str(abs(hash((norm_t[:75] or post_url))) % 1000000000))
     phone_note = f" | ت: {phones[0]}" if phones else ""
     return {
@@ -858,20 +888,21 @@ def build_fb_ad_object(pure_raw_text, group_name, author_raw, post_url, orig_age
     }
 
 def process_direct_pulled_facebook_post(payload):
+    global FB_PENDING_BATCH_COUNT
     pure_raw_text = strip_bidi(payload.get("text") or "").strip()
     group_name = strip_bidi(payload.get("group_name") or "").strip()
     author_raw = strip_bidi(payload.get("author") or "مالك مباشر").strip()
     post_url = (payload.get("url") or "").strip()
     if not pure_raw_text or len(pure_raw_text) < 10:
-        pure_raw_text = f"إعلان مالك مباشر تم سحبه بالرابط من فيسبوك - {post_url}"
+        pure_raw_text = f"إعلان مالك مباشر مضاف من المدير - {post_url}"
     fb_ad = build_fb_ad_object(pure_raw_text, group_name, author_raw, post_url, is_direct_admin=True)
     with SYNC_LOCK:
         extra_live = load_extra_live_backup()
         extra_live = [a for a in extra_live if int(a.get("ad_id") or 0) != fb_ad["ad_id"]]
         extra_live.insert(0, fb_ad)
         save_extra_live_backup(extra_live)
-        print(f"\n  >>> [DIRECT LINK PULLED & PUBLISHED LIVE] {fb_ad['title'][:55]} | {fb_ad['zone']} <<<")
-        guard_extra_ads_during_sleep(force_push=True)
+        FB_PENDING_BATCH_COUNT += 1
+        print(f"\n  >>> [ADMIN LINK STORED WITHOUT FILTER FOR END-OF-RUN BATCH #{FB_PENDING_BATCH_COUNT}] {fb_ad['title'][:55]} | {fb_ad['zone']} <<<")
     return True
 
 def process_facebook_post_payload(payload):
@@ -939,7 +970,7 @@ def process_facebook_post_payload(payload):
         pending_list.insert(0, fb_ad)
         save_pending_fb_ads(pending_list)
         FB_PENDING_BATCH_COUNT += 1
-        print(f"\n  >>> [FB QUEUED FOR YOUR APPROVAL #{FB_PENDING_BATCH_COUNT}] ({fb_ad['age']}) | {fb_ad['publisher']} | {fb_ad['zone']} <<<")
+        print(f"\n  >>> [FB QUEUED FOR END-OF-RUN APPROVAL BATCH #{FB_PENDING_BATCH_COUNT}] ({fb_ad['age']}) | {fb_ad['publisher']} | {fb_ad['zone']} <<<")
     return True, "OK", False
 
 class FacebookIngestHandler(BaseHTTPRequestHandler):
@@ -960,7 +991,7 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
             self._send_cors(200)
             url_task = DIRECT_PULL_QUEUE.pop(0) if DIRECT_PULL_QUEUE else ""
             if url_task:
-                print(f"  --> [Chrome Extension Picked Up Link] Opening in Chrome now: {url_task}")
+                print(f"  --> [Opening Separate Chrome Window for Your Link] {url_task}")
             self.wfile.write(json.dumps({"url": url_task}).encode("utf-8"))
             return
         self._send_cors(404)
@@ -968,7 +999,7 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
         global FB_PENDING_BATCH_COUNT
         if self.path == "/fb_flush":
             with SYNC_LOCK:
-                print(f"\n  >>> [FB APPROVAL QUEUE SYNC] Pushing ({len(load_pending_fb_ads())} pending ads) to Admin Panel... <<<")
+                print(f"\n  >>> [END-OF-RUN BATCH PUSH] Sending stored links & approval queue ({len(load_pending_fb_ads())} pending) to Website now... <<<")
                 guard_extra_ads_during_sleep(force_push=True)
                 FB_PENDING_BATCH_COUNT = 0
             self._send_cors(200)
@@ -1003,7 +1034,7 @@ def handle_remote_admin_command(cmd_text):
         u = cmd.split("|", 1)[1].strip()
         if "facebook.com" in u and u not in DIRECT_PULL_QUEUE:
             DIRECT_PULL_QUEUE.append(u)
-            print(f"\n  >>> [ADMIN PHONE COMMAND RECEIVED] Queued Facebook Link to Pull Live: {u} <<<")
+            print(f"\n  >>> [ADMIN LINK RECEIVED] Queued for Separate Chrome Window (No Filter, Batch at End of Run): {u} <<<")
     elif cmd.startswith("APPROVE|"):
         aid_str = cmd.split("|", 1)[1].strip()
         with SYNC_LOCK:
@@ -1067,7 +1098,7 @@ def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Approval Queue & Link Puller v16.2] Listening on http://127.0.0.1:{FB_PORT}")
+            print(f"[Facebook Separate-Window Link Puller & Approval Radar v16.3] Listening on http://127.0.0.1:{FB_PORT}")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -1157,8 +1188,8 @@ def guard_extra_ads_during_sleep(force_push=False):
             aq_c = sum(1 for a in d["ads"] if a.get("source") == "عقارماب")
             fb_c = sum(1 for a in d["ads"] if a.get("source") == "فيسبوك")
             pend_c = len(d["pending_ads"])
-            ok_p, p_info = atomic_write_and_git_push(d, f"Sync v16.2 (Live FB: {fb_c}, Pending Approval: {pend_c}, AQ: {aq_c})")
-            print(f"    --> [Sync Complete] Live FB: ({fb_c}) | Pending Approval: ({pend_c}) | AqarMap: ({aq_c})!" if ok_p else f"    --> [Sync Notice] {p_info}")
+            ok_p, p_info = atomic_write_and_git_push(d, f"End-of-Run Batch Sync v16.3 (Live FB: {fb_c}, Pending: {pend_c}, AQ: {aq_c})")
+            print(f"    --> [End-of-Run Batch Sync Complete] Stored Live FB: ({fb_c}) | Approval Page: ({pend_c}) | AqarMap: ({aq_c})!" if ok_p else f"    --> [Sync Notice] {p_info}")
     except Exception: pass
 
 def main():
@@ -1166,18 +1197,18 @@ def main():
     generate_facebook_main_extension()
     start_fb_local_server()
     start_admin_command_listener()
-    print("=== Starting Facebook Approval Queue & Instant Link Puller Radar v16.2 ===")
+    print("=== Starting Facebook Separate-Window Link Puller & Approval Radar v16.3 ===")
     with SYNC_LOCK:
         guard_extra_ads_during_sleep(force_push=True)
     print(f"[!] Reload extension once in Chrome -> {FB_EXT_DIR}")
     cycle_num = 1
     while True:
-        print(f"\n>>> [Facebook Radar Cycle #{cycle_num} Active ({AUTO_LOOP_MINUTES}m)] Listening for Phone Links & Queuing 'من المالك' to Pending Approval... <<<")
+        print(f"\n>>> [Facebook Radar Cycle #{cycle_num} Active ({AUTO_LOOP_MINUTES}m)] Storing Your Links (No Filter) + Auto-Scanning (مالك/أونر) -> Batch Push at End of Run... <<<")
         for _ in range((AUTO_LOOP_MINUTES * 60) // 30):
             time.sleep(30)
         if FB_PENDING_BATCH_COUNT > 0:
             with SYNC_LOCK:
-                print(f"\n>>> [End of 45m Run] Pushing {FB_PENDING_BATCH_COUNT} pending Facebook ads to your Admin Approval Room... <<<")
+                print(f"\n>>> [End of 45m Run] Pushing all stored Admin Links & Pending Approval Ads ({FB_PENDING_BATCH_COUNT} items) in one batch... <<<")
                 guard_extra_ads_during_sleep(force_push=True)
                 FB_PENDING_BATCH_COUNT = 0
         cycle_num += 1
