@@ -23,8 +23,6 @@ disable_cmd_quickedit_and_sleep()
 CAIRO_TZ = timezone(timedelta(hours=2))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "ads.json")
-INDEX_HTML_FILE = os.path.join(BASE_DIR, "index.html")
-ADMIN_HTML_FILE = os.path.join(BASE_DIR, "admin.html")
 EXTRA_SEEN_FILE = os.path.join(BASE_DIR, "seen_extra_local.json")
 AQ_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "aqarmap_live_ads.json")
 EXTRA_LIVE_BACKUP_FILE = os.path.join(BASE_DIR, "extra_live_ads.json")
@@ -96,56 +94,105 @@ def fix_git_identity_for_vercel():
     subprocess.run(["git", "config", "user.name", "gamallove217-glitch"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["git", "config", "user.email", "gamallove217@gmail.com"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def patch_ui_files_on_disk():
-    patched = []
-    for fpath, fname in [(INDEX_HTML_FILE, "index.html"), (ADMIN_HTML_FILE, "admin.html")]:
-        if os.path.exists(fpath):
-            try:
-                with open(fpath, "r", encoding="utf-8") as f: c = f.read()
-                nc = c.replace("السوق المفتوح", "فيسبوك").replace("السوق:", "فيسبوك:")
-                if nc != c:
-                    with open(fpath, "w", encoding="utf-8") as f: f.write(nc)
-                    patched.append(fname)
-            except Exception: pass
-    return patched
-
-def build_fb_pinpoint_url(raw_url, text_body):
-    u = str(raw_url or "").strip()
-    if any(k in u for k in ("/posts/", "/permalink/", "story_fbid=", "multi_permalinks=", "/photo", "/videos/", "/reel/", "/search/")):
-        return u
-    words = [w for w in re.sub(r'[^\w\s]', ' ', strip_bidi(text_body)).split() if len(w) >= 2][:9]
-    snippet = " ".join(words) if words else "شقة من المالك التجمع"
-    m_grp = re.search(r'facebook\.com/groups/([^/?&#]+)', u)
-    if m_grp and m_grp.group(1) not in ("feed", "discover"):
-        return f"https://www.facebook.com/groups/{m_grp.group(1)}/search/?q={urllib.parse.quote(snippet)}"
-    rf = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D"
-    return f"https://www.facebook.com/search/posts/?q={urllib.parse.quote(snippet)}&filters={rf}"
+def is_direct_fb_post_permalink(url_str):
+    u = str(url_str or "").strip()
+    if "facebook.com" not in u or "/search/" in u: return False
+    return any(k in u for k in ("/posts/", "/permalink/", "story_fbid=", "multi_permalinks=", "fbid=", "/videos/", "/reel/"))
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search Radar v12.2", "version": "12.2",
-        "description": "Direct Post Permalink Extractor + Recent-Posts Owner Search", "permissions": ["storage"],
+        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search Radar v12.3", "version": "12.3",
+        "description": "React Fiber Direct Permalink & CreationTime Extractor", "permissions": ["storage"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
-        "content_scripts": [{"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}]
+        "content_scripts": [
+            {"matches": ["https://www.facebook.com/*"], "js": ["main_world_hook.js"], "run_at": "document_start", "world": "MAIN"},
+            {"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}
+        ]
     }
-    background_js = r"""
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg && msg.type === "FB_POST_INGEST") {
-        fetch("http://127.0.0.1:5005/fb_ingest", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(msg.payload)})
-        .then(r => r.json())
-        .then(d => sendResponse({ok: true, accepted: !!(d && d.accepted), reason: (d && d.reason) || "", is_old: !!(d && d.is_old)}))
-        .catch(e => sendResponse({ok: false, accepted: false, reason: String(e), is_old: false}));
-        return true;
+    background_js = 'chrome.runtime.onMessage.addListener((m,s,sr)=>{if(m&&m.type==="FB_POST_INGEST"){fetch("http://127.0.0.1:5005/fb_ingest",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(m.payload)}).then(r=>r.json()).then(d=>sr({ok:true,accepted:!!(d&&d.accepted),reason:(d&&d.reason)||"",is_old:!!(d&&d.is_old)})).catch(e=>sr({ok:false,accepted:false,reason:String(e),is_old:false}));return true;}});'
+
+    main_world_hook_js = r"""
+(function() {
+    if (window.__gamalMainFiberHookV123) return;
+    window.__gamalMainFiberHookV123 = true;
+    const DIRECT_URL_RE = /https?:\/\/(?:www\.|m\.)?facebook\.com\/(?:groups\/[^\/?#]+\/(?:posts|permalink)\/(?:\d+|pfbid[A-Za-z0-9]+)|permalink\.php\?story_fbid=[^&"'\s]+|story\.php\?story_fbid=[^&"'\s]+|[^\/?#]+\/posts\/(?:\d+|pfbid[A-Za-z0-9]+)|photo\/?\?fbid=\d+[^"'\s]*)/i;
+    function extractFromFiberNode(domEl) {
+        let foundUrl = "", foundPostId = "", foundGroupId = "", foundCtime = 0;
+        const nowSec = Math.floor(Date.now() / 1000), visited = new WeakSet();
+        function scanObj(obj, depth) {
+            if (!obj || typeof obj !== "object" || depth > 5 || visited.has(obj)) return;
+            visited.add(obj);
+            let keys; try { keys = Object.keys(obj); } catch(e) { return; }
+            for (let i = 0; i < Math.min(keys.length, 45); i++) {
+                const k = keys[i];
+                if (k === "children" || k === "stateNode" || k === "return" || k === "sibling" || k === "child") continue;
+                let v; try { v = obj[k]; } catch(e) { continue; }
+                if (v == null) continue;
+                if (typeof v === "string") {
+                    if (!foundUrl && (v.includes("/posts/") || v.includes("/permalink") || v.includes("story_fbid="))) {
+                        const mU = v.match(DIRECT_URL_RE);
+                        if (mU) foundUrl = mU[0].replace(/\\u0025/g, "%").replace(/\\\//g, "/");
+                        else if (v.startsWith("/groups/") && (v.includes("/posts/") || v.includes("/permalink/"))) foundUrl = "https://www.facebook.com" + v.split("?")[0];
+                    }
+                    if (!foundPostId && (k === "post_id" || k === "story_fbid" || k === "top_level_post_id" || k === "mf_story_key" || k === "legacy_fbid") && (/^\d{10,25}$/.test(v) || /^pfbid[A-Za-z0-9]{15,}$/.test(v))) foundPostId = v;
+                    if (!foundPostId && k === "id" && v.length >= 16 && v.length <= 120 && /^[A-Za-z0-9+/=]+$/.test(v)) {
+                        try { const mDec = atob(v).match(/(?::|_)(\d{11,22})$/); if (mDec) foundPostId = mDec[1]; } catch(e) {}
+                    }
+                    if (!foundGroupId && (k === "group_id" || k === "groupID") && /^\d{8,25}$/.test(v)) foundGroupId = v;
+                } else if (typeof v === "number") {
+                    if (!foundCtime && (k === "creation_time" || k === "publish_time" || k === "created_time" || k === "utime" || k === "timestamp")) {
+                        if (v >= 1600000000 && v <= nowSec + 600) foundCtime = Math.floor(v);
+                        else if (v >= 1600000000000 && v <= (nowSec + 600) * 1000) foundCtime = Math.floor(v / 1000);
+                    }
+                } else if (typeof v === "object") scanObj(v, depth + 1);
+            }
+        }
+        const nodes = [domEl];
+        domEl.querySelectorAll('div[data-ad-preview="message"], div[data-ad-comet-preview="message"], a[href], span[role="link"], h2, h3, h4').forEach(n => nodes.push(n));
+        for (const el of nodes) {
+            if (!foundGroupId && el.href) {
+                const mG = el.href.match(/facebook\.com\/groups\/([^/?&#]+)/);
+                if (mG && mG[1] !== "feed" && mG[1] !== "discover") foundGroupId = mG[1];
+                const mGm = el.href.match(/set=(?:gm|pcb)\.(\d{10,25})/);
+                if (mGm && !foundPostId) foundPostId = mGm[1];
+            }
+            let fKey = null; try { fKey = Object.keys(el).find(k => k.startsWith("__reactFiber$") || k.startsWith("__reactProps$")); } catch(e) {}
+            if (!fKey) continue;
+            let cur = el[fKey];
+            for (let s = 0; s < 26 && cur; s++) {
+                if (cur.memoizedProps) scanObj(cur.memoizedProps, 0);
+                if (!foundUrl && cur.pendingProps) scanObj(cur.pendingProps, 0);
+                if (foundUrl && foundCtime) break;
+                cur = cur.return;
+            }
+            if (foundUrl && foundCtime) break;
+        }
+        if (!foundUrl && foundGroupId && foundPostId) foundUrl = "https://www.facebook.com/groups/" + foundGroupId + "/permalink/" + foundPostId + "/";
+        else if (!foundUrl && foundPostId) foundUrl = "https://www.facebook.com/permalink.php?story_fbid=" + foundPostId;
+        return {url: foundUrl, ctime: foundCtime, postId: foundPostId};
     }
-});
+    function stampVisibleCards() {
+        document.querySelectorAll("[data-g-inspect-req='1']").forEach(card => {
+            card.removeAttribute("data-g-inspect-req");
+            try {
+                const res = extractFromFiberNode(card);
+                if (res.url) card.setAttribute("data-g-permalink", res.url);
+                if (res.ctime) card.setAttribute("data-g-ctime", String(res.ctime));
+                if (res.postId) card.setAttribute("data-g-postid", String(res.postId));
+            } catch(e) {}
+        });
+    }
+    window.addEventListener("gamal_fiber_scan", stampVisibleCards);
+    setInterval(stampVisibleCards, 450);
+})();
 """.strip()
 
     content_js = r"""
 (function() {
-    if (window.__gamalFbRadarV122) return;
-    window.__gamalFbRadarV122 = true;
+    if (window.__gamalFbRadarV123) return;
+    window.__gamalFbRadarV123 = true;
     const RF = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
     const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RF;
     const Q_LIST = [
@@ -153,11 +200,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         "من المالك مباشرة التجمع الخامس", "بدون وسطاء التجمع الخامس", "يمتنع الوسطاء التجمع الخامس",
         "بدون عمولة التجمع الخامس", "من المالك النرجس التجمع", "من المالك اللوتس التجمع",
         "من المالك الياسمين التجمع", "من المالك البنفسج التجمع", "من المالك الاندلس التجمع",
-        "من المالك دار مصر التجمع", "من المالك سكن مصر التجمع", "من المالك جنة التجمع",
-        "من المالك المستثمرين التجمع", "من المالك الاكاديمية التجمع", "من المالك القرنفل التجمع",
-        "من المالك التجمع الثالث", "من المالك التجمع الاول", "من المالك القطامية", "من المالك القاهرة الجديدة"
+        "من المالك دار مصر التجمع", "من المالك سكن مصر التجمع", "من المالك المستثمرين التجمع",
+        "من المالك القرنفل التجمع", "من المالك التجمع الثالث", "من المالك التجمع الاول"
     ];
-    const TARGETS = Q_LIST.map(q => ({name: "بحث الأحدث: " + q, url: sUrl(q), maxSec: 42}));
+    const TARGETS = Q_LIST.map(q => ({name: "بحث الأحدث: " + q, url: sUrl(q), maxSec: 40}));
     const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن|من المالك|المالك مباشر|مدخل البيت|شارع)/i;
     const GROUP_WORDS_RE = /(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
     const UI_NOISE_RE = /^(انضمام|متابعة|متابعه|مراسلة|أعجبني|تعليق|مشاركة|عرض المزيد|See more|Join|Follow|Like|Comment|Share|\d+\s*تعليق.*|\d+\s*مشاركات.*)$/i;
@@ -165,12 +211,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const normDigits = s => String(s || "").replace(/[٠-٩]/g, c => H_MAP[c] || c);
     const TIME_RE = /(الآن|توًا|حالا|just now|(?:^|\s)\d{1,2}\s*[دسيهأ](?:\s|$)|دقيقة|دقيقتين|دقائق|ساعة|ساعتين|ساعات|أمس|امس|الأمس|يوم|يومين|أيام|ايام|أسبوع|اسبوع|شهر|(?:^|\s)\d{1,2}\s*(?:m|h|d|w|mins?|hrs?)(?:\s|$)|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)/i;
 
-    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v122") || "[]");
-    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v122") || "0", 10) % TARGETS.length;
-    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v122") || "0", 10);
-    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v122") || "0", 10);
+    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v123") || "[]");
+    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v123") || "0", 10) % TARGETS.length;
+    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v123") || "0", 10);
+    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v123") || "0", 10);
     let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, isResting = false;
-    let lastLogMsg = "يبحث في أحدث المنشورات بالرابط المباشر...";
+    let lastLogMsg = "يستخرج رابط البوست المباشر ووقت النشر الدقيق...";
     let shadowInfo = null;
     try {
         const host = document.createElement("span"), sh = host.attachShadow({mode: "closed"}), box = document.createElement("div");
@@ -180,12 +226,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function updateStatusUI(statusText) {
         try {
-            sessionStorage.setItem("gamal_fb_sc_v122", String(scannedCount));
-            sessionStorage.setItem("gamal_fb_ac_v122", String(acceptedCount));
+            sessionStorage.setItem("gamal_fb_sc_v123", String(scannedCount));
+            sessionStorage.setItem("gamal_fb_ac_v123", String(acceptedCount));
             document.title = "[فحص:" + scannedCount + " | ملاك:" + acceptedCount + "] " + statusText;
             if (shadowInfo) {
                 const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "بحث الأحدث";
-                shadowInfo.innerHTML = "<div><b>رادار بحث الملاك المباشر v12.2</b> | " + statusText + "</div><div style='color:#38bdf8;'>البحث الحالي (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div>";
+                shadowInfo.innerHTML = "<div><b>رادار بحث الملاك المباشر v12.3 (رابط البوست الأصلي)</b> | " + statusText + "</div><div style='color:#38bdf8;'>البحث الحالي (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div>";
             }
         } catch(e) {}
     }
@@ -194,12 +240,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!sentHashes.includes(h)) {
             sentHashes.push(h);
             if (sentHashes.length > 3500) sentHashes = sentHashes.slice(-3500);
-            localStorage.setItem("gamal_fb_sent_v122", JSON.stringify(sentHashes));
+            localStorage.setItem("gamal_fb_sent_v123", JSON.stringify(sentHashes));
         }
     }
-
     function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i) | 0; return "fb_" + Math.abs(h); }
-
     function stripCommentsSection(rawText) {
         const cutMarkers = ["\nأعجبني\n", "\nتعليق\n", "\nمشاركة\n", "\nLike\n", "\nComment\n", "\nShare\n", "عرض مزيد من التعليقات", "اكتب تعليق", "تفاعل: أعجبني"];
         let t = rawText;
@@ -231,25 +275,32 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return Array.from(cardSet);
     }
 
-    async function hydrateCardLinks(card) {
-        if (card._gHydrated) return;
-        card._gHydrated = true;
-        const anchors = card.querySelectorAll("a");
-        for (const a of anchors) {
-            try {
-                a.dispatchEvent(new PointerEvent("pointerenter", {bubbles: true}));
-                a.dispatchEvent(new MouseEvent("mouseenter", {bubbles: true}));
-                a.dispatchEvent(new MouseEvent("mouseover", {bubbles: true}));
-                a.dispatchEvent(new FocusEvent("focus", {bubbles: true}));
-            } catch(e) {}
+    async function hydrateAndInspectFiber(card) {
+        card.setAttribute("data-g-inspect-req", "1");
+        window.dispatchEvent(new CustomEvent("gamal_fiber_scan"));
+        if (!card._gHydrated) {
+            card._gHydrated = true;
+            const anchors = card.querySelectorAll("a, span[role='link']");
+            for (const a of anchors) {
+                try {
+                    a.dispatchEvent(new PointerEvent("pointerover", {bubbles: true}));
+                    a.dispatchEvent(new MouseEvent("mouseover", {bubbles: true}));
+                    a.dispatchEvent(new PointerEvent("pointerenter", {bubbles: true}));
+                    a.dispatchEvent(new MouseEvent("mouseenter", {bubbles: true}));
+                    if (a.focus) a.focus({preventScroll: true});
+                } catch(e) {}
+            }
         }
-        await new Promise(r => setTimeout(r, 110));
+        await new Promise(r => setTimeout(r, 140));
+        card.setAttribute("data-g-inspect-req", "1");
+        window.dispatchEvent(new CustomEvent("gamal_fiber_scan"));
+        await new Promise(r => setTimeout(r, 60));
     }
 
     async function extractPostData(card) {
         let preClean = stripCommentsSection(card.innerText || "");
         if (preClean.length < 22 || !PROP_RE.test(preClean)) return null;
-        await hydrateCardLinks(card);
+        await hydrateAndInspectFiber(card);
         if (!card._gExpanded) {
             const btns = card.querySelectorAll('div[role="button"], span[role="button"]');
             for (const b of btns) {
@@ -264,8 +315,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const fullClean = stripCommentsSection(card.innerText || "");
         if (fullClean.length < 22 || !PROP_RE.test(fullClean)) return null;
 
-        let postUrl = "", groupId = "", mediaPostId = "", photoUrl = "", groupName = "", headerTimeHint = "", authorFromLink = "";
+        let postUrl = card.getAttribute("data-g-permalink") || "";
+        let fiberCtime = parseInt(card.getAttribute("data-g-ctime") || "0", 10) || 0;
+        let groupId = "", mediaPostId = card.getAttribute("data-g-postid") || "", photoUrl = "", groupName = "", headerTimeHint = "", authorFromLink = "";
         const headerTextsToStrip = new Set();
+
         card.querySelectorAll("a[href], abbr, span[aria-label]").forEach(a => {
             const href = a.href || "", rawLabel = (a.innerText || "") + " " + (a.getAttribute("aria-label") || "");
             const aTxt = normDigits(rawLabel).trim(), firstLineTxt = (a.innerText || "").split("\n")[0].trim();
@@ -288,21 +342,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             if (href && !postUrl && (href.includes("/posts/") || href.includes("/permalink/") || href.includes("story_fbid=") || href.includes("multi_permalinks=") || href.includes("/videos/") || href.includes("/reel/"))) {
                 postUrl = (href.includes("story_fbid=") || href.includes("multi_permalinks=")) ? href : href.split("?")[0];
             }
-            if (href && !photoUrl && (href.includes("/photo/?") || href.includes("/photo.php?") || href.includes("/photos/"))) {
-                photoUrl = href;
-            }
+            if (href && !photoUrl && (href.includes("/photo/?") || href.includes("/photo.php?") || href.includes("/photos/"))) photoUrl = href;
             if (!headerTimeHint && aTxt && aTxt.length <= 42 && TIME_RE.test(aTxt)) {
                 headerTimeHint = aTxt; if (firstLineTxt) headerTextsToStrip.add(firstLineTxt);
             }
         });
 
-        if (!postUrl && groupId && mediaPostId) {
-            postUrl = "https://www.facebook.com/groups/" + groupId + "/posts/" + mediaPostId + "/";
-        } else if (!postUrl && mediaPostId) {
-            postUrl = "https://www.facebook.com/" + mediaPostId;
-        } else if (!postUrl && photoUrl) {
-            postUrl = photoUrl;
-        }
+        if (!postUrl && groupId && mediaPostId) postUrl = "https://www.facebook.com/groups/" + groupId + "/permalink/" + mediaPostId + "/";
+        else if (!postUrl && mediaPostId) postUrl = "https://www.facebook.com/permalink.php?story_fbid=" + mediaPostId;
+        else if (!postUrl && photoUrl) postUrl = photoUrl;
 
         card.querySelectorAll("h2, h3, h4").forEach(hNode => {
             (hNode.innerText || "").split("\n").map(x => x.trim()).filter(Boolean).forEach(x => headerTextsToStrip.add(x));
@@ -344,15 +392,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (authorName && bodyText.startsWith(authorName)) bodyText = bodyText.substring(authorName.length).trim();
         if (!bodyText || bodyText.length < 22 || !PROP_RE.test(bodyText)) return null;
 
-        if (!postUrl) {
-            const snippet = bodyText.replace(/\s+/g, " ").substring(0, 55).trim();
-            if (groupId) postUrl = "https://www.facebook.com/groups/" + groupId + "/search/?q=" + encodeURIComponent(snippet);
-            else postUrl = sUrl(snippet);
-        }
-
         const searchQ = new URLSearchParams(location.search).get("q") || "";
-        const keyHash = hashStr(bodyText.replace(/\s+/g, " ").substring(0, 95));
-        return {hash: keyHash, url: postUrl, author: authorName, group_name: groupName, search_query: searchQ, is_recent_search: location.search.includes(RF.substring(0, 20)), header_time: headerTimeHint || normDigits(lines.slice(0, 6).join(" | ")), text: bodyText.substring(0, 2600)};
+        const keyHash = hashStr(bodyText.replace(/\s+/g, " ").substring(0, 90));
+        return {hash: keyHash, url: postUrl, fiber_ctime: fiberCtime, author: authorName, group_name: groupName, search_query: searchQ, header_time: headerTimeHint || normDigits(lines.slice(0, 6).join(" | ")), text: bodyText.substring(0, 2600)};
     }
 
     function sendToBackgroundBridge(data) {
@@ -372,26 +414,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             const preview = data.text.replace(/\s+/g, " ").substring(0, 42);
             const resp = await sendToBackgroundBridge(data);
             if (resp && resp.is_old) oldPostsHit++;
-            if (resp && resp.accepted) { acceptedCount++; lastLogMsg = "مقبول مالك: " + preview; }
+            if (resp && resp.accepted) { acceptedCount++; lastLogMsg = "مقبول مالك (رابط بوست مباشر): " + preview; }
             else { lastLogMsg = "مرفوض (" + ((resp && resp.reason) || "فلتر") + "): " + preview; }
-            updateStatusUI("يبحث في الأحدث");
+            updateStatusUI("يبحث في الأحدث (<= يومين)");
         }
     }
 
     function advanceToNextTarget(reasonMsg) {
         const nextIdx = (targetIdx + 1) % TARGETS.length;
-        localStorage.setItem("gamal_fb_tidx_v122", String(nextIdx));
+        localStorage.setItem("gamal_fb_tidx_v123", String(nextIdx));
         if (nextIdx === 0) {
             isResting = true;
-            let restSec = 240;
+            let restSec = 900;
             const iv = setInterval(() => {
                 restSec -= 5;
-                updateStatusUI("استراحة أمان بعد مسح كل المناطق (" + Math.max(0, restSec) + "ث)");
+                updateStatusUI("استراحة أمان الحساب بعد مسح كل المناطق (" + Math.max(0, restSec) + "ث)");
                 if (restSec <= 0) { clearInterval(iv); location.href = TARGETS[0].url; }
             }, 5000);
             return;
         }
-        const waitNextMs = Math.floor(8500 + Math.random() * 4500);
+        const waitNextMs = Math.floor(9000 + Math.random() * 5000);
         updateStatusUI(reasonMsg + " -> المنطقة التالية بعد " + Math.round(waitNextMs / 1000) + "ث");
         setTimeout(() => { location.href = TARGETS[nextIdx].url; }, waitNextMs);
     }
@@ -405,22 +447,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         }
         await scanVisibleArticles();
         const elapsedSec = (Date.now() - pageStartTs) / 1000;
-        const curTarget = TARGETS[targetIdx] || {maxSec: 42};
+        const curTarget = TARGETS[targetIdx] || {maxSec: 40};
         if (oldPostsHit >= 3 && elapsedSec > 12) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
         if (consecutiveSeen >= 8 && elapsedSec > 14) { advanceToNextTarget("تم مسح كل الجديد هنا"); return; }
         if (elapsedSec >= curTarget.maxSec) { advanceToNextTarget("اكتمل فحص المنطقة"); return; }
 
-        window.scrollBy({top: Math.floor(540 + Math.random() * 240), behavior: "smooth"});
+        window.scrollBy({top: Math.floor(520 + Math.random() * 230), behavior: "smooth"});
         updateStatusUI("يفحص نتائج البحث (" + Math.round(elapsedSec) + "ث)");
-        setTimeout(mainLoop, Math.floor(2400 + Math.random() * 1100));
+        setTimeout(mainLoop, Math.floor(2500 + Math.random() * 1100));
     }
-    updateStatusUI("بدأ رادار البحث المباشر...");
+    updateStatusUI("بدأ رادار البحث المباشر v12.3...");
     setTimeout(mainLoop, 1200);
 })();
 """.strip()
 
     with open(os.path.join(FB_EXT_DIR, "manifest.json"), "w", encoding="utf-8") as f: json.dump(manifest, f, ensure_ascii=False, indent=2)
     with open(os.path.join(FB_EXT_DIR, "background.js"), "w", encoding="utf-8") as f: f.write(background_js)
+    with open(os.path.join(FB_EXT_DIR, "main_world_hook.js"), "w", encoding="utf-8") as f: f.write(main_world_hook_js)
     with open(os.path.join(FB_EXT_DIR, "content.js"), "w", encoding="utf-8") as f: f.write(content_js)
 
 def load_fb_memory():
@@ -454,8 +497,17 @@ def is_verified_fb_owner_post(norm_pure_text):
     if re.search(address_utility_re, norm_pure_text): return True, "عنوان/تفاصيل مالك مباشر"
     return False, "بدون دليل مالك صريح"
 
-def parse_fb_strict_2days_header_time(header_str, is_recent_search=False):
+def parse_fb_strict_2days_header_time(header_str, fiber_ctime=0):
     now_dt = datetime.now(CAIRO_TZ)
+    now_ts = int(now_dt.timestamp())
+    if fiber_ctime and fiber_ctime >= 1600000000:
+        diff_sec = max(0, now_ts - int(fiber_ctime))
+        if diff_sec > (MAX_AGE_DAYS * 86400):
+            return False, f"Old FB Post ({round(diff_sec / 86400, 1)}d > 2d)", "", True
+        if diff_sec < 3600: return True, "OK", f"منذ {max(1, diff_sec // 60)} د", False
+        if diff_sec < 86400: return True, "OK", f"منذ {diff_sec // 3600} س", False
+        return True, "OK", f"منذ {diff_sec // 86400} يوم", False
+
     clean_h, norm_h = strip_bidi(header_str), normalize_ar(header_str)
     if re.search(r'\b(?:202[0-5])\b', norm_h): return False, "Old FB Year (<2026)", "", True
     if re.search(r'(?:منذ|قبل)?\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات|\d+\s*w\b|\d+\s*أ\b)', norm_h): return False, "Old FB Post (>1w)", "", True
@@ -482,7 +534,6 @@ def parse_fb_strict_2days_header_time(header_str, is_recent_search=False):
     if re.search(r'(?:ساعه|ساعتين)', norm_h): return True, "OK", "منذ ساعة", False
     if re.search(r'(?:امس|الامس|امبارح|yesterday|1\s*ي(?:\s|$)|1\s*d(?:\s|$)|منذ\s*يوم|قبل\s*يوم)', norm_h): return True, "OK", "منذ يوم", False
     if re.search(r'(?:منذ\s*يومين|قبل\s*يومين|2\s*ي(?:\s|$)|2\s*d(?:\s|$)|يومين)', norm_h): return True, "OK", "منذ يومين", False
-    if is_recent_search: return True, "OK", "أحدث المنشورات", False
     return False, "Unverified FB Date", "", False
 
 def parse_facebook_colloquial_price(text, deal):
@@ -525,7 +576,7 @@ def process_facebook_post_payload(payload):
     search_query = strip_bidi(payload.get("search_query") or "").strip()
     author_raw = strip_bidi(payload.get("author") or "مشارك مجهول الهوية").strip()
     header_time = strip_bidi(payload.get("header_time") or "")
-    is_recent_search = bool(payload.get("is_recent_search", True))
+    fiber_ctime = int(payload.get("fiber_ctime") or 0)
     post_url = (payload.get("url") or "").strip()
     post_hash = payload.get("hash") or ""
     if group_name and pure_raw_text.startswith(group_name): pure_raw_text = pure_raw_text[len(group_name):].strip()
@@ -534,13 +585,17 @@ def process_facebook_post_payload(payload):
 
     mem = load_fb_memory()
     if post_hash and post_hash in mem.get("seen_hashes", []): return False, "مفحوص سابقا", False
-    is_fresh, time_reason, orig_age_hint, is_explicit_old = parse_fb_strict_2days_header_time(header_time, is_recent_search)
-    if post_hash: mem.setdefault("seen_hashes", []).append(post_hash)
+    is_fresh, time_reason, orig_age_hint, is_explicit_old = parse_fb_strict_2days_header_time(header_time, fiber_ctime)
     if not is_fresh:
-        save_fb_memory(mem)
+        if post_hash: mem.setdefault("seen_hashes", []).append(post_hash); save_fb_memory(mem)
         print(f"  [FB SCAN] [- REJECTED FB] {time_reason} | {short_preview}")
         return False, "منشور قديم (>يومين)", is_explicit_old
 
+    if not is_direct_fb_post_permalink(post_url):
+        print(f"  [FB SCAN] [- REJECTED FB] No Direct Post Permalink | {short_preview}")
+        return False, "بدون رابط بوست مباشر", False
+
+    if post_hash: mem.setdefault("seen_hashes", []).append(post_hash)
     norm_t = normalize_ar(pure_raw_text)
     for wp in FB_WANTED_PHRASES:
         if normalize_ar(wp) in norm_t[:180]:
@@ -610,8 +665,7 @@ def process_facebook_post_payload(payload):
     now_dt = datetime.now(CAIRO_TZ)
     entry_ts = int(now_dt.timestamp())
     entry_age_label = f"دخل الرادار {now_dt.strftime('%I:%M %p')}" + (f" (نُشر {orig_age_hint})" if orig_age_hint else "")
-    uid = int("93" + str(abs(hash(post_hash or pure_raw_text[:100])) % 1000000000))
-    final_link = build_fb_pinpoint_url(post_url, pure_raw_text)
+    uid = int("93" + str(abs(hash(norm_t[:75])) % 1000000000))
     phone_note = f" | ت: {phones[0]} [{owner_proof_label}]" if phones else f" | [{owner_proof_label}]"
 
     fb_ad = {
@@ -619,14 +673,14 @@ def process_facebook_post_payload(payload):
         "zone": zone, "location": zone, "cat": cat, "category": cat, "deal": deal, "type": deal, "area": area_val, "rooms": rooms_val,
         "publisher": pub_name + phone_note, "pub_ads": 1, "active_ads_count": 1, "age": entry_age_label, "fresh_tier": 3,
         "description": pure_raw_text[:600], "first_seen_ts": entry_ts, "timestamp": entry_ts, "desc_verified_v2": True,
-        "verified_24h_v93": True, "verified_fb_v118": True, "url": final_link, "link": final_link, "verified_v12": True,
+        "verified_24h_v93": True, "verified_fb_v123": True, "url": post_url, "link": post_url, "verified_v12": True,
         "scraped_at": now_dt.strftime("%Y-%m-%d %I:%M %p"), "date": now_dt.strftime("%Y-%m-%d %H:%M")
     }
     with SYNC_LOCK:
         extra_live = load_extra_live_backup()
         extra_live.insert(0, fb_ad)
         save_extra_live_backup(extra_live)
-        print(f"\n  >>> [FB LIVE] [+ ACCEPTED FB OWNER] ({entry_age_label}) | {pub_name}{phone_note} | {zone} | {price_str} <<<")
+        print(f"\n  >>> [FB LIVE] [+ ACCEPTED FB OWNER] ({entry_age_label}) | {pub_name}{phone_note} | {zone} | {post_url[:65]} <<<")
         guard_extra_ads_during_sleep(force_push=True)
     return True, "OK", False
 
@@ -661,7 +715,7 @@ def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Direct Search Receiver v12.2] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Direct Permalink Receiver v12.3] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -691,7 +745,9 @@ def load_extra_live_backup():
     dedup, seen_u = [], set()
     for a in combined:
         u = str(a.get("ad_id") or a.get("url") or a.get("link"))
-        if u and u not in seen_u: seen_u.add(u); dedup.append(a)
+        txt_k = normalize_ar((a.get("description") or a.get("title") or "")[:70]) if a.get("source") == "فيسبوك" else u
+        if u and u not in seen_u and txt_k not in seen_u:
+            seen_u.add(u); seen_u.add(txt_k); dedup.append(a)
     return dedup
 
 def save_extra_live_backup(extra_ads_list):
@@ -709,13 +765,11 @@ def atomic_write_and_git_push(data_payload, commit_msg):
             clear_git_locks()
             subprocess.run(["git", "fetch", "origin", "main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
             subprocess.run(["git", "reset", "--mixed", "origin/main"], cwd=BASE_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
-            patched_ui = patch_ui_files_on_disk()
             if os.path.exists(DATA_FILE):
                 try: os.chmod(DATA_FILE, stat.S_IWRITE)
                 except Exception: pass
             with open(DATA_FILE, "w", encoding="utf-8") as f: json.dump(data_payload, f, ensure_ascii=False, indent=2)
-            add_cmd = ["git", "add", "-f", "ads.json"] + patched_ui
-            subprocess.run(add_cmd, cwd=BASE_DIR, capture_output=True, timeout=15)
+            subprocess.run(["git", "add", "-f", "ads.json"], cwd=BASE_DIR, capture_output=True, timeout=15)
             subprocess.run(["git", "commit", "-m", commit_msg], cwd=BASE_DIR, capture_output=True, timeout=15)
             p_res = subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
             if p_res.returncode == 0: return True, "OK"
@@ -952,10 +1006,7 @@ def is_valid_existing_extra_ad(ad):
     if src == "دوبيزل": return True
     u = str(ad.get("url") or ad.get("link") or "")
     if src == "عقارماب" and (not ad.get("verified_aq_v100") or "/ar/listing/" not in u): return False
-    if src == "فيسبوك":
-        if not ad.get("verified_fb_v118"): return False
-        fixed_u = build_fb_pinpoint_url(u, ad.get("description") or ad.get("title") or "")
-        ad["url"], ad["link"] = fixed_u, fixed_u
+    if src == "فيسبوك" and not is_direct_fb_post_permalink(u): return False
     if src not in ("عقارماب", "فيسبوك"): return False
     now_ts = int(datetime.now(CAIRO_TZ).timestamp())
     ad_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or 0)
@@ -984,8 +1035,9 @@ def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked,
         for ad in all_pool:
             if not is_valid_existing_extra_ad(ad): continue
             u = str(ad.get("ad_id") or ad.get("url") or ad.get("link"))
-            if not u or u in seen_u: continue
-            seen_u.add(u); merged_ads.append(ad)
+            txt_k = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
+            if not u or u in seen_u or txt_k in seen_u: continue
+            seen_u.add(u); seen_u.add(txt_k); merged_ads.append(ad)
         merged_ads.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
         merged_ads = merged_ads[:450]
         extra_live = [a for a in merged_ads if a.get("source") in ("عقارماب", "فيسبوك")]
@@ -1020,8 +1072,9 @@ def guard_extra_ads_during_sleep(force_push=False):
             merged, seen_u = [], set()
             for ad in clean_pool:
                 u = str(ad.get("ad_id") or ad.get("url") or ad.get("link"))
-                if not u or u in seen_u: continue
-                seen_u.add(u); merged.append(ad)
+                txt_k = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
+                if not u or u in seen_u or txt_k in seen_u: continue
+                seen_u.add(u); seen_u.add(txt_k); merged.append(ad)
             merged.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
             d["ads"] = merged[:450]
             d["total"] = len(d["ads"])
@@ -1101,7 +1154,7 @@ def run_extra_radar():
 
     save_persistent_seen_ids(extra_checked)
     all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
-    print(f"\n[AqarMap + Facebook Radar v12.2] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    print(f"\n[AqarMap + Facebook Radar v12.3] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added, total_c = 0, len(all_candidates)
     for idx, item in enumerate(all_candidates, 1):
@@ -1148,13 +1201,12 @@ def run_extra_radar():
 
 def main():
     generate_facebook_main_extension()
-    patch_ui_files_on_disk()
     if os.environ.get("GITHUB_ACTIONS"):
         run_extra_radar()
         return
     start_fb_local_server()
     guard_extra_ads_during_sleep(force_push=True)
-    print("=== Starting 24/7 AqarMap + Facebook Direct Search Owner Radar v12.2 ===")
+    print("=== Starting 24/7 AqarMap + Facebook Direct Permalink Owner Radar v12.3 ===")
     print(f"[FB Extension Folder Ready] -> {FB_EXT_DIR}")
     cycle = 1
     while True:
