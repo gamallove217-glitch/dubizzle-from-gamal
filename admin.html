@@ -2,110 +2,196 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة القيادة والإدارة | رادار مصيدة الملاك VIP</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-    body { background-color: #050811; background-image: radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.1) 0px, transparent 45%), radial-gradient(at 90% 20%, rgba(16, 185, 129, 0.07) 0px, transparent 45%); color: #f8fafc; min-height: 100vh; padding-bottom: 80px; }
-    .fx-btn { position: relative; overflow: hidden; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; cursor: pointer; transition: transform 0.09s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease; }
-    .fx-btn:active { transform: scale(0.93) translateY(1px) !important; }
-    .fx-btn::after { content: ""; position: absolute; top: 0; left: -130%; width: 65%; height: 100%; background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent); transform: skewX(-22deg); pointer-events: none; transition: left 0.45s ease; }
-    .fx-btn:hover::after { left: 140%; }
-    .btn-ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255, 255, 255, 0.45); pointer-events: none; animation: rippleAnim 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-    @keyframes rippleAnim { to { transform: scale(3.2); opacity: 0; } }
-    @keyframes cardFadeOut { to { opacity: 0; transform: scale(0.86) translateY(8px); } }
-    @keyframes cardBanShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 99% { opacity: 0; transform: scale(0.85); } }
-    .card-deleting { pointer-events: none; border-color: #f59e0b !important; animation: cardFadeOut 0.26s ease forwards; }
-    .card-banning { pointer-events: none; border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.16) !important; animation: cardBanShake 0.32s ease forwards; }
-    #toastBox { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(90px); z-index: 9999; padding: 12px 22px; border-radius: 14px; font-size: 13.5px; font-weight: 800; color: #fff; background: rgba(15, 23, 42, 0.96); border: 1px solid #38bdf8; box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75); opacity: 0; pointer-events: none; transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease; text-align: center; min-width: 270px; }
-    #toastBox.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    #toastBox.ok { border-color: #10b981; color: #6ee7b7; }
-    #toastBox.warn { border-color: #f59e0b; color: #fde68a; }
-    #toastBox.err { border-color: #ef4444; color: #fca5a5; }
-    #authGate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-    .gate-box { background: linear-gradient(180deg, #131c31 0%, #090d16 100%); border: 1px solid rgba(245, 158, 11, 0.4); padding: 38px 28px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.1); }
-    .gate-box h2 { color: #fbbf24; margin-bottom: 8px; font-weight: 900; font-size: 25px; }
+    body {
+      background-color: #060911;
+      background-image:
+        radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
+        radial-gradient(at 90% 20%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
+      color: #f8fafc;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    .fx-btn {
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease;
+    }
+    .fx-btn:active { transform: scale(0.94) translateY(1px) !important; }
+    .btn-ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(255, 255, 255, 0.42);
+      pointer-events: none;
+      animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes rippleAnim { to { transform: scale(3.4); opacity: 0; } }
+
+    #authGate {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .gate-box {
+      background: linear-gradient(180deg, #131b2e 0%, #0b0f19 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 38px 30px; border-radius: 22px; width: 100%; max-width: 420px; text-align: center;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75);
+    }
+    .gate-box h2 { color: #fbbf24; margin-bottom: 8px; font-weight: 900; font-size: 24px; }
     .gate-box p { color: #94a3b8; font-size: 13px; margin-bottom: 22px; }
+
     #adminPanel { display: none; }
-    header { background: rgba(9, 13, 22, 0.92); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(245, 158, 11, 0.28); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #fde047 0%, #f59e0b 55%, #b45309 100%); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 15px; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.6), 0 6px 16px rgba(245, 158, 11, 0.35); }
-    header h1 { font-size: 18px; font-weight: 900; color: #fbbf24; }
-    .container { max-width: 1400px; margin: 22px auto; padding: 0 14px; display: grid; gap: 20px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-    .stat-card { background: linear-gradient(145deg, #111827 0%, #090d16 100%); border: 1px solid #1e293b; border-radius: 18px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    header {
+      background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 18px 28px; position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 15px;
+    }
+    header h1 { font-size: 20px; font-weight: 900; color: #fbbf24; }
+    .container { max-width: 1400px; margin: 28px auto; padding: 0 18px; display: grid; gap: 24px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;
+    }
+    .stat-card {
+      background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
+      border: 1px solid #1e293b; border-radius: 16px;
+      padding: 18px 22px; display: flex; flex-direction: column; gap: 4px;
+    }
     .stat-card .lbl { font-size: 12px; color: #94a3b8; font-weight: 700; }
     .stat-card .val { font-size: 26px; font-weight: 900; color: #fbbf24; }
     .stat-card .sub { font-size: 11.5px; color: #34d399; font-weight: 700; }
-    .box { background: rgba(15, 22, 36, 0.94); border: 1px solid #1e293b; border-radius: 20px; padding: 20px; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5); }
-    .box h3 { font-size: 17px; font-weight: 900; margin-bottom: 16px; color: #fbbf24; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 12px; align-items: end; }
-    .input { width: 100%; padding: 13px 14px; border-radius: 13px; border: 1.5px solid #1e293b; background: #050811; color: #fff; font-size: 14.5px; font-weight: 700; outline: none; transition: 0.2s; }
-    .input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16); }
-    .btn { padding: 13px 20px; border-radius: 13px; border: none; font-size: 14px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
-    .btn-gold { background: linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #b45309 100%); color: #050811; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.65), 0 8px 20px -3px rgba(245, 158, 11, 0.45); }
-    .btn-emerald { background: linear-gradient(135deg, #6ee7b7 0%, #10b981 50%, #047857 100%); color: #050811; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.6), 0 8px 20px -3px rgba(16, 185, 129, 0.4); }
-    .btn-dark { background: linear-gradient(145deg, #1e293b, #0f172a); color: #f8fafc; border: 1px solid rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
-    .btn-danger { background: linear-gradient(135deg, rgba(239, 68, 68, 0.24), rgba(185, 28, 28, 0.16)); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); }
-    .btn-success { background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(5, 150, 105, 0.16)); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5); }
-    .btn-sm { padding: 8px 14px; font-size: 12.5px; border-radius: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-    th, td { padding: 12px 9px; border-bottom: 1px solid #1e293b; text-align: right; }
+
+    .box {
+      background: rgba(17, 24, 39, 0.92); border: 1px solid #1e293b;
+      border-radius: 20px; padding: 24px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+    }
+    .box h3 {
+      font-size: 18px; font-weight: 900; margin-bottom: 18px; color: #fbbf24;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+
+    .form-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end;
+    }
+    .input {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid #1e293b; background: #060911; color: #fff;
+      font-size: 14px; font-weight: 700; outline: none; transition: 0.2s;
+    }
+    .input:focus { border-color: #f59e0b; }
+    .btn {
+      padding: 12px 20px; border-radius: 12px; border: none;
+      font-size: 14px; font-weight: 900; cursor: pointer; transition: 0.2s;
+    }
+    .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
+    .btn-emerald { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #060911; }
+    .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-success { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .btn-sm { padding: 7px 13px; font-size: 12px; border-radius: 9px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+    th, td { padding: 13px 10px; border-bottom: 1px solid #1e293b; text-align: right; }
     th { color: #94a3b8; font-weight: 800; background: rgba(255, 255, 255, 0.02); }
-    .code-pill { font-family: monospace; font-size: 14.5px; font-weight: 900; color: #fbbf24; background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.35); padding: 4px 10px; border-radius: 8px; letter-spacing: 1px; }
+    .code-pill {
+      font-family: monospace; font-size: 15px; font-weight: 900;
+      color: #fbbf24; background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 4px 12px; border-radius: 8px; letter-spacing: 1px;
+    }
     .status-active { color: #34d399; font-weight: 800; }
     .status-unused { color: #60a5fa; font-weight: 800; }
     .status-banned { color: #f87171; font-weight: 800; }
     .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-    .filters-bar { background: #090d18; border: 1px solid #1e293b; border-radius: 16px; padding: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; }
+
+    .filters-bar {
+      background: #0b101e; border: 1px solid #1e293b;
+      border-radius: 16px; padding: 16px; margin-bottom: 22px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;
+    }
     .filter-group { display: flex; flex-direction: column; gap: 5px; }
     .filter-group label { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
-    .filter-control { background: #050811; border: 1px solid #1e293b; color: #f8fafc; padding: 10px 12px; border-radius: 11px; font-size: 13px; font-weight: 700; outline: none; }
+    .filter-control {
+      background: #060911; border: 1px solid #1e293b; color: #f8fafc;
+      padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none;
+    }
     .filter-control:focus { border-color: #f59e0b; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-    .card { background: linear-gradient(165deg, #141e33 0%, #0a0f1c 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.22s; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 30px rgba(0, 0, 0, 0.5); }
-    .card:hover { border-color: rgba(245, 158, 11, 0.55); }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;
+    }
+    .card {
+      background: linear-gradient(165deg, #131c31 0%, #0b101e 100%);
+      border: 1px solid #1e293b; border-radius: 18px;
+      padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: 0.25s; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+    }
+    .card:hover { border-color: rgba(245, 158, 11, 0.55); transform: translateY(-3px); }
     .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; flex-wrap: wrap; }
     .badges-wrap { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); color: #e2e8f0; }
-    .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
-    .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
-    .tag.src-dub { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
-    .tag.src-aq { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
-    .tag.src-fb { background: rgba(24, 119, 242, 0.22); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
-    .time-badge { font-size: 11px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.12); padding: 4px 10px; border-radius: 8px; }
-    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; line-height: 1.55; color: #fff; }
-    .price-box { background: rgba(5, 8, 17, 0.75); border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .tag {
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 7px;
+      background: rgba(255, 255, 255, 0.06); color: #e2e8f0;
+    }
+    .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
+    .tag.src-aq { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; }
+    .tag.src-fb { background: rgba(24, 119, 242, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .time-badge { font-size: 11px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 9px; border-radius: 7px; }
+    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; line-height: 1.5; color: #fff; }
+    .price-box {
+      background: rgba(6, 9, 17, 0.65); border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 11px; padding: 9px 13px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
     .price-lbl { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
     .card-price { font-size: 19px; font-weight: 900; color: #fbbf24; }
-    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 11px; font-size: 12px; color: #94a3b8; }
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 16px; background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 11px; padding: 11px;
+      font-size: 12px; color: #94a3b8;
+    }
     .meta-item { display: flex; flex-direction: column; gap: 2px; }
     .meta-item span { font-size: 10.5px; color: #64748b; font-weight: 700; }
     .meta-item b { color: #f1f5f9; font-size: 12.5px; font-weight: 800; }
-    .card-actions-wrap { display: flex; flex-direction: column; gap: 9px; margin-top: auto; }
-    .card-actions-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .btn-card { width: 100%; text-align: center; padding: 12px 10px; border-radius: 13px; font-size: 13.5px; font-weight: 900; text-decoration: none; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
-    .btn-card.primary { background: linear-gradient(135deg, #fde047 0%, #f59e0b 52%, #b45309 100%); color: #050811; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.65), 0 8px 20px -4px rgba(245, 158, 11, 0.45); }
-    .btn-card.del-ad { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(180, 83, 9, 0.14)); color: #fde68a; border: 1.5px solid rgba(245, 158, 11, 0.55); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 15px -4px rgba(245, 158, 11, 0.25); }
-    .btn-card.del-ad.armed { background: linear-gradient(135deg, #f59e0b, #d97706); color: #050811; border-color: #fde047; box-shadow: 0 0 18px rgba(245, 158, 11, 0.7); }
-    .btn-card.ban-pub { background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(153, 27, 27, 0.16)); color: #fecaca; border: 1.5px solid rgba(239, 68, 68, 0.55); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 15px -4px rgba(239, 68, 68, 0.28); }
-    .btn-card.ban-pub.armed { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; border-color: #fca5a5; box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
-    .btn-card.ban-pub.is-generic { opacity: 0.45; border-style: dashed; }
-    .btn-ico { width: 16px; height: 16px; flex-shrink: 0; }
+    .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+    .card-actions-row { display: flex; gap: 8px; }
+    .btn-card {
+      flex: 1; text-align: center; padding: 11px 8px; border-radius: 10px;
+      font-size: 13px; font-weight: 900; text-decoration: none; cursor: pointer; border: none;
+    }
+    .btn-card.primary { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
+    .btn-card.del-only { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
+    .btn-card.ban { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
   </style>
 </head>
 <body>
-
-  <div id="toastBox"></div>
 
   <div id="authGate">
     <div class="gate-box">
       <h2>بوابة القيادة السرية</h2>
       <p>أدخل كلمة مرور المدير للتحكم الكامل في الاشتراكات والرادار</p>
-      <input type="password" inputmode="numeric" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:16px;text-align:center;font-size:20px;letter-spacing:3px;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
-      <button type="button" class="btn btn-gold fx-btn" id="authBtn" style="width:100%;padding:15px;font-size:16px;" onclick="verifyAdmin()">دخول للوحة القيادة</button>
-      <div id="authErr" style="color:#f87171;font-size:13.5px;font-weight:800;margin-top:14px;display:none;"></div>
+      <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;font-size:18px;letter-spacing:2px;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
+      <button class="btn btn-gold fx-btn" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة القيادة</button>
+      <div id="authErr" style="color:#f87171;font-size:13px;font-weight:700;margin-top:12px;display:none;"></div>
     </div>
   </div>
 
@@ -115,9 +201,9 @@
         <div class="brand-logo">VIP</div>
         <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button type="button" class="btn btn-gold btn-sm fx-btn" onclick="refreshAll()">تحديث البيانات الآن</button>
-        <a href="/" target="_blank" class="btn btn-dark btn-sm fx-btn">فتح واجهة السماسرة</a>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-gold btn-sm fx-btn" onclick="refreshAll()">تحديث البيانات الآن</button>
+        <a href="/" target="_blank" class="btn btn-sm fx-btn" style="background:#1e293b;color:#fff;text-decoration:none;">فتح واجهة السماسرة</a>
       </div>
     </header>
 
@@ -155,11 +241,11 @@
             <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">مدة الاشتراك (بالأيام)</label>
             <input type="number" id="newDuration" class="input" value="30" />
           </div>
-          <button type="button" class="btn btn-gold fx-btn" onclick="createNewCode()">توليد كود VIP الآن</button>
+          <button class="btn btn-gold fx-btn" onclick="createNewCode()">توليد كود VIP الآن</button>
         </div>
         <div id="generatedCodeBox" style="margin-top:16px;display:none;padding:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;border-radius:12px;">
           تم توليد الكود بنجاح: <span class="code-pill" id="newCodeText"></span>
-          <button type="button" class="btn btn-sm btn-gold fx-btn" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
+          <button class="btn btn-sm btn-gold fx-btn" style="margin-right:12px;" onclick="copyNewCode()">نسخ الكود</button>
         </div>
       </div>
 
@@ -193,13 +279,13 @@
             <label style="font-size:12px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:700;">Admin Chat ID</label>
             <input type="text" id="tgChatId" class="input" placeholder="مثال: 987654321" />
           </div>
-          <button type="button" class="btn btn-emerald fx-btn" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
+          <button class="btn btn-emerald fx-btn" onclick="saveTelegramConfig()">حفظ واختبار الإرسال</button>
         </div>
       </div>
 
       <div class="box">
         <h3>
-          <span>جميع إعلانات الرادار الحية (حذف الإعلان منفصل عن حظر الناشر)</span>
+          <span>جميع إعلانات الرادار الحية (نفس عرض السماسرة + تحكم الحذف والحظر الفوري)</span>
           <span style="font-size:14px;color:#34d399;">المعروض حاليا: <b id="adminShownCount">0</b> إعلان</span>
         </h3>
 
@@ -235,10 +321,10 @@
           <div class="filter-group">
             <label>المنصة</label>
             <select id="admSource" class="filter-control" onchange="renderAdminCards()">
-              <option value="ALL">كل المنصات (دوبيزل + عقارماب + فيسبوك)</option>
-              <option value="دوبيزل">دوبيزل فقط</option>
-              <option value="عقارماب">عقارماب فقط</option>
-              <option value="فيسبوك">فيسبوك فقط</option>
+              <option value="ALL">كل المنصات</option>
+              <option value="دوبيزل">دوبيزل</option>
+              <option value="عقارماب">عقارماب</option>
+              <option value="فيسبوك">فيسبوك</option>
             </select>
           </div>
           <div class="filter-group">
@@ -257,18 +343,9 @@
   </div>
 
   <script>
-    let savedAdminPass = localStorage.getItem("vip_admin_pass_v2") || "";
+    let savedAdminPass = "";
     let adminAllAds = [];
-    let localDeletedIds = new Set(JSON.parse(localStorage.getItem("vip_local_del_ids") || "[]"));
-    let localBannedPubs = new Set(JSON.parse(localStorage.getItem("vip_local_ban_pubs") || "[]"));
-    let toastTimer = null;
     const MASTER_HASH = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
-    const GENERIC_PUBS = new Set(["مالك", "مالك مباشر", "مشارك مجهول الهوية", "عضو مجهول الهوية", "غير معروف", "معلن", "owner", "anonymous"]);
-    const HINDI_DIGITS = {"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9","۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9"};
-
-    function normalizeDigits(str) {
-      return String(str || "").replace(/[٠-٩۰-۹]/g, ch => HINDI_DIGITS[ch] || ch).trim();
-    }
 
     document.addEventListener("pointerdown", function (e) {
       const btn = e.target.closest(".fx-btn");
@@ -278,37 +355,21 @@
       const ripple = document.createElement("span");
       ripple.className = "btn-ripple";
       ripple.style.width = ripple.style.height = size + "px";
-      ripple.style.left = ((e.clientX || rect.left + rect.width / 2) - rect.left - size / 2) + "px";
-      ripple.style.top = ((e.clientY || rect.top + rect.height / 2) - rect.top - size / 2) + "px";
+      ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
+      ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
       btn.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 450);
+      setTimeout(() => ripple.remove(), 550);
     });
 
-    function showToast(msg, type = "ok") {
-      const box = document.getElementById("toastBox");
-      box.textContent = msg;
-      box.className = "show " + type;
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { box.className = ""; }, 3000);
-    }
-
-    function cleanPublisherBase(rawPub) {
-      return String(rawPub || "").split("|")[0].replace(/\(\d+\s*إعلان\)/g, "").trim();
-    }
-
     async function sha256Hex(str) {
-      try {
-        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-      } catch (e) {
-        return "";
-      }
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
     async function verifyAdmin() {
-      const rawInput = document.getElementById("adminPassInput").value;
-      const pass = normalizeDigits(rawInput);
+      const pass = document.getElementById("adminPassInput").value.trim();
       const err = document.getElementById("authErr");
+      const btn = document.getElementById("authBtn");
       err.style.display = "none";
 
       if (!pass) {
@@ -318,35 +379,41 @@
       }
 
       const hash = await sha256Hex(pass);
-      if (pass !== "292004" && hash !== MASTER_HASH) {
+      if (hash !== MASTER_HASH && pass !== "292004") {
         err.textContent = "كلمة المرور غير صحيحة!";
         err.style.display = "block";
         return;
       }
 
-      savedAdminPass = "292004";
-      localStorage.setItem("vip_admin_pass_v2", savedAdminPass);
-      document.getElementById("authGate").style.display = "none";
-      document.getElementById("adminPanel").style.display = "block";
-      showToast("مرحبا بك في لوحة القيادة VIP", "ok");
+      btn.disabled = true;
+      btn.textContent = "جاري الدخول...";
+      savedAdminPass = pass;
+
+      const ok = await loadCodes();
+      btn.disabled = false;
+      btn.textContent = "دخول للوحة القيادة";
+
+      if (ok) {
+        document.getElementById("authGate").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else {
+        err.textContent = "فشل الاتصال بالخادم";
+        err.style.display = "block";
+      }
+    }
+
+    function refreshAll() {
       loadCodes();
     }
 
-    async function refreshAll() {
-      showToast("جاري تحديث البيانات...", "ok");
-      await loadCodes();
-      showToast("تم تحديث البيانات بنجاح", "ok");
-    }
-
     async function apiAdmin(bodyObj) {
-      const safePass = normalizeDigits(savedAdminPass || "292004");
       return await fetch("/api/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-password": encodeURIComponent(safePass)
+          "x-admin-password": savedAdminPass
         },
-        body: JSON.stringify({ ...bodyObj, adminPass: safePass })
+        body: JSON.stringify(bodyObj)
       });
     }
 
@@ -366,301 +433,8 @@
       return "src-dub";
     }
 
-    function updateAdminPlatformCounters() {
+    function updateCountersUI() {
       document.getElementById("stTotalAds").textContent = adminAllAds.length;
       const dubCnt = adminAllAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
       const aqCnt = adminAllAds.filter(a => a.source === "عقارماب").length;
-      const fbCnt = adminAllAds.filter(a => a.source === "فيسبوك").length;
-      document.getElementById("stPlatforms").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | فيسبوك: ${fbCnt}`;
-    }
-
-    function filterBannedFromList(rawList, serverBannedIds, serverBannedPubs) {
-      return (rawList || []).filter(a => {
-        const idStr = String(a.ad_id);
-        if (localDeletedIds.has(idStr) || serverBannedIds.has(idStr)) return false;
-        const basePub = cleanPublisherBase(a.publisher).toLowerCase();
-        if (basePub && !GENERIC_PUBS.has(basePub)) {
-          if (localBannedPubs.has(basePub) || serverBannedPubs.has(basePub)) return false;
-        }
-        return true;
-      });
-    }
-
-    async function loadCodes() {
-      let loadedFromApi = false;
-      try {
-        const res = await apiAdmin({ action: "list" });
-        if (res.ok) {
-          const data = await res.json();
-          const subs = data.subscriptions || [];
-          document.getElementById("stTotalSubs").textContent = subs.length;
-          document.getElementById("stActiveSubs").textContent = "نشط: " + subs.filter(s => s.status === "active").length;
-
-          const srvBannedIds = new Set((data.bannedAds || []).map(b => String(b.adId)));
-          const srvBannedPubs = new Set((data.bannedPublishers || []).map(p => cleanPublisherBase(p).toLowerCase()));
-          adminAllAds = filterBannedFromList(data.adsList || [], srvBannedIds, srvBannedPubs);
-          document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
-          loadedFromApi = (adminAllAds.length > 0);
-
-          const tbody = document.getElementById("subsTableBody");
-          tbody.innerHTML = subs.map(s => {
-            let stBadge = `<span class="status-unused">غير مفعل</span>`;
-            if (s.status === "active") stBadge = `<span class="status-active">مفعل (نشط)</span>`;
-            if (s.status === "banned") stBadge = `<span class="status-banned">محظور</span>`;
-            if (s.status === "expired") stBadge = `<span style="color:#94a3b8">منتهي</span>`;
-            const expDate = s.expiresAt ? new Date(s.expiresAt).toLocaleDateString("ar-EG") : "يبدأ عند التفعيل";
-            const lockedDev = (Array.isArray(s.boundDevices) && s.boundDevices[0]) ? s.boundDevices[0] : (s.boundHw || "");
-            const hasLock = Boolean(lockedDev || s.status === "banned");
-            return `
-              <tr>
-                <td><span class="code-pill">${s.code}</span></td>
-                <td><b>${s.clientName || "-"}</b><br><span style="color:#94a3b8;font-size:11px">${s.clientPhone || ""}</span></td>
-                <td>${stBadge}</td>
-                <td>${expDate}</td>
-                <td style="font-size:11.5px;color:#94a3b8">${lockedDev ? `مقفول على: ${lockedDev.slice(0, 16)}` : "متاح لأول جهاز"}<br>IP: ${s.boundIp || "-"}</td>
-                <td>
-                  <div class="action-btns">
-                    ${hasLock ? `<button type="button" class="btn btn-sm btn-success fx-btn" onclick="unbanCode('${s.code}')">تصفير الجهاز</button>` : ""}
-                    <button type="button" class="btn btn-sm btn-danger fx-btn" onclick="deleteCode('${s.code}')">حذف الكود</button>
-                  </div>
-                </td>
-              </tr>
-            `;
-          }).join("");
-        }
-      } catch (e) {}
-
-      if (!loadedFromApi) {
-        try {
-          const rAds = await fetch("/ads.json?t=" + Date.now());
-          if (rAds.ok) {
-            const dAds = await rAds.json();
-            adminAllAds = filterBannedFromList(dAds.ads || [], new Set(), new Set());
-            document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (dAds.updated_at || "-");
-          }
-        } catch (e) {}
-      }
-
-      updateAdminPlatformCounters();
-      populateAdminZones();
-      renderAdminCards();
-      return true;
-    }
-
-    function populateAdminZones() {
-      const sel = document.getElementById("admZone");
-      const current = sel.value;
-      const zones = [...new Set(adminAllAds.map(a => a.zone).filter(Boolean))].sort();
-      sel.innerHTML = `<option value="ALL">كل المناطق (${adminAllAds.length})</option>` +
-        zones.map(z => `<option value="${z}">${z}</option>`).join("");
-      if (zones.includes(current)) sel.value = current;
-    }
-
-    function renderAdminCards() {
-      const q = document.getElementById("admSearch").value.trim().toLowerCase();
-      const deal = document.getElementById("admDeal").value;
-      const cat = document.getElementById("admCat").value;
-      const zone = document.getElementById("admZone").value;
-      const src = document.getElementById("admSource").value;
-      const sort = document.getElementById("admSort").value;
-
-      let list = adminAllAds.filter(a => {
-        if (deal !== "ALL" && a.deal !== deal) return false;
-        if (cat !== "ALL" && a.cat !== cat) return false;
-        if (zone !== "ALL" && a.zone !== zone) return false;
-        if (src !== "ALL" && (a.source || "دوبيزل") !== src) return false;
-        if (q) {
-          const hay = `${a.title || ""} ${a.zone || ""} ${a.publisher || ""}`.toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        return true;
-      });
-
-      if (sort === "NEWEST") {
-        list.sort((a, b) => ((b.first_seen_ts || 0) - (a.first_seen_ts || 0)) || ((b.ad_id || 0) - (a.ad_id || 0)));
-      } else if (sort === "PRICE_ASC") {
-        list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
-      } else if (sort === "PRICE_DESC") {
-        list.sort((a, b) => (b.price_num || 0) - (a.price_num || 0));
-      }
-
-      document.getElementById("adminShownCount").textContent = list.length;
-      const grid = document.getElementById("adminAdsGrid");
-
-      const trashSvg = `<svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>`;
-      const banSvg = `<svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
-      const extSvg = `<svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
-
-      grid.innerHTML = list.map(a => {
-        const key = String(a.ad_id);
-        const srcName = a.source || "دوبيزل";
-        const basePub = cleanPublisherBase(a.publisher).toLowerCase();
-        const isGeneric = !basePub || GENERIC_PUBS.has(basePub);
-        return `
-          <div class="card" id="adm-card-${key}">
-            <div>
-              <div class="card-top">
-                <div class="badges-wrap">
-                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
-                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
-                </div>
-                <span class="time-badge">${formatAddedTime(a)}</span>
-              </div>
-              <div class="card-title">${a.title}</div>
-              <div class="price-box">
-                <span class="price-lbl">السعر المطلوب</span>
-                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
-              </div>
-              <div class="meta-grid">
-                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
-                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
-                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
-                <div class="meta-item"><span>الناشر</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
-              </div>
-            </div>
-            <div class="card-actions-wrap">
-              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary fx-btn">${extSvg}<span>فتح الإعلان الأصلي</span></a>
-              <div class="card-actions-sub">
-                <button type="button" class="btn-card del-ad fx-btn" id="btn-del-${key}" onclick="deleteAdOnly('${key}', this)">${trashSvg}<span>حذف الإعلان</span></button>
-                <button type="button" class="btn-card ban-pub fx-btn ${isGeneric ? 'is-generic' : ''}" id="btn-ban-${key}" onclick="banPublisherOnly('${key}', this)">${banSvg}<span>حظر الناشر</span></button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function deleteAdOnly(adIdStr, btnEl) {
-      const targetAd = adminAllAds.find(a => String(a.ad_id) === String(adIdStr));
-      if (!targetAd) return;
-
-      if (btnEl && !btnEl.classList.contains("armed")) {
-        btnEl.classList.add("armed");
-        const origHtml = btnEl.innerHTML;
-        btnEl.innerHTML = "<span>تأكيد الحذف؟</span>";
-        btnEl._resetTimer = setTimeout(() => {
-          btnEl.classList.remove("armed");
-          btnEl.innerHTML = origHtml;
-        }, 3200);
-        return;
-      }
-      if (btnEl && btnEl._resetTimer) clearTimeout(btnEl._resetTimer);
-
-      const cardEl = document.getElementById("adm-card-" + adIdStr);
-      if (cardEl) cardEl.classList.add("card-deleting");
-
-      localDeletedIds.add(String(adIdStr));
-      localStorage.setItem("vip_local_del_ids", JSON.stringify([...localDeletedIds].slice(-1000)));
-
-      setTimeout(() => {
-        adminAllAds = adminAllAds.filter(a => String(a.ad_id) !== String(adIdStr));
-        updateAdminPlatformCounters();
-        populateAdminZones();
-        renderAdminCards();
-        showToast("تم حذف الإعلان فقط (الناشر غير محظور)", "warn");
-      }, 240);
-
-      apiAdmin({ action: "delete_ad", adId: adIdStr }).catch(() => {});
-    }
-
-    async function banPublisherOnly(adIdStr, btnEl) {
-      const targetAd = adminAllAds.find(a => String(a.ad_id) === String(adIdStr));
-      if (!targetAd) return;
-      const cleanPub = cleanPublisherBase(targetAd.publisher);
-
-      if (!cleanPub || GENERIC_PUBS.has(cleanPub.toLowerCase())) {
-        showToast("هذا ناشر عام (مالك مباشر / مجهول الهوية)؛ استخدم زر حذف الإعلان فقط", "warn");
-        return;
-      }
-
-      if (btnEl && !btnEl.classList.contains("armed")) {
-        btnEl.classList.add("armed");
-        const origHtml = btnEl.innerHTML;
-        btnEl.innerHTML = "<span>تأكيد حظر الناشر؟</span>";
-        btnEl._resetTimer = setTimeout(() => {
-          btnEl.classList.remove("armed");
-          btnEl.innerHTML = origHtml;
-        }, 3200);
-        return;
-      }
-      if (btnEl && btnEl._resetTimer) clearTimeout(btnEl._resetTimer);
-
-      const samePubAds = adminAllAds.filter(a => cleanPublisherBase(a.publisher).toLowerCase() === cleanPub.toLowerCase());
-      const sameIds = samePubAds.map(a => String(a.ad_id));
-      sameIds.forEach(id => {
-        const el = document.getElementById("adm-card-" + id);
-        if (el) el.classList.add("card-banning");
-        localDeletedIds.add(id);
-      });
-      localBannedPubs.add(cleanPub.toLowerCase());
-      localStorage.setItem("vip_local_del_ids", JSON.stringify([...localDeletedIds].slice(-1000)));
-      localStorage.setItem("vip_local_ban_pubs", JSON.stringify([...localBannedPubs].slice(-1000)));
-
-      setTimeout(() => {
-        const idSet = new Set(sameIds);
-        adminAllAds = adminAllAds.filter(a => !idSet.has(String(a.ad_id)));
-        updateAdminPlatformCounters();
-        populateAdminZones();
-        renderAdminCards();
-        showToast(`تم حظر الناشر (${cleanPub}) وحذف ${sameIds.length} إعلان نهائيا`, "err");
-      }, 280);
-
-      apiAdmin({ action: "ban_publisher", adId: adIdStr, adIds: sameIds, publisher: cleanPub }).catch(() => {});
-    }
-
-    async function createNewCode() {
-      const clientName = document.getElementById("newClientName").value.trim();
-      const clientPhone = document.getElementById("newClientPhone").value.trim();
-      const durationDays = document.getElementById("newDuration").value;
-
-      const res = await apiAdmin({ action: "create", clientName, clientPhone, durationDays });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById("newCodeText").textContent = data.code;
-        document.getElementById("generatedCodeBox").style.display = "block";
-        document.getElementById("newClientName").value = "";
-        document.getElementById("newClientPhone").value = "";
-        showToast("تم توليد الكود بنجاح: " + data.code, "ok");
-        loadCodes();
-      }
-    }
-
-    function copyNewCode() {
-      const code = document.getElementById("newCodeText").textContent;
-      navigator.clipboard.writeText(code);
-      showToast("تم نسخ الكود: " + code, "ok");
-    }
-
-    async function unbanCode(code) {
-      await apiAdmin({ action: "unban", code });
-      showToast("تم تصفير الجهاز وفك القفل للكود " + code, "ok");
-      loadCodes();
-    }
-
-    async function deleteCode(code) {
-      if (!confirm("تأكيد حذف الكود نهائيا؟")) return;
-      await apiAdmin({ action: "delete_code", code });
-      showToast("تم حذف الكود " + code, "warn");
-      loadCodes();
-    }
-
-    async function saveTelegramConfig() {
-      const botToken = document.getElementById("tgBotToken").value.trim();
-      const chatId = document.getElementById("tgChatId").value.trim();
-      if (!botToken || !chatId) {
-        showToast("يرجى إدخال التوكن والـ Chat ID", "warn");
-        return;
-      }
-      const res = await apiAdmin({ action: "save_telegram", botToken, chatId });
-      if (res.ok) showToast("تم حفظ إعدادات تليجرام وإرسال رسالة تأكيد لبوتك!", "ok");
-      else showToast("حدث خطأ أثناء الحفظ", "err");
-    }
-
-    if (savedAdminPass === "292004") {
-      document.getElementById("authGate").style.display = "none";
-      document.getElementById("adminPanel").style.display = "block";
-      loadCodes();
-    }
-  </script>
-</body>
-</html>
+      const fbCnt = adminAllAds.filter(a => a.source === "فيسبوك").le
