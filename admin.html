@@ -2,231 +2,208 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة القيادة والإدارة | رادار مصيدة الملاك VIP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>غرفة القيادة التنفيذية | GAMAL OSAMA VIP</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-    body {
-      background-color: #060911;
-      background-image:
-        radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
-        radial-gradient(at 90% 20%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
-      color: #f8fafc;
-      min-height: 100vh;
-      padding-bottom: 70px;
-    }
-
-    .fx-btn {
-      position: relative;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease;
-    }
+    body { background-color: #060911; background-image: radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.09) 0px, transparent 45%), radial-gradient(at 90% 20%, rgba(16, 185, 129, 0.06) 0px, transparent 45%); color: #f8fafc; min-height: 100vh; padding-bottom: 70px; }
+    .fx-btn { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease; }
     .fx-btn:active { transform: scale(0.94) translateY(1px) !important; }
-    .btn-ripple {
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      background: rgba(255, 255, 255, 0.42);
-      pointer-events: none;
-      animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
+    .btn-ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255, 255, 255, 0.42); pointer-events: none; animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes rippleAnim { to { transform: scale(3.4); opacity: 0; } }
 
-    #authGate {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
-    }
-    .gate-box {
-      background: linear-gradient(180deg, #131b2e 0%, #0b0f19 100%);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 38px 30px; border-radius: 22px; width: 100%; max-width: 420px; text-align: center;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75);
-    }
-    .gate-box h2 { color: #fbbf24; margin-bottom: 8px; font-weight: 900; font-size: 24px; }
-    .gate-box p { color: #94a3b8; font-size: 13px; margin-bottom: 22px; }
+    #authGate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 18px; }
+    .gate-box { background: linear-gradient(180deg, #131b2e 0%, #0b0f19 100%); border: 1.5px solid rgba(245, 158, 11, 0.45); padding: 36px 26px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); }
+    .gate-crest { width: 54px; height: 54px; border-radius: 15px; background: linear-gradient(135deg, #fbbf24, #b45309); color: #000; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35); }
+    .gate-box h2 { color: #fbbf24; margin-bottom: 6px; font-weight: 900; font-size: 23px; }
+    .gate-box p { color: #94a3b8; font-size: 12.5px; margin-bottom: 22px; }
 
     #adminPanel { display: none; }
-    header {
-      background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
-      padding: 18px 28px; position: sticky; top: 0; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: linear-gradient(135deg, #fbbf24, #b45309);
-      display: flex; align-items: center; justify-content: center;
-      color: #000; font-weight: 900; font-size: 15px;
-    }
-    header h1 { font-size: 20px; font-weight: 900; color: #fbbf24; }
-    .container { max-width: 1400px; margin: 28px auto; padding: 0 18px; display: grid; gap: 24px; }
+    .exec-topbar { background: linear-gradient(145deg, #0b111e 0%, #15120a 60%, #0b0f19 100%); border-bottom: 1px solid rgba(245, 158, 11, 0.35); padding: 12px 16px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65); }
+    .exec-topbar-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-logo { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, #fbbf24, #b45309); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 15px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35); }
+    .brand-titles h1 { font-size: 16px; font-weight: 900; color: #fff; line-height: 1.2; }
+    .brand-titles span { font-size: 11px; font-weight: 800; color: #fbbf24; }
+    .top-actions { display: flex; gap: 8px; align-items: center; }
 
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;
-    }
-    .stat-card {
-      background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
-      border: 1px solid #1e293b; border-radius: 16px;
-      padding: 18px 22px; display: flex; flex-direction: column; gap: 4px;
-    }
-    .stat-card .lbl { font-size: 12px; color: #94a3b8; font-weight: 700; }
-    .stat-card .val { font-size: 26px; font-weight: 900; color: #fbbf24; }
-    .stat-card .sub { font-size: 11.5px; color: #34d399; font-weight: 700; }
+    .container { max-width: 1400px; margin: 16px auto; padding: 0 14px; display: grid; gap: 18px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; }
+    .stat-card { background: linear-gradient(145deg, #111827 0%, #0b0f19 100%); border: 1px solid #1e293b; border-radius: 15px; padding: 13px 15px; display: flex; flex-direction: column; gap: 3px; }
+    .stat-card.gold-card { border-color: rgba(245, 158, 11, 0.45); background: linear-gradient(145deg, #1a160b 0%, #0b0f19 100%); }
+    .stat-card .lbl { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .stat-card .val { font-size: 22px; font-weight: 900; color: #fbbf24; }
+    .stat-card .sub { font-size: 10.5px; color: #34d399; font-weight: 700; }
 
-    .box {
-      background: rgba(17, 24, 39, 0.92); border: 1px solid #1e293b;
-      border-radius: 20px; padding: 24px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-    }
-    .box h3 {
-      font-size: 18px; font-weight: 900; margin-bottom: 18px; color: #fbbf24;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-    }
+    .exec-nav-dock { background: #0b101e; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 15px; padding: 6px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); }
+    .exec-tab { background: transparent; color: #94a3b8; border: none; padding: 10px 6px; border-radius: 10px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+    .exec-tab.active { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; font-weight: 900; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+    .pend-badge { background: #ef4444; color: #fff; font-size: 11px; font-weight: 900; padding: 1px 7px; border-radius: 99px; }
 
-    .form-row {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end;
-    }
-    .input {
-      width: 100%; padding: 12px 14px; border-radius: 12px;
-      border: 1px solid #1e293b; background: #060911; color: #fff;
-      font-size: 14px; font-weight: 700; outline: none; transition: 0.2s;
-    }
+    .box { background: rgba(17, 24, 39, 0.94); border: 1px solid #1e293b; border-radius: 18px; padding: 18px; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45); }
+    .box.gold-border { border-color: rgba(245, 158, 11, 0.45); }
+    .box h3 { font-size: 16.5px; font-weight: 900; margin-bottom: 14px; color: #fbbf24; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end; }
+    .input { width: 100%; padding: 11px 13px; border-radius: 11px; border: 1px solid #1e293b; background: #060911; color: #fff; font-size: 13.5px; font-weight: 700; outline: none; transition: 0.2s; }
     .input:focus { border-color: #f59e0b; }
-    .btn {
-      padding: 12px 20px; border-radius: 12px; border: none;
-      font-size: 14px; font-weight: 900; cursor: pointer; transition: 0.2s;
-    }
+    .btn { padding: 11px 16px; border-radius: 11px; border: none; font-size: 13px; font-weight: 900; cursor: pointer; transition: 0.2s; }
     .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
     .btn-emerald { background: linear-gradient(135deg, #34d399 0%, #059669 100%); color: #060911; }
     .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
     .btn-success { background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
-    .btn-sm { padding: 7px 13px; font-size: 12px; border-radius: 9px; }
+    .btn-sm { padding: 7px 12px; font-size: 11.5px; border-radius: 9px; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
-    th, td { padding: 13px 10px; border-bottom: 1px solid #1e293b; text-align: right; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+    th, td { padding: 11px 8px; border-bottom: 1px solid #1e293b; text-align: right; }
     th { color: #94a3b8; font-weight: 800; background: rgba(255, 255, 255, 0.02); }
-    .code-pill {
-      font-family: monospace; font-size: 15px; font-weight: 900;
-      color: #fbbf24; background: rgba(245, 158, 11, 0.14);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 4px 12px; border-radius: 8px; letter-spacing: 1px;
-    }
+    .code-pill { font-family: monospace; font-size: 14px; font-weight: 900; color: #fbbf24; background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.35); padding: 3px 10px; border-radius: 8px; letter-spacing: 1px; }
     .status-active { color: #34d399; font-weight: 800; }
     .status-unused { color: #60a5fa; font-weight: 800; }
     .status-banned { color: #f87171; font-weight: 800; }
-    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
-    .filters-bar {
-      background: #0b101e; border: 1px solid #1e293b;
-      border-radius: 16px; padding: 16px; margin-bottom: 22px;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;
-    }
-    .filter-group { display: flex; flex-direction: column; gap: 5px; }
-    .filter-group label { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
-    .filter-control {
-      background: #060911; border: 1px solid #1e293b; color: #f8fafc;
-      padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none;
-    }
+    .filters-bar { background: #0b101e; border: 1px solid #1e293b; border-radius: 14px; padding: 13px; margin-bottom: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .filter-control { background: #060911; border: 1px solid #1e293b; color: #f8fafc; padding: 9px 11px; border-radius: 9px; font-size: 12.5px; font-weight: 700; outline: none; width: 100%; }
     .filter-control:focus { border-color: #f59e0b; }
 
-    .grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;
-    }
-    .card {
-      background: linear-gradient(165deg, #131c31 0%, #0b101e 100%);
-      border: 1px solid #1e293b; border-radius: 18px;
-      padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
-      transition: 0.25s; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-    }
-    .card:hover { border-color: rgba(245, 158, 11, 0.55); transform: translateY(-3px); }
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+    .card { background: linear-gradient(165deg, #131c31 0%, #0b101e 100%); border: 1px solid #1e293b; border-radius: 17px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.25s; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4); }
+    .card.pending-card { border: 1.5px solid rgba(245, 158, 11, 0.6); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px; gap: 6px; flex-wrap: wrap; }
     .badges-wrap { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag {
-      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 7px;
-      background: rgba(255, 255, 255, 0.06); color: #e2e8f0;
-    }
+    .tag { font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 7px; background: rgba(255, 255, 255, 0.06); color: #e2e8f0; }
     .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
     .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
     .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; }
     .tag.src-aq { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; }
     .tag.src-fb { background: rgba(24, 119, 242, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
-    .time-badge { font-size: 11px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 9px; border-radius: 7px; }
-    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; line-height: 1.5; color: #fff; }
-    .price-box {
-      background: rgba(6, 9, 17, 0.65); border: 1px solid rgba(245, 158, 11, 0.25);
-      border-radius: 11px; padding: 9px 13px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .price-lbl { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
-    .card-price { font-size: 19px; font-weight: 900; color: #fbbf24; }
-    .meta-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-      margin-bottom: 16px; background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 11px; padding: 11px;
-      font-size: 12px; color: #94a3b8;
-    }
+    .time-badge { font-size: 10.5px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 7px; }
+    .card-title { font-size: 15px; font-weight: 800; margin-bottom: 11px; line-height: 1.5; color: #fff; }
+    .price-box { background: rgba(6, 9, 17, 0.65); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 11px; padding: 8px 12px; margin-bottom: 11px; display: flex; justify-content: space-between; align-items: center; }
+    .price-lbl { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .card-price { font-size: 18px; font-weight: 900; color: #fbbf24; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 11px; padding: 10px; font-size: 12px; color: #94a3b8; }
     .meta-item { display: flex; flex-direction: column; gap: 2px; }
-    .meta-item span { font-size: 10.5px; color: #64748b; font-weight: 700; }
-    .meta-item b { color: #f1f5f9; font-size: 12.5px; font-weight: 800; }
+    .meta-item span { font-size: 10px; color: #64748b; font-weight: 700; }
+    .meta-item b { color: #f1f5f9; font-size: 12px; font-weight: 800; }
+    .desc-box { background: #060911; border: 1px solid #1e293b; border-radius: 10px; padding: 9px 11px; font-size: 12px; color: #cbd5e1; line-height: 1.6; max-height: 135px; overflow-y: auto; white-space: pre-line; margin-bottom: 12px; }
     .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
     .card-actions-row { display: flex; gap: 8px; }
-    .btn-card {
-      flex: 1; text-align: center; padding: 11px 8px; border-radius: 10px;
-      font-size: 13px; font-weight: 900; text-decoration: none; cursor: pointer; border: none;
-    }
+    .btn-card { flex: 1; text-align: center; padding: 10px 8px; border-radius: 10px; font-size: 12.5px; font-weight: 900; text-decoration: none; cursor: pointer; border: none; }
     .btn-card.primary { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911; }
+    .btn-card.approve-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #060911; }
     .btn-card.del-only { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
     .btn-card.ban { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .empty-msg { grid-column: 1 / -1; text-align: center; padding: 38px 16px; background: #0b101e; border: 1px dashed #334155; border-radius: 14px; color: #94a3b8; font-size: 13px; font-weight: 700; }
+
+    @media (max-width: 680px) {
+      .exec-nav-dock { grid-template-columns: repeat(2, 1fr); }
+      .exec-nav-dock .exec-tab:first-child { grid-column: span 2; }
+      .filters-bar { grid-template-columns: 1fr 1fr; }
+      .filters-bar .filter-group:first-child { grid-column: span 2; }
+    }
   </style>
 </head>
 <body>
 
   <div id="authGate">
     <div class="gate-box">
-      <h2>بوابة القيادة السرية</h2>
-      <p>أدخل كلمة مرور المدير للتحكم الكامل في الاشتراكات والرادار</p>
+      <div class="gate-crest">GO</div>
+      <h2>بوابة القيادة التنفيذية</h2>
+      <p>GAMAL OSAMA | PROJECT DIRECTOR VIP</p>
       <input type="password" id="adminPassInput" class="input" placeholder="كلمة مرور المدير" style="margin-bottom:14px;text-align:center;font-size:18px;letter-spacing:2px;" onkeydown="if(event.key==='Enter') verifyAdmin()" />
-      <button class="btn btn-gold fx-btn" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول للوحة القيادة</button>
+      <button class="btn btn-gold fx-btn" id="authBtn" style="width:100%" onclick="verifyAdmin()">دخول لغرفة القيادة</button>
       <div id="authErr" style="color:#f87171;font-size:13px;font-weight:700;margin-top:12px;display:none;"></div>
     </div>
   </div>
 
   <div id="adminPanel">
-    <header>
-      <div class="brand">
-        <div class="brand-logo">VIP</div>
-        <h1>لوحة تحكم المدير | رادار مصيدة الملاك VIP</h1>
+    <div class="exec-topbar">
+      <div class="exec-topbar-inner">
+        <div class="brand">
+          <div class="brand-logo">GO</div>
+          <div class="brand-titles">
+            <h1>GAMAL OSAMA | غرفة قيادة المشروع</h1>
+            <span>PROJECT DIRECTOR & FOUNDER VIP</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="btn btn-gold btn-sm fx-btn" onclick="refreshAll()">تحديث الآن</button>
+          <a href="/" target="_blank" class="btn btn-sm fx-btn" style="background:#1e293b;color:#fff;text-decoration:none;">واجهة السماسرة</a>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-gold btn-sm fx-btn" onclick="refreshAll()">تحديث البيانات الآن</button>
-        <a href="/" target="_blank" class="btn btn-sm fx-btn" style="background:#1e293b;color:#fff;text-decoration:none;">فتح واجهة السماسرة</a>
-      </div>
-    </header>
+    </div>
 
     <div class="container">
       <div class="stats-grid">
+        <div class="stat-card gold-card">
+          <span class="lbl">بانتظار موافقتك (فيسبوك)</span>
+          <span class="val" id="stPendingAds">0</span>
+          <span class="sub">مخفي عن السماسرة حتى توافق</span>
+        </div>
         <div class="stat-card">
-          <span class="lbl">إجمالي إعلانات الملاك الحية</span>
+          <span class="lbl">إجمالي الإعلانات الحية</span>
           <span class="val" id="stTotalAds">0</span>
           <span class="sub" id="stLastUpdate">آخر تحديث: -</span>
         </div>
         <div class="stat-card">
           <span class="lbl">توزيع المنصات العقارية</span>
-          <span class="val" id="stPlatforms" style="font-size:16px;margin-top:6px;">-</span>
-          <span class="sub">ملاك مباشرين بدون تقسيط أو بيت وطن</span>
+          <span class="val" id="stPlatforms" style="font-size:14.5px;margin-top:5px;">-</span>
+          <span class="sub">ملاك مباشرين 100%</span>
         </div>
         <div class="stat-card">
-          <span class="lbl">إجمالي أكواد المشتركين</span>
+          <span class="lbl">أكواد المشتركين</span>
           <span class="val" id="stTotalSubs">0</span>
           <span class="sub" id="stActiveSubs">نشط: 0</span>
         </div>
       </div>
 
-      <div class="box">
+      <div class="exec-nav-dock">
+        <button class="exec-tab active" id="tabBtnAds" onclick="switchExecSection('ads')">
+          <span>الإعلانات الحية</span>
+        </button>
+        <button class="exec-tab" id="tabBtnPending" onclick="switchExecSection('pending')">
+          <span>غرفة الموافقة</span>
+          <span class="pend-badge" id="navPendCount">0</span>
+        </button>
+        <button class="exec-tab" id="tabBtnPull" onclick="switchExecSection('pull')">
+          <span>سحب رابط فيسبوك</span>
+        </button>
+        <button class="exec-tab" id="tabBtnSubs" onclick="switchExecSection('subs')">
+          <span>الأكواد والمشتركين</span>
+        </button>
+        <button class="exec-tab" id="tabBtnAll" onclick="switchExecSection('all')">
+          <span>تليجرام وعرض الكل</span>
+        </button>
+      </div>
+
+      <div class="box gold-border" id="secPendingBox" style="display:none;">
+        <h3>
+          <span>غرفة فرز وموافقة المدير (إعلانات فيسبوك المنتظرة)</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm btn-emerald fx-btn" onclick="approvePendingAd('ALL')">موافقة ونشر الكل</button>
+            <button class="btn btn-sm btn-danger fx-btn" onclick="rejectPendingAd('ALL')">رفض وحذف الكل</button>
+          </div>
+        </h3>
+        <div class="grid" id="pendingAdsGrid"></div>
+      </div>
+
+      <div class="box gold-border" id="secPullBox" style="display:none;">
+        <h3>سحب إعلان مالك فوري من فيسبوك بالرابط (عبر اللابتوب المفتوح 24/7)</h3>
+        <p style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;line-height:1.6;">الصق رابط أي منشور مالك وجدته على فيسبوك، وسيقوم اللابتوب بفتح الرابط أوتوماتيكياً وسحب الإعلان كاملاً ونشره فوراً على البرنامج:</p>
+        <div class="form-row">
+          <div style="grid-column: 1 / -1;">
+            <input type="url" id="fbPullUrlInput" class="input" placeholder="https://www.facebook.com/share/p/..." style="direction:ltr;text-align:left;" />
+          </div>
+          <button class="btn btn-emerald fx-btn" id="btnPullSubmit" style="grid-column: 1 / -1;" onclick="sendInstantFacebookLink()">اسحب الإعلان وانشره بالبرنامج فوراً</button>
+        </div>
+        <div id="pullStatusMsg" style="margin-top:12px;display:none;padding:12px;border-radius:11px;font-size:12.5px;font-weight:800;"></div>
+      </div>
+
+      <div class="box" id="secCreateCodeBox" style="display:none;">
         <h3>توليد كود اشتراك VIP جديد لسمسار (جهاز واحد فقط)</h3>
         <div class="form-row">
           <div>
@@ -249,7 +226,7 @@
         </div>
       </div>
 
-      <div class="box">
+      <div class="box" id="secSubsTableBox" style="display:none;">
         <h3>إدارة المشتركين والأجهزة المربوطة</h3>
         <div style="overflow-x:auto;">
           <table>
@@ -268,7 +245,7 @@
         </div>
       </div>
 
-      <div class="box">
+      <div class="box" id="secTgBox" style="display:none;">
         <h3>إعدادات إشعارات تليجرام السرية (للمدير فقط)</h3>
         <div class="form-row">
           <div>
@@ -283,10 +260,10 @@
         </div>
       </div>
 
-      <div class="box">
+      <div class="box" id="secLiveAdsBox">
         <h3>
           <span>جميع إعلانات الرادار الحية (نفس عرض السماسرة + تحكم الحذف والحظر الفوري)</span>
-          <span style="font-size:14px;color:#34d399;">المعروض حاليا: <b id="adminShownCount">0</b> إعلان</span>
+          <span style="font-size:13.5px;color:#34d399;">المعروض حاليا: <b id="adminShownCount">0</b> إعلان</span>
         </h3>
 
         <div class="filters-bar">
@@ -345,7 +322,10 @@
   <script>
     let savedAdminPass = "";
     let adminAllAds = [];
+    let adminPendingAds = [];
+    let localProcessedPending = JSON.parse(localStorage.getItem("vip_adm_proc_pend") || "[]");
     const MASTER_HASH = "f983bcde0067d20a1c133f03e78789cd89f6a4eb4d8bc85fc0740f795bf3bbf0";
+    const ADMIN_CMD_TOPIC = "gamal_vip_cmd_9941_sec";
 
     document.addEventListener("pointerdown", function (e) {
       const btn = e.target.closest(".fx-btn");
@@ -360,6 +340,127 @@
       btn.appendChild(ripple);
       setTimeout(() => ripple.remove(), 550);
     });
+
+    function switchExecSection(sec) {
+      document.getElementById("tabBtnAds").classList.toggle("active", sec === "ads");
+      document.getElementById("tabBtnPending").classList.toggle("active", sec === "pending");
+      document.getElementById("tabBtnPull").classList.toggle("active", sec === "pull");
+      document.getElementById("tabBtnSubs").classList.toggle("active", sec === "subs");
+      document.getElementById("tabBtnAll").classList.toggle("active", sec === "all");
+
+      document.getElementById("secLiveAdsBox").style.display = (sec === "ads" || sec === "all") ? "block" : "none";
+      document.getElementById("secPendingBox").style.display = (sec === "pending" || sec === "all") ? "block" : "none";
+      document.getElementById("secPullBox").style.display = (sec === "pull" || sec === "all") ? "block" : "none";
+      document.getElementById("secCreateCodeBox").style.display = (sec === "subs" || sec === "all") ? "block" : "none";
+      document.getElementById("secSubsTableBox").style.display = (sec === "subs" || sec === "all") ? "block" : "none";
+      document.getElementById("secTgBox").style.display = (sec === "all") ? "block" : "none";
+    }
+
+    function sendLaptopCommand(cmdStr) {
+      return fetch("https://ntfy.sh/" + ADMIN_CMD_TOPIC, { method: "POST", body: cmdStr }).catch(() => {});
+    }
+
+    async function sendInstantFacebookLink() {
+      const inp = document.getElementById("fbPullUrlInput");
+      const msg = document.getElementById("pullStatusMsg");
+      const btn = document.getElementById("btnPullSubmit");
+      const url = (inp.value || "").trim();
+      if (!url || !url.includes("facebook.com")) {
+        msg.style.display = "block";
+        msg.style.background = "rgba(239,68,68,0.16)";
+        msg.style.color = "#fca5a5";
+        msg.textContent = "يرجى لصق رابط منشور فيسبوك صحيح أولا.";
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "جاري إرسال الرابط للابتوب...";
+      await sendLaptopCommand("PULL_URL|" + url);
+      inp.value = "";
+      btn.disabled = false;
+      btn.textContent = "اسحب الإعلان وانشره بالبرنامج فوراً";
+      msg.style.display = "block";
+      msg.style.background = "rgba(16,185,129,0.16)";
+      msg.style.color = "#6ee7b7";
+      msg.textContent = "تم إرسال الرابط للابتوب بنجاح! يفتح المتصفح الآن الرابط ويسحبه وينشره خلال 15 ثانية.";
+      setTimeout(() => refreshAll(), 16000);
+    }
+
+    async function approvePendingAd(adIdStr) {
+      if (adIdStr === "ALL") {
+        adminPendingAds.forEach(a => {
+          localProcessedPending.push(String(a.ad_id));
+          adminAllAds.unshift(a);
+        });
+      } else {
+        localProcessedPending.push(String(adIdStr));
+        const found = adminPendingAds.find(a => String(a.ad_id) === String(adIdStr));
+        if (found) adminAllAds.unshift(found);
+      }
+      localStorage.setItem("vip_adm_proc_pend", JSON.stringify(localProcessedPending.slice(-1000)));
+      await sendLaptopCommand("APPROVE|" + adIdStr);
+      updateCountersUI();
+      renderPendingCards();
+      renderAdminCards();
+    }
+
+    async function rejectPendingAd(adIdStr) {
+      if (adIdStr === "ALL" && !confirm("تأكيد رفض وحذف جميع الإعلانات المنتظرة حاليا؟")) return;
+      if (adIdStr === "ALL") {
+        adminPendingAds.forEach(a => localProcessedPending.push(String(a.ad_id)));
+      } else {
+        localProcessedPending.push(String(adIdStr));
+      }
+      localStorage.setItem("vip_adm_proc_pend", JSON.stringify(localProcessedPending.slice(-1000)));
+      await sendLaptopCommand("REJECT|" + adIdStr);
+      updateCountersUI();
+      renderPendingCards();
+    }
+
+    function renderPendingCards() {
+      const visiblePend = adminPendingAds.filter(a => !localProcessedPending.includes(String(a.ad_id)));
+      document.getElementById("stPendingAds").textContent = visiblePend.length;
+      document.getElementById("navPendCount").textContent = visiblePend.length;
+      const grid = document.getElementById("pendingAdsGrid");
+      if (!visiblePend.length) {
+        grid.innerHTML = `<div class="empty-msg">لا توجد إعلانات في غرفة الموافقة حاليا. كل ما يصطاده رادار فيسبوك سيظهر هنا لتوافق عليه أو ترفضه قبل ظهوره للسماسرة.</div>`;
+        return;
+      }
+      grid.innerHTML = visiblePend.map(a => {
+        const key = String(a.ad_id);
+        return `
+          <div class="card pending-card">
+            <div>
+              <div class="card-top">
+                <div class="badges-wrap">
+                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
+                  <span class="tag src-fb">فيسبوك (بانتظار الموافقة)</span>
+                </div>
+                <span class="time-badge">${formatAddedTime(a)}</span>
+              </div>
+              <div class="card-title">${a.title}</div>
+              <div class="price-box">
+                <span class="price-lbl">السعر المطلوب</span>
+                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
+                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
+                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
+                <div class="meta-item"><span>الناشر</span><b>${a.publisher || 'مالك'}</b></div>
+              </div>
+              ${a.description ? `<div class="desc-box">${a.description}</div>` : ''}
+            </div>
+            <div class="card-actions">
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary fx-btn">فتح الإعلان الأصلي في فيسبوك</a>
+              <div class="card-actions-row">
+                <button class="btn-card approve-btn fx-btn" onclick="approvePendingAd('${key}')">موافقة ونشر للسماسرة</button>
+                <button class="btn-card ban fx-btn" onclick="rejectPendingAd('${key}')">رفض وحذف نهائي</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
 
     async function sha256Hex(str) {
       const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
@@ -391,7 +492,7 @@
 
       await loadCodes();
       btn.disabled = false;
-      btn.textContent = "دخول للوحة القيادة";
+      btn.textContent = "دخول لغرفة القيادة";
 
       document.getElementById("authGate").style.display = "none";
       document.getElementById("adminPanel").style.display = "block";
@@ -438,9 +539,11 @@
 
     async function loadDirectAdsFallback(bannedIdsSet) {
       try {
-        const r = await fetch("/ads.json?t=" + Date.now());
+        const r = await fetch("/ads.json?t=" + Date.now(), { cache: "no-store" });
         if (r.ok) {
           const d = await r.json();
+          adminPendingAds = Array.isArray(d.pending_ads) ? d.pending_ads : [];
+          renderPendingCards();
           if (d && Array.isArray(d.ads)) {
             adminAllAds = d.ads.filter(a => !bannedIdsSet.has(String(a.ad_id)));
             document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (d.updated_at || "-");
@@ -468,9 +571,8 @@
             adminAllAds = rawList.filter(a => !bannedIds.has(String(a.ad_id)));
             document.getElementById("stLastUpdate").textContent = "آخر تحديث: " + (data.adsUpdatedAt || "-");
             updateCountersUI();
-          } else {
-            await loadDirectAdsFallback(bannedIds);
           }
+          await loadDirectAdsFallback(bannedIds);
 
           const tbody = document.getElementById("subsTableBody");
           tbody.innerHTML = subs.map(s => {
@@ -599,6 +701,7 @@
       adminAllAds = adminAllAds.filter(a => String(a.ad_id) !== String(adIdStr));
       updateCountersUI();
       renderAdminCards();
+      sendLaptopCommand("REJECT|" + adIdStr);
       await apiAdmin({ action: "delete_ad", adId: adIdStr });
     }
 
@@ -615,6 +718,7 @@
       adminAllAds = adminAllAds.filter(a => !sameIds.includes(String(a.ad_id)));
       updateCountersUI();
       renderAdminCards();
+      sendLaptopCommand("REJECT|" + adIdStr);
       await apiAdmin({ action: "ban_publisher", adId: adIdStr, adIds: sameIds, publisher: cleanPub });
     }
 
