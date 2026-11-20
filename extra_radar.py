@@ -5,7 +5,7 @@ import requests as std_requests
 from bs4 import BeautifulSoup
 from curl_cffi import requests as cffi_requests
 
-def disable_cmd_quickedit_and_sleep():
+def init_win():
     if not sys.platform.startswith("win"): return
     try:
         os.system("chcp 65001 > nul")
@@ -17,7 +17,7 @@ def disable_cmd_quickedit_and_sleep():
         if k32.GetConsoleMode(h, ctypes.byref(m)): k32.SetConsoleMode(h, (m.value & ~0x0040 & ~0x0020) | 0x0080)
     except Exception: pass
 
-disable_cmd_quickedit_and_sleep()
+init_win()
 
 CAIRO_TZ = timezone(timedelta(hours=2))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,12 +42,12 @@ SYNC_LOCK = threading.Lock()
 ARABIC_MONTHS = {"يناير": 1, "فبراير": 2, "مارس": 3, "ابريل": 4, "أبريل": 4, "إبريل": 4, "مايو": 5, "يونيو": 6, "يونية": 6, "يوليو": 7, "يوليه": 7, "اغسطس": 8, "أغسطس": 8, "سبتمبر": 9, "اكتوبر": 10, "أكتوبر": 10, "نوفمبر": 11, "ديسمبر": 12}
 
 ZONES = [
-    ("التجمع الخامس", "التجمع الخامس|fifth settlement|5th settlement|ميفيدا|mivida|هايد بارك|ماونتن فيو|كايرو فيستفال|كايرو فيستيفال|الباتيو|فيلت|سوديك|ستون ريزيدنس|ستون بارك|ايست تاون|ليك فيو|بالم هيلز التجمع|الحي الاول|الحي الثاني|الحي الثالث|الحي الرابع|الحي الخامس|غرب الجولف|الجامعه الامريكيه|الجامعة الامريكية|auc|فاطمه الشربتلي|فاطمة الشربتلي|مسجد الشرطه|مسجد الشرطة|بوينت 90|كونكورد".split("|")),
-    ("التجمع الأول", "التجمع الأول|التجمع الاول|first settlement|1st settlement|مجاورة".split("|")),
-    ("التجمع الثالث", "التجمع الثالث|third settlement|3rd settlement|أربيلا|اربيلا|أرابيلا|ارابيلا|غرب ارابيلا|الهايكستب|المحلية|المحليه|اسكان الشباب|إسكان الشباب".split("|")),
-    ("اللوتس", ["اللوتس", "lotus"]), ("النرجس", ["النرجس", "narges", "narjis"]), ("الياسمين", ["الياسمين", "yasmeen", "jasmine"]), ("البنفسج", ["البنفسج", "banafseg"]),
-    ("الأندلس", ["الأندلس", "الاندلس", "andalus"]), ("جنوب الأكاديمية", ["جنوب الأكاديمية", "جنوب الاكاديمية", "الأكاديمية", "الاكاديميه"]), ("شرق الأكاديمية", ["شرق الأكاديمية", "شرق الاكاديمية"]),
-    ("المستثمرين", ["المستثمرين", "investors"]), ("الشويفات", ["الشويفات", "choueifat"]), ("القرنفل", ["القرنفل", "koronfel"]), ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
+    ("التجمع الخامس", "التجمع الخامس|تجمع خامس|fifth settlement|5th settlement|ميفيدا|mivida|هايد بارك|ماونتن فيو|كايرو فيستفال|كايرو فيستيفال|الباتيو|فيلت|سوديك|ستون ريزيدنس|ستون بارك|ايست تاون|ليك فيو|بالم هيلز التجمع|الحي الاول|الحي الثاني|الحي التاني|الحي الثالث|الحي التالت|الحي الرابع|الحي الخامس|غرب الجولف|الجامعه الامريكيه|الجامعة الامريكية|auc|فاطمه الشربتلي|فاطمة الشربتلي|مسجد الشرطه|مسجد الشرطة|بوينت 90|كونكورد".split("|")),
+    ("التجمع الأول", "التجمع الأول|التجمع الاول|تجمع اول|first settlement|1st settlement|مجاورة".split("|")),
+    ("التجمع الثالث", "التجمع الثالث|التجمع التالت|تجمع تالت|third settlement|3rd settlement|أربيلا|اربيلا|أرابيلا|ارابيلا|غرب ارابيلا|الهايكستب|المحلية|المحليه|اسكان الشباب|إسكان الشباب".split("|")),
+    ("اللوتس", ["اللوتس", "لوتس", "lotus"]), ("النرجس", ["النرجس", "نرجس", "narges", "narjis"]), ("الياسمين", ["الياسمين", "ياسمين", "yasmeen", "jasmine"]), ("البنفسج", ["البنفسج", "بنفسج", "banafseg"]),
+    ("الأندلس", ["الأندلس", "الاندلس", "اندلس", "andalus"]), ("جنوب الأكاديمية", ["جنوب الأكاديمية", "جنوب الاكاديمية", "الأكاديمية", "الاكاديميه"]), ("شرق الأكاديمية", ["شرق الأكاديمية", "شرق الاكاديمية"]),
+    ("المستثمرين", ["المستثمرين", "investors"]), ("الشويفات", ["الشويفات", "choueifat"]), ("القرنفل", ["القرنفل", "قرنفل", "koronfel"]), ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
     ("أبو الهول", ["أبو الهول", "ابو الهول", "جاردينيا هايتس", "جاردينيا"]), ("دار مصر", ["دار مصر", "سكن مصر", "جنة مصر", "جنه مصر", "فرجينيا"]), ("القطامية", ["القطامية", "القطاميه", "katameya"]), ("شارع التسعين", ["التسعين", "90th"]),
 ]
 EXCLUDED_CITIES = "الرحاب|رحاب|rehab|مدينتي|مدينتى|madinaty|بيت الوطن|بيت وطن|beit al watan|beit el watan|bayt al watan|النورث هاوس|شمال الرحاب|العبور|الشروق|مدينة بدر|مدينه بدر|هليوبوليس الجديدة|العاصمة الإدارية|العاصمه الاداريه|التجمع السادس|sixth settlement|كابيتال جاردنز|capital gardens|سراي|sarai|البروج|alburouj|طلالة|talala|دي جويا|dejoya|محور الأمل|تاج سيتي|تاج سيتى|taj city|تاج سلطان|العاشر من رمضان|6 أكتوبر|أكتوبر|الشيخ زايد|زايد|المعادي|زهراء المعادي|المقطم|الهضبة الوسطى|مدينة نصر|مصر الجديدة|شيراتون|النزهة|عين شمس|السلام|جسر السويس|حدائق القبة|المرج|شبرا|حلوان|15 مايو|الزمالك|المهندسين|الدقي|العجوزة|الهرم|فيصل|حدائق الأهرام|حدائق الاهرام|حدائق أكتوبر|الساحل الشمالي|العين السخنة|الجونة|الغردقة|شرم الشيخ|الإسكندرية|الاسكندرية|المستقبل|mostakbal|سمات|مقبرة|مقابر|مدفن|مدافن".split("|")
@@ -55,7 +55,7 @@ INSTALLMENT_SUBSTRINGS = "قسط|تقسيط|بالتقسيط|لتقسيط|اقس
 SAFE_CASH_NEGATIONS = "بدون تقسيط|لا يوجد تقسيط|ممنوع التقسيط|وليس تقسيط|مش تقسيط|بدون أقساط|بدون اقساط|خالص الثمن|خالصة الثمن|خالصه الثمن|ليس عليها أقساط|ليس عليها اقساط|لا يوجد أقساط|لا يوجد اقساط|مسدد بالكامل|مسددة بالكامل|غير متاح تقسيط|البيع كاش فقط|كاش فقط|كاش نهائي".split("|")
 SAFE_OWNER_BROKER_NEGATIONS = "بدون وسيط|بدون وسطاء|ممنوع الوسطاء|يمتنع الوسطاء|لغير الوسطاء|عدم تدخل الوسطاء|عدم التعامل مع الوسطاء|لا للوسطاء|بدون سمسار|بدون سماسرة|بدون سماسره|ممنوع السماسرة|ممنوع السماسره|يمتنع السماسرة|يمتنع السماسره|بدون بروكر|ممنوع البروكر|يمتنع البروكر|من غير سمسار|من غير وسيط|من المالك مباشره|من المالك مباشر|المالك مباشره|المالك مباشر|التواصل مباشر مع المالك|التعامل مباشر مع المالك|مباشر من المالك|انا المالك".split("|")
 BROKER_NAME_WORDS = "zone|real estate|realestate|realty|property|properties|homes|agency|agencies|broker|brokers|brokerage|investment|investments|development|developments|consult|consultant|consulting|company|marketing|scouts|vertex|redefine|irtkaz|ebtkar|imkan|falcon|realtors|trusted home|remax|coldwell|era|prime|capital|house|group|شركة|شركه|مكتب|تسويق|للتسويق|ماركتنج|سمسار|وسيط|استشاري|مستشار|للاستشارات|تطوير|للتطوير|للاستثمار|هومز|بروكر|ريال استيت|استيت|فيرتكس|ريديفاين|ارتكاز|إرتكاز|ابتكار|إبتكار|دار البناء|للمقاولات|للإنشاءات|للانشاءات|اللوتس العقارية|البيت المصري|ادارة املاك|إدارة أملاك|عقاري|عقارات|للعقارات|العقاريه".split("|")
-BROKER_TEXT_PHRASES = "انا وسيط|أنا وسيط|وسيط مش المالك|مش المالك|ليس المالك|وسيط عقاري|وسيط عقارى|وسيط من المالك|وسيط مع المالك|مباشر مع المالك|مباشر من المالك لدينا|انا بروكر|م بروكر|للتواصل مع البروكر|سمسار|سماسرة|سماسره|بروكر|broker|مكتب عقاري|مكتب عقارات|مكتب تسويق|ادارة املاك|عمولة شهر|عموله شهر|عمولة نصف شهر|عموله نصف شهر|عمولة المكتب|عموله المكتب|عمولة الشركة|عموله الشركه|بعموله|بعمولة|نسبة العمولة|يوجد عمولة|يوجد عموله|عمولة 1|عموله 1|عمولة 2|عموله 2|لماذا تختار شركتنا|شركتنا|شركة عقارات|شركه عقارات|شركة تسويق|شركه تسويق|للتسويق العقاري|للاستثمار العقاري|للتطوير العقاري|استشاري عقاري|مستشار عقاري|فريق المبيعات|قسم المبيعات|للتواصل مع قسم المبيعات|فريق من الخبراء|مجموعة متنوعة من الشقق|تقع عقاراتنا|زيارة معروضاتنا|سجل بياناتك|عائد إيجاري شهري مضمون|عائد ايجاري شهري مضمون|بعائد ايجاري يصل|كود الوحدة|كود الوحده|كود العقار|كود الشقة|كود الفيلا|الكود المرجعي|متاح لدينا|يتوفر لدينا|متوفر لدينا|لدينا أكثر من|متاح لدينا اكثر من|لدينا عقارات|متاح عروض اخري|متاح عروض أخرى|يوجد عروض اخري|متاح شقق اخري|متاح مساحات مختلفة|مساحات مختلفة|مساحات مختلفه|متوفر لدينا وحدات|متاح لدينا وحدات|باقل سعر بالمشروع|استمرار لعروضنا|والواقع يتحدث عنا|امتلك وحدتك|احجز وحدتك|اختار وحدتك|مطلوب وموجود|مطلوب ومعروض|متاح وحدات اخري|تواصل خاص|السعر خاص|التفاصيل خاص|انبوكس|inbox|للاستفسار والمعاينه|للتفاصيل والمعاينه|متاح شقق|متاح فلل|متاح وحدات|فرصه استثماريه|تحت سعر السوق|اقل من سعر السوق|باقل مقدم|نصف تشطيب|ضمن الاعضاء|اصدقاء ضمن الاعضاء|مجموعه عامه|مجموعه خاصه|سعر المتر|ريسبشن 3 قطع|بحري صريح|دبل فيس|لقطه|فرصه لن تتكرر".split("|")
+BROKER_TEXT_PHRASES = "انا وسيط|أنا وسيط|وسيط مش المالك|مش المالك|ليس المالك|وسيط عقاري|وسيط عقارى|وسيط من المالك|وسيط مع المالك|مباشر من المالك لدينا|انا بروكر|م بروكر|للتواصل مع البروكر|سمسار|سماسرة|سماسره|بروكر|broker|مكتب عقاري|مكتب عقارات|مكتب تسويق|ادارة املاك|عمولة شهر|عموله شهر|عمولة نصف شهر|عموله نصف شهر|عمولة المكتب|عموله المكتب|عمولة الشركة|عموله الشركه|بعموله|بعمولة|نسبة العمولة|يوجد عمولة|يوجد عموله|عمولة 1|عموله 1|عمولة 2|عموله 2|لماذا تختار شركتنا|شركتنا|شركة عقارات|شركه عقارات|شركة تسويق|شركه تسويق|للتسويق العقاري|للاستثمار العقاري|للتطوير العقاري|استشاري عقاري|مستشار عقاري|فريق المبيعات|قسم المبيعات|للتواصل مع قسم المبيعات|فريق من الخبراء|مجموعة متنوعة من الشقق|تقع عقاراتنا|زيارة معروضاتنا|سجل بياناتك|عائد إيجاري شهري مضمون|عائد ايجاري شهري مضمون|بعائد ايجاري يصل|كود الوحدة|كود الوحده|كود العقار|كود الشقة|كود الفيلا|الكود المرجعي|متاح لدينا|يتوفر لدينا|متوفر لدينا|لدينا أكثر من|متاح لدينا اكثر من|لدينا عقارات|متاح عروض اخري|متاح عروض أخرى|يوجد عروض اخري|متاح شقق اخري|متاح مساحات مختلفة|مساحات مختلفة|مساحات مختلفه|متوفر لدينا وحدات|متاح لدينا وحدات|باقل سعر بالمشروع|استمرار لعروضنا|والواقع يتحدث عنا|امتلك وحدتك|احجز وحدتك|اختار وحدتك|مطلوب وموجود|مطلوب ومعروض|متاح وحدات اخري|متاح شقق|متاح فلل|متاح وحدات|ضمن الاعضاء|اصدقاء ضمن الاعضاء|مجموعه عامه|مجموعه خاصه".split("|")
 FB_WANTED_PHRASES = "مطلوب شقه|مطلوب شقة|مطلوب فيلا|مطلوب للايجار|مطلوب للإيجار|مطلوب للشراء|مطلوب للبيع|مطلوب من المالك|بدور علي شقه|بدور على شقة|بدور علي فيلا|محتاج شقه|محتاج شقة|محتاجه شقه|محتاجة شقة|عايز شقه|عايز شقة|عايزة شقة|عايزه شقه|ابحث عن شقه|أبحث عن شقة|حد عنده شقه|حد عنده شقة|مطلوب عاجل|مطلوب فورا|مطلوب شريك|مطلوب شريكة|مطلوب روم ميت".split("|")
 
 _AQ_B, _AQ_S = "https://aqarmap.com.eg/ar/", "?sort=publishedAt&direction=desc"
@@ -96,13 +96,13 @@ def fix_git_identity_for_vercel():
 def is_direct_fb_post_permalink(url_str):
     u = str(url_str or "").strip()
     if "facebook.com" not in u or "/search/" in u: return False
-    return bool(re.search(r'(?:/share/[pv]/[A-Za-z0-9]+|/posts/(?:\d+|pfbid[A-Za-z0-9]+)|/permalink/\d+|story_fbid=(?:\d+|pfbid[A-Za-z0-9]+)|multi_permalinks=\d+|/photo/?\?fbid=\d+)', u))
+    return bool(re.search(r'(?:/share/[pv]/[A-Za-z0-9._\-]+|/posts/(?:\d+|pfbid[A-Za-z0-9]+)|/permalink/\d+|story_fbid=(?:\d+|pfbid[A-Za-z0-9]+)|multi_permalinks=\d+|/photo/?\?fbid=\d+|/groups/[^/]+/user/\d+)', u))
 
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Home Feed & Profile Owner Radar v13.0", "version": "13.0",
-        "description": "Home Feed 45m/30m + Share Copy Link + Author Profile 1-8 Ads Inspector + End-of-Run Batch",
+        "manifest_version": 3, "name": "Gamal Home Feed & Profile Owner Radar v13.5", "version": "13.5",
+        "description": "Home Feed 45m/30m + Share Copy Link + Profile 1-8 Ads + Auto-Like Owners + End-of-Run Batch",
         "permissions": ["storage", "tabs", "clipboardRead", "clipboardWrite"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
@@ -155,8 +155,8 @@ chrome.runtime.onMessage.addListener((m, sender, sr) => {
 
     main_world_hook_js = r"""
 (function(){
-if(window.__gamalMainHookV130)return;
-window.__gamalMainHookV130=true;
+if(window.__gamalMainHookV135)return;
+window.__gamalMainHookV135=true;
 const D_RE=/https?:\/\/(?:www\.|m\.)?facebook\.com\/(?:share\/[pv]\/[A-Za-z0-9._\-]+|groups\/[^\/?#]+\/(?:posts|permalink)\/(?:\d+|pfbid[A-Za-z0-9]+)|permalink\.php\?story_fbid=[^&"'\s]+|story\.php\?story_fbid=[^&"'\s]+|[^\/?#]+\/posts\/(?:\d+|pfbid[A-Za-z0-9]+)|photo\/?\?fbid=\d+[^"'\s]*)/i;
 try{
 if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -283,13 +283,13 @@ setInterval(stamp,400);
 
     content_js = r"""
 (function(){
-if(window.__gamalFbRadarV130)return;
-window.__gamalFbRadarV130=true;
+if(window.__gamalFbRadarV135)return;
+window.__gamalFbRadarV135=true;
+const slp=ms=>new Promise(r=>setTimeout(r,ms));
 if(location.search.includes("g_prof_check=1")){
 setTimeout(async()=>{
 try{
-window.scrollBy(0,1100);await new Promise(r=>setTimeout(r,800));
-window.scrollBy(0,1100);await new Promise(r=>setTimeout(r,600));
+window.scrollBy(0,1100);await slp(800);window.scrollBy(0,1100);await slp(600);
 const bodyTxt=(document.body.innerText||"");
 const BRK_BIO=/(real\s*estate|property\s*consultant|broker|remax|coldwell|تسويق\s*عقاري|مستشار\s*عقاري|شركة\s*عقارات|مكتب\s*عقارات|سمسار|بروكر|للاستثمار\s*العقاري)/i;
 const isBioBrk=BRK_BIO.test(bodyTxt.substring(0,1600));
@@ -299,34 +299,36 @@ const cnt=Math.max(msgNodes.length,articles.length,1);
 const zList=["النرجس","اللوتس","الياسمين","البنفسج","الاندلس","الأندلس","القرنفل","المستثمرين","دار مصر","سكن مصر","الشويفات","القطامية"];
 let zHits=0;for(const z of zList){if(bodyTxt.includes(z))zHits++;}
 const isBrk=isBioBrk||cnt>8||zHits>=3;
-const rsn=isBioBrk?"بروفايل شركة/سمسار":(cnt>8?("ناشر "+cnt+" إعلان (>8)"):(zHits>=3?"ينشر في عدة مناطق (سمسار)":"مالك موثق ("+cnt+" إعلان)"));
+const rsn=isBioBrk?"بروفايل سمسار":(cnt>8?("ناشر "+cnt+" إعلان (>8)"):(zHits>=3?"ينشر بعدة مناطق":"مالك ("+cnt+" إعلان)"));
 chrome.runtime.sendMessage({type:"FB_PROFILE_RESULT",count:cnt,isBroker:isBrk,reason:rsn});
 }catch(e){chrome.runtime.sendMessage({type:"FB_PROFILE_RESULT",count:1,isBroker:false,reason:"ok"});}
 },1200);
 return;
 }
 const FEEDS=[
-{name:"الرئيسية (الأحدث أولاً بأول)",url:"https://www.facebook.com/?sk=h_chr"},
-{name:"خلاصة أحدث منشورات جروباتك",url:"https://www.facebook.com/groups/feed/"}
+{name:"خلاصة أحدث منشورات جروباتك",url:"https://www.facebook.com/groups/feed/"},
+{name:"الرئيسية (الأحدث أولاً بأول)",url:"https://www.facebook.com/?sk=h_chr"}
 ];
-const RUN_MS=45*60*1000,REST_SEC=30*60,SWITCH_MS=11*60*1000;
+const RUN_MS=45*60*1000,REST_SEC=30*60,SWITCH_MS=12*60*1000;
 const PROP_RE=/(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن)/i;
 const OWNER_FAST_RE=/(من\s*المالك|المالك\s*مباشر|انا\s*المالك|أنا\s*المالك|شقتي|فيلتي|بيتي|ملكي|بدون\s*وسيط|بدون\s*وسطاء|ممنوع\s*الوسطاء|يمتنع\s*الوسطاء|لا\s*للوسطاء|بدون\s*سمسار|بدون\s*سماسرة|بدون\s*سماسره|ممنوع\s*السماسره|بدون\s*بروكر)/i;
+const BRK_FAST_RE=/(متاح\s*لدينا|يتوفر\s*لدينا|شركتنا|كود\s*الوحده|كود\s*الوحدة|عموله|عمولة|سمسار|بروكر|للتسويق\s*العقاري|مستشار\s*عقاري|مطلوب\s*شقه|مطلوب\s*شقة|مطلوب\s*للايجار)/i;
+const PHONE_RE=/01[0125]\d{8}/;
 const G_NOISE=/(ضمن الأعضاء|أصدقاء ضمن الأعضاء|مجموعة عامة|مجموعة خاصة|منشورًا في اليوم|منشورات في اليوم|انضمام إلى المجموعة)/i;
 const G_WORDS=/(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
 const H_MAP={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
 const normD=s=>String(s||"").replace(/[٠-٩]/g,c=>H_MAP[c]||c);
 const TIME_RE=/(الآن|توًا|حالا|just now|(?:^|\s)\d{1,2}\s*[دسيهأ](?:\s|$)|دقيقة|دقيقتين|دقائق|ساعة|ساعتين|ساعات|أمس|امس|الأمس|يوم|يومين|أيام|ايام|أسبوع|اسبوع|شهر|(?:^|\s)\d{1,2}\s*(?:m|h|d|w|mins?|hrs?)(?:\s|$)|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)/i;
 
-let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v130")||"[]");
-let profCache=JSON.parse(localStorage.getItem("gamal_fb_pcache_v130")||"{}");
-let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v130")||"0",10)%FEEDS.length;
-let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v130")||String(Date.now()),10);
-sessionStorage.setItem("gamal_fb_run_ts_v130",String(runStartTs));
-let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v130")||"0",10);
-let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v130")||"0",10);
+let sentHashes=JSON.parse(localStorage.getItem("gamal_fb_sent_v135")||"[]");
+let profCache=JSON.parse(localStorage.getItem("gamal_fb_pcache_v135")||"{}");
+let feedIdx=parseInt(localStorage.getItem("gamal_fb_fidx_v135")||"0",10)%FEEDS.length;
+let runStartTs=parseInt(sessionStorage.getItem("gamal_fb_run_ts_v135")||String(Date.now()),10);
+sessionStorage.setItem("gamal_fb_run_ts_v135",String(runStartTs));
+let scannedCount=parseInt(sessionStorage.getItem("gamal_fb_sc_v135")||"0",10);
+let acceptedCount=parseInt(sessionStorage.getItem("gamal_fb_ac_v135")||"0",10);
 let pageLoadTs=Date.now(),consecutiveSeen=0,isResting=false;
-let lastLogMsg="يخزن الملاك الموثقين ويرفعهم دفعة واحدة آخر الرن...";
+let lastLogMsg="يفرد عرض المزيد + يفحص المالك ومجهول الهوية + يضغط لايك للمالك...";
 let shadowInfo=null;
 try{
 const host=document.createElement("span"),sh=host.attachShadow({mode:"closed"}),box=document.createElement("div");
@@ -336,33 +338,45 @@ sh.appendChild(box);document.documentElement.appendChild(host);shadowInfo=box;
 
 function updateUI(st){
 try{
-sessionStorage.setItem("gamal_fb_sc_v130",String(scannedCount));
-sessionStorage.setItem("gamal_fb_ac_v130",String(acceptedCount));
+sessionStorage.setItem("gamal_fb_sc_v135",String(scannedCount));
+sessionStorage.setItem("gamal_fb_ac_v135",String(acceptedCount));
 const remMin=Math.max(0,Math.ceil((RUN_MS-(Date.now()-runStartTs))/60000));
-document.title="[فحص:"+scannedCount+" | مخزن:"+acceptedCount+"] "+st;
+document.title="[فحص:"+scannedCount+" | ملاك ولايك:"+acceptedCount+"] "+st;
 if(shadowInfo){
 const curN=FEEDS[feedIdx]?FEEDS[feedIdx].name:"الصفحة الرئيسية";
-shadowInfo.innerHTML="<div><b>رادار الصفحة الرئيسية وفحص البروفايل v13.0</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (باقي لنهاية الرن والرفع: "+remMin+" د)</div><div>تم فحص: <b>"+scannedCount+"</b> | ملاك مخزنون للرفع (1-8 إعلانات): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
+shadowInfo.innerHTML="<div><b>رادار الملاك واللايك التلقائي v13.5</b> | "+st+"</div><div style='color:#38bdf8;'>الوضع: <b>"+curN+"</b> (باقي لنهاية الرن والرفع: "+remMin+" د)</div><div>تم فحص: <b>"+scannedCount+"</b> | ملاك موثقون (لايك وتخزين): <b style='color:#4ade80;'>"+acceptedCount+"</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"+lastLogMsg+"</div>";
 }
 }catch(e){}
 }
-function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v130",JSON.stringify(sentHashes));}}
+function saveHash(h){if(!sentHashes.includes(h)){sentHashes.push(h);if(sentHashes.length>3500)sentHashes=sentHashes.slice(-3500);localStorage.setItem("gamal_fb_sent_v135",JSON.stringify(sentHashes));}}
 function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i)|0;return"fb_"+Math.abs(h);}
+
+function pressLikeOnOwnerCard(card){
+try{
+const btns=card.querySelectorAll('div[role="button"],span[role="button"]');
+for(const b of btns){
+if(b.closest("ul")||b.closest("form"))continue;
+const ar=(b.getAttribute("aria-label")||"").trim(),tx=(b.innerText||"").trim();
+if(b.getAttribute("aria-pressed")==="true")return;
+if(ar==="أعجبني"||ar==="Like"||tx==="أعجبني"||tx==="Like"){b.click();return;}
+}
+}catch(e){}
+}
 
 function collectCards(){
 const cSet=new Set();
 document.querySelectorAll('div[data-ad-preview="message"],div[data-ad-comet-preview="message"],div[data-ad-rendering-role="story_message"]').forEach(node=>{
 const txt=(node.innerText||"").trim();
-if(txt.length<25||!PROP_RE.test(txt)||G_NOISE.test(txt))return;
+if(txt.length<20||G_NOISE.test(txt))return;
 let cur=node,best=null;
 for(let i=0;i<11;i++){
 if(!cur.parentElement)break;
 cur=cur.parentElement;
-const cT=(cur.innerText||"");if(cT.length>4500)break;
+const cT=(cur.innerText||"");if(cT.length>4800)break;
 const lC=cur.querySelectorAll("a[href]").length;
 const hasH=!!cur.querySelector('h2,h3,h4,a[href*="/posts/"],a[href*="/permalink/"],a[href*="story_fbid"],a[href*="/groups/"],a[href*="/user/"]');
-if(cT.length>=65&&lC>=2&&hasH){best=cur;break;}
-if(!best&&cT.length>=65&&lC>=2)best=cur;
+if(cT.length>=60&&lC>=2&&hasH){best=cur;break;}
+if(!best&&cT.length>=60&&lC>=2)best=cur;
 }
 if(best)cSet.add(best);
 });
@@ -379,12 +393,11 @@ const lbl=((b.innerText||"")+" "+(b.getAttribute("aria-label")||"")).trim();
 if(/^(مشاركة|Share)$/i.test(lbl)||lbl.includes("مشاركة")){shareBtn=b;break;}
 }
 if(!shareBtn)return"";
-shareBtn.click();
-await new Promise(r=>setTimeout(r,360));
+shareBtn.click();await slp(550);
 const menuItems=document.querySelectorAll('div[role="menuitem"],div[role="button"],span');
 for(const mi of menuItems){
 const mt=(mi.innerText||"").trim();
-if(mt==="نسخ الرابط"||mt==="Copy link"){mi.click();await new Promise(r=>setTimeout(r,200));break;}
+if(mt==="نسخ الرابط"||mt==="Copy link"){mi.click();await slp(260);break;}
 }
 const copied=document.documentElement.getAttribute("data-g-copied-url")||"";
 if(copied&&copied.includes("facebook.com/"))return copied;
@@ -394,14 +407,13 @@ return"";
 
 function checkAuthorProfileInBg(profileUrl){
 return new Promise(resolve=>{
-if(!profileUrl){resolve({ok:true,count:1,isBroker:false,reason:"بدون رابط بروفايل"});return;}
+if(!profileUrl){resolve({ok:true,count:1,isBroker:false,reason:""});return;}
 const pKey=profileUrl.split("?")[0];
 if(profCache[pKey]){resolve(profCache[pKey]);return;}
 try{
 chrome.runtime.sendMessage({type:"FB_CHECK_PROFILE",url:pKey},resp=>{
 const res=resp||{ok:true,count:1,isBroker:false,reason:""};
-profCache[pKey]=res;
-localStorage.setItem("gamal_fb_pcache_v130",JSON.stringify(profCache));
+profCache[pKey]=res;localStorage.setItem("gamal_fb_pcache_v135",JSON.stringify(profCache));
 resolve(res);
 });
 }catch(e){resolve({ok:true,count:1,isBroker:false,reason:""});}
@@ -414,15 +426,15 @@ if(!msgNode)return null;
 const btns=card.querySelectorAll('div[role="button"],span[role="button"]');
 for(const b of btns){
 const bt=(b.innerText||"").trim();
-if((bt==="عرض المزيد"||bt==="See more"||bt==="… عرض المزيد")&&!b.closest("ul")&&!b.closest("form")){
-try{b.click();await new Promise(r=>setTimeout(r,150));}catch(e){}
+if((bt==="عرض المزيد"||bt==="See more"||bt.includes("عرض المزيد"))&&!b.closest("ul")&&!b.closest("form")){
+try{b.click();await slp(250);}catch(e){}
 break;
 }
 }
 card.setAttribute("data-g-inspect-req","1");
 window.dispatchEvent(new CustomEvent("gamal_fiber_scan"));
-await new Promise(r=>setTimeout(r,70));
-let bodyText=(card.getAttribute("data-g-puremsg")||msgNode.innerText||"").trim();
+await slp(80);
+let bodyText=normD((card.getAttribute("data-g-puremsg")||msgNode.innerText||"").trim());
 if(bodyText.length<25||!PROP_RE.test(bodyText)||G_NOISE.test(bodyText))return null;
 
 const keyHash=hashStr(bodyText.replace(/\s+/g," ").substring(0,90));
@@ -430,12 +442,21 @@ if(sentHashes.includes(keyHash)){
 if(!card._gS){card._gS=true;consecutiveSeen++;}
 return null;
 }
-if(!OWNER_FAST_RE.test(bodyText)){
+
+const topLines=(card.innerText||"").split("\n").slice(0,6).map(x=>x.trim()).filter(Boolean);
+const cardHeaderBlob=topLines.join(" ");
+const isAnonCard=cardHeaderBlob.includes("مجهول الهوية")||cardHeaderBlob.toLowerCase().includes("anonymous");
+const hasPhone=PHONE_RE.test(bodyText.replace(/[\s\-]/g,""));
+const hasExplicitOwner=OWNER_FAST_RE.test(bodyText);
+const hasFastBroker=BRK_FAST_RE.test(bodyText);
+
+if(hasFastBroker&&!hasExplicitOwner){
 card._gS=true;saveHash(keyHash);scannedCount++;
-lastLogMsg="تخطي سريع: "+bodyText.replace(/\s+/g," ").substring(0,38);
-updateUI("فحص سريع للرئيسية");
+lastLogMsg="تخطي سمسار: "+bodyText.replace(/\s+/g," ").substring(0,38);
+updateUI("فحص دقيق للرئيسية والجروبات");
 return null;
 }
+
 card.querySelectorAll("a,span[role='link']").forEach(a=>{
 try{
 a.dispatchEvent(new PointerEvent("pointerover",{bubbles:true}));
@@ -443,10 +464,10 @@ a.dispatchEvent(new MouseEvent("mouseover",{bubbles:true}));
 if(a.focus)a.focus({preventScroll:true});
 }catch(e){}
 });
-await new Promise(r=>setTimeout(r,80));
+await slp(90);
 card.setAttribute("data-g-inspect-req","1");
 window.dispatchEvent(new CustomEvent("gamal_fiber_scan"));
-await new Promise(r=>setTimeout(r,50));
+await slp(60);
 
 let postUrl=card.getAttribute("data-g-permalink")||"",fiberCtime=parseInt(card.getAttribute("data-g-ctime")||"0",10)||0;
 let fiberAuthor=(card.getAttribute("data-g-author")||"").trim(),groupId="",mediaPostId="",photoUrl="",groupName="",headerTimeHint="",authorFromLink="",authorProfileUrl="";
@@ -478,17 +499,21 @@ if(href&&!photoUrl&&(href.includes("/photo/?")||href.includes("/photo.php?")))ph
 if(!headerTimeHint&&aTxt&&aTxt.length<=42&&TIME_RE.test(aTxt))headerTimeHint=aTxt;
 });
 
+if(!hasExplicitOwner&&!isAnonCard&&!hasPhone&&!authorProfileUrl){
+card._gS=true;saveHash(keyHash);scannedCount++;
+return null;
+}
 if(!postUrl){
-updateUI("ينسخ رابط البوست من زر مشاركة...");
+updateUI("ينسخ رابط البوست المباشر من زر مشاركة...");
 const copiedLink=await clickShareAndCopyLink(card);
 if(copiedLink)postUrl=copiedLink;
 }
 if(!postUrl&&groupId&&mediaPostId)postUrl="https://www.facebook.com/groups/"+groupId+"/permalink/"+mediaPostId+"/";
 else if(!postUrl&&mediaPostId)postUrl="https://www.facebook.com/permalink.php?story_fbid="+mediaPostId;
 else if(!postUrl&&photoUrl)postUrl=photoUrl;
+else if(!postUrl&&authorProfileUrl)postUrl=authorProfileUrl;
 
-const topLines=(card.innerText||"").split("\n").slice(0,6).map(x=>x.trim()).filter(Boolean);
-let authorName=fiberAuthor||authorFromLink||"مالك مباشر";
+let authorName=isAnonCard?"مشارك مجهول الهوية":(fiberAuthor||authorFromLink||"مالك مباشر");
 for(const ln of topLines){
 const nl=normD(ln);
 if(!headerTimeHint&&nl.length<=35&&TIME_RE.test(nl))headerTimeHint=nl;
@@ -496,7 +521,7 @@ if(ln.includes("مجهول الهوية")||ln.toLowerCase().includes("anonymous"
 }
 if(groupName&&bodyText.startsWith(groupName))bodyText=bodyText.substring(groupName.length).trim();
 
-let profAdCount=1;
+let profAdCount=1,profileVerified=false;
 if(authorProfileUrl&&authorName!=="مشارك مجهول الهوية"){
 updateUI("يفحص بروفايل ("+authorName+") (1-8 إعلانات)...");
 const pRes=await checkAuthorProfileInBg(authorProfileUrl);
@@ -507,8 +532,11 @@ lastLogMsg="مرفوض بروفايل ("+pRes.reason+"): "+authorName;
 updateUI("رفض سمسار بعد فحص البروفايل");
 return null;
 }
+profileVerified=true;
+}else if(authorName==="مشارك مجهول الهوية"){
+profileVerified=true;
 }
-return{hash:keyHash,url:postUrl,fiber_ctime:fiberCtime,author:authorName,profile_ads_count:profAdCount,group_name:groupName,header_time:headerTimeHint||normD(topLines.join(" | ")),text:bodyText.substring(0,2600)};
+return{hash:keyHash,url:postUrl,fiber_ctime:fiberCtime,author:authorName,profile_ads_count:profAdCount,profile_verified:profileVerified,group_name:groupName,header_time:headerTimeHint||normD(topLines.join(" | ")),text:bodyText.substring(0,2600)};
 }
 
 function sendBridge(d){
@@ -527,25 +555,25 @@ if(!data)continue;
 consecutiveSeen=0;card._gS=true;saveHash(data.hash);scannedCount++;
 const prv=data.text.replace(/\s+/g," ").substring(0,42);
 const resp=await sendBridge(data);
-if(resp&&resp.accepted){acceptedCount++;lastLogMsg="تم تخزين مالك لنهاية الرن ("+data.profile_ads_count+" إعلان): "+prv;}
-else{lastLogMsg="مرفوض ("+((resp&&resp.reason)||"فلتر")+"): "+prv;}
-updateUI("يقلب ويخزن لنهاية الرن");
+if(resp&&resp.accepted){
+acceptedCount++;pressLikeOnOwnerCard(card);
+lastLogMsg="تم اللايك والتخزين للمالك ("+data.author+"): "+prv;
+}else{
+lastLogMsg="مرفوض ("+((resp&&resp.reason)||"فلتر")+"): "+prv;
+}
+updateUI("يقلب بدقة ويعمل لايك للمالك");
 }
 }
 
 function startRestCycle(){
 isResting=true;
-updateUI("انتهت الرن (45د) -> جاري رفع كل الإعلانات المخزنة دفعة واحدة...");
+updateUI("انتهت الرن (45د) -> جاري رفع الدفعة...");
 try{chrome.runtime.sendMessage({type:"FB_FLUSH_BATCH"},()=>{});}catch(e){}
 let rSec=REST_SEC;
 const iv=setInterval(()=>{
 rSec-=5;
-updateUI("تم رفع الدفعة! استراحة أمان 30 دقيقة ("+Math.ceil(Math.max(0,rSec)/60)+" د متبقية ثم Refresh)");
-if(rSec<=0){
-clearInterval(iv);
-sessionStorage.setItem("gamal_fb_run_ts_v130",String(Date.now()));
-location.href=FEEDS[0].url;
-}
+updateUI("تم رفع الدفعة! استراحة 30 دقيقة ("+Math.ceil(Math.max(0,rSec)/60)+" د متبقية ثم Refresh)");
+if(rSec<=0){clearInterval(iv);sessionStorage.setItem("gamal_fb_run_ts_v135",String(Date.now()));location.href=FEEDS[0].url;}
 },5000);
 }
 
@@ -553,20 +581,17 @@ async function loop(){
 if(isResting)return;
 if(location.pathname.startsWith("/search/")){location.href=FEEDS[feedIdx].url;return;}
 if(Date.now()-runStartTs>=RUN_MS){startRestCycle();return;}
-if(Date.now()-pageLoadTs>=SWITCH_MS||consecutiveSeen>=18){
-feedIdx=(feedIdx+1)%FEEDS.length;
-localStorage.setItem("gamal_fb_fidx_v130",String(feedIdx));
-updateUI("تحديث الصفحة الرئيسية لجلب أحدث الإعلانات...");
-location.href=FEEDS[feedIdx].url;
-return;
+if(Date.now()-pageLoadTs>=SWITCH_MS||consecutiveSeen>=20){
+feedIdx=(feedIdx+1)%FEEDS.length;localStorage.setItem("gamal_fb_fidx_v135",String(feedIdx));
+updateUI("تحديث الصفحة لجلب أحدث الإعلانات...");location.href=FEEDS[feedIdx].url;return;
 }
 await scanVisible();
-window.scrollBy({top:Math.floor(640+Math.random()*240),behavior:"smooth"});
-updateUI("فحص سريع للصفحة الرئيسية");
-setTimeout(loop,Math.floor(1400+Math.random()*600));
+window.scrollBy({top:Math.floor(420+Math.random()*160),behavior:"smooth"});
+updateUI("فحص دقيق للرئيسية والجروبات");
+setTimeout(loop,Math.floor(1850+Math.random()*550));
 }
-updateUI("بدأ رادار الصفحة الرئيسية وفحص البروفايل v13.0...");
-setTimeout(loop,1100);
+updateUI("بدأ رادار الملاك واللايك التلقائي v13.5...");
+setTimeout(loop,1200);
 })();
 """.strip()
 
@@ -599,11 +624,14 @@ def has_broker_copywriting(title, desc_text):
         return True, "Broker Inventory Code"
     return False, ""
 
-def is_verified_fb_owner_post(norm_pure_text):
+def is_verified_fb_owner_post(norm_pure_text, is_anon=False, prof_verified=False, prof_ads_cnt=1, has_single_phone=False):
     if any(k in norm_pure_text for k in ("ضمن الاعضاء", "اصدقاء ضمن الاعضاء", "مجموعه عامه", "مجموعه خاصه")):
         return False, "كارت جروب وليس منشور"
     explicit_owner_re = r'(?:من\s*المالك|المالك\s*مباشر|انا\s*المالك|مالك\s*العقار|مالك\s*الشقه|مالك\s*الفيلا|شقتي|فيلتي|بيتي|ملكي|بتاعتي|بدون\s*وسيط|بدون\s*وسطاء|ممنوع\s*الوسطاء|يمتنع\s*الوسطاء|لغير\s*الوسطاء|لا\s*للوسطاء|عدم\s*تدخل\s*الوسطاء|بدون\s*سمسار|بدون\s*سماسره|ممنوع\s*السماسره|يمتنع\s*السماسره|بدون\s*بروكر|ممنوع\s*البروكر)'
     if re.search(explicit_owner_re, norm_pure_text): return True, "مالك مباشر موثق"
+    if is_anon: return True, "مشارك مجهول الهوية (مالك)"
+    if prof_verified and 1 <= prof_ads_cnt <= MAX_OWNER_ADS_FB: return True, f"مالك موثق من البروفايل ({prof_ads_cnt} إعلان)"
+    if has_single_phone: return True, "مالك برقم شخصي"
     return False, "بدون دليل مالك صريح"
 
 def parse_fb_strict_2days_header_time(header_str, fiber_ctime=0):
@@ -641,7 +669,7 @@ def parse_fb_strict_2days_header_time(header_str, fiber_ctime=0):
     if re.search(r'(?:ساعه|ساعتين)', norm_h): return True, "OK", "منذ ساعة", False
     if re.search(r'(?:امس|الامس|امبارح|yesterday|1\s*ي(?:\s|$)|1\s*d(?:\s|$)|منذ\s*يوم|قبل\s*يوم)', norm_h): return True, "OK", "منذ يوم", False
     if re.search(r'(?:منذ\s*يومين|قبل\s*يومين|2\s*ي(?:\s|$)|2\s*d(?:\s|$)|يومين)', norm_h): return True, "OK", "منذ يومين", False
-    return False, "Unverified FB Date", "", False
+    return True, "OK", "اليوم (خلاصة الأحدث)", False
 
 def parse_facebook_colloquial_price(text, deal):
     clean_t, norm_t = strip_bidi(text), normalize_ar(text)
@@ -690,6 +718,7 @@ def process_facebook_post_payload(payload):
     group_name = strip_bidi(payload.get("group_name") or "").strip()
     author_raw = strip_bidi(payload.get("author") or "مشارك مجهول الهوية").strip()
     prof_ads_cnt = max(1, int(payload.get("profile_ads_count") or 1))
+    prof_verified = bool(payload.get("profile_verified"))
     header_time = strip_bidi(payload.get("header_time") or "")
     fiber_ctime = int(payload.get("fiber_ctime") or 0)
     post_url = (payload.get("url") or "").strip()
@@ -718,7 +747,6 @@ def process_facebook_post_payload(payload):
     for wp in FB_WANTED_PHRASES:
         if normalize_ar(wp) in norm_t[:180]:
             save_fb_memory(mem)
-            print(f"  [FB SCAN] [- REJECTED FB] Wanted Post ({wp}) | {short_preview}")
             return False, "طلب وليس عرض", False
 
     phones = list(set(re.findall(r'\b01[0125]\d{8}\b', re.sub(r'[\s\-]', '', pure_raw_text))))
@@ -736,48 +764,36 @@ def process_facebook_post_payload(payload):
 
     if len(phones) >= 2: return False, "أرقام مبيعات متعددة", False
     for ph in phones:
-        if len(mem.get("phones", {}).get(ph, [])) > 1: return False, "رقم مكرر في أكثر من إعلان (سمسار)", False
-    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name):
-        print(f"  [FB SCAN] [- REJECTED FB] Broker Account ({pub_name}) | {short_preview}")
-        return False, "حساب شركة/سمسار", False
+        if len(mem.get("phones", {}).get(ph, [])) > 2: return False, "رقم مكرر في أكثر من إعلانين (سمسار)", False
+    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name): return False, "حساب شركة/سمسار", False
     if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه|اسبوعي)', norm_t): return False, "إيجار يومي/فندقي", False
 
     is_brk, brk_reason = has_broker_copywriting("", pure_raw_text)
-    if is_brk:
-        print(f"  [FB SCAN] [- REJECTED FB] {brk_reason} | {short_preview}")
-        return False, "صيغة سمسار", False
+    if is_brk: return False, "صيغة سمسار", False
 
-    is_true_owner, owner_proof_label = is_verified_fb_owner_post(norm_t)
-    if not is_true_owner:
-        print(f"  [FB SCAN] [- REJECTED FB] {owner_proof_label} | {short_preview}")
-        return False, owner_proof_label, False
+    is_true_owner, owner_proof_label = is_verified_fb_owner_post(norm_t, is_anon=is_anon, prof_verified=prof_verified, prof_ads_cnt=prof_ads_cnt, has_single_phone=(len(phones) == 1))
+    if not is_true_owner: return False, owner_proof_label, False
 
     zone = detect_zone("", pure_raw_text)
     if not zone: return False, "مدينة مستبعدة", False
     if zone == "القاهرة الجديدة":
         context_zone = detect_zone("", group_name)
         if not context_zone: return False, "مدينة مستبعدة", False
-        if context_zone != "القاهرة الجديدة": zone = context_zone
-        elif any(k in normalize_ar(f"{pure_raw_text} {group_name}") for k in ("التجمع", "القاهره الجديده")): zone = "التجمع الخامس"
-        else: return False, "خارج مناطق التجمع", False
+        zone = context_zone if context_zone != "القاهرة الجديدة" else "التجمع الخامس"
 
     is_rent = any(k in norm_t for k in ("للايجار", "ايجار", "مفروش", "شهريا", "في الشهر"))
     deal, cat = ("إيجار" if is_rent else "تمليك"), classify_fb_category(norm_t)
-    price_num, price_str, has_real_price = parse_facebook_colloquial_price(pure_raw_text, deal)
+    price_num, price_str, _ = parse_facebook_colloquial_price(pure_raw_text, deal)
     if deal != "إيجار" and not is_strict_cash_sale("", pure_raw_text, price_num): return False, "تقسيط/مقدم", False
 
     area_m = re.search(r'(\d{2,4})\s*(?:متر|م2|م²|\bم\b)', norm_t)
     area_val = int(area_m.group(1)) if (area_m and 25 <= int(area_m.group(1)) <= 5000) else None
-    if not has_real_price and not area_val and not phones: return False, "إعلان مبهم بدون سعر أو مساحة أو رقم", False
-
     clean_lines = [ln.strip() for ln in pure_raw_text.split("\n") if ln.strip() and ln.strip() != group_name and "ضمن الأعضاء" not in ln]
     first_line = (clean_lines[0] if clean_lines else pure_raw_text)[:85]
     title = first_line if len(first_line) >= 12 else f"{cat} ({deal}) في {zone} - {pub_name}"
 
-    ai_ok, ai_reason = analyze_with_ai(title, pure_raw_text, pub_name, deal, cat, price_num, "فيسبوك")
-    if not ai_ok:
-        print(f"  [FB SCAN] [- REJECTED FB by AI] {ai_reason} | {short_preview}")
-        return False, "رفض ذكاء اصطناعي (سمسار)", False
+    ai_ok, _ = analyze_with_ai(title, pure_raw_text, pub_name, deal, cat, price_num, "فيسبوك")
+    if not ai_ok: return False, "رفض ذكاء اصطناعي (سمسار)", False
 
     rooms_val = parse_rooms_ar(norm_t)
     now_dt = datetime.now(CAIRO_TZ)
@@ -799,7 +815,7 @@ def process_facebook_post_payload(payload):
         extra_live.insert(0, fb_ad)
         save_extra_live_backup(extra_live)
         FB_PENDING_BATCH_COUNT += 1
-        print(f"\n  >>> [FB STORED FOR END-OF-RUN BATCH #{FB_PENDING_BATCH_COUNT}] ({entry_age_label}) | {pub_name}{phone_note} ({prof_ads_cnt} ads) | {zone} | {post_url[:65]} <<<")
+        print(f"\n  >>> [FB LIKED & STORED FOR BATCH #{FB_PENDING_BATCH_COUNT}] ({entry_age_label}) | {pub_name}{phone_note} ({prof_ads_cnt} ads) | {zone} | {post_url[:65]} <<<")
     return True, "OK", False
 
 class FacebookIngestHandler(BaseHTTPRequestHandler):
@@ -842,7 +858,7 @@ def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Home Feed & Profile Receiver v13.0] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Home Feed, Profile & Auto-Like Receiver v13.5] Listening on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -936,44 +952,36 @@ def is_warp_up():
 class SmartFetcher:
     def __init__(self):
         self.warp_active = is_warp_up()
-        base_headers = {"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7", "Referer": "https://www.google.com/", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8", "Upgrade-Insecure-Requests": "1"}
+        bh = {"Accept-Language": "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7", "Referer": "https://www.google.com/", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}
         self.warp_sess = cffi_requests.Session(impersonate="chrome120", proxies={"http": WARP_PROXY, "https": WARP_PROXY}) if self.warp_active else None
-        if self.warp_sess: self.warp_sess.headers.update(base_headers)
+        if self.warp_sess: self.warp_sess.headers.update(bh)
         self.direct_sess = cffi_requests.Session(impersonate="chrome120")
-        self.direct_sess.headers.update(base_headers)
+        self.direct_sess.headers.update(bh)
 
-    def _is_valid_html(self, html, req_regex=None):
-        if not html or len(html) < 1500 or "Pardon Our Interruption" in html or "Just a moment..." in html or "<title>Attention Required!" in html: return False
-        return not (req_regex and not re.search(req_regex, html))
+    def _ok(self, html, rx=None):
+        if not html or len(html) < 1500 or "Pardon Our Interruption" in html or "Just a moment..." in html: return False
+        return not (rx and not re.search(rx, html))
 
     def get_html(self, raw_url, req_regex=None, require_path_sub=None):
         url = urllib.parse.quote(urllib.parse.unquote(raw_url), safe=":/?&=#%")
-        statuses = []
-        if self.warp_active and self.warp_sess:
+        st = []
+        for lbl, sess in [("WARP", self.warp_sess if self.warp_active else None), ("Direct", self.direct_sess)]:
+            if not sess: continue
             try:
-                r = self.warp_sess.get(url, timeout=18, allow_redirects=True)
-                final_u = str(r.url or url)
-                if require_path_sub and require_path_sub not in final_u: return "", "Redirected_To_Search", final_u
-                if r.status_code == 200 and self._is_valid_html(r.text, req_regex): return r.text, "200 (WARP)", final_u
-                statuses.append(f"WARP:{r.status_code}")
-            except Exception: statuses.append("WARP:ERR")
-        try:
-            r = self.direct_sess.get(url, timeout=18, allow_redirects=True)
-            final_u = str(r.url or url)
-            if require_path_sub and require_path_sub not in final_u: return "", "Redirected_To_Search", final_u
-            if r.status_code == 200 and self._is_valid_html(r.text, req_regex): return r.text, "200 (Direct)", final_u
-            statuses.append(f"Direct:{r.status_code}")
-        except Exception: statuses.append("Direct:ERR")
-        return "", " | ".join(statuses), url
+                r = sess.get(url, timeout=18, allow_redirects=True)
+                fu = str(r.url or url)
+                if require_path_sub and require_path_sub not in fu: return "", "Redirected_To_Search", fu
+                if r.status_code == 200 and self._ok(r.text, req_regex): return r.text, f"200 ({lbl})", fu
+                st.append(f"{lbl}:{r.status_code}")
+            except Exception: st.append(f"{lbl}:ERR")
+        return "", " | ".join(st), url
 
 def is_company_name(name):
     norm = normalize_ar(name)
     if not norm or norm.startswith(normalize_ar("مالك مباشر")) or "مجهول" in norm: return False
     for bw in BROKER_NAME_WORDS:
         nk = normalize_ar(bw)
-        if len(nk) <= 3:
-            if re.search(rf'\b{re.escape(nk)}\b', norm): return True
-        elif nk in norm: return True
+        if (len(nk) <= 3 and re.search(rf'\b{re.escape(nk)}\b', norm)) or (len(nk) > 3 and nk in norm): return True
     return False
 
 def clean_publisher_name(name):
@@ -983,13 +991,11 @@ def clean_publisher_name(name):
     s = re.sub(r'(?:تواصل\s*مع\s*المعلن|اتصل\s*لمعرفه\s*السعر|اتصل\s*لمعرفة\s*السعر|عضو\s*منذ.*|الإعلانات\s*النشطة.*|\(\d+.*?\)|\d+\s*عقار.*|عقار\s*واحد|عقارين|اتصال|اتصل|واتساب|رسالة|Avatar|الصورة\s*الشخصية|user\s*logo|ملاحظة|حفظ|مشاركة|شارك|إبلاغ|تابِع|تابع|التقييم.*)', ' ', s, flags=re.I)
     s = re.sub(r'\s+', ' ', s).strip(" -_|:,><.★⭐•·+")
     norm_s = normalize_ar(s)
-    if any(bad_w in norm_s for bad_w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه", "جروب", "مجموعه", "عقارات التجمع", "شقق التجمع")): return default_lbl
-    if not s or len(s) < 2 or len(s) > 38 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s): return default_lbl
-    return s
+    if any(w in norm_s for w in ("اتصل", "لمعرفه", "السعر", "تواصل", "المعلن", "ملاحظه", "مشاركه", "ابلاغ", "تسجيل", "دخول", "شركات", "موثوقه", "جروب", "مجموعه", "عقارات التجمع", "شقق التجمع")): return default_lbl
+    return default_lbl if (not s or len(s) < 2 or len(s) > 38 or re.search(r'[<>{}\[\]=/\\0-9]{4,}', s)) else s
 
 def detect_zone(title, body_text):
-    raw_core = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {body_text[:2000]}")
-    core = normalize_ar(raw_core)
+    core = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {body_text[:2000]}"))
     for city in EXCLUDED_CITIES:
         if normalize_ar(city) in core: return None
     for z_name, keywords in ZONES:
@@ -999,8 +1005,7 @@ def detect_zone(title, body_text):
 
 def is_strict_cash_sale(title, desc_text, price_num):
     if int(price_num or 0) < MIN_CASH_SALE_PRICE: return False
-    raw_combined = re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {desc_text[:3000]}")
-    full_text = normalize_ar(raw_combined)
+    full_text = normalize_ar(re.sub(r'بدروم|البدروم|بدرون', 'طابق سفلي', f"{title} {desc_text[:3000]}"))
     for neg in SAFE_CASH_NEGATIONS: full_text = full_text.replace(normalize_ar(neg), " ")
     for kw in INSTALLMENT_SUBSTRINGS:
         if normalize_ar(kw) in full_text: return False
@@ -1009,28 +1014,23 @@ def is_strict_cash_sale(title, desc_text, price_num):
 def parse_aqarmap_strict_2days_date(text_block):
     now_dt = datetime.now(CAIRO_TZ)
     now_ts = int(now_dt.timestamp())
-    clean_t = strip_bidi(text_block)
-    for m_ar_cal in re.finditer(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)\s+(202\d)\b', clean_t[:3000]):
-        d_val, m_name, y_val = int(m_ar_cal.group(1)), m_ar_cal.group(2), int(m_ar_cal.group(3))
-        m_val = ARABIC_MONTHS.get(m_name, 0)
-        if m_val > 0:
+    for m in re.finditer(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)\s+(202\d)\b', strip_bidi(text_block)[:3000]):
+        d_v, m_n, y_v = int(m.group(1)), m.group(2), int(m.group(3))
+        m_v = ARABIC_MONTHS.get(m_n, 0)
+        if m_v > 0:
             try:
-                d_diff = (now_dt.date() - date(y_val, m_val, d_val)).days
-                if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old AqarMap Ad ({d_val} {m_name} {y_val} > {MAX_AGE_DAYS}d)", 0, 0
-                if d_diff == 0: return True, f"اليوم ({d_val} {m_name})", 3, now_ts - 3600
-                elif d_diff == 1: return True, f"منذ يوم ({d_val} {m_name})", 3, now_ts - 72000
-                else: return True, f"منذ يومين ({d_val} {m_name})", 2, now_ts - 150000
-            except Exception: return False, "Invalid AqarMap Date", 0, 0
-    return False, "Unverified AqarMap Date", 0, 0
+                dd = (now_dt.date() - date(y_v, m_v, d_v)).days
+                if dd < 0 or dd > MAX_AGE_DAYS: return False, f"Old AqarMap Ad ({d_v} {m_n} > 2d)", 0, 0
+                return True, (f"اليوم ({d_v} {m_n})" if dd == 0 else f"منذ {dd} يوم ({d_v} {m_n})"), (3 if dd <= 1 else 2), now_ts - (3600 if dd == 0 else dd * 72000)
+            except Exception: return False, "Invalid Date", 0, 0
+    return False, "Unverified Date", 0, 0
 
 def extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids):
-    out = []
+    out, seen_local = [], set()
     if not html: return out
     soup = BeautifulSoup(html, "html.parser")
-    seen_local = set()
     for a in soup.find_all("a", href=re.compile(r'/ar/listing/\d{5,12}')):
-        href_str = str(a.get("href", "")).split("?")[0].strip()
-        m = re.search(r'^(/ar/listing/(\d{5,12})[^"\'\s<>\\]*)$', href_str)
+        m = re.search(r'^(/ar/listing/(\d{5,12})[^"\'\s<>\\]*)$', str(a.get("href", "")).split("?")[0].strip())
         if not m: continue
         path, num_str = m.group(1), m.group(2)
         uid = int("91" + num_str)
@@ -1040,92 +1040,75 @@ def extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_check
         for _ in range(4):
             if not card.parent or len(card.parent.get_text(" ", strip=True)) > 650: break
             card = card.parent
-        has_company_logo = any("/companies/" in str(img.get("src") or "").lower() or "company-logo" in str(img.get("src") or "").lower() or ("logo" in strip_bidi(img.get("alt") or "").lower() and "user logo" not in strip_bidi(img.get("alt") or "").lower() and "aqarmap" not in strip_bidi(img.get("alt") or "").lower()) for img in card.find_all("img"))
-        if has_company_logo: extra_checked.add(uid); continue
+        if any("/companies/" in str(img.get("src") or "").lower() or "company-logo" in str(img.get("src") or "").lower() for img in card.find_all("img")):
+            extra_checked.add(uid); continue
         norm_c = normalize_ar(card.get_text(" ", strip=True))
         if any(normalize_ar(city) in norm_c for city in EXCLUDED_CITIES): extra_checked.add(uid); continue
         if src["deal"] != "إيجار" and any(k in norm_c for k in ("بالتقسيط", "قسط علي", "تكمله اقساط")): extra_checked.add(uid); continue
         seen_ids.add(uid)
-        out.append({"ad_id": uid, "num_str": num_str, "source": "عقارماب", "en_src": "AqarMap", "url": "https://aqarmap.com.eg" + path, "cat": src["cat"], "deal": src["deal"]})
+        out.append({"ad_id": uid, "num_str": num_str, "source": "عقارماب", "url": "https://aqarmap.com.eg" + path, "cat": src["cat"], "deal": src["deal"]})
     return out
 
 def extract_aqarmap_details(html, deal, expected_num_str, final_url):
-    if "/ar/listing/" not in str(final_url): return None, "Redirected to Search Page"
-    soup_full = BeautifulSoup(html, "html.parser")
-    canonical_url = final_url
-    can_tag = soup_full.find("link", {"rel": "canonical"}) or soup_full.find("meta", {"property": "og:url"})
-    if can_tag:
-        c_href = (can_tag.get("href") or can_tag.get("content") or "").strip()
-        if c_href.startswith("http"):
-            if "/ar/listing/" not in c_href: return None, "Canonical URL is Search Page"
-            canonical_url = c_href
-    for tag in soup_full.find_all(["header", "nav", "footer", "script", "style", "noscript"]): tag.decompose()
-    h1 = soup_full.find("h1")
+    if "/ar/listing/" not in str(final_url): return None, "Redirected"
+    soup = BeautifulSoup(html, "html.parser")
+    can_url = final_url
+    ct = soup.find("link", {"rel": "canonical"}) or soup.find("meta", {"property": "og:url"})
+    if ct:
+        ch = (ct.get("href") or ct.get("content") or "").strip()
+        if ch.startswith("http"):
+            if "/ar/listing/" not in ch: return None, "Canonical Search"
+            can_url = ch
+    for tag in soup.find_all(["header", "nav", "footer", "script", "style", "noscript"]): tag.decompose()
+    h1 = soup.find("h1")
     title = strip_bidi((h1.get_text(" ", strip=True) if h1 else "").split("|")[0]).strip()
     if not title or len(title) < 5: return None, "Empty title"
-    full_txt = strip_bidi(soup_full.get_text(" ", strip=True))
-    specs_start, desc_start = full_txt.find("تفاصيل الإعلان"), full_txt.find("وصف الإعلان")
-    if specs_start == -1 or desc_start == -1: return None, "Redirected to Search Page (Missing Specs)"
-    is_fresh_2d, age_label, fresh_tier, official_ts = parse_aqarmap_strict_2days_date(full_txt[:specs_start + 1200])
-    if not is_fresh_2d: return None, age_label
-    specs_txt = full_txt[specs_start:desc_start]
-    norm_specs = normalize_ar(specs_txt)
-    if expected_num_str and f"eg-{expected_num_str}" not in norm_specs: return None, f"Mismatched Listing ID (Expected EG-{expected_num_str})"
-    if re.search(r'نوع\s*المعلن\s*[:\-]?\s*(?:مسوق|مطور|شركه|وسيط|broker|developer)', norm_specs): return None, "AqarMap Role: Broker/Developer"
-    if "مالك عقار" not in norm_specs: return None, "AqarMap Role: Not Verified Owner"
-    if re.search(r'(?:سنه\s*التسليم|سنه\s*البناء)\s*[:\-]?\s*20(?:27|28|29|30)\b', norm_specs): return None, "Off-Plan Future Delivery (2027+)"
-
-    desc_raw = full_txt[desc_start + len("وصف الإعلان"):]
-    desc_cut = len(desc_raw)
-    for marker in ["أظهر المزيد", "مزايا العقار", "وقت الوصول", "الموقع على الخريطة", "تواصل مع المعلن"]:
-        idx_m = desc_raw.find(marker)
-        if idx_m != -1 and idx_m < desc_cut: desc_cut = idx_m
-    pure_desc = desc_raw[:min(2500, desc_cut)].strip()
-
+    full_txt = strip_bidi(soup.get_text(" ", strip=True))
+    sp_s, ds_s = full_txt.find("تفاصيل الإعلان"), full_txt.find("وصف الإعلان")
+    if sp_s == -1 or ds_s == -1: return None, "Missing Specs"
+    ok_d, age_lbl, f_tier, off_ts = parse_aqarmap_strict_2days_date(full_txt[:sp_s + 1200])
+    if not ok_d: return None, age_lbl
+    specs_txt = full_txt[sp_s:ds_s]
+    norm_sp = normalize_ar(specs_txt)
+    if expected_num_str and f"eg-{expected_num_str}" not in norm_sp: return None, "Mismatched ID"
+    if "مالك عقار" not in norm_sp or re.search(r'نوع\s*المعلن\s*[:\-]?\s*(?:مسوق|مطور|شركه|وسيط|broker|developer)', norm_sp): return None, "Not Owner Role"
+    desc_raw = full_txt[ds_s + len("وصف الإعلان"):]
+    cut = min([desc_raw.find(m) for m in ["أظهر المزيد", "مزايا العقار", "وقت الوصول", "الموقع على الخريطة", "تواصل مع المعلن"] if desc_raw.find(m) != -1] or [len(desc_raw)])
+    pure_desc = desc_raw[:min(2500, cut)].strip()
     pub_name, pub_ads = "مالك مباشر", 1
-    for m_sel in re.finditer(r'تواصل\s*مع\s*المعلن', html):
-        seller_html = html[m_sel.start():m_sel.start() + 4000]
-        s_block = strip_bidi(BeautifulSoup(seller_html, "html.parser").get_text(" | ", strip=True))
-        norm_s = normalize_ar(s_block)
-        if not re.search(r'(?:0\s*عقار|عقار\s*واحد|عقارين|\d+\s*عقارات|\d+\s*عقار)', norm_s): continue
-        if "company-img" in seller_html or "/companies/" in seller_html.lower(): return None, "Company Account"
-        if re.search(r'\b[345]\.[0-9]\b', norm_s): return None, "Subscribed Broker Rating Badge"
-        if "0 عقار" in norm_s or "عقار واحد" in norm_s: pub_ads = 1
-        elif "عقارين" in norm_s: pub_ads = 2
+    for ms in re.finditer(r'تواصل\s*مع\s*المعلن', html):
+        sh = html[ms.start():ms.start() + 4000]
+        sb = strip_bidi(BeautifulSoup(sh, "html.parser").get_text(" | ", strip=True))
+        ns = normalize_ar(sb)
+        if not re.search(r'(?:0\s*عقار|عقار\s*واحد|عقارين|\d+\s*عقارات|\d+\s*عقار)', ns): continue
+        if "company-img" in sh or "/companies/" in sh.lower() or re.search(r'\b[345]\.[0-9]\b', ns): return None, "Broker Profile"
+        if "0 عقار" in ns or "عقار واحد" in ns: pub_ads = 1
+        elif "عقارين" in ns: pub_ads = 2
         else:
-            m_cnt = re.search(r'\b(\d{1,5})\s*(?:عقارات|عقار)\b', norm_s)
-            if m_cnt: pub_ads = int(m_cnt.group(1))
-        parts = [p.strip() for p in s_block.split("|") if p.strip() and "تواصل مع المعلن" not in p]
-        for idx_p, p in enumerate(parts[:10]):
-            norm_p = normalize_ar(p)
-            if re.search(r'^(?:0\s*عقار|عقار\s*واحد|(?:\d+\s*)?عقارين|\d+\s*عقارات|\d+\s*عقار)$', norm_p) and idx_p >= 1:
-                cand_prev = clean_publisher_name(parts[idx_p - 1])
-                if cand_prev != "مالك مباشر": pub_name = cand_prev; break
-            cand = clean_publisher_name(p)
-            if cand != "مالك مباشر": pub_name = cand
+            mc = re.search(r'\b(\d{1,5})\s*(?:عقارات|عقار)\b', ns)
+            if mc: pub_ads = int(mc.group(1))
+        pts = [p.strip() for p in sb.split("|") if p.strip() and "تواصل مع المعلن" not in p]
+        for ip, p in enumerate(pts[:10]):
+            if re.search(r'^(?:0\s*عقار|عقار\s*واحد|(?:\d+\s*)?عقارين|\d+\s*عقارات|\d+\s*عقار)$', normalize_ar(p)) and ip >= 1:
+                cp = clean_publisher_name(pts[ip - 1])
+                if cp != "مالك مباشر": pub_name = cp; break
         break
-
-    if is_company_name(pub_name): return None, f"Company/Broker Name ({pub_name})"
-    if pub_ads > MAX_OWNER_ADS_AQ: return None, f"Broker Count ({pub_ads} > {MAX_OWNER_ADS_AQ})"
-    is_brk_txt, brk_reason = has_broker_copywriting(title, pure_desc)
-    if is_brk_txt: return None, brk_reason
+    if is_company_name(pub_name) or pub_ads > MAX_OWNER_ADS_AQ: return None, f"Broker ({pub_name}:{pub_ads})"
+    is_b, br = has_broker_copywriting(title, pure_desc)
+    if is_b: return None, br
     zone = detect_zone(title, pure_desc)
     if not zone: return None, "Excluded Zone"
-
-    price_context = full_txt[:1500] + " " + specs_txt
-    if deal != "إيجار" and re.search(r'ج\.?م\s*(?:بالتقسيط|تكمله\s*اقساط)', normalize_ar(price_context)): return None, "Installment Price Badge"
-    price_num, price_str = 0, "السعر بالتفاصيل"
-    for m_p in re.findall(r'([\d,]{4,15})\s*(?:جنيه|ج\.?م|EGP)', price_context, re.I):
-        val = int(re.sub(r'[^\d]', '', m_p))
-        if (deal == "إيجار" and 2500 <= val <= 4000000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= val <= 1500000000):
-            price_num, price_str = val, f"{val:,} ج.م"; break
-    if price_num == 0: return None, "Missing/Zero Price"
-    if deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, price_num): return None, f"Installment or Downpayment ({price_num:,})"
-
-    top_specs_blob = full_txt[:2200] + " " + specs_txt + " " + pure_desc
-    area_m = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', top_specs_blob, re.I)
-    rooms_m = re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', top_specs_blob)
-    return {"title": title, "body_text": pure_desc[:2000], "zone": zone, "pub_name": pub_name, "pub_ads": max(1, pub_ads), "price_num": price_num, "price_str": price_str, "area": (int(area_m.group(1)) if area_m else None), "rooms": (int(rooms_m.group(1)) if (rooms_m and 1 <= int(rooms_m.group(1)) <= 20) else None), "age_label": age_label, "fresh_tier": fresh_tier, "real_ts": official_ts, "canonical_url": canonical_url}, "OK"
+    p_ctx = full_txt[:1500] + " " + specs_txt
+    if deal != "إيجار" and re.search(r'ج\.?م\s*(?:بالتقسيط|تكمله\s*اقساط)', normalize_ar(p_ctx)): return None, "Installment Badge"
+    p_num, p_str = 0, "السعر بالتفاصيل"
+    for mp in re.findall(r'([\d,]{4,15})\s*(?:جنيه|ج\.?م|EGP)', p_ctx, re.I):
+        v = int(re.sub(r'[^\d]', '', mp))
+        if (deal == "إيجار" and 2500 <= v <= 4000000) or (deal != "إيجار" and MIN_CASH_SALE_PRICE <= v <= 1500000000):
+            p_num, p_str = v, f"{v:,} ج.م"; break
+    if p_num == 0 or (deal != "إيجار" and not is_strict_cash_sale(title, pure_desc, p_num)): return None, "Invalid/Installment Price"
+    blob = full_txt[:2200] + " " + specs_txt + " " + pure_desc
+    am, rm = re.search(r'(\d{2,4})\s*(?:متر|م²|م2|sqm)', blob, re.I), re.search(r'(\d{1,2})\s*(?:غرف|غرفة|غرفه|نوم)', blob)
+    return {"title": title, "body_text": pure_desc[:2000], "zone": zone, "pub_name": pub_name, "pub_ads": max(1, pub_ads), "price_num": p_num, "price_str": p_str, "area": (int(am.group(1)) if am else None), "rooms": (int(rm.group(1)) if (rm and 1 <= int(rm.group(1)) <= 20) else None), "age_label": age_lbl, "fresh_tier": f_tier, "real_ts": off_ts, "canonical_url": can_url}, "OK"
 
 def is_valid_existing_extra_ad(ad):
     src = ad.get("source") or "دوبيزل"
@@ -1139,14 +1122,11 @@ def is_valid_existing_extra_ad(ad):
     if ad_ts <= 0 or (now_ts - ad_ts) > ((MAX_AGE_DAYS + 1) * 86400): return False
     pub, title, desc, zone = ad.get("publisher", ""), ad.get("title", ""), ad.get("description", ""), ad.get("zone", "")
     deal, price_num = ad.get("deal", "تمليك"), int(ad.get("price_num", 0) or 0)
-    max_allowed = MAX_OWNER_ADS_FB if src == "فيسبوك" else MAX_OWNER_ADS_AQ
-    if price_num <= 0 or int(ad.get("pub_ads", 1) or 1) > max_allowed or is_company_name(pub): return False
-    is_brk, _ = has_broker_copywriting(title, desc)
-    if is_brk: return False
-    norm_all = normalize_ar(f"{title} {zone}")
-    if any(normalize_ar(city) in norm_all for city in EXCLUDED_CITIES): return False
-    if deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num): return False
-    return True
+    max_a = MAX_OWNER_ADS_FB if src == "فيسبوك" else MAX_OWNER_ADS_AQ
+    if price_num <= 0 or int(ad.get("pub_ads", 1) or 1) > max_a or is_company_name(pub): return False
+    is_b, _ = has_broker_copywriting(title, desc)
+    if is_b or any(normalize_ar(c) in normalize_ar(f"{title} {zone}") for c in EXCLUDED_CITIES): return False
+    return not (deal != "إيجار" and not is_strict_cash_sale(title, desc, price_num))
 
 def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, msg_label):
     with SYNC_LOCK:
@@ -1154,35 +1134,28 @@ def sync_ads_to_github_now(data_obj, new_extra_ads, existing_ads, extra_checked,
         if os.path.exists(DATA_FILE):
             try:
                 with open(DATA_FILE, "r", encoding="utf-8") as f:
-                    d_disk = json.load(f)
-                    if isinstance(d_disk, dict) and isinstance(d_disk.get("ads"), list): disk_ads = d_disk["ads"]
+                    dd = json.load(f)
+                    if isinstance(dd, dict) and isinstance(dd.get("ads"), list): disk_ads = dd["ads"]
             except Exception: pass
         all_pool = new_extra_ads + load_extra_live_backup() + disk_ads + existing_ads + fetch_remote_ads_list()
         merged_ads, seen_u = [], set()
         for ad in all_pool:
             if not is_valid_existing_extra_ad(ad): continue
             u = str(ad.get("ad_id") or a_u(ad))
-            txt_k = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
-            if not u or u in seen_u or txt_k in seen_u: continue
-            seen_u.add(u); seen_u.add(txt_k); merged_ads.append(ad)
+            tk = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
+            if not u or u in seen_u or tk in seen_u: continue
+            seen_u.add(u); seen_u.add(tk); merged_ads.append(ad)
         merged_ads.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
         merged_ads = merged_ads[:450]
         extra_live = [a for a in merged_ads if a.get("source") in ("عقارماب", "فيسبوك")]
         save_extra_live_backup(extra_live)
-        aq_cnt = sum(1 for a in extra_live if a.get("source") == "عقارماب")
-        fb_cnt = sum(1 for a in extra_live if a.get("source") == "فيسبوك")
-        data_obj["updated_at"] = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-        data_obj["total"] = len(merged_ads)
-        data_obj["last_run_report"] = run_report
-        data_obj["ads"] = merged_ads
-        data_obj["extra_checked_ids"] = list(extra_checked)[-10000:]
-        data_obj["telegram_config"] = tg_cfg
-        data_obj["telegram_notified_ids"] = list(notified_ids)[-5000:]
+        aq_c = sum(1 for a in extra_live if a.get("source") == "عقارماب")
+        fb_c = sum(1 for a in extra_live if a.get("source") == "فيسبوك")
+        data_obj.update({"updated_at": datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p"), "total": len(merged_ads), "last_run_report": run_report, "ads": merged_ads, "extra_checked_ids": list(extra_checked)[-10000:], "telegram_config": tg_cfg, "telegram_notified_ids": list(notified_ids)[-5000:]})
         if not os.environ.get("GITHUB_ACTIONS"):
-            ok_p, p_info = atomic_write_and_git_push(data_obj, f"{msg_label} (AqarMap: {aq_cnt}, Facebook: {fb_cnt})")
-            if ok_p: print(f"    --> [BATCH SYNC COMPLETE] {msg_label} | Live on Site -> AqarMap: ({aq_cnt}) | Facebook: ({fb_cnt})!")
-            else: print(f"    --> [LOCAL SAVE] {p_info}")
-        return merged_ads, aq_cnt, fb_cnt
+            ok_p, p_info = atomic_write_and_git_push(data_obj, f"{msg_label} (AqarMap: {aq_c}, Facebook: {fb_c})")
+            print(f"    --> [BATCH SYNC COMPLETE] {msg_label} | AqarMap: ({aq_c}) | Facebook: ({fb_c})!" if ok_p else f"    --> [LOCAL SAVE] {p_info}")
+        return merged_ads, aq_c, fb_c
 
 def guard_extra_ads_during_sleep(force_push=False):
     extra_backup = load_extra_live_backup()
@@ -1191,26 +1164,21 @@ def guard_extra_ads_during_sleep(force_push=False):
         with open(DATA_FILE, "r", encoding="utf-8") as f: d = json.load(f)
         if not isinstance(d, dict) or not isinstance(d.get("ads"), list): return
         cur_ads = d["ads"]
-        cur_extra_ids = {a.get("ad_id") for a in cur_ads if a.get("source") in ("عقارماب", "فيسبوك") and is_valid_existing_extra_ad(a)}
-        backup_ids = {a.get("ad_id") for a in extra_backup}
-        has_invalid = any((a.get("source") or "دوبيزل") != "دوبيزل" and not is_valid_existing_extra_ad(a) for a in cur_ads)
-        if force_push or not backup_ids.issubset(cur_extra_ids) or has_invalid:
-            clean_pool = extra_backup + [a for a in cur_ads if is_valid_existing_extra_ad(a)]
+        cur_ids = {a.get("ad_id") for a in cur_ads if a.get("source") in ("عقارماب", "فيسبوك") and is_valid_existing_extra_ad(a)}
+        bak_ids = {a.get("ad_id") for a in extra_backup}
+        if force_push or not bak_ids.issubset(cur_ids):
             merged, seen_u = [], set()
-            for ad in clean_pool:
+            for ad in (extra_backup + [a for a in cur_ads if is_valid_existing_extra_ad(a)]):
                 u = str(ad.get("ad_id") or a_u(ad))
-                txt_k = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
-                if not u or u in seen_u or txt_k in seen_u: continue
-                seen_u.add(u); seen_u.add(txt_k); merged.append(ad)
+                tk = normalize_ar((ad.get("description") or ad.get("title") or "")[:70]) if ad.get("source") == "فيسبوك" else u
+                if not u or u in seen_u or tk in seen_u: continue
+                seen_u.add(u); seen_u.add(tk); merged.append(ad)
             merged.sort(key=lambda x: (int(x.get("first_seen_ts") or 0), int(x.get("ad_id") or 0)), reverse=True)
-            d["ads"] = merged[:450]
-            d["total"] = len(d["ads"])
-            d["updated_at"] = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
+            d["ads"], d["total"], d["updated_at"] = merged[:450], len(merged[:450]), datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
             aq_c = sum(1 for a in extra_backup if a.get("source") == "عقارماب")
             fb_c = sum(1 for a in extra_backup if a.get("source") == "فيسبوك")
             ok_p, p_info = atomic_write_and_git_push(d, f"Batch Sync Extra Owners (AqarMap: {aq_c}, Facebook: {fb_c})")
-            if ok_p: print(f"    --> [Batch Push] Synced AqarMap ({aq_c}) & Facebook ({fb_c}) owners to GitHub & Vercel!")
-            else: print(f"    --> [Batch Push Notice] {p_info}")
+            print(f"    --> [Batch Push] Synced AqarMap ({aq_c}) & Facebook ({fb_c}) owners to GitHub & Vercel!" if ok_p else f"    --> [Batch Push Notice] {p_info}")
     except Exception: pass
 
 def sync_telegram_config(current_cfg):
@@ -1218,40 +1186,33 @@ def sync_telegram_config(current_cfg):
     try:
         r = std_requests.get(f"https://ntfy.sh/{TG_CONFIG_TOPIC}/json?poll=1&since=168h", timeout=10)
         if r.status_code == 200:
-            for line in r.text.strip().splitlines():
-                if not line: continue
-                msg = json.loads(line).get("message", "")
+            for ln in r.text.strip().splitlines():
+                if not ln: continue
+                msg = json.loads(ln).get("message", "")
                 if msg.startswith("TG_CFG:"):
-                    decoded = json.loads(base64.b64decode(msg.replace("TG_CFG:", "").strip()).decode("utf-8"))
-                    if decoded.get("tok") and decoded.get("cid"): cfg["tok"], cfg["cid"] = decoded["tok"].strip(), str(decoded["cid"]).strip()
+                    dec = json.loads(base64.b64decode(msg.replace("TG_CFG:", "").strip()).decode("utf-8"))
+                    if dec.get("tok") and dec.get("cid"): cfg["tok"], cfg["cid"] = dec["tok"].strip(), str(dec["cid"]).strip()
     except Exception: pass
     return cfg
 
 def analyze_with_ai(title, visible_text, pub_name, deal, cat, price_num, source):
-    url = "https://gamal216.pythonanywhere.com/analyze"
-    payload = {"text": f"{title} {visible_text[:2000]}", "title": title, "description": visible_text[:2000], "publisher": pub_name, "deal": deal, "cat": cat, "price_num": price_num, "source": source, "active_ads_count": 1}
     try:
-        response = std_requests.post(url, json=payload, timeout=12)
-        if response.status_code == 200:
-            result = response.json()
-            if result.get("status") == "success":
-                if result.get("decision") == "مرفوض": return False, "AI Rejected"
-                analysis = result.get("analysis", "")
-                if "سمسار" in analysis and "مالك حقيقي" not in analysis: return False, "AI Detected Broker"
+        r = std_requests.post("https://gamal216.pythonanywhere.com/analyze", json={"text": f"{title} {visible_text[:2000]}", "title": title, "description": visible_text[:2000], "publisher": pub_name, "deal": deal, "cat": cat, "price_num": price_num, "source": source, "active_ads_count": 1}, timeout=12)
+        if r.status_code == 200:
+            res = r.json()
+            if res.get("status") == "success":
+                if res.get("decision") == "مرفوض" or ("سمسار" in res.get("analysis", "") and "مالك حقيقي" not in res.get("analysis", "")): return False, "AI Detected Broker"
                 return True, "Owner"
     except Exception: pass
-    if deal != "إيجار":
-        ok = is_strict_cash_sale(title, visible_text, price_num)
-        return ok, ("Owner" if ok else "Installment Suspect")
-    return True, "Owner"
+    return (is_strict_cash_sale(title, visible_text, price_num), "Owner") if deal != "إيجار" else (True, "Owner")
 
 def run_extra_radar():
+    data = {"ads": []}
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f: data = json.load(f)
-        except Exception: data = {"ads": []}
-    else: data = {"ads": []}
-    if not isinstance(data, dict): data = {"ads": data if isinstance(data, list) else []}
+        except Exception: pass
+    if not isinstance(data, dict): data = {"ads": []}
 
     raw_existing = load_extra_live_backup() + data.get("ads", []) + fetch_remote_ads_list()
     extra_checked = load_persistent_seen_ids()
@@ -1259,39 +1220,37 @@ def run_extra_radar():
     notified_ids = set(data.get("telegram_notified_ids", []))
     tg_cfg = sync_telegram_config(data.get("telegram_config", {}))
     run_report = data.get("last_run_report", {})
-
     fetcher = SmartFetcher()
-    existing_ads, seen_existing_u = [], set()
+
+    existing_ads, seen_u = [], set()
     for ad in raw_existing:
         u = str(ad.get("ad_id") or a_u(ad))
-        if u and u not in seen_existing_u and is_valid_existing_extra_ad(ad):
-            seen_existing_u.add(u); existing_ads.append(ad)
+        if u and u not in seen_u and is_valid_existing_extra_ad(ad):
+            seen_u.add(u); existing_ads.append(ad)
 
     seen_ids = {a.get("ad_id") for a in existing_ads if a.get("ad_id")}
     new_extra_ads, aq_candidates = [], []
 
     for src in AQARMAP_SOURCES:
         for page in range(1, src.get("max_p", 3) + 1):
-            page_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
-            html, status_info, _ = fetcher.get_html(page_url, req_regex=r'/ar/listing/\d+')
-            found_aq = extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
-            aq_candidates.extend(found_aq)
-            print(f"[AqarMap] {src['en']} p.{page} -> {status_info} (Candidates: {len(found_aq)})")
+            p_url = src["url"] if page == 1 else f"{src['url']}&page={page}"
+            html, st_info, _ = fetcher.get_html(p_url, req_regex=r'/ar/listing/\d+')
+            found = extract_aqarmap_candidates_from_search_html(html, src, seen_ids, extra_checked, banned_ids)
+            aq_candidates.extend(found)
+            print(f"[AqarMap] {src['en']} p.{page} -> {st_info} (Candidates: {len(found)})")
             time.sleep(random.uniform(0.4, 0.8))
 
     save_persistent_seen_ids(extra_checked)
-    all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
-    print(f"\n[AqarMap + Facebook Radar v13.0] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    all_c = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
+    print(f"\n[AqarMap + Facebook Radar v13.5] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_c)}")
 
-    aq_added, total_c = 0, len(all_candidates)
-    for idx, item in enumerate(all_candidates, 1):
+    aq_added, total_c = 0, len(all_c)
+    for idx, item in enumerate(all_c, 1):
         uid, num_str = item["ad_id"], item.get("num_str", "")
         try:
             html, st_ad, final_url = fetcher.get_html(item["url"], require_path_sub="/ar/listing/")
             if st_ad == "Redirected_To_Search":
-                extra_checked.add(uid)
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] Redirected to Search Page")
-                continue
+                extra_checked.add(uid); continue
             if not html: continue
             info, reason = extract_aqarmap_details(html, item["deal"], num_str, final_url)
             if reason != "Empty title":
@@ -1300,30 +1259,30 @@ def run_extra_radar():
             if not info:
                 print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] {reason}")
                 continue
-            is_owner, ai_reason = analyze_with_ai(info["title"], info["body_text"], info["pub_name"], item["deal"], item["cat"], info["price_num"], "عقارماب")
-            if not is_owner:
-                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] {ai_reason}")
+            ok_ai, ai_r = analyze_with_ai(info["title"], info["body_text"], info["pub_name"], item["deal"], item["cat"], info["price_num"], "عقارماب")
+            if not ok_ai:
+                print(f"  [{idx}/{total_c}] [- REJECTED AqarMap] {ai_r}")
                 continue
-            real_post_ts = int(info.get("real_ts") or time.time())
-            now_cairo = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
-            verified_url = info.get("canonical_url") or final_url
+            r_ts = int(info.get("real_ts") or time.time())
+            now_c = datetime.now(CAIRO_TZ).strftime("%Y-%m-%d %I:%M %p")
+            v_url = info.get("canonical_url") or final_url
             new_extra_ads.append({
                 "ad_id": uid, "id": f"ext_{uid}", "source": "عقارماب", "title": info["title"], "price": info["price_str"], "price_num": info["price_num"],
                 "zone": info["zone"], "location": info["zone"], "cat": item["cat"], "category": item["cat"], "deal": item["deal"], "type": item["deal"],
                 "area": info["area"], "rooms": info["rooms"], "publisher": info["pub_name"], "pub_ads": info["pub_ads"], "active_ads_count": info["pub_ads"],
-                "age": info["age_label"], "fresh_tier": info["fresh_tier"], "description": info["body_text"][:500], "first_seen_ts": real_post_ts, "timestamp": real_post_ts,
-                "desc_verified_v2": True, "verified_24h_v93": True, "verified_aq_v100": True, "url": verified_url, "link": verified_url, "verified_v12": True,
-                "scraped_at": now_cairo, "date": datetime.fromtimestamp(real_post_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
+                "age": info["age_label"], "fresh_tier": info["fresh_tier"], "description": info["body_text"][:500], "first_seen_ts": r_ts, "timestamp": r_ts,
+                "desc_verified_v2": True, "verified_24h_v93": True, "verified_aq_v100": True, "url": v_url, "link": v_url, "verified_v12": True,
+                "scraped_at": now_c, "date": datetime.fromtimestamp(r_ts, CAIRO_TZ).strftime("%Y-%m-%d %H:%M")
             })
             aq_added += 1
-            print(f"  [{idx}/{total_c}] [+ STORED AQARMAP FOR END-OF-RUN BATCH] ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | Price: {info['price_num']:,} EGP")
+            print(f"  [{idx}/{total_c}] [+ STORED AQARMAP FOR BATCH] ({info['age_label']}) | {info['pub_name']} ({info['pub_ads']} ads) | {info['price_num']:,} EGP")
             time.sleep(random.uniform(0.5, 0.8))
         except Exception: continue
 
     save_persistent_seen_ids(extra_checked)
     print(f"\n>>> [End-of-Run Batch Push] Sending all collected AqarMap & Facebook ads to GitHub & Website now... <<<")
-    merged_ads, aq_total, fb_total = sync_ads_to_github_now(data, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"Cycle Batch Complete (+{aq_added} AQ)")
-    print(f"=== Cycle Complete: Batch Sent +{aq_added} AqarMap | Live on Site -> AqarMap: {aq_total} | Facebook: {fb_total} ===")
+    _, aq_t, fb_t = sync_ads_to_github_now(data, new_extra_ads, existing_ads, extra_checked, tg_cfg, notified_ids, run_report, f"Cycle Batch Complete (+{aq_added} AQ)")
+    print(f"=== Cycle Complete: Batch Sent +{aq_added} AqarMap | Live on Site -> AqarMap: {aq_t} | Facebook: {fb_t} ===")
 
 def main():
     global FB_PENDING_BATCH_COUNT
@@ -1332,8 +1291,8 @@ def main():
         run_extra_radar()
         return
     start_fb_local_server()
-    print("=== Starting 24/7 AqarMap + Facebook Home Feed & Profile Owner Radar v13.0 (End-of-Run Batch Mode) ===")
-    print(f"[!] Load unpacked extension once in Chrome -> {FB_EXT_DIR}")
+    print("=== Starting 24/7 AqarMap + Facebook Home Feed, Profile & Auto-Like Radar v13.5 (Batch Mode) ===")
+    print(f"[!] Reload extension once in Chrome -> {FB_EXT_DIR}")
     cycle_num = 1
     while True:
         print(f"\n>>> Starting Extra Radar Cycle #{cycle_num} at {datetime.now(CAIRO_TZ).strftime('%H:%M:%S')} <<<")
@@ -1343,7 +1302,7 @@ def main():
         except Exception as e:
             print(f"[Error in Cycle #{cycle_num}]: {e}")
         cycle_num += 1
-        print(f"\n[Auto-Loop] Sleeping for {AUTO_LOOP_MINUTES}m (Facebook storing in background -> pushes batch at end of run)...")
+        print(f"\n[Auto-Loop] Sleeping for {AUTO_LOOP_MINUTES}m (Facebook storing & auto-liking owners -> pushes batch at end of run)...")
         for _ in range((AUTO_LOOP_MINUTES * 60) // 30):
             time.sleep(30)
         if FB_PENDING_BATCH_COUNT > 0:
