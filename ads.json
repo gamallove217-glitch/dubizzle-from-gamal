@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-20 22:14",
-  "total": 136,
+  "updated_at": "2026-11-20 22:17",
+  "total": 137,
   "ads": [
     {
       "ad_id": 209549375,
@@ -79,6 +79,32 @@
       "first_seen_ts": 1795204085,
       "timestamp": 1795204085,
       "date": "2026-11-20 21:48"
+    },
+    {
+      "ad_id": 209549190,
+      "id": "dub_209549190",
+      "title": "Second floor",
+      "url": "https://www.dubizzle.com.eg/ad/second-floor-ID209549190.html",
+      "link": "https://www.dubizzle.com.eg/ad/second-floor-ID209549190.html",
+      "price": "65,000 ج.م",
+      "price_num": 65000,
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "zone": "القاهرة الجديدة",
+      "location": "القاهرة الجديدة",
+      "source": "دوبيزل",
+      "publisher": "Yousef yaser",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "area": "150",
+      "rooms": "3",
+      "age": "منذ 33 دقيقة",
+      "description": "",
+      "first_seen_ts": 1795203793,
+      "timestamp": 1795203793,
+      "date": "2026-11-20 21:43"
     },
     {
       "ad_id": 9327484620,
