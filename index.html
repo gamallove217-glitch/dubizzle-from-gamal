@@ -16,6 +16,24 @@
       min-height: 100vh;
     }
 
+    .fx-btn {
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease;
+    }
+    .fx-btn:active { transform: scale(0.95) translateY(1px) !important; }
+    .btn-ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(255, 255, 255, 0.42);
+      pointer-events: none;
+      animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes rippleAnim { to { transform: scale(3.4); opacity: 0; } }
+
     #loginScreen {
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px;
@@ -46,59 +64,13 @@
       margin-bottom: 18px; outline: none; transition: 0.25s;
     }
     .code-input:focus { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
-
-    .fx-btn {
-      position: relative;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
-    }
-    .fx-btn:active {
-      transform: scale(0.95) translateY(1px) !important;
-    }
-    .fx-btn::after {
-      content: "";
-      position: absolute;
-      top: 0; left: -120%;
-      width: 65%; height: 100%;
-      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.32), transparent);
-      transform: skewX(-22deg);
-      pointer-events: none;
-      transition: left 0.55s ease;
-    }
-    .fx-btn:hover::after {
-      left: 140%;
-    }
-    .btn-ripple {
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      background: rgba(255, 255, 255, 0.42);
-      pointer-events: none;
-      animation: rippleAnim 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    @keyframes rippleAnim {
-      to { transform: scale(3.4); opacity: 0; }
-    }
-    @keyframes donePop {
-      0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
-      60% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .done-pop-anim {
-      animation: donePop 0.38s ease;
-    }
-
     .login-btn {
       width: 100%; padding: 15px; border-radius: 14px; border: none;
       background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911;
-      font-size: 16px; font-weight: 900; cursor: pointer;
+      font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.25s;
       box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
     }
-    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(245, 158, 11, 0.42); }
-    .login-btn:disabled { opacity: 0.7; cursor: wait; }
-
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(245, 158, 11, 0.4); }
     .error-msg {
       margin-top: 16px; padding: 14px; border-radius: 12px;
       background: rgba(239, 68, 68, 0.14); border: 1px solid #ef4444;
@@ -170,7 +142,7 @@
       background: #060911; border: 1px solid #1e293b; color: #f8fafc;
       padding: 11px 14px; border-radius: 12px; font-size: 13.5px; font-weight: 700; outline: none; transition: 0.2s;
     }
-    .filter-control:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14); }
+    .filter-control:focus { border-color: #f59e0b; }
 
     .grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;
@@ -188,7 +160,7 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.08);
     }
     .card.contacted {
-      opacity: 0.62; border-color: rgba(16, 185, 129, 0.5);
+      opacity: 0.6; border-color: rgba(16, 185, 129, 0.5);
       background: linear-gradient(165deg, #0b1919 0%, #070d12 100%);
     }
     .card-top {
@@ -202,9 +174,9 @@
     }
     .tag.sale { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
     .tag.rent { background: rgba(59, 130, 246, 0.16); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .tag.src-aq { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .tag.src-fb { background: rgba(24, 119, 242, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.45); }
+    .tag.src-dub { background: rgba(239, 68, 68, 0.14); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.28); }
+    .tag.src-aq { background: rgba(16, 185, 129, 0.14); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.28); }
+    .tag.src-fb { background: rgba(24, 119, 242, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
     .time-badge {
       font-size: 11px; font-weight: 800; color: #34d399;
       background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 8px;
@@ -236,30 +208,19 @@
     .btn-card {
       flex: 1; text-align: center; padding: 12px; border-radius: 12px;
       font-size: 13.5px; font-weight: 900; text-decoration: none; cursor: pointer;
-      border: none; display: inline-flex; align-items: center; justify-content: center;
+      border: none; transition: 0.2s;
     }
     .btn-card.primary {
       background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #060911;
       box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
     }
-    .btn-card.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(245, 158, 11, 0.38);
-    }
+    .btn-card.primary:hover { opacity: 0.95; transform: translateY(-1px); }
     .btn-card.done-btn {
       background: rgba(16, 185, 129, 0.12); color: #34d399;
       border: 1px solid rgba(16, 185, 129, 0.35);
     }
-    .btn-card.done-btn:hover {
-      background: rgba(16, 185, 129, 0.22);
-      border-color: rgba(16, 185, 129, 0.65);
-      transform: translateY(-2px);
-    }
     .btn-card.done-btn.active {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #060911;
-      border-color: #10b981;
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+      background: #10b981; color: #060911;
     }
     .empty-state {
       grid-column: 1 / -1; text-align: center; padding: 60px 20px;
@@ -381,7 +342,6 @@
   <script>
     let allAds = [];
     let contactedMap = JSON.parse(localStorage.getItem("vip_contacted_ads") || "{}");
-    let lastPoppedId = null;
 
     document.addEventListener("pointerdown", function (e) {
       const btn = e.target.closest(".fx-btn");
@@ -437,6 +397,36 @@
       return "src-dub";
     }
 
+    function applyAdsPayloadToScreen(data) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appScreen").style.display = "block";
+      document.getElementById("clientNameBadge").textContent = data.clientName || "مشترك VIP";
+      document.getElementById("updatedAtText").textContent = "آخر تحديث: " + (data.updated_at || "-");
+
+      allAds = data.ads || [];
+      const dubCnt = allAds.filter(a => (a.source || "دوبيزل") === "دوبيزل").length;
+      const aqCnt = allAds.filter(a => a.source === "عقارماب").length;
+      const fbCnt = allAds.filter(a => a.source === "فيسبوك").length;
+      document.getElementById("statSources").textContent = `دوبيزل: ${dubCnt} | عقارماب: ${aqCnt} | فيسبوك: ${fbCnt}`;
+
+      populateZones();
+      renderCards();
+    }
+
+    function loadCachedSessionIfAvailable() {
+      try {
+        const cachedStr = localStorage.getItem("vip_cached_payload");
+        if (cachedStr) {
+          const cachedData = JSON.parse(cachedStr);
+          if (cachedData && Array.isArray(cachedData.ads)) {
+            applyAdsPayloadToScreen(cachedData);
+            return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    }
+
     async function activateSubscription() {
       const code = document.getElementById("subCodeInput").value.trim();
       const errBox = document.getElementById("loginError");
@@ -459,4 +449,180 @@
       btn.textContent = "جاري التحقق من الكود...";
 
       try {
-        const res = awa
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, deviceId: getDeviceId() })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errBox.textContent = data.error || "فشل الدخول";
+          errBox.style.display = "block";
+        } else {
+          localStorage.setItem("vip_saved_code", code);
+          await fetchProtectedAds();
+        }
+      } catch (e) {
+        errBox.textContent = "تعذر الاتصال بالخادم، تأكد من اتصالك بالإنترنت";
+        errBox.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "تفعيل الاشتراك والدخول للرادار";
+      }
+    }
+
+    async function fetchProtectedAds() {
+      try {
+        let res = await fetch("/api/data", {
+          headers: { "x-device-id": getDeviceId() }
+        });
+
+        if (res.status === 401) {
+          const savedCode = localStorage.getItem("vip_saved_code");
+          if (savedCode) {
+            try {
+              const authRes = await fetch("/api/auth", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: savedCode, deviceId: getDeviceId() })
+              });
+              if (authRes.ok) {
+                res = await fetch("/api/data", {
+                  headers: { "x-device-id": getDeviceId() }
+                });
+              }
+            } catch (e) {}
+          }
+        }
+
+        if (res.status >= 500) {
+          if (loadCachedSessionIfAvailable()) return true;
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 403 || res.status === 401) {
+            localStorage.removeItem("vip_cached_payload");
+            if (res.status === 403) localStorage.removeItem("vip_saved_code");
+            document.getElementById("appScreen").style.display = "none";
+            document.getElementById("loginScreen").style.display = "flex";
+            if (data.error && res.status === 403) {
+              const errBox = document.getElementById("loginError");
+              errBox.textContent = data.error;
+              errBox.style.display = "block";
+            }
+            return false;
+          }
+          if (loadCachedSessionIfAvailable()) return true;
+          return false;
+        }
+
+        try {
+          localStorage.setItem("vip_cached_payload", JSON.stringify(data));
+        } catch (e) {}
+
+        applyAdsPayloadToScreen(data);
+        return true;
+      } catch (e) {
+        if (loadCachedSessionIfAvailable()) return true;
+        return false;
+      }
+    }
+
+    function populateZones() {
+      const sel = document.getElementById("zoneFilter");
+      const current = sel.value;
+      const zones = [...new Set(allAds.map(a => a.zone).filter(Boolean))].sort();
+      sel.innerHTML = `<option value="ALL">كل مناطق القاهرة الجديدة (${allAds.length})</option>` +
+        zones.map(z => `<option value="${z}">${z}</option>`).join("");
+      if (zones.includes(current)) sel.value = current;
+    }
+
+    function toggleContacted(adId) {
+      const key = String(adId);
+      if (contactedMap[key]) delete contactedMap[key];
+      else contactedMap[key] = Date.now();
+      localStorage.setItem("vip_contacted_ads", JSON.stringify(contactedMap));
+      renderCards();
+    }
+
+    function renderCards() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const deal = document.getElementById("dealFilter").value;
+      const cat = document.getElementById("catFilter").value;
+      const zone = document.getElementById("zoneFilter").value;
+      const src = document.getElementById("sourceFilter").value;
+      const sort = document.getElementById("sortFilter").value;
+
+      let list = allAds.filter(a => {
+        if (deal !== "ALL" && a.deal !== deal) return false;
+        if (cat !== "ALL" && a.cat !== cat) return false;
+        if (zone !== "ALL" && a.zone !== zone) return false;
+        if (src !== "ALL" && (a.source || "دوبيزل") !== src) return false;
+        if (q && !(a.title || "").toLowerCase().includes(q) && !(a.zone || "").toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      if (sort === "NEWEST") {
+        list.sort((a, b) => {
+          const tsDiff = (b.first_seen_ts || 0) - (a.first_seen_ts || 0);
+          if (tsDiff !== 0) return tsDiff;
+          return (b.ad_id || 0) - (a.ad_id || 0);
+        });
+      } else if (sort === "PRICE_ASC") {
+        list.sort((a, b) => (a.price_num || 999999999) - (b.price_num || 999999999));
+      } else if (sort === "PRICE_DESC") {
+        list.sort((a, b) => (b.price_num || 0) - (a.price_num || 0));
+      }
+
+      document.getElementById("statShown").textContent = list.length;
+      document.getElementById("statContacted").textContent = Object.keys(contactedMap).length;
+
+      const grid = document.getElementById("adsGrid");
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state">لا توجد إعلانات مطابقة للفلتر المحدد حاليا. جرب تغيير شروط البحث.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(a => {
+        const key = String(a.ad_id);
+        const isDone = !!contactedMap[key];
+        const srcName = a.source || "دوبيزل";
+        return `
+          <div class="card ${isDone ? 'contacted' : ''}">
+            <div>
+              <div class="card-top">
+                <div class="badges-wrap">
+                  <span class="tag ${a.deal === 'إيجار' ? 'rent' : 'sale'}">${a.deal === 'إيجار' ? 'إيجار مباشر' : 'تمليك كاش'} | ${a.cat || 'عقار'}</span>
+                  <span class="tag ${getSourceBadgeClass(srcName)}">${srcName}</span>
+                </div>
+                <span class="time-badge">${formatAddedTime(a)}</span>
+              </div>
+              <div class="card-title">${a.title}</div>
+              <div class="price-box">
+                <span class="price-lbl">السعر المطلوب</span>
+                <span class="card-price">${a.price || 'السعر بالتفاصيل'}</span>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-item"><span>المنطقة / الحي</span><b>${a.zone || 'القاهرة الجديدة'}</b></div>
+                <div class="meta-item"><span>المساحة</span><b>${a.area ? a.area + ' م²' : 'مذكورة بالإعلان'}</b></div>
+                <div class="meta-item"><span>عدد الغرف</span><b>${a.rooms ? a.rooms + ' غرف' : '-'}</b></div>
+                <div class="meta-item"><span>اسم المالك</span><b>${a.publisher || 'مالك'} (${a.pub_ads || 1} إعلان)</b></div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="${a.url}" target="_blank" rel="noopener" class="btn-card primary fx-btn">فتح الإعلان الأصلي</a>
+              <button class="btn-card done-btn fx-btn ${isDone ? 'active' : ''}" onclick="toggleContacted('${key}')">
+                ${isDone ? 'تم التواصل' : 'تحديد كـ تم'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    fetchProtectedAds();
+    setInterval(fetchProtectedAds, 180000);
+  </script>
+</body>
+</html>
