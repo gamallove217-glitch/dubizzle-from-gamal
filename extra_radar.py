@@ -15,8 +15,7 @@ def disable_cmd_quickedit_and_sleep():
         k32.SetThreadExecutionState(0x80000003)
         h = k32.GetStdHandle(-10)
         m = ctypes.c_uint32()
-        if k32.GetConsoleMode(h, ctypes.byref(m)):
-            k32.SetConsoleMode(h, (m.value & ~0x0040 & ~0x0020) | 0x0080)
+        if k32.GetConsoleMode(h, ctypes.byref(m)): k32.SetConsoleMode(h, (m.value & ~0x0040 & ~0x0020) | 0x0080)
     except Exception: pass
 
 disable_cmd_quickedit_and_sleep()
@@ -52,42 +51,33 @@ ZONES = [
     ("المستثمرين", ["المستثمرين", "investors"]), ("الشويفات", ["الشويفات", "choueifat"]), ("القرنفل", ["القرنفل", "koronfel"]), ("التمر حنة", ["التمر حنة", "تمر حنة", "tamr hena"]),
     ("أبو الهول", ["أبو الهول", "ابو الهول", "جاردينيا هايتس", "جاردينيا"]), ("دار مصر", ["دار مصر", "سكن مصر", "جنة مصر", "جنه مصر", "فرجينيا"]), ("القطامية", ["القطامية", "القطاميه", "katameya"]), ("شارع التسعين", ["التسعين", "90th"]),
 ]
-
 EXCLUDED_CITIES = ["الرحاب", "رحاب", "rehab", "مدينتي", "مدينتى", "madinaty", "بيت الوطن", "بيت وطن", "beit al watan", "beit el watan", "bayt al watan", "النورث هاوس", "شمال الرحاب", "العبور", "الشروق", "مدينة بدر", "مدينه بدر", "هليوبوليس الجديدة", "العاصمة الإدارية", "العاصمه الاداريه", "التجمع السادس", "sixth settlement", "كابيتال جاردنز", "capital gardens", "سراي", "sarai", "البروج", "alburouj", "طلالة", "talala", "دي جويا", "dejoya", "محور الأمل", "تاج سيتي", "تاج سيتى", "taj city", "تاج سلطان", "العاشر من رمضان", "6 أكتوبر", "أكتوبر", "الشيخ زايد", "زايد", "المعادي", "زهراء المعادي", "المقطم", "الهضبة الوسطى", "مدينة نصر", "مصر الجديدة", "شيراتون", "النزهة", "عين شمس", "السلام", "جسر السويس", "حدائق القبة", "المرج", "شبرا", "حلوان", "15 مايو", "الزمالك", "المهندسين", "الدقي", "العجوزة", "الهرم", "فيصل", "حدائق الأهرام", "حدائق الاهرام", "حدائق أكتوبر", "الساحل الشمالي", "العين السخنة", "الجونة", "الغردقة", "شرم الشيخ", "الإسكندرية", "الاسكندرية", "المستقبل", "mostakbal", "سمات", "مقبرة", "مقابر", "مدفن", "مدافن"]
 INSTALLMENT_SUBSTRINGS = ["قسط", "تقسيط", "بالتقسيط", "لتقسيط", "اقساط", "أقساط", "باقساط", "بأقساط", "تكملة أقساط", "تكمله اقساط", "مقدم", "بمقدم", "بقدم ", "دفعة", "دفعه", "دفعات", "تسهيلات", "سداد", "فترة سداد", "سنوات سداد", "أنظمة سداد", "انظمه سداد", "بدون فوائد", "متبقي", "المتبقي", "والباقي", "أوفر", "اوفر", "امكانية التقسيط", "متاح تقسيط", "ويوجد تقسيط", "سنة التسليم 2027", "سنة التسليم 2028", "سنة التسليم 2029", "سنة التسليم 2030", "قيد الإنشاء", "قيد الانشاء", "down payment", "downpayment", "installment", "installments", "payment plan"]
 SAFE_CASH_NEGATIONS = ["بدون تقسيط", "لا يوجد تقسيط", "ممنوع التقسيط", "وليس تقسيط", "مش تقسيط", "بدون أقساط", "بدون اقساط", "خالص الثمن", "خالصة الثمن", "خالصه الثمن", "ليس عليها أقساط", "ليس عليها اقساط", "لا يوجد أقساط", "لا يوجد اقساط", "مسدد بالكامل", "مسددة بالكامل", "غير متاح تقسيط", "البيع كاش فقط", "كاش فقط", "كاش نهائي"]
 SAFE_OWNER_BROKER_NEGATIONS = ["بدون وسيط", "بدون وسطاء", "ممنوع الوسطاء", "يمتنع الوسطاء", "لغير الوسطاء", "عدم تدخل الوسطاء", "عدم التعامل مع الوسطاء", "لا للوسطاء", "بدون سمسار", "بدون سماسرة", "بدون سماسره", "ممنوع السماسرة", "ممنوع السماسره", "يمتنع السماسرة", "يمتنع السماسره", "بدون بروكر", "ممنوع البروكر", "يمتنع البروكر", "بدون عمولة", "بدون عموله", "بدون اي عمولة", "بدون اي عموله", "بدون اى عموله", "من غير سمسار", "من غير وسيط", "من المالك مباشره", "من المالك مباشر", "المالك مباشره", "المالك مباشر", "التواصل مباشر مع المالك", "التعامل مباشر مع المالك", "مباشر من المالك", "انا المالك"]
 BROKER_NAME_WORDS = ["zone", "real estate", "realestate", "realty", "property", "properties", "homes", "agency", "agencies", "broker", "brokers", "brokerage", "investment", "investments", "development", "developments", "consult", "consultant", "consulting", "company", "marketing", "scouts", "vertex", "redefine", "irtkaz", "ebtkar", "imkan", "falcon", "realtors", "trusted home", "شركة", "شركه", "مكتب", "تسويق", "للتسويق", "ماركتنج", "سمسار", "وسيط", "استشاري", "مستشار", "للاستشارات", "تطوير", "للتطوير", "للاستثمار", "هومز", "بروكر", "ريال استيت", "استيت", "فيرتكس", "ريديفاين", "ارتكاز", "إرتكاز", "ابتكار", "إبتكار", "دار البناء", "للمقاولات", "للإنشاءات", "للانشاءات", "اللوتس العقارية", "البيت المصري", "ادارة املاك", "إدارة أملاك"]
-BROKER_TEXT_PHRASES = ["انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى", "وسيط من المالك", "وسيط مع المالك", "انا بروكر", "م بروكر", "للتواصل مع البروكر", "سمسار", "سماسرة", "سماسره", "بروكر", "broker", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "ادارة املاك", "عمولة شهر", "عموله شهر", "عمولة نصف شهر", "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "بعموله", "بعمولة", "نسبة العمولة", "يوجد عمولة", "يوجد عموله", "عمولة 1", "عموله 1", "عمولة 2", "عموله 2", "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري", "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك", "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل", "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي", "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات", "متاح عروض اخري", "متاح عروض أخرى", "يوجد عروض اخري", "متاح شقق اخري", "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات", "باقل سعر بالمشروع", "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "مطلوب وموجود", "مطلوب ومعروض"]
+BROKER_TEXT_PHRASES = ["انا وسيط", "أنا وسيط", "وسيط مش المالك", "مش المالك", "ليس المالك", "وسيط عقاري", "وسيط عقارى", "وسيط من المالك", "وسيط مع المالك", "انا بروكر", "م بروكر", "للتواصل مع البروكر", "سمسار", "سماسرة", "سماسره", "بروكر", "broker", "مكتب عقاري", "مكتب عقارات", "مكتب تسويق", "ادارة املاك", "عمولة شهر", "عموله شهر", "عمولة نصف شهر", "عموله نصف شهر", "عمولة المكتب", "عموله المكتب", "عمولة الشركة", "عموله الشركه", "بعموله", "بعمولة", "نسبة العمولة", "يوجد عمولة", "يوجد عموله", "عمولة 1", "عموله 1", "عمولة 2", "عموله 2", "لماذا تختار شركتنا", "شركتنا", "شركة عقارات", "شركه عقارات", "شركة تسويق", "شركه تسويق", "للتسويق العقاري", "للاستثمار العقاري", "للتطوير العقاري", "استشاري عقاري", "مستشار عقاري", "فريق المبيعات", "قسم المبيعات", "للتواصل مع قسم المبيعات", "فريق من الخبراء", "مجموعة متنوعة من الشقق", "تقع عقاراتنا", "زيارة معروضاتنا", "سجل بياناتك", "عائد إيجاري شهري مضمون", "عائد ايجاري شهري مضمون", "بعائد ايجاري يصل", "كود الوحدة", "كود الوحده", "كود العقار", "كود الشقة", "كود الفيلا", "الكود المرجعي", "متاح لدينا", "يتوفر لدينا", "متوفر لدينا", "لدينا أكثر من", "متاح لدينا اكثر من", "لدينا عقارات", "متاح عروض اخري", "متاح عروض أخرى", "يوجد عروض اخري", "متاح شقق اخري", "متاح مساحات مختلفة", "مساحات مختلفة", "مساحات مختلفه", "متوفر لدينا وحدات", "متاح لدينا وحدات", "باقل سعر بالمشروع", "استمرار لعروضنا", "والواقع يتحدث عنا", "امتلك وحدتك", "احجز وحدتك", "اختار وحدتك", "مطلوب وموجود", "مطلوب ومعروض", "متاح وحدات اخري"]
 FB_WANTED_PHRASES = ["مطلوب شقه", "مطلوب شقة", "مطلوب فيلا", "مطلوب للايجار", "مطلوب للإيجار", "مطلوب للشراء", "مطلوب للبيع", "مطلوب من المالك", "بدور علي شقه", "بدور على شقة", "بدور علي فيلا", "محتاج شقه", "محتاج شقة", "محتاجه شقه", "محتاجة شقة", "عايز شقه", "عايز شقة", "عايزة شقة", "عايزه شقه", "ابحث عن شقه", "أبحث عن شقة", "حد عنده شقه", "حد عنده شقة", "مطلوب عاجل", "مطلوب فورا", "مطلوب شريك", "مطلوب شريكة", "مطلوب روم ميت"]
 
-_AQ_BASE = "https://aqarmap.com.eg/ar/"
-_AQ_SPECS = [
-    ("شقق", "إيجار", "Apartments (Rent)", 5, "for-rent/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("شقق", "إيجار", "Furnished Apts (Rent)", 4, "for-rent/furnished-apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("فلل", "إيجار", "Villas (Rent)", 3, "for-rent/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "إيجار", "Commercial (Rent)", 3, "for-rent/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "إيجار", "Administrative (Rent)", 3, "for-rent/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "إيجار", "Medical (Rent)", 2, "for-rent/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("أراضي", "إيجار", "Buildings (Rent)", 2, "for-rent/building/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("أراضي", "إيجار", "Lands (Rent)", 2, "for-rent/land/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("شقق", "تمليك", "Apartments (Cash Sale)", 5, "for-sale/apartment/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"),
-    ("شقق", "تمليك", "Apartments (All Sale)", 4, "for-sale/apartment/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("فلل", "تمليك", "Villas (Cash Sale)", 3, "for-sale/villa/cairo/new-cairo/?payment_method=1&sort=publishedAt&direction=desc"),
-    ("فلل", "تمليك", "Villas (All Sale)", 3, "for-sale/villa/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "تمليك", "Commercial (Sale)", 3, "for-sale/commercial/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "تمليك", "Administrative (Sale)", 3, "for-sale/administrative/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("تجاري", "تمليك", "Medical (Sale)", 2, "for-sale/medical/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("أراضي", "تمليك", "Lands (Sale)", 3, "for-sale/land/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-    ("أراضي", "تمليك", "Buildings (Sale)", 2, "for-sale/building/cairo/new-cairo/?sort=publishedAt&direction=desc"),
-]
-AQARMAP_SOURCES = [{"cat": c, "deal": d, "en": e, "max_p": m, "url": _AQ_BASE + p} for c, d, e, m, p in _AQ_SPECS]
+_AQ_B = "https://aqarmap.com.eg/ar/"
+_AQ_S = "?sort=publishedAt&direction=desc"
+AQARMAP_SOURCES = [{"cat": c, "deal": d, "en": e, "max_p": m, "url": _AQ_B + p + _AQ_S} for c, d, e, m, p in [
+    ("شقق", "إيجار", "Apartments (Rent)", 5, "for-rent/apartment/cairo/new-cairo/"), ("شقق", "إيجار", "Furnished Apts (Rent)", 4, "for-rent/furnished-apartment/cairo/new-cairo/"),
+    ("فلل", "إيجار", "Villas (Rent)", 3, "for-rent/villa/cairo/new-cairo/"), ("تجاري", "إيجار", "Commercial (Rent)", 3, "for-rent/commercial/cairo/new-cairo/"),
+    ("تجاري", "إيجار", "Administrative (Rent)", 3, "for-rent/administrative/cairo/new-cairo/"), ("تجاري", "إيجار", "Medical (Rent)", 2, "for-rent/medical/cairo/new-cairo/"),
+    ("أراضي", "إيجار", "Buildings (Rent)", 2, "for-rent/building/cairo/new-cairo/"), ("أراضي", "إيجار", "Lands (Rent)", 2, "for-rent/land/cairo/new-cairo/"),
+    ("شقق", "تمليك", "Apartments (Cash Sale)", 5, "for-sale/apartment/cairo/new-cairo/?payment_method=1&"), ("شقق", "تمليك", "Apartments (All Sale)", 4, "for-sale/apartment/cairo/new-cairo/"),
+    ("فلل", "تمليك", "Villas (Cash Sale)", 3, "for-sale/villa/cairo/new-cairo/?payment_method=1&"), ("فلل", "تمليك", "Villas (All Sale)", 3, "for-sale/villa/cairo/new-cairo/"),
+    ("تجاري", "تمليك", "Commercial (Sale)", 3, "for-sale/commercial/cairo/new-cairo/"), ("تجاري", "تمليك", "Administrative (Sale)", 3, "for-sale/administrative/cairo/new-cairo/"),
+    ("تجاري", "تمليك", "Medical (Sale)", 2, "for-sale/medical/cairo/new-cairo/"), ("أراضي", "تمليك", "Lands (Sale)", 3, "for-sale/land/cairo/new-cairo/"),
+    ("أراضي", "تمليك", "Buildings (Sale)", 2, "for-sale/building/cairo/new-cairo/")
+]]
+for _s in AQARMAP_SOURCES: _s["url"] = _s["url"].replace("?&sort=", "?payment_method=1&sort=")
 
 def strip_bidi(text): return BIDI_REGEX.sub("", str(text)).translate(HINDI_MAP) if text else ""
 def normalize_ar(text):
     t = re.sub(r'[\u0640\u064B-\u065F]', '', strip_bidi(text).lower())
-    t = re.sub(r'[إأآا]', 'ا', t)
-    return re.sub(r'\s+', ' ', re.sub(r'ى', 'ي', re.sub(r'ة', 'ه', t))).strip()
+    return re.sub(r'\s+', ' ', re.sub(r'ى', 'ي', re.sub(r'ة', 'ه', re.sub(r'[إأآا]', 'ا', t)))).strip()
 
 def clear_git_locks():
     git_dir = os.path.join(BASE_DIR, ".git")
@@ -119,11 +109,23 @@ def patch_ui_files_on_disk():
             except Exception: pass
     return patched
 
+def build_fb_pinpoint_url(raw_url, text_body):
+    u = str(raw_url or "").strip()
+    if any(k in u for k in ("/posts/", "/permalink/", "story_fbid=", "multi_permalinks=", "/photo", "/videos/", "/reel/", "/search/")):
+        return u
+    words = [w for w in re.sub(r'[^\w\s]', ' ', strip_bidi(text_body)).split() if len(w) >= 2][:9]
+    snippet = " ".join(words) if words else "شقة من المالك التجمع"
+    m_grp = re.search(r'facebook\.com/groups/([^/?&#]+)', u)
+    if m_grp and m_grp.group(1) not in ("feed", "discover"):
+        return f"https://www.facebook.com/groups/{m_grp.group(1)}/search/?q={urllib.parse.quote(snippet)}"
+    rf = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D"
+    return f"https://www.facebook.com/search/posts/?q={urllib.parse.quote(snippet)}&filters={rf}"
+
 def generate_facebook_main_extension():
     os.makedirs(FB_EXT_DIR, exist_ok=True)
     manifest = {
-        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search Radar v12.0", "version": "12.0",
-        "description": "Direct Facebook Recent-Posts Owner Search Engine", "permissions": ["storage"],
+        "manifest_version": 3, "name": "Gamal Real-Time Facebook Search Radar v12.2", "version": "12.2",
+        "description": "Direct Post Permalink Extractor + Recent-Posts Owner Search", "permissions": ["storage"],
         "host_permissions": ["https://www.facebook.com/*", "http://127.0.0.1:5005/*"],
         "background": {"service_worker": "background.js"},
         "content_scripts": [{"matches": ["https://www.facebook.com/*"], "js": ["content.js"], "run_at": "document_idle"}]
@@ -142,8 +144,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     content_js = r"""
 (function() {
-    if (window.__gamalFbRadarV120) return;
-    window.__gamalFbRadarV120 = true;
+    if (window.__gamalFbRadarV122) return;
+    window.__gamalFbRadarV122 = true;
     const RF = "eyJyZWNlbnRfcG9zdHM6MCI6IntcIm5hbWVcIjpcInJlY2VudF9wb3N0c1wiLFwiYXJnc1wiOlwiXCJ9In0%3D";
     const sUrl = q => "https://www.facebook.com/search/posts/?q=" + encodeURIComponent(q) + "&filters=" + RF;
     const Q_LIST = [
@@ -155,17 +157,20 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         "من المالك المستثمرين التجمع", "من المالك الاكاديمية التجمع", "من المالك القرنفل التجمع",
         "من المالك التجمع الثالث", "من المالك التجمع الاول", "من المالك القطامية", "من المالك القاهرة الجديدة"
     ];
-    const TARGETS = Q_LIST.map(q => ({name: "بحث الأحدث: " + q, url: sUrl(q), maxSec: 40}));
+    const TARGETS = Q_LIST.map(q => ({name: "بحث الأحدث: " + q, url: sUrl(q), maxSec: 42}));
     const PROP_RE = /(شقه|شقة|فيلا|دوبلكس|بنتهاوس|ستوديو|استوديو|رووف|روف|محل|مكتب|عياده|عيادة|عقار|ارضي|أرضي|بجاردن|للايجار|للإيجار|للبيع|تمليك|ايجار|إيجار|مفروش|غرف|ثلاث غرف|غرفتين|ريسبشن|من المالك|المالك مباشر|مدخل البيت|شارع)/i;
     const GROUP_WORDS_RE = /(جروب|مجموعه|مجموعة|عقارات|شقق|سكان|اهالي|أهالي|بيع وشراء|ايجار وتمليك|إيجار وتمليك|سوق|ملتقى|رابطه|رابطة)/i;
     const UI_NOISE_RE = /^(انضمام|متابعة|متابعه|مراسلة|أعجبني|تعليق|مشاركة|عرض المزيد|See more|Join|Follow|Like|Comment|Share|\d+\s*تعليق.*|\d+\s*مشاركات.*)$/i;
+    const H_MAP = {"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
+    const normDigits = s => String(s || "").replace(/[٠-٩]/g, c => H_MAP[c] || c);
+    const TIME_RE = /(الآن|توًا|حالا|just now|(?:^|\s)\d{1,2}\s*[دسيهأ](?:\s|$)|دقيقة|دقيقتين|دقائق|ساعة|ساعتين|ساعات|أمس|امس|الأمس|يوم|يومين|أيام|ايام|أسبوع|اسبوع|شهر|(?:^|\s)\d{1,2}\s*(?:m|h|d|w|mins?|hrs?)(?:\s|$)|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)/i;
 
-    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v120") || "[]");
-    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v120") || "0", 10) % TARGETS.length;
-    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v120") || "0", 10);
-    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v120") || "0", 10);
+    let sentHashes = JSON.parse(localStorage.getItem("gamal_fb_sent_v122") || "[]");
+    let targetIdx = parseInt(localStorage.getItem("gamal_fb_tidx_v122") || "0", 10) % TARGETS.length;
+    let scannedCount = parseInt(sessionStorage.getItem("gamal_fb_sc_v122") || "0", 10);
+    let acceptedCount = parseInt(sessionStorage.getItem("gamal_fb_ac_v122") || "0", 10);
     let pageStartTs = Date.now(), consecutiveSeen = 0, oldPostsHit = 0, isResting = false;
-    let lastLogMsg = "يبحث في أحدث المنشورات مباشرة...";
+    let lastLogMsg = "يبحث في أحدث المنشورات بالرابط المباشر...";
     let shadowInfo = null;
     try {
         const host = document.createElement("span"), sh = host.attachShadow({mode: "closed"}), box = document.createElement("div");
@@ -175,12 +180,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function updateStatusUI(statusText) {
         try {
-            sessionStorage.setItem("gamal_fb_sc_v120", String(scannedCount));
-            sessionStorage.setItem("gamal_fb_ac_v120", String(acceptedCount));
+            sessionStorage.setItem("gamal_fb_sc_v122", String(scannedCount));
+            sessionStorage.setItem("gamal_fb_ac_v122", String(acceptedCount));
             document.title = "[فحص:" + scannedCount + " | ملاك:" + acceptedCount + "] " + statusText;
             if (shadowInfo) {
                 const curName = TARGETS[targetIdx] ? TARGETS[targetIdx].name : "بحث الأحدث";
-                shadowInfo.innerHTML = "<div><b>رادار بحث الملاك المباشر v12.0</b> | " + statusText + "</div><div style='color:#38bdf8;'>البحث الحالي (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div>";
+                shadowInfo.innerHTML = "<div><b>رادار بحث الملاك المباشر v12.2</b> | " + statusText + "</div><div style='color:#38bdf8;'>البحث الحالي (" + (targetIdx + 1) + "/" + TARGETS.length + "): <b>" + curName + "</b></div><div>تم فحص: <b>" + scannedCount + "</b> | ملاك موثقون: <b style='color:#4ade80;'>" + acceptedCount + "</b></div><div style='color:#cbd5e1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>" + lastLogMsg + "</div>";
             }
         } catch(e) {}
     }
@@ -189,7 +194,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!sentHashes.includes(h)) {
             sentHashes.push(h);
             if (sentHashes.length > 3500) sentHashes = sentHashes.slice(-3500);
-            localStorage.setItem("gamal_fb_sent_v120", JSON.stringify(sentHashes));
+            localStorage.setItem("gamal_fb_sent_v122", JSON.stringify(sentHashes));
         }
     }
 
@@ -210,27 +215,48 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         document.querySelectorAll('div[data-ad-preview="message"], div[data-ad-comet-preview="message"], div[dir="auto"]').forEach(node => {
             const txt = (node.innerText || "").trim();
             if (txt.length < 22 || !PROP_RE.test(txt)) return;
-            let cur = node;
-            for (let i = 0; i < 9; i++) {
+            let cur = node, bestCard = null;
+            for (let i = 0; i < 11; i++) {
                 if (!cur.parentElement) break;
                 cur = cur.parentElement;
-                const cTxt = (cur.innerText || ""), linksCnt = cur.querySelectorAll("a[href]").length;
-                if (cTxt.length >= 50 && cTxt.length <= 4200 && linksCnt >= 1) { cardSet.add(cur); break; }
+                const cTxt = (cur.innerText || "");
+                if (cTxt.length > 4500) break;
+                const linksCnt = cur.querySelectorAll("a[href]").length;
+                const hasHeader = !!cur.querySelector('h2, h3, h4, a[href*="/posts/"], a[href*="/permalink/"], a[href*="story_fbid"], a[href*="/groups/"], a[href*="/user/"]');
+                if (cTxt.length >= 65 && linksCnt >= 2 && hasHeader) { bestCard = cur; break; }
+                if (!bestCard && cTxt.length >= 65 && linksCnt >= 2) bestCard = cur;
             }
+            if (bestCard) cardSet.add(bestCard);
         });
         return Array.from(cardSet);
+    }
+
+    async function hydrateCardLinks(card) {
+        if (card._gHydrated) return;
+        card._gHydrated = true;
+        const anchors = card.querySelectorAll("a");
+        for (const a of anchors) {
+            try {
+                a.dispatchEvent(new PointerEvent("pointerenter", {bubbles: true}));
+                a.dispatchEvent(new MouseEvent("mouseenter", {bubbles: true}));
+                a.dispatchEvent(new MouseEvent("mouseover", {bubbles: true}));
+                a.dispatchEvent(new FocusEvent("focus", {bubbles: true}));
+            } catch(e) {}
+        }
+        await new Promise(r => setTimeout(r, 110));
     }
 
     async function extractPostData(card) {
         let preClean = stripCommentsSection(card.innerText || "");
         if (preClean.length < 22 || !PROP_RE.test(preClean)) return null;
+        await hydrateCardLinks(card);
         if (!card._gExpanded) {
             const btns = card.querySelectorAll('div[role="button"], span[role="button"]');
             for (const b of btns) {
                 const bt = (b.innerText || "").trim();
                 if ((bt === "عرض المزيد" || bt === "See more" || bt === "… عرض المزيد") && !b.closest("ul") && !b.closest("form")) {
                     card._gExpanded = true;
-                    try { b.click(); await new Promise(r => setTimeout(r, 250)); } catch(e) {}
+                    try { b.click(); await new Promise(r => setTimeout(r, 240)); } catch(e) {}
                     break;
                 }
             }
@@ -238,26 +264,45 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const fullClean = stripCommentsSection(card.innerText || "");
         if (fullClean.length < 22 || !PROP_RE.test(fullClean)) return null;
 
-        let postUrl = "", groupName = "", headerTimeHint = "", authorFromLink = "";
+        let postUrl = "", groupId = "", mediaPostId = "", photoUrl = "", groupName = "", headerTimeHint = "", authorFromLink = "";
         const headerTextsToStrip = new Set();
-        card.querySelectorAll("a[href]").forEach(a => {
-            const href = a.href || "", aTxt = (a.innerText || a.getAttribute("aria-label") || "").trim(), firstLineTxt = aTxt.split("\n")[0].trim();
-            if (href.includes("/groups/") && !href.includes("/user/") && !href.includes("/posts/") && !href.includes("/permalink/") && !href.includes("story_fbid=")) {
+        card.querySelectorAll("a[href], abbr, span[aria-label]").forEach(a => {
+            const href = a.href || "", rawLabel = (a.innerText || "") + " " + (a.getAttribute("aria-label") || "");
+            const aTxt = normDigits(rawLabel).trim(), firstLineTxt = (a.innerText || "").split("\n")[0].trim();
+            const mGrp = href.match(/facebook\.com\/groups\/([^/?&#]+)/);
+            if (mGrp && mGrp[1] !== "feed" && mGrp[1] !== "discover" && !groupId) groupId = mGrp[1];
+            const mGm = href.match(/set=(?:gm|pcb)\.(\d{8,25})/);
+            if (mGm && !mediaPostId) mediaPostId = mGm[1];
+            const mIdor = href.match(/idorvanity=([^&]+)/);
+            if (mIdor && !groupId) groupId = mIdor[1];
+
+            if (href && href.includes("/groups/") && !href.includes("/user/") && !href.includes("/posts/") && !href.includes("/permalink/") && !href.includes("story_fbid=")) {
                 if (firstLineTxt.length >= 3 && firstLineTxt.length <= 85) { if (!groupName) groupName = firstLineTxt; headerTextsToStrip.add(firstLineTxt); }
             }
-            if (href.includes("/user/") || href.includes("profile.php") || (!href.includes("/groups/") && !href.includes("/posts/") && !href.includes("/hashtag/") && !href.includes("/photo"))) {
+            if (href && (href.includes("/user/") || href.includes("profile.php") || (!href.includes("/groups/") && !href.includes("/posts/") && !href.includes("/hashtag/") && !href.includes("/photo")))) {
                 if (firstLineTxt.length >= 2 && firstLineTxt.length <= 45 && !GROUP_WORDS_RE.test(firstLineTxt) && firstLineTxt !== groupName) {
                     if (!authorFromLink) authorFromLink = firstLineTxt;
                     headerTextsToStrip.add(firstLineTxt);
                 }
             }
-            if (!postUrl && (href.includes("/posts/") || href.includes("/permalink/") || href.includes("story_fbid=") || href.includes("multi_permalinks="))) {
-                postUrl = href.includes("story_fbid=") ? href : href.split("?")[0];
+            if (href && !postUrl && (href.includes("/posts/") || href.includes("/permalink/") || href.includes("story_fbid=") || href.includes("multi_permalinks=") || href.includes("/videos/") || href.includes("/reel/"))) {
+                postUrl = (href.includes("story_fbid=") || href.includes("multi_permalinks=")) ? href : href.split("?")[0];
             }
-            if (!headerTimeHint && aTxt && aTxt.length <= 32 && /(الآن|توًا|\b\d+\s*[دسيه]|\bدقيقة|\bدقائق|\bساعة|\bساعات|\bأمس|\bيوم|\bيومين|\b\d+\s*[mhd]\b|يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)/i.test(aTxt)) {
-                headerTimeHint = aTxt; headerTextsToStrip.add(firstLineTxt);
+            if (href && !photoUrl && (href.includes("/photo/?") || href.includes("/photo.php?") || href.includes("/photos/"))) {
+                photoUrl = href;
+            }
+            if (!headerTimeHint && aTxt && aTxt.length <= 42 && TIME_RE.test(aTxt)) {
+                headerTimeHint = aTxt; if (firstLineTxt) headerTextsToStrip.add(firstLineTxt);
             }
         });
+
+        if (!postUrl && groupId && mediaPostId) {
+            postUrl = "https://www.facebook.com/groups/" + groupId + "/posts/" + mediaPostId + "/";
+        } else if (!postUrl && mediaPostId) {
+            postUrl = "https://www.facebook.com/" + mediaPostId;
+        } else if (!postUrl && photoUrl) {
+            postUrl = photoUrl;
+        }
 
         card.querySelectorAll("h2, h3, h4").forEach(hNode => {
             (hNode.innerText || "").split("\n").map(x => x.trim()).filter(Boolean).forEach(x => headerTextsToStrip.add(x));
@@ -265,7 +310,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
         const lines = fullClean.split("\n").map(x => x.trim()).filter(x => x.length > 0);
         let authorName = authorFromLink || "مالك مباشر";
-        for (let i = 0; i < Math.min(5, lines.length); i++) {
+        for (let i = 0; i < Math.min(6, lines.length); i++) {
+            const nl = normDigits(lines[i]);
+            if (!headerTimeHint && nl.length <= 35 && TIME_RE.test(nl)) headerTimeHint = nl;
             if (lines[i].includes("مجهول الهوية") || lines[i].toLowerCase().includes("anonymous")) {
                 authorName = "مشارك مجهول الهوية"; headerTextsToStrip.add(lines[i]); break;
             }
@@ -285,10 +332,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (!bodyText || bodyText.length < 20) {
             const pureLines = [];
             for (let i = 0; i < lines.length; i++) {
-                const ln = lines[i];
+                const ln = lines[i], nln = normDigits(ln);
                 if (headerTextsToStrip.has(ln) || ln === groupName || ln === authorName || UI_NOISE_RE.test(ln)) continue;
                 if (i <= 2 && GROUP_WORDS_RE.test(ln) && ln.length < 65) { if (!groupName) groupName = ln; continue; }
-                if (i <= 3 && ln.length <= 25 && /(الآن|\b\d+\s*[دسيه]|\bدقيقة|\bساعة|\bأمس|\bيوم)/i.test(ln)) { if (!headerTimeHint) headerTimeHint = ln; continue; }
+                if (i <= 3 && nln.length <= 28 && TIME_RE.test(nln)) { if (!headerTimeHint) headerTimeHint = nln; continue; }
                 pureLines.push(ln);
             }
             bodyText = pureLines.join("\n").trim();
@@ -297,9 +344,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (authorName && bodyText.startsWith(authorName)) bodyText = bodyText.substring(authorName.length).trim();
         if (!bodyText || bodyText.length < 22 || !PROP_RE.test(bodyText)) return null;
 
+        if (!postUrl) {
+            const snippet = bodyText.replace(/\s+/g, " ").substring(0, 55).trim();
+            if (groupId) postUrl = "https://www.facebook.com/groups/" + groupId + "/search/?q=" + encodeURIComponent(snippet);
+            else postUrl = sUrl(snippet);
+        }
+
         const searchQ = new URLSearchParams(location.search).get("q") || "";
         const keyHash = hashStr(bodyText.replace(/\s+/g, " ").substring(0, 95));
-        return {hash: keyHash, url: postUrl || location.href, author: authorName, group_name: groupName, search_query: searchQ, header_time: headerTimeHint || lines.slice(0, 5).join(" | "), text: bodyText.substring(0, 2600)};
+        return {hash: keyHash, url: postUrl, author: authorName, group_name: groupName, search_query: searchQ, is_recent_search: location.search.includes(RF.substring(0, 20)), header_time: headerTimeHint || normDigits(lines.slice(0, 6).join(" | ")), text: bodyText.substring(0, 2600)};
     }
 
     function sendToBackgroundBridge(data) {
@@ -327,7 +380,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
     function advanceToNextTarget(reasonMsg) {
         const nextIdx = (targetIdx + 1) % TARGETS.length;
-        localStorage.setItem("gamal_fb_tidx_v120", String(nextIdx));
+        localStorage.setItem("gamal_fb_tidx_v122", String(nextIdx));
         if (nextIdx === 0) {
             isResting = true;
             let restSec = 240;
@@ -352,9 +405,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         }
         await scanVisibleArticles();
         const elapsedSec = (Date.now() - pageStartTs) / 1000;
-        const curTarget = TARGETS[targetIdx] || {maxSec: 40};
-        if (oldPostsHit >= 3 && elapsedSec > 10) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
-        if (consecutiveSeen >= 8 && elapsedSec > 12) { advanceToNextTarget("تم مسح كل الجديد هنا"); return; }
+        const curTarget = TARGETS[targetIdx] || {maxSec: 42};
+        if (oldPostsHit >= 3 && elapsedSec > 12) { advanceToNextTarget("وصل لمنشورات أقدم من يومين"); return; }
+        if (consecutiveSeen >= 8 && elapsedSec > 14) { advanceToNextTarget("تم مسح كل الجديد هنا"); return; }
         if (elapsedSec >= curTarget.maxSec) { advanceToNextTarget("اكتمل فحص المنطقة"); return; }
 
         window.scrollBy({top: Math.floor(540 + Math.random() * 240), behavior: "smooth"});
@@ -396,43 +449,41 @@ def has_broker_copywriting(title, desc_text):
 
 def is_verified_fb_owner_post(norm_pure_text):
     explicit_owner_re = r'(?:من\s*المالك|المالك\s*مباشر|انا\s*المالك|مالك\s*العقار|مالك\s*الشقه|شقتي|فيلتي|بيتي|ملكي|بتاعتي|بدون\s*وسيط|بدون\s*وسطاء|ممنوع\s*الوسطاء|يمتنع\s*الوسطاء|لغير\s*الوسطاء|لا\s*للوسطاء|عدم\s*تدخل\s*الوسطاء|بدون\s*سمسار|بدون\s*سماسره|ممنوع\s*السماسره|بدون\s*بروكر|ممنوع\s*البروكر|بدون\s*عموله|بدون\s*اي\s*عموله)'
-    if re.search(explicit_owner_re, norm_pure_text):
-        return True, "مالك مباشر صريح"
+    if re.search(explicit_owner_re, norm_pure_text): return True, "مالك مباشر صريح"
     address_utility_re = r'(?:شارع\s*(?!90\b)\d{1,3}|عماره\s*\d{1,4}|فيلا\s*رقم\s*\d{1,4}|قطعه\s*\d{1,4}|مدخل\s*البيت|مدخل\s*العماره|عداد\s*كهرباء|عداد\s*قديم|فواتير\s*مش\s*كروت|تليفون\s*ارضي)'
-    if re.search(address_utility_re, norm_pure_text):
-        return True, "عنوان/تفاصيل مالك مباشر"
+    if re.search(address_utility_re, norm_pure_text): return True, "عنوان/تفاصيل مالك مباشر"
     return False, "بدون دليل مالك صريح"
 
-def parse_fb_strict_2days_header_time(header_str):
+def parse_fb_strict_2days_header_time(header_str, is_recent_search=False):
     now_dt = datetime.now(CAIRO_TZ)
-    clean_h = strip_bidi(header_str)
-    norm_h = normalize_ar(clean_h)
-    if re.search(r'\b(?:202[0-5])\b', norm_h): return False, "Old FB Year (<2026)", ""
-    if re.search(r'(?:منذ|قبل)?\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات|\d+\s*w\b|\d+\s*أ\b)', norm_h): return False, "Old FB Post (>1w)", ""
-    m_old_d = re.search(r'\b([3-9]|\d{2,})\s*(?:يوم|ايام|ي\b|d\b)', norm_h)
-    if m_old_d: return False, f"Old FB Post ({m_old_d.group(1)}d > 2d)", ""
-    for m_cal in re.finditer(r'\b(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)(?:\s+(202\d))?\b', clean_h):
+    clean_h, norm_h = strip_bidi(header_str), normalize_ar(header_str)
+    if re.search(r'\b(?:202[0-5])\b', norm_h): return False, "Old FB Year (<2026)", "", True
+    if re.search(r'(?:منذ|قبل)?\s*(?:\d+\s*)?(?:اسبوع|اسابيع|اسبوعين|شهر|شهور|اشهر|سنه|سنوات|\d+\s*w\b|\d+\s*أ\b)', norm_h): return False, "Old FB Post (>1w)", "", True
+    m_old_d = re.search(r'(?:^|\s)([3-9]|\d{2,})\s*(?:يوم|ايام|ي(?:\s|$)|d(?:\s|$))', norm_h)
+    if m_old_d: return False, f"Old FB Post ({m_old_d.group(1)}d > 2d)", "", True
+    for m_cal in re.finditer(r'(\d{1,2})\s+(يناير|فبراير|مارس|ابريل|أبريل|إبريل|مايو|يونيو|يونية|يوليو|يوليه|اغسطس|أغسطس|سبتمبر|اكتوبر|أكتوبر|نوفمبر|ديسمبر)(?:\s+(202\d))?', clean_h):
         d_val, m_name = int(m_cal.group(1)), m_cal.group(2)
         y_val = int(m_cal.group(3)) if m_cal.group(3) else now_dt.year
         m_val = ARABIC_MONTHS.get(m_name, 0)
         if m_val > 0:
             try:
                 d_diff = (now_dt.date() - date(y_val, m_val, d_val)).days
-                if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old FB Date ({d_val} {m_name} > 2d)", ""
-                return True, "OK", ("اليوم" if d_diff == 0 else f"منذ {d_diff} يوم")
-            except Exception: return False, "Invalid FB Date", ""
-    if re.search(r'\b(?:الان|توا|حالا|just now)\b', norm_h): return True, "OK", "الآن"
-    m_min = re.search(r'\b(\d{1,2})\s*(?:دقيقه|دقائق|دقايق|د\b|m\b|mins?\b)', norm_h)
-    if m_min: return True, "OK", f"منذ {m_min.group(1)} د"
-    if re.search(r'\b(?:دقيقه|دقيقتين)\b', norm_h): return True, "OK", "منذ دقائق"
-    m_hr = re.search(r'\b(\d{1,2})\s*(?:ساعه|ساعات|س\b|h\b|hrs?\b)', norm_h)
+                if d_diff < 0 or d_diff > MAX_AGE_DAYS: return False, f"Old FB Date ({d_val} {m_name} > 2d)", "", True
+                return True, "OK", ("اليوم" if d_diff == 0 else f"منذ {d_diff} يوم"), False
+            except Exception: return False, "Invalid FB Date", "", False
+    if re.search(r'(?:الان|توا|حالا|just now)', norm_h): return True, "OK", "الآن", False
+    m_min = re.search(r'(\d{1,2})\s*(?:دقيقه|دقائق|دقايق|د(?:\s|$)|m(?:\s|$)|mins?)', norm_h)
+    if m_min: return True, "OK", f"منذ {m_min.group(1)} د", False
+    if re.search(r'(?:دقيقه|دقيقتين)', norm_h): return True, "OK", "منذ دقائق", False
+    m_hr = re.search(r'(\d{1,2})\s*(?:ساعه|ساعات|س(?:\s|$)|h(?:\s|$)|hrs?)', norm_h)
     if m_hr:
         hrs = int(m_hr.group(1))
-        return (False, f"Old FB Hours ({hrs}h)", "") if hrs > 48 else (True, "OK", f"منذ {hrs} س")
-    if re.search(r'\b(?:ساعه|ساعتين)\b', norm_h): return True, "OK", "منذ ساعة"
-    if re.search(r'\b(?:امس|الامس|امبارح|yesterday|1\s*ي\b|1\s*d\b|منذ\s*يوم|قبل\s*يوم)\b', norm_h): return True, "OK", "منذ يوم"
-    if re.search(r'\b(?:منذ\s*يومين|قبل\s*يومين|2\s*ي\b|2\s*d\b|يومين)\b', norm_h): return True, "OK", "منذ يومين"
-    return False, "Unverified or Old FB Date", ""
+        return (False, f"Old FB Hours ({hrs}h)", "", True) if hrs > 48 else (True, "OK", f"منذ {hrs} س", False)
+    if re.search(r'(?:ساعه|ساعتين)', norm_h): return True, "OK", "منذ ساعة", False
+    if re.search(r'(?:امس|الامس|امبارح|yesterday|1\s*ي(?:\s|$)|1\s*d(?:\s|$)|منذ\s*يوم|قبل\s*يوم)', norm_h): return True, "OK", "منذ يوم", False
+    if re.search(r'(?:منذ\s*يومين|قبل\s*يومين|2\s*ي(?:\s|$)|2\s*d(?:\s|$)|يومين)', norm_h): return True, "OK", "منذ يومين", False
+    if is_recent_search: return True, "OK", "أحدث المنشورات", False
+    return False, "Unverified FB Date", "", False
 
 def parse_facebook_colloquial_price(text, deal):
     clean_t, norm_t = strip_bidi(text), normalize_ar(text)
@@ -474,6 +525,7 @@ def process_facebook_post_payload(payload):
     search_query = strip_bidi(payload.get("search_query") or "").strip()
     author_raw = strip_bidi(payload.get("author") or "مشارك مجهول الهوية").strip()
     header_time = strip_bidi(payload.get("header_time") or "")
+    is_recent_search = bool(payload.get("is_recent_search", True))
     post_url = (payload.get("url") or "").strip()
     post_hash = payload.get("hash") or ""
     if group_name and pure_raw_text.startswith(group_name): pure_raw_text = pure_raw_text[len(group_name):].strip()
@@ -482,12 +534,12 @@ def process_facebook_post_payload(payload):
 
     mem = load_fb_memory()
     if post_hash and post_hash in mem.get("seen_hashes", []): return False, "مفحوص سابقا", False
-    is_fresh, time_reason, orig_age_hint = parse_fb_strict_2days_header_time(header_time)
+    is_fresh, time_reason, orig_age_hint, is_explicit_old = parse_fb_strict_2days_header_time(header_time, is_recent_search)
     if post_hash: mem.setdefault("seen_hashes", []).append(post_hash)
     if not is_fresh:
         save_fb_memory(mem)
         print(f"  [FB SCAN] [- REJECTED FB] {time_reason} | {short_preview}")
-        return False, "منشور قديم (>يومين)", ("Old FB" in time_reason)
+        return False, "منشور قديم (>يومين)", is_explicit_old
 
     norm_t = normalize_ar(pure_raw_text)
     for wp in FB_WANTED_PHRASES:
@@ -517,11 +569,15 @@ def process_facebook_post_payload(payload):
     if len(phones) >= 2: return False, "أرقام مبيعات متعددة", False
     for ph in phones:
         if len(mem.get("phones", {}).get(ph, [])) > 2: return False, "رقم سمسار مكرر", False
-    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name): return False, "حساب شركة/سمسار", False
-    if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه)', norm_t): return False, "إيجار يومي/فندقي", False
+    if not is_anon and pub_name != "مالك مباشر" and is_company_name(pub_name):
+        print(f"  [FB SCAN] [- REJECTED FB] Broker Account ({pub_name}) | {short_preview}")
+        return False, "حساب شركة/سمسار", False
+    if re.search(r'(?:للايجار\s*اليومي|ايجار\s*يومي|شقه\s*فندقيه|شقق\s*فندقيه|اسبوعي)', norm_t): return False, "إيجار يومي/فندقي", False
 
     is_brk, brk_reason = has_broker_copywriting("", pure_raw_text)
-    if is_brk: return False, "صيغة سمسار", False
+    if is_brk:
+        print(f"  [FB SCAN] [- REJECTED FB] {brk_reason} | {short_preview}")
+        return False, "صيغة سمسار", False
 
     is_true_owner, owner_proof_label = is_verified_fb_owner_post(norm_t)
     if not is_true_owner:
@@ -555,7 +611,7 @@ def process_facebook_post_payload(payload):
     entry_ts = int(now_dt.timestamp())
     entry_age_label = f"دخل الرادار {now_dt.strftime('%I:%M %p')}" + (f" (نُشر {orig_age_hint})" if orig_age_hint else "")
     uid = int("93" + str(abs(hash(post_hash or pure_raw_text[:100])) % 1000000000))
-    final_link = post_url if "facebook.com" in post_url else "https://www.facebook.com/groups/feed/"
+    final_link = build_fb_pinpoint_url(post_url, pure_raw_text)
     phone_note = f" | ت: {phones[0]} [{owner_proof_label}]" if phones else f" | [{owner_proof_label}]"
 
     fb_ad = {
@@ -576,6 +632,9 @@ def process_facebook_post_payload(payload):
 
 class FacebookIngestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args): pass
+    def handle(self):
+        try: super().handle()
+        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError): pass
     def _send_cors(self, code=200):
         self.send_response(code)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -593,14 +652,16 @@ class FacebookIngestHandler(BaseHTTPRequestHandler):
             self._send_cors(200)
             self.wfile.write(json.dumps({"accepted": ok, "reason": reason, "is_old": is_old}).encode("utf-8"))
         except Exception as e:
-            self._send_cors(200)
-            self.wfile.write(json.dumps({"accepted": False, "reason": str(e), "is_old": False}).encode("utf-8"))
+            try:
+                self._send_cors(200)
+                self.wfile.write(json.dumps({"accepted": False, "reason": str(e), "is_old": False}).encode("utf-8"))
+            except Exception: pass
 
 def start_fb_local_server():
     def _serve():
         try:
             srv = HTTPServer(("127.0.0.1", FB_PORT), FacebookIngestHandler)
-            print(f"[Facebook Direct Search Receiver v12.0] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
+            print(f"[Facebook Direct Search Receiver v12.2] Listening live on http://127.0.0.1:{FB_PORT}/fb_ingest")
             srv.serve_forever()
         except Exception as e: print(f"[FB Receiver Notice] {e}")
     threading.Thread(target=_serve, daemon=True).start()
@@ -891,7 +952,10 @@ def is_valid_existing_extra_ad(ad):
     if src == "دوبيزل": return True
     u = str(ad.get("url") or ad.get("link") or "")
     if src == "عقارماب" and (not ad.get("verified_aq_v100") or "/ar/listing/" not in u): return False
-    if src == "فيسبوك" and not ad.get("verified_fb_v118"): return False
+    if src == "فيسبوك":
+        if not ad.get("verified_fb_v118"): return False
+        fixed_u = build_fb_pinpoint_url(u, ad.get("description") or ad.get("title") or "")
+        ad["url"], ad["link"] = fixed_u, fixed_u
     if src not in ("عقارماب", "فيسبوك"): return False
     now_ts = int(datetime.now(CAIRO_TZ).timestamp())
     ad_ts = int(ad.get("first_seen_ts") or ad.get("timestamp") or 0)
@@ -1037,7 +1101,7 @@ def run_extra_radar():
 
     save_persistent_seen_ids(extra_checked)
     all_candidates = [x for x in aq_candidates if x["deal"] == "إيجار"][:160] + [x for x in aq_candidates if x["deal"] != "إيجار"][:160]
-    print(f"\n[AqarMap + Facebook Radar v12.0] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
+    print(f"\n[AqarMap + Facebook Radar v12.2] AqarMap Unchecked: {len(aq_candidates)} | Inspecting: {len(all_candidates)}")
 
     aq_added, total_c = 0, len(all_candidates)
     for idx, item in enumerate(all_candidates, 1):
@@ -1090,7 +1154,7 @@ def main():
         return
     start_fb_local_server()
     guard_extra_ads_during_sleep(force_push=True)
-    print("=== Starting 24/7 AqarMap + Facebook Direct Search Owner Radar v12.0 ===")
+    print("=== Starting 24/7 AqarMap + Facebook Direct Search Owner Radar v12.2 ===")
     print(f"[FB Extension Folder Ready] -> {FB_EXT_DIR}")
     cycle = 1
     while True:
