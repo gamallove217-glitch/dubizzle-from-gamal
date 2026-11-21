@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21 01:44 AM",
+  "updated_at": "2026-11-21 02:02 AM",
   "total": 119,
   "ads": [
     {
@@ -3158,6 +3158,38 @@
     }
   ],
   "pending_ads": [
+    {
+      "ad_id": 93105268679,
+      "id": "fb_93105268679",
+      "source": "فيسبوك",
+      "title": "استوديو كينج جاردينا هايتس دور ثالث بدون اسانسير منفصل الايجار 15000 من المالك",
+      "price": "السعر بالتفاصيل (خاص)",
+      "price_num": 1,
+      "zone": "التجمع الخامس",
+      "location": "التجمع الخامس",
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "area": null,
+      "rooms": null,
+      "publisher": "مالك مباشر",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "age": "دخل الرادار 01:50 AM (نُشر منذ 15 س)",
+      "fresh_tier": 3,
+      "description": "استوديو كينج جاردينا هايتس دور ثالث بدون اسانسير منفصل الايجار 15000 من المالك",
+      "first_seen_ts": 1795218610,
+      "timestamp": 1795218610,
+      "desc_verified_v2": true,
+      "verified_24h_v93": true,
+      "verified_fb_v160": true,
+      "url": "https://www.facebook.com/groups/493500006883940/permalink/1152553330978601",
+      "link": "https://www.facebook.com/groups/493500006883940/permalink/1152553330978601",
+      "verified_v12": true,
+      "scraped_at": "2026-11-21 01:50 AM",
+      "date": "2026-11-21 01:50"
+    },
     {
       "ad_id": 93450133234,
       "id": "fb_93450133234",
