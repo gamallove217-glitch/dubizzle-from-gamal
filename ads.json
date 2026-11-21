@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21 02:09 PM",
+  "updated_at": "2026-11-21 02:10 PM",
   "total": 129,
   "ads": [
     {
@@ -4311,38 +4311,6 @@
       "verified_v12": true,
       "scraped_at": "2026-11-21 11:10 AM",
       "date": "2026-11-21 11:10"
-    },
-    {
-      "ad_id": 93122816465,
-      "id": "fb_93122816465",
-      "source": "فيسبوك",
-      "title": "شقه للبيع ف الياسمين فيلات",
-      "price": "كاش (السعر بالتفاصيل)",
-      "price_num": 1200000,
-      "zone": "الياسمين",
-      "location": "الياسمين",
-      "cat": "فلل",
-      "category": "فلل",
-      "deal": "تمليك",
-      "type": "تمليك",
-      "area": null,
-      "rooms": 3,
-      "publisher": "مالك مباشر",
-      "pub_ads": 1,
-      "active_ads_count": 1,
-      "age": "دخل الرادار 11:09 AM (نُشر منذ 1 د)",
-      "fresh_tier": 3,
-      "description": "شقه للبيع ف الياسمين فيلات\nالمساحه 220م\n من المالك مباشرة بدون عمولة\n3 نوم منهم وحد ماستر 3 حمام 3رسبشن ومطبخ واليفنج \nاستلام سنه\n لوكيشن: دقائق من محور السادات, أحمد شوقي, والتسعين الشمالي\n01032422926 عرض أقل",
-      "first_seen_ts": 1795252194,
-      "timestamp": 1795252194,
-      "desc_verified_v2": true,
-      "verified_24h_v93": true,
-      "verified_fb_v160": true,
-      "url": "https://www.facebook.com/groups/2672420396317502/posts/5694543257438519",
-      "link": "https://www.facebook.com/groups/2672420396317502/posts/5694543257438519",
-      "verified_v12": true,
-      "scraped_at": "2026-11-21 11:09 AM",
-      "date": "2026-11-21 11:09"
     },
     {
       "ad_id": 93963205415,
