@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21 12:41 PM",
+  "updated_at": "2026-11-21 12:53 PM",
   "total": 127,
   "ads": [
     {
@@ -3390,6 +3390,38 @@
     }
   ],
   "pending_ads": [
+    {
+      "ad_id": 9326178625,
+      "id": "fb_9326178625",
+      "source": "فيسبوك",
+      "title": "متاح شقتين للإيجار في سكن مصر أرض المعارض جنب أمان والمواصلات كامله العدادات للأسر وا",
+      "price": "السعر بالتفاصيل (خاص)",
+      "price_num": 1,
+      "zone": "دار مصر",
+      "location": "دار مصر",
+      "cat": "شقق",
+      "category": "شقق",
+      "deal": "إيجار",
+      "type": "إيجار",
+      "area": null,
+      "rooms": null,
+      "publisher": "مالك مباشر",
+      "pub_ads": 1,
+      "active_ads_count": 1,
+      "age": "دخل الرادار 12:45 PM (نُشر منذ 36 د)",
+      "fresh_tier": 3,
+      "description": "متاح شقتين للإيجار في سكن مصر أرض المعارض جنب أمان والمواصلات كامله العدادات للأسر والعرسان \n01211679180",
+      "first_seen_ts": 1795257933,
+      "timestamp": 1795257933,
+      "desc_verified_v2": true,
+      "verified_24h_v93": true,
+      "verified_fb_v160": true,
+      "url": "https://www.facebook.com/groups/27208825082039106/posts/30196749133246671",
+      "link": "https://www.facebook.com/groups/27208825082039106/posts/30196749133246671",
+      "verified_v12": true,
+      "scraped_at": "2026-11-21 12:45 PM",
+      "date": "2026-11-21 12:45"
+    },
     {
       "ad_id": 93957583855,
       "id": "fb_93957583855",
