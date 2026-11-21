@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21 10:10 AM",
+  "updated_at": "2026-11-21 10:11 AM",
   "total": 120,
   "ads": [
     {
@@ -3445,38 +3445,6 @@
       "verified_v12": true,
       "scraped_at": "2026-11-21 07:15 AM",
       "date": "2026-11-21 07:15"
-    },
-    {
-      "ad_id": 93766898573,
-      "id": "fb_93766898573",
-      "source": "فيسبوك",
-      "title": "بسم الله الرحمن الرحيم",
-      "price": "كاش (السعر بالتفاصيل)",
-      "price_num": 1200000,
-      "zone": "النرجس",
-      "location": "النرجس",
-      "cat": "فلل",
-      "category": "فلل",
-      "deal": "تمليك",
-      "type": "تمليك",
-      "area": null,
-      "rooms": 3,
-      "publisher": "أبو يوسف حجازي",
-      "pub_ads": 1,
-      "active_ads_count": 1,
-      "age": "دخل الرادار 07:13 AM (نُشر منذ 7 د)",
-      "fresh_tier": 3,
-      "description": "بسم الله الرحمن الرحيم\nشقه دور أول علوى \n\nنصف تشطيب \n\nثلاث غرف وريسبش 2حمام \n\nومطبخ \n\nمساحه الشقة 165م\n\nالفيلا متسلمة الجهاز \n\nصحة في الجراج \n\nالشقة بالعدادات \n\nتسليم فورى من المالك الشقة نصف تشطيب \n\nالتواصل تليفون فقط للمعاينة \n\nللجادين فقط \n\n01147403014\n\nالنرجس الجديدة",
-      "first_seen_ts": 1795238011,
-      "timestamp": 1795238011,
-      "desc_verified_v2": true,
-      "verified_24h_v93": true,
-      "verified_fb_v160": true,
-      "url": "https://www.facebook.com/groups/721294964967868/permalink/2804669059963771/",
-      "link": "https://www.facebook.com/groups/721294964967868/permalink/2804669059963771/",
-      "verified_v12": true,
-      "scraped_at": "2026-11-21 07:13 AM",
-      "date": "2026-11-21 07:13"
     },
     {
       "ad_id": 93232446211,
